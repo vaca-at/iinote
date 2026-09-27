@@ -64,7 +64,7 @@
    - ✅ (2026-09-28) 4분할형: 가로 화면에서 스크롤 없이 한 화면에. 1 · 3 · 4칸은 글 대신 그림(✓ 도장, 🔥연속, 📔✏️🌱)으로 줄이고, 칸이 낮으면 차트 · 틀린 낱말부터 숨김(@container). 2칸(교환일기)만 스크롤
    - ✅ 모양 · 글씨 고르기를 글자 대신 도형 아이콘과 그 글씨체의 "가"로 (이름은 마우스를 올리면 보임)
    - (웹디자인 시안 1~20번 중 사용자가 1 · 9 · 10 · 20을 좋아함 → 20번은 원고지 디자인으로 들어감)
-   - ✅ 예전 가족일기장 가져오기 (우리 가족 탭, 부모만): 예전 일기장(jsun.site/diary)과 공부방 아이 일기는 파이어베이스 moon-15f88의 diary/{날짜}_{me|doyun|dojin} 에 있음. OLD_DIARY_CONFIG로 두 번째 앱을 열어 bellachord 계정으로 읽고, 일기 · 댓글을 importKey("old:문서id")와 함께 복사 → 다시 눌러도 새 것만. 하트 · 도장 · 맞춤법 기록은 안 옮김. moon-15f88 승인된 도메인에 iinote.co.kr 추가 필요
+   - ✅ 예전 가족일기장 가져오기 (우리 가족 탭, 부모만): 예전 일기장(jsun.site/diary)과 공부방 아이 일기는 파이어베이스 moon-15f88의 diary/{날짜}_{me|doyun|dojin} 에 있음. OLD_DIARY_CONFIG로 두 번째 앱을 열어 bellachord 계정으로 읽고, 일기 · 댓글을 importKey("old:문서id")와 함께 복사 → 다시 눌러도 새 것만 + 예전 일기장에서 고친 일기(updatedAt > importAt)는 새 내용으로 바꿈. 빨간펜 기록(spellFixes · spellFeedback)은 aiResult로(어떻게 고쳤는지는 explain에), 아이 일기의 고친 낱말은 quizWords에. 하트 · 도장 · 날씨는 안 옮김. moon-15f88 승인된 도메인에 iinote.co.kr 추가 필요
    - ✅ 디자인 4가지 (화면 위 맨 왼쪽 견본 단추, 기기마다 기억 · html[data-design]): note(노트, 기본) · clean(깔끔: 공부방과 같은 흰 카드 · 파랑 · 밑줄 탭) · bright(산뜻: 색 카드 · 주황 · 알약 탭, 4분할 네 칸이 과목 카드처럼 색) · wongoji(시안 20 레드 원고지). 제목 글씨는 G마켓 산스(noonfonts jsdelivr, 공부방과 같은 파일). 시안 모음은 _local/designs, _local/themes, _local/themes2
 3. 클라우드플레어 워커로 AI 맞춤법 확인 만들기 (API 키는 워커에만, 어린이 한 명당 하루 1회 제한은 KV로, 파이어베이스 ID 토큰 검증) → AI_WORKER_URL에 연결
 4. Blaze 전환 후 Storage 켜고 storage.rules 적용 (사진 · 소리 저장)

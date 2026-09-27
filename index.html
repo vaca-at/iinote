@@ -2030,24 +2030,37 @@ async function readOldDiaries(){
 }
 const OLD_MOOD = {"😆":"great","🥰":"great","😊":"good","😐":"calm","😢":"sad","😠":"sad","😴":"tired"};
 const msOf = (t,fb) => t?.toMillis ? t.toMillis() : typeof t==="number" ? t : fb;
+// 예전 일기장의 빨간펜(AI 맞춤법) 기록 → iinote의 aiResult 모양으로. 어떻게 고쳤는지(how)는 설명 칸에
+const OLD_HOW = {self:"스스로 찾아 고쳤어요", hint:"힌트를 보고 고쳤어요", ai:"AI 선생님이 고쳐 줬어요", other:"다른 말로 고쳐 썼어요"};
+function oldAiResult(o){
+  if(!o.spellChecked && !(o.spellFixes||[]).length) return null;
+  const fb=o.spellFeedback||{}, cs=(o.spellFixes||[]).filter(f=>f.wrong&&f.right)
+    .map(f=>({wrong:f.wrong,right:f.right,explain:[OLD_HOW[f.how],f.kind].filter(Boolean).join(" · "),context:""}));
+  return {praise:fb.praise||"", feedback:fb.cheer||(cs.length?`틀린 곳 ${cs.length}개를 고쳤어요.`:"틀린 곳 없이 잘 썼어요."),
+    corrections:cs, checkedAt:msOf(o.updatedAt,Date.now()), imported:true};
+}
 async function importOld(fd){
   const map={}; OLD_PEOPLE.forEach(([k])=>{ if(fd[k]) map[k]=fd[k]; });
   if(!Object.keys(map).length){ toast("가져올 사람을 하나 이상 골라 주세요"); return; }
   const old=(await readOldDiaries()).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   toast("가져오는 중이에요…");
-  const have=new Map(S.diaries.filter(d=>d.importKey).map(d=>[d.importKey,d.id]));
+  const have=new Map(S.diaries.filter(d=>d.importKey).map(d=>[d.importKey,d]));
   const haveC=new Set(S.comments.map(c=>c.importKey).filter(Boolean));
-  let nd=0, nc=0;
+  let nd=0, nu=0, nc=0, nq=0;
   for(const o of old){
     const pid=map[o.author]; if(!pid || !o.date || !String(o.content||"").trim()) continue;
-    const key="old:"+o.id; let did=have.get(key);
-    if(!did){
-      const at=msOf(o.createdAt, new Date(o.date+"T20:00:00").getTime()), title=String(o.title||"").trim();
-      const text=(o.question?`Q. ${o.question}\n\n`:"")+o.content;   // 질문에 답한 일기는 질문을 맨 위에
-      did=await B.add(S.gid,"diaries",{profileId:pid,date:o.date,mood:OLD_MOOD[o.mood]||"",title,text,status:"submitted",
-        photos:[],audio:null,location:null,tags:[...new Set(extractTags(title+" "+o.content))].slice(0,20),
-        createdAt:at,updatedAt:msOf(o.updatedAt,at),importKey:key});
+    const key="old:"+o.id, at=msOf(o.createdAt, new Date(o.date+"T20:00:00").getTime()), up=msOf(o.updatedAt,at);
+    const title=String(o.title||"").trim(), ai=oldAiResult(o);
+    // 질문에 답한 일기는 질문을 맨 위에
+    const body={mood:OLD_MOOD[o.mood]||"", title, text:(o.question?`Q. ${o.question}\n\n`:"")+o.content,
+      tags:[...new Set(extractTags(title+" "+o.content))].slice(0,20), aiChecked:!!ai, aiResult:ai, importAt:up};
+    const ex=have.get(key); let did=ex?.id;
+    if(!ex){
+      did=await B.add(S.gid,"diaries",{profileId:pid,date:o.date,status:"submitted",photos:[],audio:null,location:null,createdAt:at,updatedAt:up,importKey:key,...body});
       nd++;
+    }else if(up>(ex.importAt||0)){
+      // 예전 일기장에서 고쳤거나, 빨간펜 검사를 다시 받은 일기 → 새 내용으로 바꿔요
+      await B.update(S.gid,"diaries",did,{...body,updatedAt:up}); nu++;
     }
     for(const c of o.comments||[]){
       const ck=`${key}:${c.at}:${c.by}`, cp=map[c.by];
@@ -2055,9 +2068,15 @@ async function importOld(fd){
       await B.add(S.gid,"comments",{diaryId:did,parentId:null,profileId:cp,text:c.text,createdAt:c.at||Date.now(),importKey:ck});
       haveC.add(ck); nc++;
     }
+    // 아이 일기에서 고친 낱말은 받아쓰기 퀴즈에도 (이미 있으면 건너뛰기)
+    if(prof(pid)?.type==="child") for(const f of ai?.corrections||[]){
+      if(S.quizWords.some(w=>w.profileId===pid && w.wrong===f.wrong && w.right===f.right)) continue;
+      const w={profileId:pid,wrong:f.wrong,right:f.right,explain:f.explain,distractors:[],context:contextOf(o.content,f.right),wrongCount:1,correctStreak:0,createdAt:up,importKey:key};
+      await B.add(S.gid,"quizWords",w); S.quizWords.push(w); nq++;
+    }
   }
-  await reload("diaries"); await reload("comments"); render();
-  toast(nd||nc?`일기 ${nd}편, 댓글 ${nc}개를 가져왔어요`:"새로 가져올 일기가 없어요");
+  await reload("diaries"); await reload("comments"); await reload("quizWords"); render();
+  toast(nd||nu||nc||nq?`새 일기 ${nd}편 · 고친 일기 ${nu}편 · 댓글 ${nc}개 · 퀴즈 낱말 ${nq}개를 가져왔어요`:"새로 가져올 일기가 없어요");
 }
 
 async function saveDiary(status){
