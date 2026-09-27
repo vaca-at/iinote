@@ -571,6 +571,24 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .stamp-btn{border:1.5px dashed var(--coral);color:var(--coral-ink);background:none;border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px}
 .stamp-btn.on{background:var(--coral);border-style:solid;color:var(--paper)}
 .stamp-mini{color:var(--coral-ink);border:1.5px solid var(--coral);border-radius:6px;padding:0 6px;font-size:12px;font-weight:800;transform:rotate(-4deg)}
+/* 일기 PDF로 저장 화면 */
+.pdf-box fieldset{border:0;margin:0;padding:0}
+.pdf-box legend{font-weight:700;margin-bottom:8px}
+.lay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.lay{position:relative}
+.lay input{position:absolute;opacity:0;width:1px;height:1px}
+.lay span{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;padding:10px 8px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);text-align:center;cursor:pointer}
+.lay b{font-size:14px}
+.lay small{font-size:12px;color:var(--ink3);line-height:1.35}
+.lay input:checked+span{border-color:var(--coral);box-shadow:0 0 0 2px var(--coral) inset;background:var(--coral-soft)}
+.lay input:focus-visible+span{outline:3px solid var(--focus);outline-offset:2px}
+.pdf-who{display:flex;flex-wrap:wrap;gap:8px 14px}
+.pdf-ck{display:inline-flex!important;align-items:center;gap:6px;flex-direction:row!important;font-weight:600}
+.pdf-ck input{width:auto}
+.print-shops p,.book-soon p{margin:8px 0;color:var(--ink2);font-size:14px}
+.print-shops .row{flex-wrap:wrap;gap:8px}
+.book-soon>div{display:flex;align-items:center;gap:8px}
+.book-soon .pill{background:var(--butter-soft);color:var(--ink);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
 
 /* ============ 퀴즈 ============ */
 .q-words{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
@@ -1415,6 +1433,7 @@ function viewMain(){
   if(S.sub?.type==="diary") return viewDiaryDetail();
   if(S.sub?.type==="write") return viewWrite();
   if(S.sub?.type==="quiz") return viewQuizRun();
+  if(S.sub?.type==="pdf") return viewPdf();
   return ({home:viewHome,diary:viewDiaryList,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
@@ -1687,13 +1706,260 @@ function viewFeed(){
 function viewDiaryList(){
   const ps=sortedProfiles(), tags=popularTags().slice(0,12);
   const chips=`<div class="chips" role="group" aria-label="누구의 일기"><button class="chip all ${S.filter==="all"?"on":""}" data-act="filter" data-v="all" aria-pressed="${S.filter==="all"}">모두</button>${ps.map(p=>`<button class="chip ${S.filter===p.id?"on":""}" data-act="filter" data-v="${p.id}" aria-pressed="${S.filter===p.id}">${av(p,28)}${esc(p.name)}</button>`).join("")}</div>`;
-  return `<div class="page-h"><h1>가족 일기</h1><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div>
+  return `<div class="page-h"><h1>가족 일기</h1><div class="row"><button class="btn btn-ghost" data-act="pdf">📄 PDF로 저장</button><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div></div>
     <div class="search">${ic("search")}<label class="sr" for="q">일기 찾기</label><input type="search" id="q" value="${esc(S.search)}" placeholder="낱말, #태그, 장소로 찾기" autocomplete="off"></div>
     ${chips}
     ${tags.length?`<div class="tags-row" role="group" aria-label="태그로 모아 보기">${tags.map(([t,n])=>`<button class="htag ${S.tag===t?"on":""}" data-act="tag" data-v="${esc(t)}" aria-pressed="${S.tag===t}">#${esc(t)} <small>${n}</small></button>`).join("")}</div>`:""}
     <div id="feed-wrap">${viewFeed()}</div>`;
 }
 
+/* ---------- 일기 PDF로 저장 (A4 · 컬러 · 구성 10가지) ----------
+   새 라이브러리 없이 브라우저의 '인쇄 → PDF로 저장'을 써요. 기기 안에서 만들고 어디에도 보내지 않아요.
+   표지 한 장 + 고른 구성대로 일기 쪽. 종이 일기책은 출시 예정 */
+// [키, 이름, 설명, 가로 A4인지]
+const PDF_LAYOUTS = [
+  ["basic","기본","일기마다 한 장 · 글 아래 사진",false],
+  ["day","하루 모음","그날 가족 일기를 한 장에",false],
+  ["top","위 사진 · 아래 글","사진을 크게, 글은 가로로",false],
+  ["topv","위 사진 · 세로 글","사진 아래 글을 세로쓰기로",false],
+  ["left","왼쪽 사진 · 오른쪽 글","A4 가로",true],
+  ["right","왼쪽 글 · 오른쪽 사진","A4 가로",true],
+  ["picture","사진 + 원고지","위 사진 한 장 · 아래 원고지 칸",false],
+  ["grid","원고지","글만 원고지 칸에",false],
+  ["two","두 편씩","한 장에 일기 두 편",false],
+  ["album","앨범","사진 가득 · 짧은 글",false]
+];
+// 구성 미리보기 (사진 = 색 네모, 글 = 줄)
+function pdfThumb(k){
+  const land=PDF_LAYOUTS.find(x=>x[0]===k)?.[3], W=land?56:40, H=land?40:56;
+  const ph=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="var(--sky)" opacity=".55"/>`;
+  const ln=(x,y,w,n,gap=4)=>Array.from({length:n},(_,i)=>`<line x1="${x}" y1="${y+i*gap}" x2="${x+w}" y2="${y+i*gap}" stroke="var(--ink3)" stroke-width="1.2"/>`).join("");
+  const vl=(x,y,h,n)=>Array.from({length:n},(_,i)=>`<line x1="${x-i*4}" y1="${y}" x2="${x-i*4}" y2="${y+h}" stroke="var(--ink3)" stroke-width="1.2"/>`).join("");
+  const gr=(x,y,c,r,s)=>{ let o=""; for(let i=0;i<=c;i++) o+=`<line x1="${x+i*s}" y1="${y}" x2="${x+i*s}" y2="${y+r*s}" stroke="var(--coral)" stroke-width=".7"/>`; for(let j=0;j<=r;j++) o+=`<line x1="${x}" y1="${y+j*s}" x2="${x+c*s}" y2="${y+j*s}" stroke="var(--coral)" stroke-width=".7"/>`; return o; };
+  const body={
+    basic: ln(6,10,28,6)+ph(6,36,28,14),
+    day: `<rect x="5" y="5" width="30" height="14" rx="2" fill="none" stroke="var(--coral)"/><rect x="5" y="21" width="30" height="14" rx="2" fill="none" stroke="var(--sage)"/><rect x="5" y="37" width="30" height="14" rx="2" fill="none" stroke="var(--butter)"/>`+ln(8,10,24,2)+ln(8,26,24,2)+ln(8,42,24,2),
+    top: ph(5,5,30,22)+ln(6,32,28,5),
+    topv: ph(5,5,30,22)+vl(33,30,21,7),
+    left: ph(4,5,22,30)+ln(30,9,22,7),
+    right: ln(4,9,22,7)+ph(30,5,22,30),
+    picture: ph(5,5,30,20)+gr(5,29,6,4,5),
+    grid: gr(5,6,6,9,5),
+    two: ln(6,8,28,4)+`<line x1="4" y1="28" x2="36" y2="28" stroke="var(--coral)" stroke-dasharray="2 2"/>`+ln(6,34,28,4),
+    album: ph(4,4,15,15)+ph(21,4,15,15)+ph(4,21,32,20)+ln(8,46,24,2)
+  }[k]||"";
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><rect x=".5" y=".5" width="${W-1}" height="${H-1}" rx="3" fill="var(--surface)" stroke="var(--line)"/>${body}</svg>`;
+}
+function viewPdf(){
+  const ps=sortedProfiles(), t=todayStr(), first=t.slice(0,8)+"01", cur=S.pdfLay||"basic";
+  return `<div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button></div>
+  <div class="page-h"><h1>일기 PDF로 저장</h1></div>
+  <section class="block pdf-box"><form class="form-grid" data-form="pdf">
+    <fieldset class="span2 pdf-lays"><legend>쪽 구성 고르기</legend><div class="lay-grid">${PDF_LAYOUTS.map(([k,l,s])=>`<label class="lay"><input type="radio" name="lay" value="${k}" ${k===cur?"checked":""}><span>${pdfThumb(k)}<b>${l}</b><small>${s}</small></span></label>`).join("")}</div></fieldset>
+    <fieldset class="span2 pdf-who"><legend>누구의 일기</legend>${ps.map(p=>`<label class="pdf-ck"><input type="checkbox" name="who" value="${esc(p.id)}" checked>${av(p,26)}${esc(p.name)}</label>`).join("")}</fieldset>
+    <div class="span2 row" role="group" aria-label="기간 빨리 고르기">
+      <button type="button" class="chip all" data-act="pdf-range" data-v="month">이번 달</button><button type="button" class="chip all" data-act="pdf-range" data-v="last">지난달</button>
+      <button type="button" class="chip all" data-act="pdf-range" data-v="year">올해</button><button type="button" class="chip all" data-act="pdf-range" data-v="all">전체</button></div>
+    <label>처음 날<input type="date" name="from" id="pdf-from" value="${first}" max="${t}"></label>
+    <label>마지막 날<input type="date" name="to" id="pdf-to" value="${t}" max="${t}"></label>
+    <label class="pdf-ck"><input type="checkbox" name="photos" checked>사진 넣기</label>
+    <label class="pdf-ck"><input type="checkbox" name="cmts" checked>댓글 · 하트 넣기</label>
+    <p class="muted span2" style="margin:0;font-size:13px">A4 컬러로 표지와 일기 쪽을 만들어요. 새 창이 열리면 <b>대상(프린터)을 ‘PDF로 저장’</b>으로 고르고, 더 보기에서 <b>‘배경 그래픽’</b>을 켜 주세요. 만든 파일은 이 기기에만 저장돼요.</p>
+    <button class="btn btn-primary span2">📄 PDF 만들기</button>
+  </form></section>
+  <section class="block print-shops"><strong>🖨️ 인쇄소에 맡기기</strong>
+    <p>만든 PDF를 USB나 메일로 가져가면 컬러로 뽑고 제본까지 해 줘요. 온라인 인쇄소는 PDF를 올리면 집으로 보내 줘요.</p>
+    <div class="row"><a class="btn btn-ghost sm" href="https://map.kakao.com/?q=${encodeURIComponent("인쇄소")}" target="_blank" rel="noopener">📍 가까운 인쇄소 찾기 (카카오맵)</a>
+      <a class="btn btn-ghost sm" href="https://map.naver.com/p/search/${encodeURIComponent("인쇄소 제본")}" target="_blank" rel="noopener">📍 네이버 지도로 찾기</a>
+      <a class="btn btn-ghost sm" href="https://search.naver.com/search.naver?query=${encodeURIComponent("온라인 인쇄 PDF 책 제본")}" target="_blank" rel="noopener">🌐 온라인 인쇄소 찾아보기</a>
+      <a class="btn btn-ghost sm" href="https://search.naver.com/search.naver?query=${encodeURIComponent("포토북 만들기")}" target="_blank" rel="noopener">📷 포토북 업체 찾아보기</a></div>
+    <p class="muted" style="font-size:13px">검색 결과로 연결돼요. 아이아이노트와 제휴한 곳은 아니에요.</p></section>
+  <section class="block book-soon"><div><strong>📚 종이 일기책</strong><span class="pill">출시 예정</span></div>
+    <p>차곡차곡 쌓인 일기를 고른 구성 그대로 예쁜 종이책으로 받아 볼 수 있게 준비하고 있어요. 그때까지는 PDF로 모아 두세요.</p></section>`;
+}
+function pdfRange(v){
+  const t=todayStr(), d=toDate(t);
+  const r={month:[t.slice(0,8)+"01",t], year:[t.slice(0,4)+"-01-01",t],
+    last:[ymd(new Date(d.getFullYear(),d.getMonth()-1,1)), ymd(new Date(d.getFullYear(),d.getMonth(),0))],
+    all:[S.diaries.map(x=>x.date).sort()[0]||t, t]}[v];
+  if(!r) return;
+  document.getElementById("pdf-from").value=r[0]; document.getElementById("pdf-to").value=r[1];
+}
+// 원고지 칸: 한 칸에 한 글자, 줄바꿈은 그 줄을 비워요
+function pdfWongoji(text,cols){
+  const cells=[];
+  for(const line of String(text||"").split("\n")){
+    const ch=[...line]; ch.forEach(c=>cells.push(c===" "?"":c));
+    const rest=(cols - ch.length%cols)%cols; if(rest || !ch.length) for(let i=0;i<(ch.length?rest:cols);i++) cells.push("");
+  }
+  return `<div class="wg" style="--cols:${cols}">${cells.map(c=>`<i>${esc(c)}</i>`).join("")}</div>`;
+}
+function makePdf(form){
+  const fd=new FormData(form), lay=fd.get("lay")||"basic", who=fd.getAll("who"), from=fd.get("from")||"0000", to=fd.get("to")||"9999";
+  const withPh=!!fd.get("photos"), withCm=!!fd.get("cmts"), land=!!PDF_LAYOUTS.find(x=>x[0]===lay)?.[3];
+  S.pdfLay=lay;
+  const list=visibleDiaries().filter(d=>d.status==="submitted" && who.includes(d.profileId) && d.date>=from && d.date<=to)
+    .sort((a,b)=>a.date.localeCompare(b.date)||(a.createdAt||0)-(b.createdAt||0));
+  if(!list.length){ toast("고른 기간에 올린 일기가 없어요"); return; }
+  const w=window.open("","_blank"); if(!w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }
+  const people=who.map(prof).filter(Boolean), total=list.length, fam=S.group?.name||"우리집 일기장";
+  const nPh=list.reduce((s,d)=>s+(d.photos||[]).length,0), nCm=list.reduce((s,d)=>s+S.comments.filter(c=>c.diaryId===d.id).length,0);
+  const dotDate=s=>{ const d=toDate(s); return `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`; };
+  const colorOf=p=>p?.color||"#1F2A44";
+  const chip=p=>`<span class="who" style="--pc:${colorOf(p)};--pt:${onColor(colorOf(p))}"><i>${esc((p?.name||"?").slice(0,1))}</i>${esc(p?.name||"")}</span>`;
+  // 일기 한 편의 조각들
+  const head=d=>{ const p=prof(d.profileId), m=MOODS.find(x=>x[0]===d.mood);
+    return `<header class="d-h"><div><p class="d-date">${fmtLong(d.date)}</p>${chip(p)}${m?`<span class="mood"><i style="background:${m[2]}"></i>${esc(m[1])}</span>`:""}</div>${d.stamp?`<div class="stamp">${esc(d.stamp)}</div>`:""}</header>`; };
+  const title=d=>d.title?`<h2 class="d-title">${esc(d.title)}</h2>`:"";
+  const text=(d,cls="")=>`<div class="d-text ${cls}">${esc(d.text)}</div>`;
+  const photos=(d,n)=>{ const ph=withPh?(d.photos||[]).slice(0,n):[]; return ph.length?`<div class="photos n${ph.length}">${ph.map(x=>`<img src="${esc(x.url)}" alt="">`).join("")}</div>`:""; };
+  const bigPhoto=d=>{ const ph=withPh?(d.photos||[]).slice(0,2):[];
+    return ph.length?`<div class="big-ph n${ph.length}">${ph.map(x=>`<img src="${esc(x.url)}" alt="">`).join("")}</div>`
+      :`<div class="big-ph none"><span>${esc(fmtLong(d.date))}</span></div>`; };
+  const meta=d=>d.location?.name||(d.tags||[]).length?`<p class="d-meta">${d.location?.name?`📍 ${esc(d.location.name)}　`:""}${(d.tags||[]).map(t=>`#${esc(t)}`).join(" ")}</p>`:"";
+  const cmts=d=>{ if(!withCm) return ""; const cs=S.comments.filter(x=>x.diaryId===d.id && !x.deleted).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)), hs=heartsOf(d).map(id=>prof(id)?.name).filter(Boolean);
+    return cs.length||hs.length?`<div class="cmts">${hs.length?`<p class="hearts">❤️ ${hs.map(esc).join(" · ")}</p>`:""}${cs.map(x=>`<p><b style="color:${colorOf(prof(x.profileId))}">${esc(prof(x.profileId)?.name||"")}</b>${x.parentId?" ↳":""} ${esc(x.text)}</p>`).join("")}</div>`:""; };
+  const page=(inner,d,cls="")=>`<section class="page ${cls}" style="--pc:${colorOf(d&&prof(d.profileId))};--pt:${onColor(colorOf(d&&prof(d.profileId)))}"><div class="band"></div>${inner}<p class="pg">${esc(fam)}</p></section>`;
+  // 세로쓰기는 글이 길면 글씨를 조금 작게
+  const vSize=d=>{ const n=[...d.text].length; return n>700?"9pt":n>450?"10.5pt":n>250?"12pt":"13.5pt"; };
+  let pages="";
+  if(lay==="day"){
+    const days=[...new Set(list.map(d=>d.date))];
+    pages=days.map(day=>{ const ds=list.filter(d=>d.date===day);
+      return `<section class="page dayp"><div class="band multi">${ds.map(d=>`<i style="background:${colorOf(prof(d.profileId))}"></i>`).join("")}</div>
+        <p class="d-date">${fmtLong(day)}</p>
+        <div class="day-list">${ds.map(d=>{ const p=prof(d.profileId);
+          return `<article class="day-one" style="--pc:${colorOf(p)};--pt:${onColor(colorOf(p))}"><div class="day-h">${chip(p)}${d.stamp?`<span class="stamp sm">${esc(d.stamp)}</span>`:""}</div>${title(d)}${text(d,"sm")}${photos(d,2)}${cmts(d)}</article>`; }).join("")}</div>
+        <p class="pg">${esc(fam)}</p></section>`; }).join("");
+  }else if(lay==="two"){
+    for(let i=0;i<list.length;i+=2){ const pair=list.slice(i,i+2);
+      pages+=`<section class="page twop">${pair.map(d=>`<article class="half" style="--pc:${colorOf(prof(d.profileId))};--pt:${onColor(colorOf(prof(d.profileId)))}"><div class="band"></div>${head(d)}${title(d)}${text(d,"sm")}${photos(d,2)}</article>`).join('<hr class="cut">')}<p class="pg">${esc(fam)}</p></section>`; }
+  }else{
+    pages=list.map(d=>{
+      if(lay==="top") return page(`${bigPhoto(d)}${head(d)}${title(d)}${text(d)}${meta(d)}${cmts(d)}`,d,"topp");
+      if(lay==="topv") return page(`${bigPhoto(d)}${head(d)}<div class="vbox"><div class="vtext" style="font-size:${vSize(d)}">${d.title?`<b>${esc(d.title)}</b>\n`:""}${esc(d.text)}</div></div>`,d,"topp");
+      if(lay==="left"||lay==="right"){ const ph=`<div class="side-ph">${bigPhoto(d)}</div>`, tx=`<div class="side-tx">${head(d)}${title(d)}${text(d)}${meta(d)}${cmts(d)}</div>`;
+        return page(`<div class="side">${lay==="left"?ph+tx:tx+ph}</div>`,d,"landp"); }
+      if(lay==="picture") return page(`${head(d)}${withPh&&(d.photos||[])[0]?`<div class="pic-frame"><img src="${esc(d.photos[0].url)}" alt=""></div>`:""}${d.title?`<p class="pic-title">제목: ${esc(d.title)}</p>`:""}${pdfWongoji(d.text,14)}`,d,"picp");
+      if(lay==="grid") return page(`${head(d)}${d.title?`<p class="pic-title">${esc(d.title)}</p>`:""}${pdfWongoji(d.text,20)}${cmts(d)}`,d,"gridp");
+      if(lay==="album"){ const ph=withPh?(d.photos||[]).slice(0,4):[];
+        return page(`${head(d)}${ph.length?`<div class="album n${ph.length}">${ph.map(x=>`<img src="${esc(x.url)}" alt="">`).join("")}</div>`:""}<div class="caption">${title(d)}<p>${esc(d.text.length>220?d.text.slice(0,220)+"…":d.text)}</p></div>`,d,"albp"); }
+      return page(`${head(d)}${title(d)}${text(d)}${photos(d,4)}${meta(d)}${cmts(d)}`,d,"basicp");
+    }).join("");
+  }
+  const cover=`<section class="page cover"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    <div class="cv-in"><img class="cv-logo" src="${location.origin}/icon.png" alt=""><p class="cv-kicker">OUR FAMILY DIARY</p>
+      <h1>${esc(fam)}</h1><p class="cv-range">${dotDate(list[0].date)} ~ ${dotDate(list[total-1].date)}</p>
+      <div class="cv-who">${people.map(chip).join("")}</div>
+      <div class="cv-stats"><div><b>${total}</b>편의 일기</div><div><b>${nPh}</b>장의 사진</div><div><b>${nCm}</b>개의 댓글</div></div></div>
+    <p class="cv-foot">아이아이노트 · ${esc(SITE_ADDRESS)}</p></section>`;
+  const layName=PDF_LAYOUTS.find(x=>x[0]===lay)?.[1]||"";
+  w.document.open();
+  w.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(fam)} ${list[0].date}~${list[total-1].date} (${esc(layName)})</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Pen+Script&display=swap">
+<style>${PDF_CSS}${land?PDF_CSS_LAND:""}:root{--diary:${getComputedStyle(document.documentElement).getPropertyValue("--diary")}}</style></head><body>
+<div class="bar"><b>📄 ${esc(layName)} · 일기 ${total}편</b><span>대상(프린터)을 <b>‘PDF로 저장’</b>으로, 더 보기에서 <b>‘배경 그래픽’</b>을 켜 주세요.</span><button onclick="print()">인쇄 · PDF로 저장</button></div>
+${cover}${pages}
+<script>document.fonts.ready.then(()=>setTimeout(()=>print(),800));<\/script></body></html>`);
+  w.document.close();
+}
+// PDF 모양 (새 창 안에서만 쓰는 색 · 크기)
+const PDF_CSS = `@page{size:A4;margin:0}
+:root{--ivory:#FBF6EE;--paper:#FFFDF9;--navy:#1F2A44;--ink2:#4E5870;--ink3:#767E91;--coral:#EF6F53;--coral-ink:#B8452D;--butter:#F4BE45;--sage:#3F7F70;--sky:#6F9BD8;--line:#E9DCC8;--margin:#F2B5A4;--grid:#F2B5A4;--pw:210mm;--ph:297mm}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{margin:0;background:#E9EBF0;color:var(--navy);font-family:"Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif;word-break:keep-all}
+.bar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:center;padding:10px 16px;background:var(--navy);color:#fff;font-size:14px}
+.bar button{border:0;border-radius:99px;padding:8px 18px;background:var(--coral);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.page{position:relative;width:var(--pw);min-height:var(--ph);margin:8mm auto;padding:20mm 18mm 18mm 24mm;background:var(--ivory);overflow:hidden;box-shadow:0 6px 24px rgba(31,42,68,.18);break-after:page;page-break-after:always}
+@media print{html,body{background:none}.bar{display:none}.page{margin:0;box-shadow:none}}
+.page:not(.cover)::before{content:"";position:absolute;left:17mm;top:10mm;bottom:0;width:.6mm;background:var(--margin)}
+.band{position:absolute;left:0;right:0;top:0;height:9mm;background:var(--pc)}
+.band.multi{display:flex}.band.multi i{flex:1}
+.pg{position:absolute;left:24mm;right:18mm;bottom:8mm;margin:0;text-align:right;font-size:8pt;color:var(--ink3)}
+.cover{background:linear-gradient(160deg,#FFF4E0 0%,var(--ivory) 45%,#FDE3DA 100%);display:flex;flex-direction:column;justify-content:center;padding:0 22mm}
+.blob{position:absolute;border-radius:50%}
+.b1{width:120mm;height:120mm;right:-40mm;top:-35mm;background:var(--butter);opacity:.9}
+.b2{width:70mm;height:70mm;left:-22mm;bottom:30mm;background:var(--sky);opacity:.5}
+.b3{width:38mm;height:38mm;right:28mm;bottom:48mm;background:var(--coral);opacity:.8}
+.cv-in{position:relative}
+.cv-logo{width:22mm;height:22mm;border-radius:6mm;box-shadow:0 2mm 6mm rgba(31,42,68,.15)}
+.cv-kicker{margin:10mm 0 2mm;letter-spacing:.35em;font-size:10pt;font-weight:700;color:var(--coral-ink)}
+.cover h1{margin:0;font-family:"Gowun Batang",serif;font-size:40pt;line-height:1.15}
+.cv-range{margin:5mm 0 9mm;font-size:14pt;color:var(--ink2);font-weight:600}
+.cv-who{display:flex;flex-wrap:wrap;gap:3mm}
+.cv-stats{display:flex;gap:4mm;margin-top:14mm}
+.cv-stats div{background:rgba(255,255,255,.85);border-radius:5mm;padding:4mm 6mm;font-size:10pt;color:var(--ink2)}
+.cv-stats b{display:block;font-size:22pt;color:var(--navy)}
+.cv-foot{position:absolute;left:22mm;bottom:14mm;margin:0;font-size:9pt;color:var(--ink3)}
+.who{display:inline-flex;align-items:center;gap:2mm;background:var(--pc);color:var(--pt);border-radius:99px;padding:1mm 4mm 1mm 1mm;font-weight:700;font-size:10.5pt}
+.who i{display:grid;place-items:center;width:6.5mm;height:6.5mm;border-radius:50%;background:rgba(255,255,255,.35);font-style:normal;font-size:8.5pt}
+.d-h{display:flex;justify-content:space-between;align-items:flex-start;gap:6mm;margin-bottom:2mm}
+.d-date{margin:0 0 3mm;font-size:19pt;font-weight:800}
+.mood{display:inline-flex;align-items:center;gap:1.5mm;margin-left:3mm;font-size:10pt;color:var(--ink2);font-weight:600}
+.mood i{width:3mm;height:3mm;border-radius:50%}
+.stamp{flex:none;transform:rotate(-10deg);color:var(--coral-ink);border:.9mm solid var(--coral);border-radius:48% 52% 45% 55%/55% 45% 55% 45%;padding:3mm 5mm;font-family:"Gowun Batang",serif;font-weight:700;font-size:13pt;margin-top:1mm}
+.stamp.sm{font-size:9.5pt;padding:1.5mm 3mm;border-width:.6mm}
+.d-title{margin:5mm 0 2mm;font-family:var(--diary);font-size:18pt;font-weight:700}
+.d-text{font-family:var(--diary);font-size:13pt;line-height:9.5mm;white-space:pre-wrap;overflow-wrap:break-word;background-image:repeating-linear-gradient(transparent 0,transparent calc(9.5mm - .3mm),var(--line) calc(9.5mm - .3mm),var(--line) 9.5mm);padding-bottom:1mm}
+.basicp .d-text{min-height:95mm}
+.d-text.sm{font-size:11pt;line-height:7.5mm;background-image:repeating-linear-gradient(transparent 0,transparent calc(7.5mm - .3mm),var(--line) calc(7.5mm - .3mm),var(--line) 7.5mm)}
+.photos{display:grid;gap:3mm;margin-top:5mm}
+.photos.n1{grid-template-columns:1fr}.photos.n2,.photos.n4{grid-template-columns:1fr 1fr}.photos.n3{grid-template-columns:1fr 1fr 1fr}
+.photos img{width:100%;height:55mm;object-fit:cover;border-radius:3mm;border:1.2mm solid #fff;box-shadow:0 1mm 3mm rgba(31,42,68,.15)}
+.photos.n1 img{height:85mm}
+.d-meta{margin:4mm 0 0;font-size:10pt;color:var(--sage);font-weight:600}
+.cmts{margin-top:5mm;background:var(--paper);border:.4mm solid var(--line);border-radius:4mm;padding:3mm 5mm;font-size:10pt;line-height:1.6;break-inside:avoid}
+.cmts p{margin:1mm 0}
+.hearts{color:var(--coral-ink);font-weight:700}
+/* 위 사진 */
+.big-ph{display:grid;gap:3mm;height:110mm;margin:0 0 6mm}
+.big-ph.n2{grid-template-columns:1fr 1fr}
+.big-ph img{width:100%;height:100%;object-fit:cover;border-radius:4mm;border:1.5mm solid #fff;box-shadow:0 1.5mm 4mm rgba(31,42,68,.18)}
+.big-ph.none{place-items:center;border-radius:4mm;background:linear-gradient(135deg,var(--pc),color-mix(in srgb,var(--pc) 45%,#fff));color:var(--pt);font-family:"Gowun Batang",serif;font-size:22pt;font-weight:700}
+/* 세로쓰기 */
+.vbox{height:115mm;display:flex;justify-content:flex-end;overflow:hidden;background-image:repeating-linear-gradient(90deg,transparent 0,transparent calc(9mm - .3mm),var(--line) calc(9mm - .3mm),var(--line) 9mm)}
+.vtext{writing-mode:vertical-rl;text-orientation:upright;font-family:var(--diary);line-height:9mm;white-space:pre-wrap;height:100%}
+.vtext b{font-size:1.2em}
+/* 사진 + 원고지 · 원고지 */
+.pic-frame{height:95mm;margin:3mm 0 5mm;border:.8mm solid var(--navy);border-radius:2mm;background:#fff;display:grid;place-items:center;overflow:hidden}
+.pic-frame img{width:100%;height:100%;object-fit:cover}
+.pic-frame span{color:var(--ink3);font-size:11pt}
+.pic-title{margin:0 0 3mm;font-family:var(--diary);font-size:14pt;font-weight:700}
+.wg{display:grid;grid-template-columns:repeat(var(--cols),1fr);border-top:.4mm solid var(--grid);border-left:.4mm solid var(--grid);background:#fff}
+.wg i{aspect-ratio:1;display:grid;place-items:center;border-right:.4mm solid var(--grid);border-bottom:.4mm solid var(--grid);font-style:normal;font-family:var(--diary);line-height:1}
+.picp .wg i{font-size:15pt}
+.gridp .wg i{font-size:11.5pt}
+/* 하루 모음 · 두 편씩 */
+.day-list{display:grid;gap:5mm;margin-top:2mm}
+.day-one{background:var(--paper);border-radius:4mm;border-left:2.5mm solid var(--pc);padding:3mm 5mm;break-inside:avoid}
+.day-h{display:flex;justify-content:space-between;align-items:center}
+.day-one .d-title{font-size:13pt;margin:2mm 0}
+.day-one .photos img{height:38mm}
+.twop{padding:0}
+.half{position:relative;height:148mm;padding:15mm 18mm 8mm 24mm;overflow:hidden}
+.half .d-date{font-size:15pt}
+.half .d-title{font-size:14pt;margin:2mm 0}
+.half .photos{margin-top:3mm}.half .photos img{height:34mm}
+.cut{border:0;border-top:.5mm dashed var(--coral);margin:0 10mm}
+/* 앨범 */
+.album{display:grid;gap:3mm;grid-template-columns:1fr 1fr;margin:4mm 0}
+.album.n1{grid-template-columns:1fr}.album.n1 img{height:170mm}
+.album img{width:100%;height:95mm;object-fit:cover;border-radius:3mm;border:1.5mm solid #fff;box-shadow:0 1.5mm 4mm rgba(31,42,68,.18)}
+.album.n3 img:first-child{grid-column:span 2;height:110mm}
+.caption{background:var(--paper);border-radius:4mm;padding:4mm 6mm;border-left:2mm solid var(--pc)}
+.caption p{margin:1mm 0 0;font-family:var(--diary);font-size:12pt;line-height:1.7;white-space:pre-wrap}
+.caption .d-title{margin:0;font-size:14pt}`;
+// A4 가로 구성 (왼쪽 · 오른쪽)
+const PDF_CSS_LAND = `@page{size:A4 landscape;margin:0}
+:root{--pw:297mm;--ph:210mm}
+.landp{padding:16mm 14mm 14mm 22mm}
+.side{display:grid;grid-template-columns:1fr 1fr;gap:8mm;height:170mm}
+.side-ph .big-ph{height:170mm;margin:0}
+.side-ph .big-ph.n2{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+.side-tx{overflow:hidden}
+.side-tx .d-text{font-size:12pt;line-height:8.5mm;background-image:repeating-linear-gradient(transparent 0,transparent calc(8.5mm - .3mm),var(--line) calc(8.5mm - .3mm),var(--line) 8.5mm)}
+.cover .b1{right:-20mm}`;
 /* ---------- 칭찬 도장 · 하트 ----------
    도장: 부모가 아이 일기에 하나 찍어요 (같은 도장을 다시 누르면 지워져요). 하트: 가족 누구나 (diaries.hearts = {프로필id:true}) */
 const STAMPS = ["참 잘했어요","최고예요","멋진 생각","글씨왕"];
@@ -2043,6 +2309,8 @@ const acts = {
   back: () => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.sub=null; S.draft=null; S.lb=null; }),
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
+  pdf: () => go(()=>{ S.sub={type:"pdf"}; }),
+  "pdf-range": el => pdfRange(el.dataset.v),
   heart: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
     const hearts={...(d.hearts||{})}; if(hearts[S.me.id]) delete hearts[S.me.id]; else hearts[S.me.id]=true;
     await B.update(S.gid,"diaries",d.id,{hearts}); d.hearts=hearts; render(); }),
@@ -2359,6 +2627,7 @@ async function penCheck(){
 
 /* 폼 제출 */
 const forms = {
+  pdf: (fd, f) => makePdf(f),
   // 아이 일기 최소 글자 수 (비우면 학년 기본값)
   "kid-goal": fd => guard(async()=>{
     for(const p of S.profiles.filter(x=>x.type==="child")){
