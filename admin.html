@@ -106,7 +106,7 @@ async function load(){
   const fams=await Promise.all(groups.map(async g=>{
     const dcol=F.collection(db,"groups",g.id,"diaries");
     const [profiles,total,today_,w,m]=await Promise.all([
-      F.getDocs(F.collection(db,"groups",g.id,"profiles")).then(s=>s.docs.map(d=>{ const p=d.data(); return {id:d.id,name:p.name,type:p.type,grade:p.grade,linked:!!p.uid}; })),
+      F.getDocs(F.collection(db,"groups",g.id,"profiles")).then(s=>s.docs.map(d=>{ const p=d.data(); return {id:d.id,type:p.type,grade:p.grade,linked:!!p.uid};   // 이름은 가져오지 않아요 })),
       count(dcol), count(F.query(dcol,F.where("date","==",today))),
       count(F.query(dcol,F.where("date",">=",d7))), count(F.query(dcol,F.where("date",">=",d30)))]);
     const members=await Promise.all(profiles.map(async p=>{
@@ -126,11 +126,13 @@ function render(fams,users,idx){
   const sum=k=>fams.reduce((s,f)=>s+f[k],0), ms=fams.flatMap(f=>f.members);
   const kids=ms.filter(p=>p.type==="child"), maxW=Math.max(1,...fams.map(f=>f.w));
   const active=fams.filter(f=>f.w>0).length;
+  // 이름은 보여 주지 않아요: 가족은 만든 차례대로 번호, 사람은 보호자 · 아이(학년)로만
+  fams.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach((f,i)=>{ f.no=i+1; });
   const rows=fams.sort((a,b)=>b.w-a.w||b.total-a.total).map((f,i)=>`
-    <tr class="fam" data-act="toggle" data-v="${i}"><td class="l"><b>${esc(f.name||"(이름 없음)")}</b> <span class="sub">▾</span></td><td>${fmtDate(f.createdAt)}</td>
+    <tr class="fam" data-act="toggle" data-v="${i}"><td class="l"><b>가족 ${f.no}</b> <span class="sub">▾</span></td><td>${fmtDate(f.createdAt)}</td>
       <td>${f.members.filter(p=>p.type!=="child").length} · ${f.members.filter(p=>p.type==="child").length}</td>
       <td>${f.today||'<span class="z">0</span>'}</td><td class="l"><span class="bar" style="width:${Math.round(f.w/maxW*60)}px"></span>${f.w}</td><td>${f.m}</td><td>${f.total}</td></tr>
-    ${f.members.map(p=>`<tr class="mem" data-g="${i}" hidden><td class="l">${esc(p.name)} <span class="sub">${p.type==="child"?(p.grade?p.grade+"학년":"어린이")+(p.linked?" · 자기 기기":""):"보호자"}</span></td>
+    ${f.members.map(p=>`<tr class="mem" data-g="${i}" hidden><td class="l">${p.type==="child"?`아이 <span class="sub">${p.grade?p.grade+"학년":""}${p.linked?" · 자기 기기":""}</span>`:"보호자"}</td>
       <td></td><td></td><td></td><td>${p.week==null?'<span class="z">?</span>':p.week?`<span class="good">${p.week}</span>`:'<span class="z">0</span>'}</td>
       <td class="sub">${p.pen!=null?`빨간펜 ${p.pen}`:""}</td><td>${p.sub}${p.all>p.sub?` <span class="sub">(+쓰는 중 ${p.all-p.sub})</span>`:""}</td></tr>`).join("")}`).join("");
   $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="sub">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
@@ -148,7 +150,7 @@ function render(fams,users,idx){
     <div class="card"><h2>가족별</h2><div class="scroll"><table>
       <tr><th class="l">가족 (누르면 사람별)</th><th>만든 날</th><th>보호자 · 아이</th><th>오늘</th><th class="l">최근 7일</th><th>30일</th><th>전체</th></tr>${rows||'<tr><td colspan="7" class="z">아직 가족이 없어요</td></tr>'}
     </table></div>
-    <p class="note">일기 수는 쓰는 중(임시 저장)을 포함해요. 사람별 '전체'는 제출한 일기 수예요. 일기 내용은 이 화면에서 읽지 않아요.</p>
+    <p class="note">일기 수는 쓰는 중(임시 저장)을 포함해요. 사람별 ‘전체’는 제출한 일기 수예요. 이 화면은 이름과 일기 내용을 보여 주지 않고 숫자만 세요.</p>
     ${idx.length?`<p class="alert">사람별 최근 7일(?)을 세려면 파이어베이스 색인이 한 번 필요해요. <a href="${esc(idx[0])}" target="_blank" rel="noopener">여기를 눌러 색인 만들기</a> → 몇 분 뒤 새로고침.</p>`:""}</div>`;
 }
 
