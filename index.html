@@ -638,6 +638,104 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
   .addr-t strong{font-size:19px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ═════════ 디자인 4가지: note(노트 · 기본) · clean(깔끔 · 흰 카드) · bright(산뜻 · 색 카드) · wongoji(원고지) ═════════
+   깔끔 · 산뜻은 공부방과 같은 느낌. 제목 글씨는 G마켓 산스, 일기 글씨는 그대로 (위에서 고른 글씨) */
+@font-face{font-family:'GMarketSans';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');font-weight:500;font-display:swap}
+@font-face{font-family:'GMarketSans';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');font-weight:700;font-display:swap}
+[data-design="clean"]:not([data-theme="dark"]){
+  --paper:#F4F6FA; --grid:transparent; --surface:#FFFFFF; --surface2:#EEF2F8;
+  --ink:#16213A; --ink2:#4A5568; --ink3:#6B7589; --line:#E3E8F0; --rule:#E3E8F0;
+  --accent:#1F4FD8; --accent-soft:#EAF0FE; --focus:#FFC53D;
+}
+[data-design="bright"]:not([data-theme="dark"]){
+  --paper:#FFFFFF; --grid:transparent; --surface:#FFFFFF; --surface2:#F5F6F9;
+  --ink:#1B1F2E; --ink2:#4A5063; --ink3:#6D7385; --line:#E4E7EE; --rule:#E4E7EE;
+  --accent:#FF6A3D; --accent-soft:#FFEFE8; --focus:#FFC53D;
+}
+[data-design="clean"][data-theme="dark"]{--accent:#6E9BFF;--accent-soft:#1F2C44}
+[data-design="bright"][data-theme="dark"]{--accent:#FF8A5F;--accent-soft:#3A2525}
+:root:is([data-design="clean"],[data-design="bright"]) body{background-image:none}
+:root:is([data-design="clean"],[data-design="bright"]) :is(.mast-t,.page-h h1,.block-h h2,.today-date){font-family:'GMarketSans',var(--sans);font-weight:700;letter-spacing:-.5px}
+:root:is([data-design="clean"],[data-design="bright"]) .btn-primary{background:var(--accent);color:#fff;box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 26%,transparent)}
+:root[data-design="clean"] .block{border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(22,33,58,.04),0 6px 16px rgba(22,33,58,.06)}
+:root[data-design="clean"] .chip.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+:root[data-design="bright"] .block{background:var(--surface2);border-color:transparent;border-radius:22px;box-shadow:none}
+:root[data-design="bright"] .btn-primary{border-radius:999px}
+:root[data-design="bright"]:not([data-theme="dark"]) .hero-date{background:linear-gradient(120deg,#FFE7DB,#FFF4D6);padding:20px 24px;border-radius:22px}
+/* 모양 · 글씨 · 디자인 고르기: 공부방처럼 한 칸에 모은 단추 */
+:root:is([data-design="clean"],[data-design="bright"]) .hb-g{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+:root:is([data-design="clean"],[data-design="bright"]) .hb-g span{border:0;background:none;min-height:32px;width:34px;border-radius:7px}
+:root[data-design="clean"] .hb-g input:checked+span{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(22,33,58,.14)}
+:root[data-design="bright"] .hb-g{border-radius:999px;border-color:transparent}
+:root[data-design="bright"] .hb-g span{border-radius:999px}
+:root[data-design="bright"] .hb-g input:checked+span{background:var(--ink);color:var(--paper)}
+/* 디자인 견본 그림 */
+.dsw{display:block;flex:0 0 20px;width:20px;min-width:20px;height:20px;border-radius:6px;border:1.5px solid #E7DDCD;background:linear-gradient(90deg,transparent 5px,#F2B5A4 5px 6.5px,transparent 6.5px),linear-gradient(#EFE4D2 1px,transparent 1px) 0 0/100% 5px,#FBF6EE}
+.dsw.clean{border-color:#D5DCE8;background:linear-gradient(#1F4FD8 0 0) bottom/100% 5px no-repeat,#FFFFFF}
+.dsw.bright{border:0;border-radius:50%;background:conic-gradient(#0FA3B1 0 25%,#E8604C 0 50%,#2F7BE5 0 75%,#7A5AF0 0)}
+@media (min-width:760px){
+  :root:is([data-design="clean"],[data-design="bright"]) .sheet{background:transparent;box-shadow:none;border-top:0;border-radius:0;padding:24px 0 40px}
+  :root:is([data-design="clean"],[data-design="bright"]) .sheet:has(.quad){padding:16px 0 12px}
+  :root:is([data-design="clean"],[data-design="bright"]) .sheet::before{display:none}
+  :root[data-design="clean"] .sheet .block{background:var(--surface)}
+  :root[data-design="clean"] .sheet :is(.st-row,.ct-card,.empty,.qn,.qs-row,.qg-stats div,.qg-chart){background:var(--surface2)}
+  :root[data-design="bright"] .sheet .block{background:var(--surface2)}
+  :root[data-design="bright"] .sheet :is(.st-row,.ct-card,.empty,.qn,.qs-row,.qg-stats div,.qg-chart){background:var(--surface)}
+  /* 폴더 탭 → 깔끔: 밑줄 탭 / 산뜻: 알약 탭 */
+  :root:is([data-design="clean"],[data-design="bright"]) .ftabs{padding-left:0;gap:2px;border-bottom:1px solid var(--line)}
+  :root:is([data-design="clean"],[data-design="bright"]) .ftab{background:none;border-radius:0;opacity:1;color:var(--ink3);min-height:46px;padding:0 16px;box-shadow:none;border-bottom:3px solid transparent;font-size:15px}
+  :root:is([data-design="clean"],[data-design="bright"]) .ftab .ic{color:currentColor}
+  :root:is([data-design="clean"],[data-design="bright"]) .ftab:hover{color:var(--ink)}
+  :root[data-design="clean"] .ftab.on{min-height:46px;color:var(--ink);border-bottom-color:var(--accent)}
+  :root[data-design="bright"] .ftabs{border-bottom:0;gap:6px;padding:4px 0}
+  :root[data-design="bright"] .ftab{border:0;border-radius:999px;min-height:40px;padding:0 18px}
+  :root[data-design="bright"] .ftab.on{min-height:40px;background:var(--ink);color:var(--paper)}
+}
+/* 산뜻: 4분할 네 칸을 공부방 과목 카드처럼 색 카드로 */
+:root[data-design="bright"] .quad .q-cell:nth-child(1){--c:#0FA3B1}
+:root[data-design="bright"] .quad .q-cell:nth-child(2){--c:#E8604C}
+:root[data-design="bright"] .quad .q-cell:nth-child(3){--c:#2F7BE5}
+:root[data-design="bright"] .quad .q-cell:nth-child(4){--c:#7A5AF0}
+:root[data-design="bright"] .sheet .quad .q-cell,:root[data-design="bright"] .quad .q-cell{position:relative;overflow:hidden;background:var(--c);color:#fff;border-color:transparent;box-shadow:0 10px 22px color-mix(in srgb,var(--c) 28%,transparent)}
+:root[data-design="bright"] .quad .q-cell::after{content:"";position:absolute;right:-34px;bottom:-44px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+:root[data-design="bright"] .quad .q-cell :is(h2,.today-date,.qm-who b,.qg-words){color:#fff}
+:root[data-design="bright"] .quad .q-cell .muted{color:rgba(255,255,255,.88)}
+:root[data-design="bright"] .quad .q-cell :is(.qn,.qs-row,.qg-stats div,.qg-chart){background:rgba(255,255,255,.94);color:#1B1F2E}
+:root[data-design="bright"] .quad .q-cell :is(.qn-h b,.qg-stats b){color:#1B1F2E}
+:root[data-design="bright"] .quad .q-cell .qn-x{background:#F5F6F9}
+:root[data-design="bright"] .quad .q-cell .btn-primary{background:#fff;color:var(--c);box-shadow:none}
+:root[data-design="bright"] .quad .qg-who button.on{border-color:#fff}
+/* 원고지(시안 20 · 레드 원고지 노트): 흰 종이 + 빨간 원고지 칸 + 먹색 외곽선 */
+[data-design="wongoji"]:not([data-theme="dark"]){
+  --paper:#FCFBF7; --grid:#F4CFCA; --surface:#FFFFFF; --surface2:#F8F4EC;
+  --ink:#1E1E24; --ink2:#45454F; --ink3:#606069;
+  --line:#E6E1D6; --rule:#EBD2CD; --margin:#E0564F;
+  --coral:#D7263D; --coral-ink:#A61A2C; --coral-soft:#FBE0E2;
+  --butter:#F2B632; --butter-soft:#FCEFCB;
+  --sage:#2F7D5B; --sage-soft:#DFEFE6;
+  --sky:#2B5DAA; --sky-soft:#E0E8F5; --lilac:#6E4FB0; --lilac-soft:#EAE4F6;
+  --focus:#D7263D; --r-lg:6px; --r-md:4px; --r-sm:3px;
+  --card-line:#1E1E24; --card-shadow:0 3px 0 #1E1E24; --sheet-shadow:0 0 0 1.5px #1E1E24,0 10px 26px rgba(30,30,36,.10);
+}
+[data-design="wongoji"]{--brand:#D7263D;--brand-deep:#1E1E24;--on-brand:#FFFFFF}
+[data-design="wongoji"][data-theme="dark"]{--brand:#F0566A;--brand-deep:#000;--card-line:var(--line);--card-shadow:0 3px 0 #000;--sheet-shadow:0 10px 30px rgba(0,0,0,.4)}
+:root[data-design="wongoji"]:not([data-theme="dark"]) body{background-image:linear-gradient(transparent 29px,var(--paper) 29px),linear-gradient(var(--grid) 1px,transparent 1px,transparent 28px,var(--grid) 28px,var(--grid) 29px,transparent 29px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:100% 38px,28px 38px,28px 38px}
+:root[data-design="wongoji"] :is(.mast-t,.today-date,.page-h h1){font-family:var(--sans);font-weight:800;letter-spacing:-.5px}
+:root[data-design="wongoji"] .block-h h2{font-weight:800;letter-spacing:-.2px}
+:root[data-design="wongoji"] .btn{border-radius:6px}
+:root[data-design="wongoji"] :is(.btn-primary,.btn-accent){background:var(--brand);color:var(--on-brand);box-shadow:0 3px 0 var(--brand-deep)}
+:root[data-design="wongoji"] .btn-ghost{border-width:2px;border-color:var(--card-line)}
+:root[data-design="wongoji"] .sheet{box-shadow:var(--sheet-shadow);border-top-color:var(--brand)}
+:root[data-design="wongoji"] .ftab.on{background:var(--surface);box-shadow:inset 0 4px 0 var(--brand)}
+:root[data-design="wongoji"] .block{border:2px solid var(--card-line);box-shadow:var(--card-shadow)}
+:root[data-design="wongoji"] .sheet .block{background:var(--surface)}
+:root[data-design="wongoji"] .sheet :is(.st-row,.ct-card,.empty,.qn,.qs-row,.qg-stats div,.qg-chart){background:var(--surface2)}
+:root[data-design="wongoji"] :is(.seg input:checked+span,.fav.add.on){background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+:root[data-design="wongoji"] :is(.fav,.me-chip){border-width:2px;border-color:var(--card-line);background:var(--surface)}
+:root[data-design="wongoji"] :is(.pill,.tag){font-weight:700}
+:root[data-design="wongoji"] .sheet .pill.none{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+:root[data-design="wongoji"] .sheet::before{width:1px;box-shadow:4px 0 0 var(--margin)}
+.dsw.wongoji{border-color:#1E1E24;background:linear-gradient(#F4CFCA 1px,transparent 1px) 0 0/6px 6px,linear-gradient(90deg,#F4CFCA 1px,transparent 1px) 0 0/6px 6px,#FFFFFF;box-shadow:inset 3px 0 0 #D7263D}
 </style>
 </head>
 <body>
@@ -956,11 +1054,12 @@ const S = {
   search:"", tag:"", lb:null, rec:null, locEdit:false,
   joinCode:(new URLSearchParams(location.search).get("join")||"").toUpperCase(),
   kidId:new URLSearchParams(location.search).get("kid")||"", kidName:new URLSearchParams(location.search).get("n")||"",
-  theme:ls.get("iinote-theme","light"), dfont:ls.get("iinote-dfont","batang")
+  theme:ls.get("iinote-theme","light"), dfont:ls.get("iinote-dfont","batang"), design:ls.get("iinote-design","note")
 };
 if(!["batang","pen","gothic","dodum"].includes(S.dfont)) S.dfont="batang";
-function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.documentElement.dataset.dfont=S.dfont;
-  document.querySelector('meta[name="theme-color"]').content = S.theme==="dark" ? "#141A28" : "#FBF6EE"; }
+if(!["note","clean","bright","wongoji"].includes(S.design)) S.design="note";
+function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
+  document.querySelector('meta[name="theme-color"]').content = S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7"})[S.design] || "#FBF6EE"; }
 applyPrefs();
 
 const prof = id => S.profiles.find(p=>p.id===id);
@@ -1148,12 +1247,15 @@ function viewPicker(){
 const TAB_TONE = {home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
 // 일기 글씨 4가지
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
-// 화면 위쪽: 첫 화면 모양(어른만)과 일기 글씨 고르기
+// 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
+const DESIGNS = [["note","노트"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
+// 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
 function prefBar(){
   // 글자 대신 그림으로: 모양은 도형, 글씨는 그 글씨체로 쓴 '가'. 이름은 마우스를 올리면 보여요
   const st = isParent() ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양">${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
   const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨">${DFONTS.map(([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`).join("")}</div>`;
-  return `<div class="prefs">${st}${ft}</div>`;
+  const dz = `<div class="seg hb-g" role="radiogroup" aria-label="디자인">${DESIGNS.map(([k,l])=>`<label title="${l}"><input type="radio" name="design" value="${k}" aria-label="${l}" ${S.design===k?"checked":""} data-pref="design"><span><i class="dsw ${k}"></i></span></label>`).join("")}</div>`;
+  return `<div class="prefs">${dz}${st}${ft}</div>`;
 }
 // 즐겨찾기 줄: 누르면 바로 열리고, 어른은 추가 · 편집
 function favRow(){
@@ -2047,6 +2149,7 @@ document.addEventListener("change", e => {
   if(t.name==="mood" && S.draft){ S.draft.mood=t.value; return; }
   if(t.dataset.pref==="theme"){ S.theme=t.value; ls.set("iinote-theme",t.value); applyPrefs(); }
   if(t.dataset.pref==="dfont"){ S.dfont=t.value; ls.set("iinote-dfont",t.value); applyPrefs(); }
+  if(t.dataset.pref==="design"){ S.design=t.value; ls.set("iinote-design",t.value); applyPrefs(); }
   if(t.dataset.pref==="home"){ guard(async()=>{ await B.update(S.gid,"profiles",S.me.id,{homeStyle:t.value}); S.me.homeStyle=t.value; const p=prof(S.me.id); if(p) p.homeStyle=t.value; if(S.tab!=="home"||S.sub){ S.tab="home"; S.sub=null; } render(); }); }
   if(t.dataset.pref==="group"){ guard(async()=>{ await B.setLastGroup(S.user.uid,t.value); S.me=null; await enterGroup(t.value); }); }
 });
