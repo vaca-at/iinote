@@ -68,8 +68,8 @@ td:first-child{white-space:nowrap;font-weight:600}
 <table>
 <tr><th>업체</th><th>하는 일</th></tr>
 <tr><td>Google (Firebase)</td><td>로그인(Firebase 인증), 일기 · 가족 데이터 저장(Cloud Firestore, 서울 지역), 사진 · 소리 파일 저장(Cloud Storage)</td></tr>
-<tr><td>Cloudflare</td><td>AI 빨간펜 검사 요청을 AI 서비스로 전달하는 중간 서버(Workers). 요청을 전달만 하고 일기 내용을 저장하지 않아요.</td></tr>
-<tr><td>AI 맞춤법 서비스</td><td>아이가 ‘AI 빨간펜 검사’를 누른 경우에만 그 일기의 본문, 학년, 부르는 이름을 보내 틀린 곳과 칭찬 · 응원 한마디를 받아요. 서비스 제공업체: 확인하는 대로 여기에 적을게요.</td></tr>
+<tr><td>Cloudflare</td><td>AI 빨간펜 검사 요청을 AI 서비스로 전달하는 중간 서버(Workers). 요청을 전달만 하고 일기 내용을 저장하지 않아요. 요금 확인을 위해 한 달 동안의 사용 횟수와 토큰 수(숫자)만 세어 둬요.</td></tr>
+<tr><td>Anthropic (Claude)</td><td>아이가 ‘AI 빨간펜 검사’를 누른 경우에만 그 일기의 본문, 학년, 부르는 이름을 보내 틀린 곳과 칭찬 · 응원 한마디를 받아요. 다른 가족의 정보나 운영자 가족의 정보는 함께 보내지 않아요.</td></tr>
 <tr><td>OpenStreetMap (Nominatim)</td><td>‘지금 있는 곳’을 누른 경우에만, 대략적인 위치 값을 보내 동네 이름을 받아 와요.</td></tr>
 </table>
 <p>‘카카오톡 공유하기’ 버튼을 위해 카카오 JavaScript SDK를 불러와요. 버튼을 누르면 아이아이노트 주소(일기 내용은 아님)가 카카오톡 공유 화면으로 전달돼요.</p>
