@@ -658,6 +658,16 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "412097553357",
   appId: "1:412097553357:web:ca64a3b887316f79ba5a84"
 };
+// 예전 가족일기장(jsun.site/diary · 공부방 일기, 공부방과 같은 파이어베이스). '우리 가족 > 예전 가족일기장 가져오기'에서만 써요.
+const OLD_DIARY_CONFIG = {
+  apiKey: "AIzaSyBHMmNT-TxBAJqarHqLAYtM3VhaUhynzEw",
+  authDomain: "moon-15f88.firebaseapp.com",
+  projectId: "moon-15f88",
+  storageBucket: "moon-15f88.firebasestorage.app",
+  messagingSenderId: "124372121061",
+  appId: "1:124372121061:web:b1596628daae0bb08eab0c"
+};
+const OLD_PEOPLE = [["me","엄마"],["doyun","도윤"],["dojin","도진"]];   // 예전 일기장의 author 값과 이름
 // AI 맞춤법 확인을 대신 호출해 주는 클라우드플레어 워커 주소 (API 키는 워커에만 보관)
 const AI_WORKER_URL = "https://여기에-워커-주소.workers.dev";
 // 컴퓨터에서 접속하는 쉬운 주소 (화면 곳곳에 안내돼요)
@@ -985,6 +995,7 @@ async function enterGroup(gid){
 const ICONS = {
   home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
   // 첫 화면 모양 고르기 그림: 일기장 · 달력 · 4분할 · 앨범
+  download:'<path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/>',
   "lay-diary":'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
   "lay-calendar":'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>',
   "lay-quad":'<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
@@ -1674,6 +1685,11 @@ function viewFamily(){
         <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
         <p class="muted" style="font-size:13px;margin:10px 0 0">첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요.</p>
       </section>
+      ${isParent()&&!DEMO?`<section class="block" aria-labelledby="h-old"><div class="block-h"><h2 id="h-old">예전 가족일기장 가져오기</h2></div>
+        <p class="muted" style="margin:0 0 12px;font-size:14px">jsun.site/diary 와 공부방에서 쓴 일기 · 댓글을 옮겨 와요. 예전 일기장 구글 계정으로 한 번 더 로그인해요. 다시 누르면 그 뒤에 새로 쓴 것만 들어와요.</p>
+        <form class="form-grid" data-form="old-import">${OLD_PEOPLE.map(([k,n])=>`<label>${n}의 일기를<select name="${k}"><option value="">가져오지 않기</option>${ps.map(p=>`<option value="${esc(p.id)}" ${p.name===n?"selected":""}>${esc(p.name)} 일기로</option>`).join("")}</select></label>`).join("")}
+          <button class="btn btn-primary span2">${ic("download")}가져오기</button></form>
+      </section>`:""}
       <section class="block" aria-labelledby="h-acc"><div class="block-h"><h2 id="h-acc">계정</h2></div>
         <div class="row">
           <button class="btn btn-ghost sm" data-act="switch-profile">프로필 바꾸기</button>
@@ -1894,6 +1910,54 @@ function deleteMyAccount(){
   });
 }
 
+/* 예전 가족일기장에서 가져오기: 예전 일기장 계정으로 한 번 더 로그인해서 diary 모음을 읽어 와요.
+   가져온 일기 · 댓글에는 importKey를 적어 두어서, 다시 눌러도 새로 쓴 것만 들어와요. */
+async function readOldDiaries(){
+  const V="10.12.2";
+  const A = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+  const AU = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`);
+  const F = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`);
+  const app = A.getApps().find(a=>a.name==="old") || A.initializeApp(OLD_DIARY_CONFIG,"old");
+  const auth = AU.getAuth(app), p = new AU.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
+  try{
+    await AU.signInWithPopup(auth,p);
+    const s = await F.getDocs(F.collection(F.getFirestore(app),"diary"));
+    return s.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){ throw new Error(`예전 일기장을 읽지 못했어요 (${e.code||e.message})`); }
+  finally{ AU.signOut(auth).catch(()=>{}); }
+}
+const OLD_MOOD = {"😆":"great","🥰":"great","😊":"good","😐":"calm","😢":"sad","😠":"sad","😴":"tired"};
+const msOf = (t,fb) => t?.toMillis ? t.toMillis() : typeof t==="number" ? t : fb;
+async function importOld(fd){
+  const map={}; OLD_PEOPLE.forEach(([k])=>{ if(fd[k]) map[k]=fd[k]; });
+  if(!Object.keys(map).length){ toast("가져올 사람을 하나 이상 골라 주세요"); return; }
+  const old=(await readOldDiaries()).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  toast("가져오는 중이에요…");
+  const have=new Map(S.diaries.filter(d=>d.importKey).map(d=>[d.importKey,d.id]));
+  const haveC=new Set(S.comments.map(c=>c.importKey).filter(Boolean));
+  let nd=0, nc=0;
+  for(const o of old){
+    const pid=map[o.author]; if(!pid || !o.date || !String(o.content||"").trim()) continue;
+    const key="old:"+o.id; let did=have.get(key);
+    if(!did){
+      const at=msOf(o.createdAt, new Date(o.date+"T20:00:00").getTime()), title=String(o.title||"").trim();
+      const text=(o.question?`Q. ${o.question}\n\n`:"")+o.content;   // 질문에 답한 일기는 질문을 맨 위에
+      did=await B.add(S.gid,"diaries",{profileId:pid,date:o.date,mood:OLD_MOOD[o.mood]||"",title,text,status:"submitted",
+        photos:[],audio:null,location:null,tags:[...new Set(extractTags(title+" "+o.content))].slice(0,20),
+        createdAt:at,updatedAt:msOf(o.updatedAt,at),importKey:key});
+      nd++;
+    }
+    for(const c of o.comments||[]){
+      const ck=`${key}:${c.at}:${c.by}`, cp=map[c.by];
+      if(!cp || !c.text || haveC.has(ck)) continue;
+      await B.add(S.gid,"comments",{diaryId:did,parentId:null,profileId:cp,text:c.text,createdAt:c.at||Date.now(),importKey:ck});
+      haveC.add(ck); nc++;
+    }
+  }
+  await reload("diaries"); await reload("comments"); render();
+  toast(nd||nc?`일기 ${nd}편, 댓글 ${nc}개를 가져왔어요`:"새로 가져올 일기가 없어요");
+}
+
 async function saveDiary(status){
   const d=S.draft, child=S.me.type==="child";
   if(!d.text.trim()){ toast("일기 내용을 써 주세요"); return; }
@@ -1939,6 +2003,7 @@ async function aiCheck(){
 
 /* 폼 제출 */
 const forms = {
+  "old-import": fd => guard(()=>importOld(fd)),
   "create-group": fd => guard(async()=>{ const gid=await B.createGroup(fd.name.trim(),S.user,fd.me.trim()); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid); toast("가족을 만들었어요. 초대 코드는 '우리 가족'에 있어요"); }),
   "join-group": fd => guard(async()=>{ const role = fd.role==="child" ? {type:"child",grade:Number(fd.grade),pin:""} : {type:"parent"};
     const gid=await B.joinGroup(fd.code.trim().toUpperCase(),S.user,fd.me.trim(),role); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid);
