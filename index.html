@@ -561,6 +561,16 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .pen .pen-warn{color:var(--coral-ink);font-size:14px}
 .pen-orig{margin-top:12px;font-size:14px;color:var(--ink2)}
 .pen-orig p{white-space:pre-wrap;font-family:var(--diary);background:var(--surface2);border-radius:10px;padding:10px 12px;margin:6px 0 0}
+/* 칭찬 도장 · 하트 */
+.react{margin:20px 0 6px;display:grid;gap:12px}
+.stamp{justify-self:start;transform:rotate(-8deg);color:var(--coral-ink);border:3px solid var(--coral);border-radius:48% 52% 45% 55%/55% 45% 55% 45%;padding:8px 20px;font-family:var(--diary);font-weight:700;font-size:22px;letter-spacing:1px}
+.react-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.heart-btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font-weight:700}
+.heart-btn.on{background:var(--coral-soft);border-color:var(--coral);color:var(--coral-ink)}
+.stamp-pick{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.stamp-btn{border:1.5px dashed var(--coral);color:var(--coral-ink);background:none;border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px}
+.stamp-btn.on{background:var(--coral);border-style:solid;color:var(--paper)}
+.stamp-mini{color:var(--coral-ink);border:1.5px solid var(--coral);border-radius:6px;padding:0 6px;font-size:12px;font-weight:800;transform:rotate(-4deg)}
 
 /* ============ 퀴즈 ============ */
 .q-words{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
@@ -1667,7 +1677,7 @@ function dcard(d){
     <span class="dcard-ex">${esc(d.text.slice(0,140))}</span>
     ${(d.location||tags.length||d.audio)?`<span class="dcard-meta">${d.location?`<span>${ic("pin")}${esc(d.location.name)}</span>`:""}${d.audio?`<span>${ic("mic")}소리</span>`:""}${tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join("")}</span>`:""}
     ${ai}
-    <span class="dcard-foot">${moodChip(d.mood)}<span>댓글 ${n}</span></span></button>`;
+    <span class="dcard-foot">${moodChip(d.mood)}${d.stamp?`<span class="stamp-mini">${esc(d.stamp)}</span>`:""}${heartsOf(d).length?`<span>❤️ ${heartsOf(d).length}</span>`:""}<span>댓글 ${n}</span></span></button>`;
 }
 function viewFeed(){
   const list=filteredDiaries();
@@ -1682,6 +1692,21 @@ function viewDiaryList(){
     ${chips}
     ${tags.length?`<div class="tags-row" role="group" aria-label="태그로 모아 보기">${tags.map(([t,n])=>`<button class="htag ${S.tag===t?"on":""}" data-act="tag" data-v="${esc(t)}" aria-pressed="${S.tag===t}">#${esc(t)} <small>${n}</small></button>`).join("")}</div>`:""}
     <div id="feed-wrap">${viewFeed()}</div>`;
+}
+
+/* ---------- 칭찬 도장 · 하트 ----------
+   도장: 부모가 아이 일기에 하나 찍어요 (같은 도장을 다시 누르면 지워져요). 하트: 가족 누구나 (diaries.hearts = {프로필id:true}) */
+const STAMPS = ["참 잘했어요","최고예요","멋진 생각","글씨왕"];
+const heartsOf = d => Object.keys(d.hearts||{}).filter(k=>d.hearts[k]);
+function viewReact(d,mine){
+  if(d.status!=="submitted") return "";
+  const hs=heartsOf(d), on=hs.includes(S.me.id), who=hs.map(id=>prof(id)?.name).filter(Boolean);
+  const canStamp=isParent() && !mine && prof(d.profileId)?.type==="child";
+  return `<section class="react" aria-label="칭찬 도장과 하트">
+    ${d.stamp?`<div class="stamp" role="img" aria-label="칭찬 도장: ${esc(d.stamp)}">${esc(d.stamp)}</div>`:""}
+    <div class="react-row"><button class="heart-btn ${on?"on":""}" data-act="heart" data-id="${d.id}" aria-pressed="${on}">${on?"❤️":"🤍"} 하트 ${hs.length}</button>${who.length?`<span class="muted">${who.map(esc).join(" · ")}</span>`:""}</div>
+    ${canStamp?`<div class="stamp-pick" role="group" aria-label="칭찬 도장 찍기"><span class="muted">칭찬 도장</span>${STAMPS.map(s=>`<button class="stamp-btn ${d.stamp===s?"on":""}" data-act="stamp" data-id="${d.id}" data-v="${esc(s)}" aria-pressed="${d.stamp===s}">${esc(s)}</button>`).join("")}</div>`:""}
+  </section>`;
 }
 
 /* ---------- 일기 읽기 + 댓글 ---------- */
@@ -1699,6 +1724,7 @@ function viewDiaryDetail(){
     ${(d.photos||[]).length?photoGrid(d.photos,d.id):""}
     <div class="paper-lines">${tagify(d.text)}</div>
     ${d.audio?`<div class="audio-card">${ic("mic")}<audio controls preload="none" src="${esc(d.audio.url)}"></audio></div>`:""}
+    ${viewReact(d,mine)}
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(p?.name||"")}의 하루에 답해 주세요.</p>`}
@@ -2017,6 +2043,12 @@ const acts = {
   back: () => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.sub=null; S.draft=null; S.lb=null; }),
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
+  heart: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
+    const hearts={...(d.hearts||{})}; if(hearts[S.me.id]) delete hearts[S.me.id]; else hearts[S.me.id]=true;
+    await B.update(S.gid,"diaries",d.id,{hearts}); d.hearts=hearts; render(); }),
+  stamp: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d || !isParent()) return;
+    const v=d.stamp===el.dataset.v ? null : el.dataset.v;
+    await B.update(S.gid,"diaries",d.id,{stamp:v,stampBy:v?S.me.id:null}); d.stamp=v; render(); if(v) toast(`'${v}' 도장을 찍었어요`); }),
   "pen-check": () => penCheck(),
   "pen-reveal": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ er.shown=true; refreshPen(); } },
   "pen-apply": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ penApplyOne(er); penSyncText(); refreshPen(); } },
@@ -2242,6 +2274,10 @@ async function importOld(fd){
       // 예전 일기장에서 고쳤거나, 빨간펜 검사를 다시 받은 일기 → 새 내용으로 바꿔요
       await B.update(S.gid,"diaries",did,{...body,updatedAt:up}); nu++;
     }
+    // 예전 일기장의 칭찬 도장 · 하트도 (iinote에서 누른 하트는 그대로 두고 합쳐요)
+    const cur=ex?.hearts||{}, add=Object.keys(o.hearts||{}).filter(k=>o.hearts[k] && map[k] && !cur[map[k]]).map(k=>map[k]);
+    if(add.length || (o.stamp && o.stamp!==ex?.stamp))
+      await B.update(S.gid,"diaries",did,{hearts:{...cur,...Object.fromEntries(add.map(id=>[id,true]))}, ...(o.stamp?{stamp:o.stamp}:{})});
     for(const c of o.comments||[]){
       const ck=`${key}:${c.at}:${c.by}`, cp=map[c.by];
       if(!cp || !c.text || haveC.has(ck)) continue;
