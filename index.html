@@ -246,7 +246,7 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
   /* 노트 여백선: 이 앱의 상징 */
   .sheet::before{content:"";position:absolute;left:40px;top:0;bottom:0;width:2px;background:var(--margin)}
 }
-@media (min-width:1100px){ .prefs{display:flex;gap:18px;align-items:center} }
+@media (min-width:760px){ .prefs{display:flex;gap:10px;align-items:center} }
 /* 높이가 낮은 가로 화면(아이패드 가로 등): 머리 부분을 납작하게 */
 @media (min-width:760px) and (max-height:900px){
   .frame{padding-top:12px}
@@ -258,8 +258,6 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
   .ftabs{margin-top:6px}
   .ftab{min-height:40px;padding:6px 18px}
   .ftab.on{min-height:46px}
-  .quad{height:calc(100dvh - 330px);min-height:430px}
-  .q-mini>p.muted{display:none}
   .qm-who .av{width:36px!important;height:36px!important;font-size:15px!important}
 }
 @media (max-width:759px){
@@ -350,19 +348,24 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 /* 화면 위쪽: 모양 · 글씨 고르기 */
 .hb-g{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto;max-width:100%;padding:2px}
 .hb-g b{font-size:13px;color:var(--ink3);margin-right:4px;white-space:nowrap}
-.hb-g span{min-height:34px;padding:0 13px;font-size:14px;white-space:nowrap}
-.hb-g span.pen{font-size:19px}
+.hb-g span{width:38px;min-height:38px;padding:0;justify-content:center;font-size:18px;white-space:nowrap}
+.hb-g span .ic{width:20px;height:20px}
+.hb-g span.pen{font-size:24px}
+.hb-g+.hb-g{border-left:1.5px solid var(--line);padding-left:10px}
 /* 4분할형 첫 화면 */
 .quad{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
 .q-cell{min-width:0;display:flex;flex-direction:column}
 .q-cell .block-h{flex:none}
 .q-body{min-height:0}
-.q-mini{align-items:center;justify-content:center;text-align:center;gap:6px}
-.q-mini .today-date{font-size:clamp(28px,3.4vw,40px);margin:0 0 10px}
-.qm-who{list-style:none;padding:0;margin:0 0 16px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-.qm-who li{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px;min-width:56px}
+.q-mini{align-items:center;justify-content:center;text-align:center;gap:10px}
+.q-mini .today-date{font-size:clamp(26px,3vw,36px);margin:0}
+.qm-who{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.qm-who li{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;min-width:44px}
 .qm-who li.no .av{opacity:.35}
-.qm-who small{color:var(--ink3);font-size:12px}
+.qm-av{position:relative;display:inline-flex}
+.qm-av i{position:absolute;right:-4px;bottom:-3px;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:800;line-height:1;border:2px solid var(--paper)}
+.qm-av i.ok{background:var(--sage);color:var(--paper)}
+.qm-av i.ing{background:var(--butter);color:var(--ink)}
 .qn-list{list-style:none;padding:0;margin:0;display:grid;gap:8px}
 .qn{display:flex;gap:10px;align-items:flex-start;width:100%;border:0;border-radius:14px;background:var(--paper);padding:10px 12px;text-align:left}
 .qn:hover{background:var(--surface2)}
@@ -371,33 +374,48 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .qn-h b{color:var(--ink);font-size:14px}
 .qn-h time{margin-left:auto;white-space:nowrap}
 .qn-x{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--surface);border-radius:10px;padding:4px 10px}
-.qs-list{display:grid;gap:8px}
-.qs-row{display:flex;gap:10px;align-items:center;background:var(--paper);border-radius:14px;padding:6px 10px}
-.qs-who{display:flex;flex-direction:column;align-items:center;gap:0;min-width:52px;font-size:12px;font-weight:650;line-height:1.3}
+/* 스티커판: 한 사람 한 줄 (한 달 칸이 한 줄에) */
+.qs-list{display:grid;gap:5px}
+.qs-row{display:flex;gap:8px;align-items:center;background:var(--paper);border-radius:12px;padding:4px 8px}
+.qs-who{display:flex;align-items:center;gap:4px;min-width:62px;font-weight:650;line-height:1}
 .qs-who small{color:var(--coral-ink);font-size:11px;white-space:nowrap}
-.qs-st{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px;flex:1;min-width:0}
-.qs-st i{aspect-ratio:1;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:9px;line-height:1}
+.qs-st{display:grid;grid-template-columns:repeat(var(--n,31),minmax(0,1fr));gap:2px;flex:1;min-width:0}
+.qs-st i{aspect-ratio:1;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:8px;line-height:1}
 .qs-st i.on{background:var(--pc);border-color:var(--pc);color:var(--pt)}
 .qs-st i.fut{border-style:dashed;opacity:.55}
-.qg-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
-.qg-stats div{background:var(--paper);border-radius:12px;padding:8px;text-align:center;font-size:12px;color:var(--ink3)}
-.qg-stats b{display:block;font-size:22px;color:var(--ink);line-height:1.3}
-.qg-chart{background:var(--paper);border-radius:12px;padding:8px 10px;margin-bottom:10px;font-size:12px;color:var(--ink3)}
-.qg-chart svg{display:block;width:100%;height:60px}
-.qg-words{display:flex;flex-wrap:wrap;gap:6px;font-size:12px}
-.qg-words span{background:var(--coral-soft);color:var(--coral-ink);border-radius:8px;padding:2px 8px;font-weight:650}
-.quad .chips{margin-bottom:10px}
+/* 성장 기록: 그림 글자 + 숫자 한 줄 */
+.q-cell .block-h h2 small{font-size:13px;font-weight:500}
+.qg-who{display:flex;gap:4px}
+.qg-who button{border:2px solid transparent;border-radius:50%;padding:1px;background:none;opacity:.5;line-height:0}
+.qg-who button.on{border-color:var(--ink);opacity:1}
+.qg-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
+.qg-stats div{background:var(--paper);border-radius:10px;padding:4px 6px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:15px}
+.qg-stats b{font-size:17px;color:var(--ink);line-height:1.3}
+.qg-chart{background:var(--paper);border-radius:10px;padding:6px 10px;margin-bottom:8px;font-size:12px;color:var(--ink3)}
+.qg-chart svg{display:block;width:100%;height:40px}
+.qg-words{display:flex;flex-wrap:nowrap;gap:5px;font-size:12px;overflow:hidden;white-space:nowrap;align-items:center;color:var(--ink3)}
+.qg-words em{font-style:normal;flex:none}
+.qg-words span{background:var(--coral-soft);color:var(--coral-ink);border-radius:8px;padding:2px 7px;font-weight:650}
 @media (min-width:760px){ .quad{grid-template-columns:repeat(2,minmax(0,1fr))} }
-/* 가로 화면(컴퓨터 · 아이패드 가로)에서는 네 칸이 한 화면에 다 들어오게 */
+/* 가로 화면(컴퓨터 · 아이패드 가로)에서는 네 칸이 한 화면에 다 들어오게.
+   1 · 3 · 4칸은 내용을 줄여서 스크롤 없이, 2칸(교환일기)만 길면 스크롤 */
 @media (min-width:760px) and (orientation:landscape){
-  .quad{grid-template-rows:repeat(2,minmax(0,1fr));height:calc(100dvh - 410px);min-height:480px}
-  .sheet:has(.quad){padding-top:20px;padding-bottom:20px}
-  .q-cell{overflow:hidden}
-  .q-body{flex:1;overflow:auto}
-  .q-mini{overflow:auto;justify-content:safe center}
-  .q-mini .today-date{font-size:clamp(26px,3vw,40px);margin-bottom:6px}
-  .qm-who{margin-bottom:12px}
+  .quad{grid-template-rows:repeat(2,minmax(0,1fr));height:calc(100dvh - 350px);min-height:340px}
+  .sheet:has(.quad){padding-top:20px;padding-bottom:20px;margin-bottom:12px}
+  .quad .block{padding:14px 18px}
+  .quad .block-h{margin-bottom:10px}
+  .q-cell{overflow:hidden;container-type:size}
+  .q-body{flex:1;overflow:hidden}
+  .q-cell:nth-child(2) .q-body{overflow:auto;scrollbar-width:thin}
+  /* 칸이 낮으면 덜 중요한 것부터 숨기기 */
+  @container (max-height:250px){ .qg-chart{display:none} }
+  @container (max-height:230px){ .q-mini .today-date{font-size:26px} .qm-who b{display:none} .qs-row{padding:1px 8px} .qs-list{gap:3px} }
+  @container (max-height:180px){ .q-mini .today-date{font-size:22px} .q-mini .btn{min-height:40px;padding:0 16px} .qs-who .av{width:16px!important;height:16px!important;font-size:9px!important} }
+  @container (max-height:110px){ .qg-words{display:none} }
 }
+/* 높이가 낮은 가로 화면: 머리 부분이 납작해진 만큼 네 칸을 더 크게 */
+@media (min-width:760px) and (orientation:landscape) and (max-height:900px){ .quad{height:calc(100dvh - 290px);min-height:320px} }
+@media (min-width:760px) and (orientation:landscape) and (max-height:700px){ .quad{height:calc(100dvh - 305px);min-height:300px} }
 /* 앨범형 첫 화면 */
 .album{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-rows:150px;grid-auto-flow:dense}
 .al{position:relative;overflow:hidden;border:0;padding:0;border-radius:14px;background:var(--pc);color:var(--pt);text-align:left}
@@ -966,6 +984,11 @@ async function enterGroup(gid){
    ========================================================= */
 const ICONS = {
   home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  // 첫 화면 모양 고르기 그림: 일기장 · 달력 · 4분할 · 앨범
+  "lay-diary":'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+  "lay-calendar":'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>',
+  "lay-quad":'<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
+  "lay-album":'<rect x="3" y="3" width="11" height="11" rx="1.5"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="16" y="10" width="5" height="4" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><rect x="10" y="16" width="11" height="5" rx="1"/>',
   book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5"/>',
   quiz:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><path d="M12 17h.01"/>',
   people:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.3-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.6c2.6.2 4.4 2 5 4.9"/>',
@@ -1116,8 +1139,9 @@ const TAB_TONE = {home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 화면 위쪽: 첫 화면 모양(어른만)과 일기 글씨 고르기
 function prefBar(){
-  const st = isParent() ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양"><b>모양</b>${HOME_STYLES.map(([k,l])=>`<label><input type="radio" name="home" value="${k}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${l}</span></label>`).join("")}</div>` : "";
-  const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨"><b>글씨</b>${DFONTS.map(([k,l,f])=>`<label><input type="radio" name="dfont" value="${k}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">${l}</span></label>`).join("")}</div>`;
+  // 글자 대신 그림으로: 모양은 도형, 글씨는 그 글씨체로 쓴 '가'. 이름은 마우스를 올리면 보여요
+  const st = isParent() ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양">${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
+  const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨">${DFONTS.map(([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`).join("")}</div>`;
   return `<div class="prefs">${st}${ft}</div>`;
 }
 // 즐겨찾기 줄: 누르면 바로 열리고, 어른은 추가 · 편집
@@ -1260,10 +1284,11 @@ function viewHomeQuad(){
 // 1. 미니멀: 오늘 날짜, 누가 썼는지, 큰 쓰기 버튼
 function quadMini(){
   const t=todayStr(), ps=sortedProfiles();
-  const who=ps.map(p=>{ const d=findDiary(p.id,t), s=d?.status==="submitted";
-    return `<li class="${s?"":"no"}">${av(p,44)}<b>${esc(p.name)}</b><small>${s?"썼어요":d?"쓰는 중":"아직"}</small></li>`; }).join("");
+  // 글자 대신 표시: 썼으면 ✓ 도장, 쓰는 중이면 ✎, 아직이면 흐리게
+  const who=ps.map(p=>{ const d=findDiary(p.id,t), s=d?.status==="submitted", lab=s?"썼어요":d?"쓰는 중":"아직";
+    return `<li class="${s?"":"no"}" title="${esc(p.name)} ${lab}"><span class="qm-av">${av(p,36)}${s||d?`<i class="${s?"ok":"ing"}">${s?"✓":"✎"}</i>`:""}</span><b>${esc(p.name)}</b><span class="sr">${lab}</span></li>`; }).join("");
   return `<section class="block q-cell q-mini" aria-labelledby="h-qm">
-    <p class="muted" style="margin:0">오늘</p><h2 id="h-qm" class="today-date">${fmtLong(t)}</h2>
+    <h2 id="h-qm" class="today-date">${fmtLong(t)}</h2>
     <ul class="qm-who">${who}</ul>${homeCta(findDiary(S.me.id,t))}</section>`;
 }
 // 2. 교환일기: 나에게 온 댓글 · 답글과 가족의 새 일기
@@ -1290,8 +1315,8 @@ function quadSticker(){
     const st=[...Array(days)].map((_,i)=>{ const d=`${month}-${pad(i+1)}`, on=submittedOn(p.id,d);
       return `<i class="${on?"on":d>t?"fut":""}" title="${mm}월 ${i+1}일${on?" 썼어요":""}">${on?"★":""}</i>`; }).join("");
     const n=[...Array(days)].filter((_,i)=>submittedOn(p.id,`${month}-${pad(i+1)}`)).length;
-    return `<div class="qs-row" style="--pc:${c};--pt:${onColor(c)}"><span class="qs-who">${av(p,26)}${esc(p.name)}<small>${s?`${s}일 연속`:`${n}개`}</small></span><div class="qs-st" aria-label="${esc(p.name)} ${mm}월 스티커 ${n}개">${st}</div></div>`; }).join("");
-  return `<section class="block q-cell" aria-labelledby="h-qs"><div class="block-h"><h2 id="h-qs">칭찬 스티커판</h2><span class="muted">${mm}월 · 일기 쓴 날마다 별 하나</span></div>
+    return `<div class="qs-row" style="--pc:${c};--pt:${onColor(c)}"><span class="qs-who" title="${esc(p.name)}">${av(p,20)}<small>${s>1?`🔥${s}`:`★${n}`}</small></span><div class="qs-st" style="--n:${days}" aria-label="${esc(p.name)} ${mm}월 스티커 ${n}개${s>1?`, ${s}일 연속`:""}">${st}</div></div>`; }).join("");
+  return `<section class="block q-cell" aria-labelledby="h-qs"><div class="block-h"><h2 id="h-qs">칭찬 스티커판</h2><span class="muted">${mm}월 ★</span></div>
     <div class="q-body"><div class="qs-list">${rows}</div></div></section>`;
 }
 // 4. 성장 기록: 이번 달 일기 수, 평균 글자 수, 글 길이 변화, 자주 틀린 낱말
@@ -1305,17 +1330,18 @@ function quadGrowth(){
   const ws=S.quizWords.filter(w=>w.profileId===p.id);
   const learned=ws.filter(w=>(w.correctStreak||0)>=3).length;
   const pts=all.slice(-12).map(d=>(d.text||"").length);
-  let chart=`<p style="margin:0">일기를 두 편 넘게 쓰면 글 길이 변화가 그려져요.</p>`;
+  let chart=`<p style="margin:0">2편부터 그려져요</p>`;
   if(pts.length>1){ const mx=Math.max(...pts,1);
     const xy=pts.map((v,i)=>`${(i/(pts.length-1)*300).toFixed(1)},${(56-v/mx*50).toFixed(1)}`).join(" ");
     chart=`<svg viewBox="0 0 300 60" preserveAspectRatio="none" role="img" aria-label="최근 일기 ${pts.length}편의 글자 수: ${pts.join(", ")}"><polyline points="${xy}" fill="none" stroke="var(--sky)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`; }
-  const wrong=ws.filter(w=>(w.correctStreak||0)<3).sort((a,b)=>(b.wrongCount||1)-(a.wrongCount||1)).slice(0,6);
-  const chips=pool.length>1?`<div class="chips" role="group" aria-label="누구의 기록">${pool.map(x=>`<button class="chip ${x.id===p.id?"on":""}" data-act="grow" data-v="${x.id}" aria-pressed="${x.id===p.id}">${av(x,26)}${esc(x.name)}</button>`).join("")}</div>`:"";
-  return `<section class="block q-cell" aria-labelledby="h-qg"><div class="block-h"><h2 id="h-qg">성장 기록</h2><span class="muted">${esc(p.name)}${p.grade?` ${p.grade}학년`:""}</span></div>
-    <div class="q-body">${chips}
-      <div class="qg-stats"><div>이번 달 일기<b>${mon.length}편</b></div><div>평균 글자<b>${avg}자</b></div><div>${p.type==="child"?"익힌 낱말":"모든 일기"}<b>${p.type==="child"?learned:all.length}${p.type==="child"?"개":"편"}</b></div></div>
-      <div class="qg-chart">글 길이 변화 (최근 ${pts.length}편)${chart}</div>
-      ${p.type==="child"?`<div class="qg-chart" style="margin:0">자주 틀린 낱말<div class="qg-words" style="margin-top:6px">${wrong.length?wrong.map(w=>`<span>${esc(w.wrong)} → ${esc(w.right)}</span>`).join(""):"아직 없어요"}</div></div>`:""}
+  const wrong=ws.filter(w=>(w.correctStreak||0)<3).sort((a,b)=>(b.wrongCount||1)-(a.wrongCount||1)).slice(0,4);
+  // 누구 기록인지 고르는 단추는 제목 줄 오른쪽에 작게
+  const chips=pool.length>1?`<div class="qg-who" role="group" aria-label="누구의 기록">${pool.map(x=>`<button class="${x.id===p.id?"on":""}" data-act="grow" data-v="${x.id}" aria-pressed="${x.id===p.id}" title="${esc(x.name)}">${av(x,26)}</button>`).join("")}</div>`:"";
+  return `<section class="block q-cell" aria-labelledby="h-qg"><div class="block-h"><h2 id="h-qg">성장 기록 <small class="muted">${esc(p.name)}</small></h2>${chips}</div>
+    <div class="q-body">
+      <div class="qg-stats"><div title="이번 달 일기">📔<b>${mon.length}편</b></div><div title="평균 글자 수">✏️<b>${avg}자</b></div><div title="${p.type==="child"?"익힌 낱말":"모든 일기"}">${p.type==="child"?"🌱":"📚"}<b>${p.type==="child"?learned:all.length}${p.type==="child"?"개":"편"}</b></div></div>
+      <div class="qg-chart">📈 글 길이 (최근 ${pts.length}편)${chart}</div>
+      ${p.type==="child"?`<div class="qg-words" aria-label="자주 틀린 낱말"><em>틀린 낱말</em>${wrong.length?wrong.map(w=>`<span>${esc(w.wrong)}→${esc(w.right)}</span>`).join(""):"없어요 👍"}</div>`:""}
     </div></section>`;
 }
 
