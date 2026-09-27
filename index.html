@@ -525,7 +525,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .fix-st{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--coral-ink)}
 .fix.fixed .fix-st{color:var(--sage)}
 .fix-e{flex-basis:100%;margin:0;font-size:14px;color:var(--ink2)}
-/* 빨간펜 선생님: 일기 칸 위 형광펜 + 빨간펜 칸 (공부방 빨간펜과 같은 모양) */
+/* AI 빨간펜 선생님: 일기 칸 위 형광펜 + 빨간펜 칸 (공부방 빨간펜과 같은 모양) */
 .w-ed{position:relative}
 .w-ed .w-text{overflow:hidden;resize:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal}
 .w-hl{position:absolute;inset:0;border:1.5px solid transparent;border-radius:16px;padding:6px 16px;font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal;color:transparent;pointer-events:none;overflow:hidden}
@@ -1046,7 +1046,7 @@ function contextOf(text, wrong){
   if(ctx.length > 40){ const i = ctx.indexOf("____"); ctx = ctx.slice(Math.max(0,i-18), i+22).trim(); }
   return ctx;
 }
-/* ===== 빨간펜 선생님 (공부방 빨간펜과 같은 워커 · 같은 방식) =====
+/* ===== AI 빨간펜 선생님 (공부방 빨간펜과 같은 워커 · 같은 방식) =====
    목표 글자 수를 채우면 부를 수 있어요 → 틀린 곳을 노란 형광펜으로 칠해요 → 스스로 고치거나 정답을 보고 고쳐요.
    1 · 2학년은 빨간펜이 바로 고쳐 줘요(초록 형광펜). 다 고쳐야 제출할 수 있어요. 칭찬 · 응원 한마디(AI 피드백)도 함께.
    워커: { text, level:"grade4", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer } */
@@ -1058,8 +1058,8 @@ const penGoalOf = p => Number(p?.diaryGoal) || penGoalDefault(p);
 const penAuto = g => (g||2) <= 2;
 const countChars = s => String(s||"").replace(/\s/g,"").length;
 const PEN_ENDS = /[.?!…~。)"'”’\]]$|\p{Extended_Pictographic}$/u;
-const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"빨간펜이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
-const PRAISE_SELF = ["👍 스스로 찾아서 고쳤어요! 정말 대단해요!","🦸 혼자 고치다니, 맞춤법 영웅이에요!","🧠 똑똑해요! 선생님 도움 없이 고쳤어요!"];
+const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"AI 빨간펜이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
+const PRAISE_SELF = ["👍 스스로 찾아서 고쳤어요! 정말 대단해요!","🦸 혼자 고치다니, 맞춤법 영웅이에요!","🧠 똑똑해요! AI 선생님 도움 없이 고쳤어요!"];
 // 틀린 말이 글 어디에 있는지 (고친 말 안에 틀린 말이 들어 있는 경우는 건너뛰어요)
 function penAt(er,text){
   const off=er.right.indexOf(er.wrong); let i=text.indexOf(er.wrong);
@@ -1781,16 +1781,16 @@ function viewMedia(d){
 // 빨간펜 칸: 부르기 전(글자 수 게이지) → 검사 뒤(칭찬 · 응원 + 고칠 곳 목록)
 function viewPen(d){
   const goal=penGoalOf(S.me), n=countChars(d.text), p=d.pen, text=d.text;
-  const call=label=>`<button class="btn btn-pen sm" data-act="pen-check" ${S.penBusy?"disabled":""}>${S.penBusy?"🖍 선생님이 읽는 중…":label}</button>`;
-  const rest=S.penFailed?`<p class="pen-warn">빨간펜 선생님이 잠깐 쉬는 중이에요. 조금 있다가 다시 눌러 보세요. 제출은 지금도 할 수 있어요.</p>`:"";
-  if(!p) return `<section class="pen" id="pen"><div class="pen-h"><h3>🖍 빨간펜 선생님</h3>${call("🖍 빨간펜 검사")}</div>
-    <p>${n>=goal?"다 썼으면 빨간펜 선생님을 불러 보세요. 틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요.":`${goal}자를 다 쓰면 빨간펜 선생님을 부를 수 있어요.`}</p>
+  const call=label=>`<button class="btn btn-pen sm" data-act="pen-check" ${S.penBusy?"disabled":""}>${S.penBusy?"🖍 AI 선생님이 읽는 중…":label}</button>`;
+  const rest=S.penFailed?`<p class="pen-warn">AI 빨간펜 선생님이 잠깐 쉬는 중이에요. 조금 있다가 다시 눌러 보세요. 제출은 지금도 할 수 있어요.</p>`:"";
+  if(!p) return `<section class="pen" id="pen"><div class="pen-h"><h3>🖍 AI 빨간펜 선생님</h3>${call("🖍 빨간펜 검사")}</div>
+    <p>${n>=goal?"다 썼으면 AI 빨간펜 선생님을 불러 보세요. 틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요.":`${goal}자를 다 쓰면 AI 빨간펜 선생님을 부를 수 있어요.`}</p>
     <div class="pen-gauge ${n>=goal?"full":""}"><i style="width:${Math.min(100,n/goal*100)}%"></i></div><p class="pen-cnt">${n>=goal?`${n}자 👍`:`${n} / ${goal}자`}</p>${rest}</section>`;
   const errs=p.errors, left=errs.filter(er=>penLeft(er,text));
-  const fb=p.praise||p.cheer?`<div class="pen-fb">${p.praise?`<b>👏 선생님의 칭찬</b><p>${esc(p.praise)}</p>`:""}${p.cheer?`<b>💪 응원 한마디</b><p>${esc(p.cheer)}</p>`:""}</div>`:"";
+  const fb=p.praise||p.cheer?`<div class="pen-fb">${p.praise?`<b>👏 AI 선생님의 칭찬</b><p>${esc(p.praise)}</p>`:""}${p.cheer?`<b>💪 응원 한마디</b><p>${esc(p.cheer)}</p>`:""}</div>`:"";
   let head, sub="";
   if(!errs.length) head="💯 틀린 곳이 하나도 없어요!";
-  else if(p.auto){ head=`🖍 빨간펜 선생님이 ${errs.length}군데를 고쳐 줬어요`; sub=`<p><mark class="pen-ok">초록색</mark>으로 칠한 곳이 고친 곳이에요. 어떻게 바뀌었는지 소리 내어 읽어 봐요!</p>`; }
+  else if(p.auto){ head=`🖍 AI 빨간펜 선생님이 ${errs.length}군데를 고쳐 줬어요`; sub=`<p><mark class="pen-ok">초록색</mark>으로 칠한 곳이 고친 곳이에요. 어떻게 바뀌었는지 소리 내어 읽어 봐요!</p>`; }
   else if(left.length){ head=`🖍 형광펜으로 칠한 곳이 ${left.length}군데 있어요`; sub=`<p>틀려도 괜찮아요! 고치면서 실력이 쑥쑥 자라요 🌱 일기 칸에 <mark class="pen-x">노란색</mark>으로 칠한 곳을 찾아 스스로 고쳐 보세요. 잘 모르겠으면 💡 정답 보기를 눌러요. 다 고쳐야 제출할 수 있어요!</p>`; }
   else { head="🎉 모두 고쳤어요!"; sub=`<p class="pen-good">정말 멋져요! 이제 제출해요.</p>`; }
   const pair=er=>`<span class="pen-w">${esc(er.wrong)}</span> → <span class="pen-r">${esc(er.right)}</span>`;
@@ -1844,7 +1844,7 @@ function viewAIResult(r,text,live){
     const how = c.how || (fixed?"self":"left");   // 빨간펜 기록이 있으면 어떻게 고쳤는지 그대로
     const st = live ? (fixed?ic("check")+"고쳤어요":"고쳐 볼까요?") : (fixed?ic("check"):"")+PEN_HOW[how];
     return `<li class="fix ${fixed?"fixed":""}"><span class="fix-w">${esc(c.wrong)}</span>${ic("arrow")}<span class="fix-r">${esc(c.right)}</span><span class="fix-st">${st}</span>${c.explain?`<p class="fix-e">${esc(c.explain)}</p>`:""}</li>`; }).join("");
-  return `<section class="ai-res" id="ai-res" aria-live="polite"><h2>${ic("spark")}${parentView?"빨간펜 선생님 기록":"빨간펜 선생님의 한마디"}</h2>
+  return `<section class="ai-res" id="ai-res" aria-live="polite"><h2>${ic("spark")}${parentView?"AI 빨간펜 선생님 기록":"AI 빨간펜 선생님의 한마디"}</h2>
     ${parentView?`<p class="muted" style="margin:0 0 8px;font-size:14px">${cs.length?`틀린 곳 ${cs.length}개 중 ${fixedN}개를 고쳤어요 (스스로 ${cs.filter(c=>(c.how||(text.includes(c.wrong)?"left":"self"))==="self").length}개).`:"틀린 곳 없이 잘 썼어요."} 틀린 낱말은 받아쓰기 퀴즈에 들어가요.</p>`:""}
     <p class="ai-praise">${esc(r.praise||"")}</p><p>${esc(r.feedback||"")}</p>
     ${cs.length?`<ul class="fix-list">${items}</ul>`:""}
@@ -1932,7 +1932,7 @@ function viewFamily(){
         ${isParent()&&ps.some(p=>p.type==="child"&&!p.uid)?`<p class="muted" style="margin:0 0 8px;font-size:13px">초대 문자를 복사해 아이 휴대폰에 문자로 보내면, 구글 계정 없이 크롬에서 바로 일기를 써요. 이 링크가 있으면 누구나 가족 일기장에 들어올 수 있으니 아이에게만 보내고, 걱정되면 비밀번호를 걸어 주세요.</p>`:""}
         ${isParent()&&ps.some(p=>p.type==="child")?`<details class="add"><summary>${ic("pen")}아이 일기 최소 글자 수</summary>
           <form class="form-grid" data-form="kid-goal">
-            <p class="muted span2" style="margin:0;font-size:13px">이만큼 써야 빨간펜 선생님을 부르고 제출할 수 있어요. 비워 두면 학년 기본값을 써요 (1학년 40 · 2학년 60 · 3학년 100 · 4학년 150 · 5학년 200 · 6학년 250자, 띄어쓰기 빼고).</p>
+            <p class="muted span2" style="margin:0;font-size:13px">이만큼 써야 AI 빨간펜 선생님을 부르고 제출할 수 있어요. 비워 두면 학년 기본값을 써요 (1학년 40 · 2학년 60 · 3학년 100 · 4학년 150 · 5학년 200 · 6학년 250자, 띄어쓰기 빼고).</p>
             ${ps.filter(p=>p.type==="child").map(p=>`<label>${esc(p.name)} <small class="muted">(기본 ${penGoalDefault(p)}자)</small><input name="${esc(p.id)}" type="number" inputmode="numeric" min="10" max="1000" step="10" value="${p.diaryGoal?Number(p.diaryGoal):""}" placeholder="${penGoalDefault(p)}"></label>`).join("")}
             <button class="btn btn-primary span2">저장</button>
           </form></details>`:""}
@@ -2268,7 +2268,7 @@ async function saveDiary(status){
     if(n<goal){ toast(`${goal}자를 채우면 제출할 수 있어요! (지금 ${n}자)`); return; }
     const left=(d.pen?.errors||[]).filter(er=>penLeft(er,d.text)).length;
     if(left){ toast(`✏️ 노란 형광펜 ${left}군데만 고치면 제출할 수 있어요! 거의 다 왔어요 💪`); document.getElementById("pen")?.scrollIntoView({behavior:"smooth",block:"nearest"}); return; }
-    if(!d.pen && !S.penFailed && !confirm("빨간펜 선생님께 아직 보여 주지 않았어요. 그래도 제출할까요?")) return;
+    if(!d.pen && !S.penFailed && !confirm("AI 빨간펜 선생님께 아직 보여 주지 않았어요. 그래도 제출할까요?")) return;
   }
   const pend=document.getElementById("w-tag")?.value; if(pend){ const t=cleanTag(pend); if(t && !d.tags.includes(t)) d.tags.push(t); }
   const data={profileId:S.me.id,date:d.date,mood:d.mood,title:d.title.trim(),text:d.text,status,updatedAt:Date.now()};
@@ -2289,7 +2289,7 @@ async function saveDiary(status){
 async function penCheck(){
   const d=S.draft, g=S.me.grade||2, goal=penGoalOf(S.me), n=countChars(d.text);
   if(S.penBusy) return;
-  if(n<goal){ toast(`${goal}자를 다 쓰면 빨간펜 선생님을 부를 수 있어요! (지금 ${n}자)`); return; }
+  if(n<goal){ toast(`${goal}자를 다 쓰면 AI 빨간펜 선생님을 부를 수 있어요! (지금 ${n}자)`); return; }
   if(d.pen && d.pen.checks>=PEN_MAX_CHECK){ toast(`빨간펜 검사는 일기 하나에 ${PEN_MAX_CHECK}번까지예요`); return; }
   S.penBusy=true; S.penFailed=false; refreshPen();
   try{
