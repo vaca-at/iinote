@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>아이아이노트 운영 현황</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* 운영자 현황판: 가족 · 구성원 · 일기 수만 세요. 일기 내용은 한 글자도 받아 오지 않아요 (파이어베이스 '개수 세기'만 사용) */
+:root{--bg:#FBF6EE;--paper:#FFFDF9;--soft:#F6EFE3;--ink:#1F2A44;--sub:#767E91;--line:#E7DDCD;--accent:#EF6F53;--accent-ink:#B8452D;--ok:#3F7F70;--ok-soft:#DFEEE9;--warn:#B8452D}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--accent:#F07C62;--accent-ink:#F59C86;--ok:#8CC2B4;--ok-soft:#1E3430;--warn:#F59C86}}
+:root[data-theme="dark"]{--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--accent:#F07C62;--accent-ink:#F59C86;--ok:#8CC2B4;--ok-soft:#1E3430;--warn:#F59C86}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;line-height:1.6;font-size:15px;word-break:keep-all}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px}
+h1{font-size:22px;margin:0;flex:1;min-width:12em}
+h2{font-size:17px;margin:0 0 10px}
+.sub{color:var(--sub);font-size:13px}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:0;border-radius:999px;padding:10px 20px;background:var(--ink);color:var(--paper);font-weight:700}
+.pill{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.card{background:var(--paper);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:14px}
+.login{max-width:420px;margin:12vh auto 0;text-align:center}
+.login .btn{width:100%;margin-top:14px}
+.alert{color:var(--warn);font-size:14px;margin:10px 0 0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.tile{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
+.tile b{display:block;font-size:26px;line-height:1.2}
+.tile span{color:var(--sub);font-size:13px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border-bottom:1.5px solid var(--line);padding:8px 10px;text-align:center;white-space:nowrap}
+th{color:var(--sub);font-weight:600;font-size:13px}
+td.l,th.l{text-align:left}
+tr.fam{cursor:pointer}
+tr.fam:hover td{background:var(--soft)}
+tr.mem td{background:var(--soft);font-size:13px}
+tr.mem td.l{padding-left:26px}
+.z{color:var(--sub)}
+.good{color:var(--ok);font-weight:700}
+.bar{display:inline-block;height:8px;border-radius:99px;background:var(--ok);vertical-align:middle;margin-right:6px;min-width:2px}
+.note{font-size:13px;color:var(--sub);margin:8px 0 0}
+pre{background:var(--soft);border-radius:12px;padding:12px;overflow-x:auto;font-size:12.5px;line-height:1.5;white-space:pre}
+a{color:var(--accent-ink)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><p class="sub">불러오는 중…</p></div>
+<script type="module">
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDAA9awvX3nmdY41Tgvy0KJDkEfxt7dxpM",
+  authDomain: "iinote.firebaseapp.com",
+  projectId: "iinote",
+  storageBucket: "iinote.firebasestorage.app",
+  messagingSenderId: "412097553357",
+  appId: "1:412097553357:web:ca64a3b887316f79ba5a84"
+};
+const ADMIN_EMAIL = "bellachord@gmail.com";   // 이 계정만 들어와요 (파이어베이스 규칙에서도 같은 계정만 허락)
+const V = "10.12.2";
+const A = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+const AU = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`);
+const F = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`);
+const app = A.initializeApp(FIREBASE_CONFIG), auth = AU.getAuth(app), db = F.getFirestore(app);
+
+const $app = document.getElementById("app");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const dayStr = t => `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`;
+const daysAgo = n => { const t=new Date(); t.setDate(t.getDate()-n); return dayStr(t); };
+const fmtDate = ms => ms ? new Date(ms).toLocaleDateString("ko-KR",{year:"numeric",month:"short",day:"numeric"}) : "-";
+// 개수만 세요: 문서 내용은 받아 오지 않아요
+const count = async q => (await F.getCountFromServer(q)).data().count;
+
+// 관리자 계정이 숫자를 셀 수 있게 하는 파이어베이스 규칙 (콘솔 > Firestore > 규칙에 이미 있는 match 들 옆에 추가)
+const RULES = `// 아이아이노트 운영 현황판 (bellachord 계정만 · 숫자 세기용)
+function isIinoteAdmin() {
+  return request.auth != null && request.auth.token.email == "${ADMIN_EMAIL}"
+    && request.auth.token.email_verified == true;
+}
+match /users/{uid} { allow list: if isIinoteAdmin(); }
+match /groups/{gid} {
+  allow read: if isIinoteAdmin();
+  match /profiles/{pid} { allow read: if isIinoteAdmin(); }
+  match /diaries/{did} { allow list: if isIinoteAdmin(); }
+}`;
+
+function loginHTML(msg=""){
+  return `<div class="card login"><h1>📊 아이아이노트 운영 현황</h1>
+    <p class="sub">운영자 구글 계정으로 로그인하세요. 일기 내용은 보이지 않고, 가족 수와 일기 수만 세요.</p>
+    <button class="btn" data-act="login">구글 계정으로 로그인</button>${msg?`<p class="alert">${esc(msg)}</p>`:""}</div>`;
+}
+const errText = e => { const m={"auth/unauthorized-domain":"이 주소가 Firebase 승인된 도메인에 없어요","auth/popup-blocked":"팝업이 막혔어요","auth/network-request-failed":"인터넷 연결을 확인해 주세요"}[e?.code];
+  return (m||"로그인하지 못했어요")+` (${e?.code||e?.message||"알 수 없는 오류"})`; };
+
+async function load(){
+  $app.innerHTML = `<p class="sub">세는 중…</p>`;
+  const today=dayStr(new Date()), d7=daysAgo(6), d30=daysAgo(29);
+  let groups;
+  try{ groups=(await F.getDocs(F.collection(db,"groups"))).docs.map(d=>({id:d.id,...d.data()})); }
+  catch(e){ return showRuleHelp(e); }
+  let users="-"; try{ users=await count(F.collection(db,"users")); }catch(e){}
+  const idxErrs=new Set();
+  const fams=await Promise.all(groups.map(async g=>{
+    const dcol=F.collection(db,"groups",g.id,"diaries");
+    const [profiles,total,today_,w,m]=await Promise.all([
+      F.getDocs(F.collection(db,"groups",g.id,"profiles")).then(s=>s.docs.map(d=>{ const p=d.data(); return {id:d.id,name:p.name,type:p.type,grade:p.grade,linked:!!p.uid}; })),
+      count(dcol), count(F.query(dcol,F.where("date","==",today))),
+      count(F.query(dcol,F.where("date",">=",d7))), count(F.query(dcol,F.where("date",">=",d30)))]);
+    const members=await Promise.all(profiles.map(async p=>{
+      const mine=F.query(dcol,F.where("profileId","==",p.id));
+      const [all,sub,pen]=await Promise.all([count(mine), count(F.query(dcol,F.where("profileId","==",p.id),F.where("status","==","submitted"))),
+        p.type==="child"?count(F.query(dcol,F.where("profileId","==",p.id),F.where("aiChecked","==",true))):Promise.resolve(null)]);
+      // 사람별 최근 7일: 파이어베이스 색인이 한 번 필요해요 (없으면 만들 수 있는 링크를 보여 줘요)
+      let week=null; try{ week=await count(F.query(dcol,F.where("profileId","==",p.id),F.where("date",">=",d7))); }catch(e){ const u=String(e.message||"").match(/https:\/\/console\.firebase\.google\.com\S+/); if(u) idxErrs.add(u[0]); }
+      return {...p,all,sub,pen,week};
+    }));
+    return {...g,members,total,today:today_,w,m};
+  }));
+  render(fams,users,[...idxErrs]);
+}
+
+function render(fams,users,idx){
+  const sum=k=>fams.reduce((s,f)=>s+f[k],0), ms=fams.flatMap(f=>f.members);
+  const kids=ms.filter(p=>p.type==="child"), maxW=Math.max(1,...fams.map(f=>f.w));
+  const active=fams.filter(f=>f.w>0).length;
+  const rows=fams.sort((a,b)=>b.w-a.w||b.total-a.total).map((f,i)=>`
+    <tr class="fam" data-act="toggle" data-v="${i}"><td class="l"><b>${esc(f.name||"(이름 없음)")}</b> <span class="sub">▾</span></td><td>${fmtDate(f.createdAt)}</td>
+      <td>${f.members.filter(p=>p.type!=="child").length} · ${f.members.filter(p=>p.type==="child").length}</td>
+      <td>${f.today||'<span class="z">0</span>'}</td><td class="l"><span class="bar" style="width:${Math.round(f.w/maxW*60)}px"></span>${f.w}</td><td>${f.m}</td><td>${f.total}</td></tr>
+    ${f.members.map(p=>`<tr class="mem" data-g="${i}" hidden><td class="l">${esc(p.name)} <span class="sub">${p.type==="child"?(p.grade?p.grade+"학년":"어린이")+(p.linked?" · 자기 기기":""):"보호자"}</span></td>
+      <td></td><td></td><td></td><td>${p.week==null?'<span class="z">?</span>':p.week?`<span class="good">${p.week}</span>`:'<span class="z">0</span>'}</td>
+      <td class="sub">${p.pen!=null?`빨간펜 ${p.pen}`:""}</td><td>${p.sub}${p.all>p.sub?` <span class="sub">(+쓰는 중 ${p.all-p.sub})</span>`:""}</td></tr>`).join("")}`).join("");
+  $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="sub">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
+      <button class="pill" data-act="reload">🔄 새로고침</button><button class="pill" data-act="logout">로그아웃</button></header>
+    <div class="tiles">
+      <div class="tile"><b>${fams.length}</b><span>가족</span></div>
+      <div class="tile"><b>${active}</b><span>이번 주 쓴 가족</span></div>
+      <div class="tile"><b>${users}</b><span>가입한 구글 계정</span></div>
+      <div class="tile"><b>${ms.length-kids.length} · ${kids.length}</b><span>보호자 · 아이 프로필</span></div>
+      <div class="tile"><b>${sum("today")}</b><span>오늘 일기</span></div>
+      <div class="tile"><b>${sum("w")}</b><span>최근 7일 일기</span></div>
+      <div class="tile"><b>${sum("m")}</b><span>최근 30일 일기</span></div>
+      <div class="tile"><b>${kids.reduce((s,p)=>s+(p.pen||0),0)}</b><span>빨간펜 받은 아이 일기</span></div>
+    </div>
+    <div class="card"><h2>가족별</h2><div class="scroll"><table>
+      <tr><th class="l">가족 (누르면 사람별)</th><th>만든 날</th><th>보호자 · 아이</th><th>오늘</th><th class="l">최근 7일</th><th>30일</th><th>전체</th></tr>${rows||'<tr><td colspan="7" class="z">아직 가족이 없어요</td></tr>'}
+    </table></div>
+    <p class="note">일기 수는 쓰는 중(임시 저장)을 포함해요. 사람별 '전체'는 제출한 일기 수예요. 일기 내용은 이 화면에서 읽지 않아요.</p>
+    ${idx.length?`<p class="alert">사람별 최근 7일(?)을 세려면 파이어베이스 색인이 한 번 필요해요. <a href="${esc(idx[0])}" target="_blank" rel="noopener">여기를 눌러 색인 만들기</a> → 몇 분 뒤 새로고침.</p>`:""}</div>`;
+}
+
+function showRuleHelp(e){
+  $app.innerHTML = `<div class="card"><h2>🔒 파이어베이스 규칙을 한 번 추가해 주세요</h2>
+    <p>운영자 계정이 가족 수와 일기 수를 셀 수 있게 허락하는 규칙이 아직 없어요 <span class="sub">(${esc(e.code||e.message)})</span>.</p>
+    <p class="sub">파이어베이스 콘솔 → iinote → Firestore Database → 규칙 → <b>match /databases/{database}/documents { … }</b> 안쪽, 이미 있는 match 들 옆에 아래를 붙여 넣고 [게시]를 누르세요. 기존 규칙은 그대로 두면 돼요.</p>
+    <pre>${esc(RULES)}</pre>
+    <p class="note">이 규칙은 bellachord 계정에게만 목록 읽기를 허락해요. 이 화면은 그중 '개수 세기'만 써서 일기 내용은 받아 오지 않아요.</p>
+    <button class="pill" data-act="reload">🔄 다시 해 보기</button> <button class="pill" data-act="logout">로그아웃</button></div>`;
+}
+
+document.addEventListener("click", async e => {
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const act=b.dataset.act;
+  if(act==="login"){ const p=new AU.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
+    try{ await AU.signInWithPopup(auth,p); }catch(err){ if(err.code!=="auth/popup-closed-by-user" && err.code!=="auth/cancelled-popup-request") $app.innerHTML=loginHTML(errText(err)); } }
+  if(act==="logout"){ await AU.signOut(auth); }
+  if(act==="reload") load();
+  if(act==="toggle") document.querySelectorAll(`tr.mem[data-g="${b.dataset.v}"]`).forEach(r=>r.hidden=!r.hidden);
+});
+let msg="";
+AU.onAuthStateChanged(auth, async u => {
+  if(!u){ $app.innerHTML=loginHTML(msg); msg=""; return; }
+  if(u.email!==ADMIN_EMAIL){ msg=`운영자 계정이 아니에요: ${u.email||"이메일 없음"} (admin/not-allowed)`; const m=msg; await AU.signOut(auth); $app.innerHTML=loginHTML(m); return; }
+  load();
+});
+</script>
+</body>
+</html>
