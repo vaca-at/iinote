@@ -525,6 +525,42 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .fix-st{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--coral-ink)}
 .fix.fixed .fix-st{color:var(--sage)}
 .fix-e{flex-basis:100%;margin:0;font-size:14px;color:var(--ink2)}
+/* 빨간펜 선생님: 일기 칸 위 형광펜 + 빨간펜 칸 (공부방 빨간펜과 같은 모양) */
+.w-ed{position:relative}
+.w-ed .w-text{overflow:hidden;resize:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal}
+.w-hl{position:absolute;inset:0;border:1.5px solid transparent;border-radius:16px;padding:6px 16px;font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal;color:transparent;pointer-events:none;overflow:hidden}
+.w-hl mark{color:transparent;background:rgba(255,214,51,.55);border-radius:4px}
+.w-hl mark.pen-ok{background:rgba(80,200,120,.35)}
+.pen{margin-top:18px;border:2.5px solid var(--coral);border-radius:18px;padding:16px 18px;background:var(--surface)}
+.pen-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.pen h3{margin:0;color:var(--coral-ink);font-size:18px}
+.pen p{margin:8px 0 0;color:var(--ink2);font-size:15px}
+.btn-pen{background:var(--coral);color:#fff}
+.btn-pen:disabled{opacity:.7}
+.pen-gauge{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:12px}
+.pen-gauge i{display:block;height:100%;background:var(--butter);border-radius:99px;transition:width .3s}
+.pen-gauge.full i{background:var(--sage)}
+.pen .pen-cnt{font-size:13px;color:var(--ink3);margin:4px 0 0;text-align:right}
+.pen-fb{background:var(--sage-soft);border-radius:12px;padding:10px 14px;margin:12px 0 4px}
+.pen-fb b{font-size:14px}
+.pen-fb p{margin:2px 0 8px;color:var(--ink)}
+.pen-fb p:last-child{margin-bottom:0}
+.pen mark{color:inherit;border-radius:4px;padding:0 3px}
+.pen mark.pen-x{background:rgba(255,214,51,.6)}
+.pen mark.pen-ok{background:rgba(80,200,120,.35)}
+.pen-list{margin:12px 0 0;padding-left:1.4em;display:grid;gap:10px}
+.pen-list li.done{opacity:.85}
+.pen-chip{display:inline-block;font-size:12px;border-radius:99px;padding:0 8px;margin-right:6px;background:var(--coral-soft);color:var(--coral-ink);font-weight:700}
+.pen-mini{border:1.5px dashed var(--line);background:none;border-radius:8px;font-size:13px;padding:2px 8px;margin:6px 6px 0 0;color:var(--ink2)}
+.pen-mini:hover{border-color:var(--coral);color:var(--coral-ink)}
+.pen-ans{margin-top:6px;padding:8px 12px;border-radius:10px;background:var(--surface2)}
+.pen-w{color:var(--coral-ink);text-decoration:line-through}
+.pen-r{color:var(--sage);font-weight:800}
+.pen-good{color:var(--sage);font-weight:700}
+.pen-soft{color:var(--ink3);font-size:14px}
+.pen .pen-warn{color:var(--coral-ink);font-size:14px}
+.pen-orig{margin-top:12px;font-size:14px;color:var(--ink2)}
+.pen-orig p{white-space:pre-wrap;font-family:var(--diary);background:var(--surface2);border-radius:10px;padding:10px 12px;margin:6px 0 0}
 
 /* ============ 퀴즈 ============ */
 .q-words{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
@@ -766,8 +802,8 @@ const OLD_DIARY_CONFIG = {
   appId: "1:124372121061:web:b1596628daae0bb08eab0c"
 };
 const OLD_PEOPLE = [["me","엄마"],["doyun","도윤"],["dojin","도진"]];   // 예전 일기장의 author 값과 이름
-// AI 맞춤법 확인을 대신 호출해 주는 클라우드플레어 워커 주소 (API 키는 워커에만 보관)
-const AI_WORKER_URL = "https://여기에-워커-주소.workers.dev";
+// 빨간펜(AI 맞춤법 · 칭찬 · 응원) 클라우드플레어 워커: 공부방 빨간펜과 같은 워커 (API 키는 워커에만 보관)
+const SPELL_API = "https://family-spell.bellachord.workers.dev";
 // 컴퓨터에서 접속하는 쉬운 주소 (화면 곳곳에 안내돼요)
 const SITE_ADDRESS = "iinote.co.kr";
 // 카카오톡 공유: JavaScript 키 (카카오 개발자 > 앱 > 플랫폼 > Web에 사이트 도메인을 등록해야 동작해요)
@@ -1010,20 +1046,90 @@ function contextOf(text, wrong){
   if(ctx.length > 40){ const i = ctx.indexOf("____"); ctx = ctx.slice(Math.max(0,i-18), i+22).trim(); }
   return ctx;
 }
-async function callAI(text, grade){
-  if(DEMO){
-    await new Promise(r=>setTimeout(r,900));
-    const found = [];
-    for(const [w,r,e] of DEMO_DICT){ if(text.includes(w) && !found.some(f=>f.wrong.includes(w))) found.push({wrong:w,right:r,explain:e}); }
-    return { praise:"오늘 있었던 일이 생생하게 느껴지는 일기예요!", feedback: found.length?`틀린 낱말 ${found.length}개를 찾았어요. 아래를 보고 고쳐 볼까요?`:"맞춤법이 모두 바르게 쓰였어요. 정말 잘했어요!", corrections:found };
+/* ===== 빨간펜 선생님 (공부방 빨간펜과 같은 워커 · 같은 방식) =====
+   목표 글자 수를 채우면 부를 수 있어요 → 틀린 곳을 노란 형광펜으로 칠해요 → 스스로 고치거나 정답을 보고 고쳐요.
+   1 · 2학년은 빨간펜이 바로 고쳐 줘요(초록 형광펜). 다 고쳐야 제출할 수 있어요. 칭찬 · 응원 한마디(AI 피드백)도 함께.
+   워커: { text, level:"grade4", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer } */
+const PEN_MAX_CHECK = 3;   // 일기 하나에 빨간펜 검사는 세 번까지
+// 아이 일기 최소 글자 수: 학년별 기본값 (공부방과 같게 2학년 60자 · 4학년 150자). 부모가 우리 가족 탭에서 아이마다 바꿀 수 있어요 (profiles.diaryGoal)
+const PEN_GOAL_DEFAULT = {1:40,2:60,3:100,4:150,5:200,6:250};
+const penGoalDefault = p => PEN_GOAL_DEFAULT[Number(p?.grade)] || 60;
+const penGoalOf = p => Number(p?.diaryGoal) || penGoalDefault(p);
+const penAuto = g => (g||2) <= 2;
+const countChars = s => String(s||"").replace(/\s/g,"").length;
+const PEN_ENDS = /[.?!…~。)"'”’\]]$|\p{Extended_Pictographic}$/u;
+const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"빨간펜이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
+const PRAISE_SELF = ["👍 스스로 찾아서 고쳤어요! 정말 대단해요!","🦸 혼자 고치다니, 맞춤법 영웅이에요!","🧠 똑똑해요! 선생님 도움 없이 고쳤어요!"];
+// 틀린 말이 글 어디에 있는지 (고친 말 안에 틀린 말이 들어 있는 경우는 건너뛰어요)
+function penAt(er,text){
+  const off=er.right.indexOf(er.wrong); let i=text.indexOf(er.wrong);
+  while(i>=0){ if(off<0 || !text.startsWith(er.right,i-off)) return i; i=text.indexOf(er.wrong,i+1); }
+  return -1;
+}
+const penLeft = (er,text) => !er.kept && penAt(er,text)>=0;
+// 줄 끝(문장 끝)에 마침표가 없는 곳: 빨간펜이 놓쳐도 꼭 잡혀요
+function penPeriod(text,known){
+  const out=[]; let pos=0;
+  for(const line of text.split("\n")){
+    const body=line.replace(/\s+$/,""), end=pos+body.length; pos+=line.length+1;
+    if(countChars(body)<4 || PEN_ENDS.test(body)) continue;
+    if([...known,...out].some(er=>{ const i=penAt(er,text); return i>=0 && i+er.wrong.length===end; })) continue;
+    const words=[...body.matchAll(/\S+/g)]; let tail="";
+    for(let n=1;n<=words.length;n++){ const t=body.slice(words[words.length-n].index); if(text.indexOf(t)===end-t.length && text.lastIndexOf(t)===end-t.length){ tail=t; break; } }
+    if(!tail) continue;
+    out.push({wrong:tail,right:tail+".",kind:"문장부호",hint:"문장이 끝났어요. 끝에 무엇을 찍어야 할까요?",
+      why:"문장이 끝나면 마침표(.)를 찍어요. 묻는 말이면 물음표(?), 놀란 말이면 느낌표(!)예요."});
   }
-  const token = await B.getIdToken();
-  const res = await fetch(AI_WORKER_URL,{ method:"POST", headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+token },
-    body: JSON.stringify({ groupId:S.gid, profileId:S.me.id, date:S.draft.date, grade:S.me.grade||2, text }) });
-  if(res.status===429) throw new Error("오늘은 이미 AI 맞춤법 확인을 받았어요. 내일 다시 받을 수 있어요.");
-  if(!res.ok) throw new Error("AI 맞춤법 확인에 실패했어요. 잠시 뒤 다시 눌러 주세요.");
-  // 워커는 { praise, feedback, corrections:[{wrong,right,explain,distractors?}] } 모양으로 돌려줘요.
-  return await res.json();
+  return out;
+}
+// 쉼표 · 마침표 · 물음표 · 느낌표 바로 뒤에 글자가 붙어 있으면 한 칸 띄어요 (1,000 · 3.5 는 그대로)
+function penSpace(text,known){
+  const out=[];
+  for(const m of text.matchAll(/[,.!?](?=[^\s.,!?)"'”’~…])/g)){
+    const i=m.index, c=m[0], prev=text[i-1]||"", rest=text.slice(i+1);
+    if(c==="," && /\d/.test(prev) && /^\d{3}(?!\d)/.test(rest)) continue;
+    if(c==="." && /\d/.test(prev) && /^\d/.test(rest)) continue;
+    const start=Math.max(text.lastIndexOf(" ",i)+1, text.lastIndexOf("\n",i)+1);
+    const e1=text.slice(i).search(/\s/), end=e1<0?text.length:i+e1, wrong=text.slice(start,end);
+    if(!wrong || text.indexOf(wrong)!==text.lastIndexOf(wrong)) continue;
+    if([...known,...out].some(er=>{ const j=penAt(er,text); return j>=0 && j<end && j+er.wrong.length>start; })) continue;
+    const cut=i-start+1;
+    out.push({wrong,right:wrong.slice(0,cut)+" "+wrong.slice(cut),kind:"띄어쓰기",hint:"문장 부호 뒤에 글자가 딱 붙어 있어요. 어디를 한 칸 띄우면 될까요?",why:"쉼표(,)나 마침표(.) 뒤에는 한 칸 띄어 써요."});
+  }
+  return out;
+}
+// 어떻게 고쳤는지: ai(빨간펜이 고쳐 줌) · hint(정답 보고) · self(스스로) · other(다른 말로) · kept(그대로 두기) · left(아직)
+function penHow(er,text){
+  if(penAt(er,text)>=0) return er.kept?"kept":"left";
+  return er.applied ? (er.auto?"ai":"hint") : !text.includes(er.right) ? "other" : er.shown ? "hint" : "self";
+}
+// 일기에 저장하는 모양(aiResult): 부모 화면 · 받아쓰기 퀴즈 · 예전 일기 가져오기와 같은 모양
+function penResult(d){
+  const p=d.pen;
+  return {praise:p.praise||"", feedback:p.cheer||"", checks:p.checks||1, original:p.original||"", auto:!!p.auto, checkedAt:Date.now(),
+    corrections:p.errors.map(er=>({wrong:er.wrong,right:er.right,explain:er.why||"",hint:er.hint||"",kind:er.kind||"",how:penHow(er,d.text)}))};
+}
+function penFromResult(r){
+  if(!r) return null;
+  return {praise:r.praise||"", cheer:r.feedback||"", checks:r.checks||1, original:r.original||"", auto:!!r.auto,
+    errors:(r.corrections||[]).map(c=>({wrong:c.wrong,right:c.right,why:c.explain||"",hint:c.hint||"",kind:c.kind||"",
+      shown:c.how==="hint"||c.how==="kept", applied:c.how==="ai"||c.how==="hint", auto:c.how==="ai", kept:c.how==="kept"}))};
+}
+async function callPen(text){
+  if(DEMO){
+    await new Promise(r=>setTimeout(r,700));
+    return { errors:DEMO_DICT.filter(([w])=>text.includes(w)).map(([w,r,e])=>({wrong:w,right:r,kind:"맞춤법",hint:"소리 내어 읽어 보고, 바르게 쓰는 말을 떠올려 볼까요?",why:e})),
+      praise:"오늘 있었던 일이 생생하게 느껴지는 일기예요!", cheer:"조금만 고치면 더 반짝이는 일기가 돼요!" };
+  }
+  let last;
+  for(let i=0;i<2;i++){   // 선생님이 가끔 바빠서 못 받을 때가 있어요: 한 번 더 불러요
+    try{
+      const r=await fetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,level:"grade"+(S.me.grade||2),name:S.me.name})});
+      if(r.ok) return await r.json();
+      last=new Error("빨간펜 "+r.status);
+    }catch(e){ last=e; }
+  }
+  throw last;
 }
 
 /* 퀴즈 오답 보기 만들기: 헷갈리기 쉬운 글자를 바꿔 봐요 */
@@ -1054,6 +1160,7 @@ const S = {
   search:"", tag:"", lb:null, rec:null, locEdit:false,
   joinCode:(new URLSearchParams(location.search).get("join")||"").toUpperCase(),
   kidId:new URLSearchParams(location.search).get("kid")||"", kidName:new URLSearchParams(location.search).get("n")||"",
+  wantWrite:new URLSearchParams(location.search).has("write"), penBusy:false, penFailed:false,
   theme:ls.get("iinote-theme","light"), dfont:ls.get("iinote-dfont","batang"), design:ls.get("iinote-design","note")
 };
 if(!["batang","pen","gothic","dodum"].includes(S.dfont)) S.dfont="batang";
@@ -1616,10 +1723,10 @@ function renderThread(cs,parent,depth){
 /* ---------- 일기 쓰기 ---------- */
 function loadDraft(date){
   const d=findDiary(S.me.id,date);
-  S.locEdit=false;
-  S.draft = d ? {id:d.id,date,mood:d.mood||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,
+  S.locEdit=false; S.penFailed=false;
+  S.draft = d ? {id:d.id,date,mood:d.mood||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,pen:penFromResult(d.aiResult),
                  photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[]}
-              : {id:null,date,mood:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,photos:[],audio:null,location:null,tags:[],removed:[]};
+              : {id:null,date,mood:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[]};
 }
 // 쓰는 중에 날짜를 바꾸면 내용은 그대로 두고 날짜만 옮겨요. 그날 쓴 일기가 이미 있으면 불러올지 물어봐요.
 function changeDraftDate(input){
@@ -1642,10 +1749,10 @@ function viewWrite(){
     <fieldset class="moods"><legend>오늘 기분</legend>${MOODS.map(([k,l,c])=>`<label class="mood"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""}><span><i style="background:${c}"></i>${l}</span></label>`).join("")}</fieldset>
     ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} 아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요.</p>`:""}
     <label class="sr" for="w-title">제목</label><input id="w-title" class="w-title" maxlength="40" placeholder="제목" value="${esc(d.title)}" ${child?'spellcheck="false" autocomplete="off" autocorrect="off"':""}>
-    <label class="sr" for="w-text">일기</label><textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 써 보세요" ${child?'spellcheck="false" autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>
+    <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 써 보세요" ${child?'spellcheck="false" autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
     <div class="w-count muted"><span id="w-len">${d.text.length}</span>자</div>
     ${viewMedia(d)}
-    ${child?(d.aiResult?viewAIResult(d.aiResult,d.text,true):(submitted?"":viewAIBox(d))):""}
+    ${child?viewPen(d):""}
     <div class="w-acts">${submitted
       ? `<button class="btn btn-primary" data-act="save-diary" data-v="submitted">고친 내용 저장</button>`
       : `<button class="btn btn-ghost" data-act="save-diary" data-v="draft">임시 저장</button><button class="btn btn-accent" data-act="save-diary" data-v="submitted">${child?"제출하기":"올리기"}</button>`}</div>
@@ -1671,22 +1778,77 @@ function viewMedia(d){
     <div class="tag-in">${d.tags.map(t=>`<button class="htag" data-act="tag-del" data-v="${esc(t)}" aria-label="#${esc(t)} 태그 빼기">#${esc(t)}${ic("x")}</button>`).join("")}<label class="sr" for="w-tag">태그 추가</label><input id="w-tag" maxlength="21" placeholder="${d.tags.length?"태그 더하기":"예: 운동회 쓰고 엔터"}" enterkeyhint="done" autocomplete="off"></div></section>`);
   return secs.length?`<div class="media">${secs.join("")}</div>`:"";
 }
-function viewAIBox(d){
-  return `<div class="ai-box"><div><strong>${ic("spark")}AI 맞춤법 선생님</strong><p>제출하기 전에 딱 한 번 맞춤법을 살펴볼 수 있어요. 일기를 다 쓴 다음에 눌러 주세요.</p></div>
-    <button class="btn btn-primary" data-act="ai-check" ${S.busy||d.aiChecked?"disabled":""}>${S.busy?"살펴보는 중...":"맞춤법 살펴보기"}</button></div>`;
+// 빨간펜 칸: 부르기 전(글자 수 게이지) → 검사 뒤(칭찬 · 응원 + 고칠 곳 목록)
+function viewPen(d){
+  const goal=penGoalOf(S.me), n=countChars(d.text), p=d.pen, text=d.text;
+  const call=label=>`<button class="btn btn-pen sm" data-act="pen-check" ${S.penBusy?"disabled":""}>${S.penBusy?"🖍 선생님이 읽는 중…":label}</button>`;
+  const rest=S.penFailed?`<p class="pen-warn">빨간펜 선생님이 잠깐 쉬는 중이에요. 조금 있다가 다시 눌러 보세요. 제출은 지금도 할 수 있어요.</p>`:"";
+  if(!p) return `<section class="pen" id="pen"><div class="pen-h"><h3>🖍 빨간펜 선생님</h3>${call("🖍 빨간펜 검사")}</div>
+    <p>${n>=goal?"다 썼으면 빨간펜 선생님을 불러 보세요. 틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요.":`${goal}자를 다 쓰면 빨간펜 선생님을 부를 수 있어요.`}</p>
+    <div class="pen-gauge ${n>=goal?"full":""}"><i style="width:${Math.min(100,n/goal*100)}%"></i></div><p class="pen-cnt">${n>=goal?`${n}자 👍`:`${n} / ${goal}자`}</p>${rest}</section>`;
+  const errs=p.errors, left=errs.filter(er=>penLeft(er,text));
+  const fb=p.praise||p.cheer?`<div class="pen-fb">${p.praise?`<b>👏 선생님의 칭찬</b><p>${esc(p.praise)}</p>`:""}${p.cheer?`<b>💪 응원 한마디</b><p>${esc(p.cheer)}</p>`:""}</div>`:"";
+  let head, sub="";
+  if(!errs.length) head="💯 틀린 곳이 하나도 없어요!";
+  else if(p.auto){ head=`🖍 빨간펜 선생님이 ${errs.length}군데를 고쳐 줬어요`; sub=`<p><mark class="pen-ok">초록색</mark>으로 칠한 곳이 고친 곳이에요. 어떻게 바뀌었는지 소리 내어 읽어 봐요!</p>`; }
+  else if(left.length){ head=`🖍 형광펜으로 칠한 곳이 ${left.length}군데 있어요`; sub=`<p>틀려도 괜찮아요! 고치면서 실력이 쑥쑥 자라요 🌱 일기 칸에 <mark class="pen-x">노란색</mark>으로 칠한 곳을 찾아 스스로 고쳐 보세요. 잘 모르겠으면 💡 정답 보기를 눌러요. 다 고쳐야 제출할 수 있어요!</p>`; }
+  else { head="🎉 모두 고쳤어요!"; sub=`<p class="pen-good">정말 멋져요! 이제 제출해요.</p>`; }
+  const pair=er=>`<span class="pen-w">${esc(er.wrong)}</span> → <span class="pen-r">${esc(er.right)}</span>`;
+  const items=errs.map((er,i)=>{ const how=penHow(er,text);
+    return `<li class="${how==="left"?"":"done"}">${er.kind?`<span class="pen-chip">${esc(er.kind)}</span>`:""}${
+      how==="left" ? `<mark class="pen-x">${esc(er.wrong)}</mark> ${esc(er.hint||"어떻게 고치면 좋을까요?")}
+        <div><button class="pen-mini" data-act="pen-find" data-i="${i}">👀 찾기</button>${er.shown
+          ? `<div class="pen-ans">${pair(er)}${er.why?`<br><small>${esc(er.why)}</small>`:""}<br><button class="pen-mini" data-act="pen-apply" data-i="${i}">✏️ 이렇게 고칠래요</button><button class="pen-mini" data-act="pen-keep" data-i="${i}">🙆 이대로 둘래요</button></div>`
+          : `<button class="pen-mini" data-act="pen-reveal" data-i="${i}">💡 정답 보기</button>`}</div>`
+      : how==="kept" ? `<span class="pen-soft">🙆 그대로 두었어요 · ${pair(er)}</span>`
+      : `<span class="pen-good">${how==="self"?"👍 스스로 고쳤어요!":how==="other"?"✏️ 다른 말로 바꿨어요":"✅ 고쳤어요"}</span> <span class="pen-soft">${pair(er)}</span>${p.auto&&er.why?`<br><small class="pen-soft">${esc(er.why)}</small>`:""}`}</li>`; }).join("");
+  return `<section class="pen" id="pen"><div class="pen-h"><h3>${head}</h3>${p.checks<PEN_MAX_CHECK&&(left.length||!errs.length)?call("🔁 다시 검사"):""}</div>
+    ${fb}${sub}${errs.length?`<ol class="pen-list">${items}</ol>`:""}${rest}</section>`;
 }
+// 일기 칸 위에 형광펜 칠하기: 노랑 = 고칠 곳, 초록 = 고친 곳
+function penHL(){
+  const hl=document.getElementById("w-hl"), ta=document.getElementById("w-text"); if(!hl||!ta||!S.draft) return;
+  const text=S.draft.text, spans=[];
+  (S.draft.pen?.errors||[]).forEach(er=>{
+    let i=penAt(er,text), len=er.wrong.length, cls="pen-x";
+    if(i>=0 && er.kept) return;
+    if(i<0 && er.applied){ i=er.at!=null&&text.startsWith(er.right,er.at)?er.at:text.indexOf(er.right); len=er.right.length; cls="pen-ok"; }
+    if(i>=0 && !spans.some(s=>i<s.e && i+len>s.i)) spans.push({i,e:i+len,cls});
+  });
+  spans.sort((a,b)=>a.i-b.i);
+  let h="", pos=0;
+  spans.forEach(s=>{ h+=esc(text.slice(pos,s.i))+`<mark class="${s.cls}">${esc(text.slice(s.i,s.e))}</mark>`; pos=s.e; });
+  hl.innerHTML=h+esc(text.slice(pos))+" ";
+  ta.style.height="auto"; ta.style.height=ta.scrollHeight+"px";
+}
+function refreshPen(){
+  const d=S.draft; if(!d) return;
+  penHL();
+  (d.pen?.errors||[]).forEach(er=>{ const L=penLeft(er,d.text);
+    if(er._left && !L && !er.applied && !er.kept && d.text.includes(er.right)) toast(PRAISE_SELF[Math.floor(Math.random()*PRAISE_SELF.length)]);
+    er._left=L; });
+  const box=document.getElementById("pen"); if(box) box.outerHTML=viewPen(d);
+}
+function penApplyOne(er){
+  const d=S.draft, i=penAt(er,d.text); if(i<0) return;
+  d.text=d.text.slice(0,i)+er.right+d.text.slice(i+er.wrong.length);
+  er.applied=true; er.shown=true; er.at=i;
+}
+function penSyncText(){ const ta=document.getElementById("w-text"); if(ta) ta.value=S.draft.text; const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length; }
 // 맞춤법 요약: 찾은 곳 몇 개 중 몇 개를 스스로 고쳤는지
 const aiSummary = d => { const cs=d.aiResult?.corrections||[]; return {n:cs.length, fixed:cs.filter(c=>!(d.text||"").includes(c.wrong)).length}; };
 function viewAIResult(r,text,live){
   const cs=r.corrections||[]; let fixedN=0;
   const parentView = !live && isParent();
   const items=cs.map(c=>{ const fixed=!text.includes(c.wrong); if(fixed) fixedN++;
-    const st = live ? (fixed?ic("check")+"고쳤어요":"고쳐 볼까요?") : (fixed?ic("check")+"스스로 고쳤어요":"그대로예요");
+    const how = c.how || (fixed?"self":"left");   // 빨간펜 기록이 있으면 어떻게 고쳤는지 그대로
+    const st = live ? (fixed?ic("check")+"고쳤어요":"고쳐 볼까요?") : (fixed?ic("check"):"")+PEN_HOW[how];
     return `<li class="fix ${fixed?"fixed":""}"><span class="fix-w">${esc(c.wrong)}</span>${ic("arrow")}<span class="fix-r">${esc(c.right)}</span><span class="fix-st">${st}</span>${c.explain?`<p class="fix-e">${esc(c.explain)}</p>`:""}</li>`; }).join("");
-  return `<section class="ai-res" id="ai-res" aria-live="polite"><h2>${ic("spark")}${parentView?"AI 맞춤법 확인 결과":"AI 맞춤법 선생님의 한마디"}</h2>
-    ${parentView?`<p class="muted" style="margin:0 0 8px;font-size:14px">${cs.length?`틀린 곳 ${cs.length}개 중 ${fixedN}개를 스스로 고쳤어요.`:"틀린 곳 없이 잘 썼어요."} 틀린 낱말은 받아쓰기 퀴즈에 들어가요.</p>`:""}
+  return `<section class="ai-res" id="ai-res" aria-live="polite"><h2>${ic("spark")}${parentView?"빨간펜 선생님 기록":"빨간펜 선생님의 한마디"}</h2>
+    ${parentView?`<p class="muted" style="margin:0 0 8px;font-size:14px">${cs.length?`틀린 곳 ${cs.length}개 중 ${fixedN}개를 고쳤어요 (스스로 ${cs.filter(c=>(c.how||(text.includes(c.wrong)?"left":"self"))==="self").length}개).`:"틀린 곳 없이 잘 썼어요."} 틀린 낱말은 받아쓰기 퀴즈에 들어가요.</p>`:""}
     <p class="ai-praise">${esc(r.praise||"")}</p><p>${esc(r.feedback||"")}</p>
     ${cs.length?`<ul class="fix-list">${items}</ul>`:""}
+    ${parentView && r.original && r.original!==text?`<details class="pen-orig"><summary>처음 쓴 글 보기 (빨간펜을 부르기 전)</summary><p>${esc(r.original)}</p></details>`:""}
     ${live&&cs.length?`<p class="muted">${fixedN===cs.length?"모두 고쳤어요! 이제 제출해 볼까요?":`${cs.length}개 중 ${fixedN}개 고쳤어요`}</p>`:""}
     ${live?`<p class="muted" style="font-size:13px;margin:6px 0 0">AI 선생님의 답변은 부모님도 함께 봐요.</p>`:""}
     <p class="ai-report"><button class="link-btn" data-act="ai-report">${ic("flag")}이상한 답변 알리기</button></p></section>`;
@@ -1768,6 +1930,12 @@ function viewFamily(){
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
         <ul class="mem-list">${ps.map(p=>`<li class="mem">${av(p)}<span>${esc(p.name)}</span><small class="muted">${p.type==="child"?`${p.grade?p.grade+"학년":"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`${link}&kid=${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>`).join("")}</ul>
         ${isParent()&&ps.some(p=>p.type==="child"&&!p.uid)?`<p class="muted" style="margin:0 0 8px;font-size:13px">초대 문자를 복사해 아이 휴대폰에 문자로 보내면, 구글 계정 없이 크롬에서 바로 일기를 써요. 이 링크가 있으면 누구나 가족 일기장에 들어올 수 있으니 아이에게만 보내고, 걱정되면 비밀번호를 걸어 주세요.</p>`:""}
+        ${isParent()&&ps.some(p=>p.type==="child")?`<details class="add"><summary>${ic("pen")}아이 일기 최소 글자 수</summary>
+          <form class="form-grid" data-form="kid-goal">
+            <p class="muted span2" style="margin:0;font-size:13px">이만큼 써야 빨간펜 선생님을 부르고 제출할 수 있어요. 비워 두면 학년 기본값을 써요 (1학년 40 · 2학년 60 · 3학년 100 · 4학년 150 · 5학년 200 · 6학년 250자, 띄어쓰기 빼고).</p>
+            ${ps.filter(p=>p.type==="child").map(p=>`<label>${esc(p.name)} <small class="muted">(기본 ${penGoalDefault(p)}자)</small><input name="${esc(p.id)}" type="number" inputmode="numeric" min="10" max="1000" step="10" value="${p.diaryGoal?Number(p.diaryGoal):""}" placeholder="${penGoalDefault(p)}"></label>`).join("")}
+            <button class="btn btn-primary span2">저장</button>
+          </form></details>`:""}
         ${isParent()?`<details class="add"><summary>${ic("plus")}아이 프로필 추가</summary>
           <form class="form-grid" data-form="child">
             <label>이름<input name="name" required maxlength="10" placeholder="예: 하랑"></label>
@@ -1818,13 +1986,18 @@ function render(){
   else if(S.phase==="landing") $app.innerHTML=viewLanding();
   else if(S.phase==="onboard") $app.innerHTML=viewOnboard();
   else if(S.phase==="picker") $app.innerHTML=viewPicker();
-  else $app.innerHTML=viewShell();
+  else {
+    // 공부방 일기 단추 등에서 ?write 로 들어오면: 프로필이 정해진 뒤 바로 오늘 일기 쓰는 칸으로
+    if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; history.replaceState(null,"",location.pathname); }
+    $app.innerHTML=viewShell();
+    if(S.sub?.type==="write") penHL();
+  }
   document.body.style.overflow = S.lb ? "hidden" : "";
 }
 function go(fn){ fn(); render(); window.scrollTo(0,0); }
 let toastT;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2400); }
-function refreshAI(){ const el=document.getElementById("ai-res"); if(el && S.draft?.aiResult) el.outerHTML=viewAIResult(S.draft.aiResult,S.draft.text,true); }
+
 async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catch(e){ console.error(e); toast(e.message||"문제가 생겼어요. 다시 시도해 주세요."); }finally{ S.busy=false; } }
 
 /* =========================================================
@@ -1844,7 +2017,14 @@ const acts = {
   back: () => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.sub=null; S.draft=null; S.lb=null; }),
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
-  "ai-check": () => aiCheck(),
+  "pen-check": () => penCheck(),
+  "pen-reveal": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ er.shown=true; refreshPen(); } },
+  "pen-apply": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ penApplyOne(er); penSyncText(); refreshPen(); } },
+  "pen-keep": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ er.kept=true; refreshPen(); } },
+  "pen-find": el => { const er=S.draft?.pen?.errors[+el.dataset.i], ta=document.getElementById("w-text"); if(!er||!ta) return;
+    const i=penAt(er,S.draft.text); if(i<0) return;
+    ta.focus({preventScroll:true}); ta.setSelectionRange(i,i+er.wrong.length);
+    [...document.querySelectorAll("#w-hl mark.pen-x")].find(m=>m.textContent===er.wrong)?.scrollIntoView({behavior:"smooth",block:"center"}); },
   reply: el => { S.replyTo=el.dataset.id; S.editing=null; render(); document.getElementById("r-"+el.dataset.id)?.focus(); },
   "cancel-reply": () => { S.replyTo=null; render(); },
   "edit-comment": el => { S.editing=el.dataset.id; S.replyTo=null; render(); document.getElementById("e-"+el.dataset.id)?.focus(); },
@@ -2082,10 +2262,18 @@ async function importOld(fd){
 async function saveDiary(status){
   const d=S.draft, child=S.me.type==="child";
   if(!d.text.trim()){ toast("일기 내용을 써 주세요"); return; }
-  if(status==="submitted" && child && !d.aiChecked && !confirm("AI 맞춤법 선생님께 아직 보여 주지 않았어요. 그래도 제출할까요?")) return;
+  // 빨간펜: 노란 형광펜이 남아 있으면 제출 못 해요 (선생님이 쉬는 중이면 그냥 제출 가능)
+  if(status==="submitted" && child){
+    const goal=penGoalOf(S.me), n=countChars(d.text);
+    if(n<goal){ toast(`${goal}자를 채우면 제출할 수 있어요! (지금 ${n}자)`); return; }
+    const left=(d.pen?.errors||[]).filter(er=>penLeft(er,d.text)).length;
+    if(left){ toast(`✏️ 노란 형광펜 ${left}군데만 고치면 제출할 수 있어요! 거의 다 왔어요 💪`); document.getElementById("pen")?.scrollIntoView({behavior:"smooth",block:"nearest"}); return; }
+    if(!d.pen && !S.penFailed && !confirm("빨간펜 선생님께 아직 보여 주지 않았어요. 그래도 제출할까요?")) return;
+  }
   const pend=document.getElementById("w-tag")?.value; if(pend){ const t=cleanTag(pend); if(t && !d.tags.includes(t)) d.tags.push(t); }
   const data={profileId:S.me.id,date:d.date,mood:d.mood,title:d.title.trim(),text:d.text,status,updatedAt:Date.now()};
-  if(d.aiChecked){ data.aiChecked=true; data.aiResult=d.aiResult; }
+  if(d.pen){ data.aiChecked=true; data.aiResult=penResult(d); }
+  else if(d.aiChecked){ data.aiChecked=true; data.aiResult=d.aiResult; }
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
   if(d.photos.some(p=>p.blob) || d.audio?.blob) toast("사진과 소리를 올리고 있어요");
   await uploadPending(d);
@@ -2098,32 +2286,51 @@ async function saveDiary(status){
   else { toast("임시 저장했어요"); render(); }
 }
 
-async function aiCheck(){
-  const d=S.draft;
-  if(d.aiChecked){ toast("AI 맞춤법 확인은 한 번만 받을 수 있어요"); return; }
-  if(d.text.trim().length<10){ toast("10글자 넘게 쓴 다음에 살펴볼 수 있어요"); return; }
-  await guard(async()=>{
-    render();
-    // 먼저 저장해 두어야 결과를 일기에 붙일 수 있어요
-    const base={profileId:S.me.id,date:d.date,mood:d.mood,title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now()};
-    if(d.id) await B.update(S.gid,"diaries",d.id,base); else { base.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",base); d.status="draft"; }
-    const r=await callAI(d.text, S.me.grade);
-    const corrections=(r.corrections||[]).filter(c=>c && c.wrong && c.right && c.wrong!==c.right)
-      .map(c=>({wrong:String(c.wrong),right:String(c.right),explain:String(c.explain||""),distractors:Array.isArray(c.distractors)?c.distractors.slice(0,3):[],context:contextOf(d.text,c.wrong)}));
-    d.aiChecked=true; d.aiResult={praise:r.praise||"",feedback:r.feedback||"",corrections,checkedAt:Date.now()};
-    await B.update(S.gid,"diaries",d.id,{aiChecked:true,aiResult:d.aiResult});
-    for(const c of corrections){
-      const ex=S.quizWords.find(w=>w.profileId===S.me.id && w.wrong===c.wrong && w.right===c.right);
-      if(ex) await B.update(S.gid,"quizWords",ex.id,{wrongCount:(ex.wrongCount||1)+1,correctStreak:0,context:c.context||ex.context||"",explain:c.explain||ex.explain||""});
-      else await B.add(S.gid,"quizWords",{profileId:S.me.id,wrong:c.wrong,right:c.right,explain:c.explain,distractors:c.distractors,context:c.context,wrongCount:1,correctStreak:0,createdAt:Date.now()});
+async function penCheck(){
+  const d=S.draft, g=S.me.grade||2, goal=penGoalOf(S.me), n=countChars(d.text);
+  if(S.penBusy) return;
+  if(n<goal){ toast(`${goal}자를 다 쓰면 빨간펜 선생님을 부를 수 있어요! (지금 ${n}자)`); return; }
+  if(d.pen && d.pen.checks>=PEN_MAX_CHECK){ toast(`빨간펜 검사는 일기 하나에 ${PEN_MAX_CHECK}번까지예요`); return; }
+  S.penBusy=true; S.penFailed=false; refreshPen();
+  try{
+    const data=await callPen(d.text), prev=d.pen, text=d.text;
+    let errors=(data.errors||[]).filter(e=>e && e.wrong && e.right && e.wrong!==e.right)
+      .map(e=>({wrong:String(e.wrong),right:String(e.right),kind:String(e.kind||""),hint:String(e.hint||""),why:String(e.why||"")}));
+    const found=errors.slice();   // 받아쓰기 퀴즈에 넣을 것 (빨간펜이 찾은 낱말만)
+    errors.push(...penSpace(text,errors)); errors.push(...penPeriod(text,errors));
+    // 앞 검사에서 고친 기록은 그대로 남겨요 (같은 것은 한 번만)
+    const kept=(prev?.errors||[]).filter(er=>penAt(er,text)<0 || er.kept), seen=new Set(errors.map(e=>e.wrong+"→"+e.right));
+    errors=[...kept.filter(e=>!seen.has(e.wrong+"→"+e.right)), ...errors];
+    errors.forEach(er=>{ er._left=penLeft(er,text); });
+    d.pen={praise:data.praise||"", cheer:data.cheer||"", errors, checks:(prev?.checks||0)+1, original:prev?.original||text, auto:penAuto(g)};
+    if(d.pen.auto){ for(const er of errors) if(penAt(er,d.text)>=0){ penApplyOne(er); er.auto=true; er._left=false; } }
+    // 검사 결과를 일기에 바로 붙여 둬요 (나갔다 와도 그대로)
+    const base={profileId:S.me.id,date:d.date,mood:d.mood,title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now(),aiChecked:true,aiResult:penResult(d)};
+    if(d.id) await B.update(S.gid,"diaries",d.id,base);
+    else { base.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...base,photos:[],audio:null,location:null,tags:[]}); d.status="draft"; }
+    d.aiChecked=true; d.aiResult=base.aiResult;
+    for(const c of found){
+      const ctx=contextOf(text,c.wrong), ex=S.quizWords.find(w=>w.profileId===S.me.id && w.wrong===c.wrong && w.right===c.right);
+      if(ex) await B.update(S.gid,"quizWords",ex.id,{wrongCount:(ex.wrongCount||1)+1,correctStreak:0,context:ctx||ex.context||"",explain:c.why||ex.explain||""});
+      else await B.add(S.gid,"quizWords",{profileId:S.me.id,wrong:c.wrong,right:c.right,explain:c.why,distractors:[],context:ctx,wrongCount:1,correctStreak:0,createdAt:Date.now()});
     }
     await Promise.all([reload("diaries"),reload("quizWords")]);
-  });
+  }catch(e){ console.error(e); S.penFailed=true; }   // 선생님이 쉬는 중이어도 제출은 막지 않아요
+  finally{ S.penBusy=false; }
   render();
+  document.getElementById("pen")?.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 
 /* 폼 제출 */
 const forms = {
+  // 아이 일기 최소 글자 수 (비우면 학년 기본값)
+  "kid-goal": fd => guard(async()=>{
+    for(const p of S.profiles.filter(x=>x.type==="child")){
+      const v=Math.round(Number(fd[p.id]||0)), goal=v ? Math.min(1000,Math.max(10,v)) : null;
+      if((p.diaryGoal||null)!==goal) await B.update(S.gid,"profiles",p.id,{diaryGoal:goal});
+    }
+    await reload("profiles"); S.me=prof(S.me.id)||S.me; render(); toast("최소 글자 수를 저장했어요");
+  }),
   "old-import": fd => guard(()=>importOld(fd)),
   "create-group": fd => guard(async()=>{ const gid=await B.createGroup(fd.name.trim(),S.user,fd.me.trim()); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid); toast("가족을 만들었어요. 초대 코드는 '우리 가족'에 있어요"); }),
   "join-group": fd => guard(async()=>{ const role = fd.role==="child" ? {type:"child",grade:Number(fd.grade),pin:""} : {type:"parent"};
@@ -2157,7 +2364,7 @@ document.addEventListener("input", e => {
     const prev = e.target.id==="w-text" ? S.draft.text : S.draft.title;
     if(e.target.value.length-prev.length >= KID_MAX_BURST){ e.target.value=prev; toast(KID_TYPE_MSG); return; }
   }
-  if(e.target.id==="w-text"){ S.draft.text=e.target.value; const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length; refreshAI(); }
+  if(e.target.id==="w-text"){ S.draft.text=e.target.value; const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length; refreshPen(); }
   else if(e.target.id==="w-title") S.draft.title=e.target.value;
 });
 document.addEventListener("change", e => {

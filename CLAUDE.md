@@ -4,7 +4,7 @@
 가족 단위로 쓰는 공유 일기 웹앱. 나중에 Capacitor로 안드로이드 앱으로 포장할 예정.
 - 가족 그룹 만들기, 6자리 초대 코드로 합류. 어른은 각자 구글 로그인, 아이는 계정 없이 프로필(선택: 4자리 PIN)
 - 서로의 일기 보기, 댓글 · 답글(여러 단계) · 내 댓글 수정
-- 어린이 일기: 제출 전 1회 AI 맞춤법 확인 → 틀린 낱말을 quizWords에 저장 → 받아쓰기 퀴즈(빈칸 객관식, OX, 3번 연속 정답이면 익힘)
+- 어린이 일기: 빨간펜 선생님(공부방 빨간펜과 같은 워커 family-spell) → 최소 글자 수를 채우면 검사 → 노란 형광펜(고칠 곳) · 초록(고친 곳), 힌트 · 정답 보기 · 이대로 두기, 1 · 2학년은 자동 고침, 칭찬 · 응원 한마디, 다 고쳐야 제출(검사는 일기당 3번까지) → 틀린 낱말을 quizWords에 저장 → 받아쓰기 퀴즈(빈칸 객관식, OX, 3번 연속 정답이면 익힘)
 - 첫 화면: 어른은 프로필마다 모양 선택(일기장형 · 달력형, 예정: 4분할형 · 앨범형), 아이는 일기장형 고정. 일기장형 = 오늘의 일기 현황, 이번 주 기록표, 가족/나만 일정, 즐겨찾기(부모만 추가)
 - 지우기: 일기 · 댓글(쓴 사람), 아이 프로필과 기록(부모), 내 계정과 기록(우리 가족 > 계정). 플레이스토어 요구 사항
 - 어른: 사진 1~9장(장수별 분할 레이아웃 + 크게 보기), 위치(현재 위치 약 100m 범위 또는 직접 입력)
@@ -27,7 +27,7 @@
 - 데이터: users/{uid}, invites/{code}, groups/{gid} 아래 profiles(homeStyle 포함), diaries, comments, schedules, links, quizWords, aiReports(이상한 AI 답변 신고)
 - 카카오톡 공유: 카카오 JS SDK(t1.kakaocdn.net, 사용자가 요청해서 넣음) + KAKAO_JS_KEY(공개용 JavaScript 키) → Kakao.Share.sendScrap(SHARE_URL). 카드 내용은 OG 태그. 카카오 개발자 > 플랫폼 > Web에 https://iinote.co.kr, https://jsun.site 등록 필요
 - 아이 일기 규칙: 말로 쓰기(한 번에 10글자 이상 들어오면 되돌림) · 붙여넣기 · 끌어다 놓기 막음, 브라우저 맞춤법 밑줄 끔
-- 설정값: FEATURES(기능별 어른만/모두), MAX_PHOTOS=9, MAX_AUDIO_SEC=180, AI_WORKER_URL(아직 비어 있음), SITE_ADDRESS
+- 설정값: FEATURES(기능별 어른만/모두), MAX_PHOTOS=9, MAX_AUDIO_SEC=180, SPELL_API(빨간펜 워커 family-spell.bellachord.workers.dev, 키 없이 { text, level:"gradeN", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer }), PEN_GOAL_DEFAULT(학년별 최소 글자 수 1:40 · 2:60 · 3:100 · 4:150 · 5:200 · 6:250, 부모가 우리 가족 탭에서 아이마다 바꿈 → profiles.diaryGoal), SITE_ADDRESS
 - 디자인: 색은 모두 :root CSS 변수. 아이보리 #FBF6EE, 네이비 #1F2A44, 코랄 #EF6F53, 버터 #F4BE45, 모눈 배경, 컴퓨터 화면의 노트 여백선
 - 글꼴: Pretendard(화면), Gowun Batang / Nanum Pen Script(일기 글씨). 앱 안에서 밝게 · 어둡게, 바탕체 · 손글씨 전환 버튼
 
@@ -66,6 +66,6 @@
    - (웹디자인 시안 1~20번 중 사용자가 1 · 9 · 10 · 20을 좋아함 → 20번은 원고지 디자인으로 들어감)
    - ✅ 예전 가족일기장 가져오기 (우리 가족 탭, 부모만): 예전 일기장(jsun.site/diary)과 공부방 아이 일기는 파이어베이스 moon-15f88의 diary/{날짜}_{me|doyun|dojin} 에 있음. OLD_DIARY_CONFIG로 두 번째 앱을 열어 bellachord 계정으로 읽고, 일기 · 댓글을 importKey("old:문서id")와 함께 복사 → 다시 눌러도 새 것만 + 예전 일기장에서 고친 일기(updatedAt > importAt)는 새 내용으로 바꿈. 빨간펜 기록(spellFixes · spellFeedback)은 aiResult로(어떻게 고쳤는지는 explain에), 아이 일기의 고친 낱말은 quizWords에. 하트 · 도장 · 날씨는 안 옮김. moon-15f88 승인된 도메인에 iinote.co.kr 추가 필요
    - ✅ 디자인 4가지 (화면 위 맨 왼쪽 견본 단추, 기기마다 기억 · html[data-design]): note(노트, 기본) · clean(깔끔: 공부방과 같은 흰 카드 · 파랑 · 밑줄 탭) · bright(산뜻: 색 카드 · 주황 · 알약 탭, 4분할 네 칸이 과목 카드처럼 색) · wongoji(시안 20 레드 원고지). 제목 글씨는 G마켓 산스(noonfonts jsdelivr, 공부방과 같은 파일). 시안 모음은 _local/designs, _local/themes, _local/themes2
-3. 클라우드플레어 워커로 AI 맞춤법 확인 만들기 (API 키는 워커에만, 어린이 한 명당 하루 1회 제한은 KV로, 파이어베이스 ID 토큰 검증) → AI_WORKER_URL에 연결
+3. ✅ 빨간펜 연결 (2026-09-28): 새 워커 대신 공부방이 쓰던 family-spell 워커를 그대로 씀. ⚠ 워커의 Access-Control-Allow-Origin 이 https://jsun.site 로 고정이라 클라우드플레어 대시보드에서 https://iinote.co.kr 도 허락하게 고쳐야 실제로 동작함 (워커 코드는 깃허브에 없음). 워커가 가끔 502(안쪽 AI 403)를 내서 앱이 한 번 더 부름. 공부방 일기 단추는 https://iinote.co.kr/?write 로 (들어오면 오늘 일기 쓰는 칸이 바로 열림)
 4. Blaze 전환 후 Storage 켜고 storage.rules 적용 (사진 · 소리 저장)
 5. 나중에: Capacitor 안드로이드 포장, 앱용 구글 로그인으로 교체
