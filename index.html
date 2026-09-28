@@ -1218,6 +1218,27 @@ async function makeFirebase(){
     // 한 계정에 구글 · 카카오 둘 다 연결: 어느 쪽으로 로그인해도 같은 계정(uid)
     providers(){ const u=auth.currentUser; return u&&!u.isAnonymous ? u.providerData.map(p=>p.providerId) : []; },
     async link(kind){ await AU.linkWithPopup(auth.currentUser, kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
+    // 연결하려는 계정이 이미 따로 가입돼 있으면, 오류 안에 든 로그인 정보로 그 계정을 확인할 수 있어요
+    credFromError(kind,e){ try{ return kind==="kakao" ? AU.OAuthProvider.credentialFromError(e) : AU.GoogleAuthProvider.credentialFromError(e); }catch(x){ return null; } },
+    // 다른 로그인(구글 ↔ 카카오)을 잠깐 따로 열어 확인해요. 지금 로그인은 그대로예요
+    async otherLogin(kind,cred){
+      const app2=A.getApps().find(a=>a.name==="other") || A.initializeApp(FIREBASE_CONFIG,"other");
+      const a2=AU.getAuth(app2), db2=F.getFirestore(app2);
+      if(cred) await AU.signInWithCredential(a2,cred);
+      else { const p=kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider(); if(kind!=="kakao") p.setCustomParameters({prompt:"select_account"}); await AU.signInWithPopup(a2,p); }
+      const uid=a2.currentUser.uid;
+      return { uid,
+        async getUser(){ const s=await F.getDoc(F.doc(db2,"users",uid)); return s.exists()?s.data():null; },
+        async addUserGroup(gid){ await F.setDoc(F.doc(db2,"users",uid),{groupIds:F.arrayUnion(gid)},{merge:true}); },
+        // 그 계정의 권한으로: 새 로그인(newUid)을 가족 구성원으로 넣고 그 계정의 프로필을 같이 쓰게 해요
+        async adopt(gid,newUid){
+          const ps=(await F.getDocs(F.collection(db2,"groups",gid,"profiles"))).docs.map(d=>({id:d.id,...d.data()}));
+          const p=ps.find(x=>ownsProfile(x,uid)); if(!p) return null;
+          await F.updateDoc(F.doc(db2,"groups",gid),{memberUids:F.arrayUnion(newUid)});
+          await F.updateDoc(F.doc(db2,"groups",gid,"profiles",p.id),{uids:F.arrayUnion(newUid)});
+          return p.id; },
+        async done(){ await AU.signOut(a2).catch(()=>{}); } };
+    },
     // 휴대폰 연결 링크로 들어온 아이: 구글 계정 없이 이 브라우저를 익명 계정으로 기억해요.
     async signInKid(){ await AU.signInAnonymously(auth); },
     async signOut(){ await AU.signOut(auth); },
@@ -1243,7 +1264,7 @@ async function makeFirebase(){
       const gid=s.data().groupId;
       await F.updateDoc(F.doc(db,"groups",gid),{memberUids:F.arrayUnion(u.uid),lastJoinCode:code});
       // role이 없으면(아이 휴대폰 연결) 새 프로필을 만들지 않고 가족에만 들어가요.
-      const mine=!role || (await F.getDocs(col(gid,"profiles"))).docs.some(d=>d.data().uid===u.uid);
+      const mine=!role || (await F.getDocs(col(gid,"profiles"))).docs.some(d=>ownsProfile(d.data(),u.uid));
       if(!mine) await F.addDoc(col(gid,"profiles"),{name:myName,...role,uid:u.uid,color:COLORS[Math.floor(Math.random()*COLORS.length)],createdAt:Date.now()});
       await api.addUserGroup(u.uid,gid);
       return gid;
@@ -1418,7 +1439,10 @@ applyPrefs();
 const prof = id => S.profiles.find(p=>p.id===id);
 const sortedProfiles = () => [...S.profiles].sort((a,b)=>(a.type===b.type?0:a.type==="parent"?-1:1)||(a.createdAt||0)-(b.createdAt||0));
 const findDiary = (pid,date) => S.diaries.find(d=>d.profileId===pid && d.date===date);
-const canUse = p => p.type==="child" || (S.user && p.uid===S.user.uid);
+// 한 사람이 구글 · 카카오로 따로 가입했어도 같은 프로필: uid(처음 계정) + uids(합친 로그인들)
+const ownsProfile = (p,uid) => !!(p && uid) && (p.uid===uid || (p.uids||[]).includes(uid));
+const isMine = p => !!S.user && ownsProfile(p,S.user.uid);
+const canUse = p => p.type==="child" || isMine(p);
 const isParent = () => S.me && S.me.type==="parent";
 const allow = f => (["photos","audio"].includes(f) && !MEDIA_READY && !DEMO) ? false : (FEATURES[f]==="all" || (S.me && S.me.type==="parent"));
 // 고치기 · 지우기 단추 이름: 아이는 '고쳐 쓰기 · 지우기', 어른은 '수정 · 삭제'
@@ -1443,7 +1467,9 @@ async function enterGroup(gid){
   if(!S.group){ S.phase="onboard"; render(); return; }
   await reloadAll();
   const saved = ls.get("iinote-pid-"+gid,"");
-  const p = prof(saved);
+  let p = prof(saved);
+  // 기억해 둔 프로필이 합치기로 없어졌으면, 내 로그인이 쓰는 프로필로
+  if(saved && !p){ const m=S.profiles.filter(x=>x.type==="parent" && isMine(x)); if(m.length===1){ p=m[0]; ls.set("iinote-pid-"+gid,p.id); } }
   if(p && canUse(p) && !(p.type==="child" && p.pin)){ S.me=p; S.phase="app"; }
   else S.phase="picker";
   render();
@@ -1602,6 +1628,9 @@ function viewOnboard(){
         <button class="btn btn-accent wide">가족에 들어가기</button>
       </form>
     </div>
+    ${!DEMO&&S.user&&!S.user.isAnonymous?(k=>`<div class="card" style="margin-top:16px"><h2>전에 ${loginName(k)}로 가족에 들어온 적 있나요?</h2>
+      <p>${loginName(k)} 로그인을 한 번 확인하면 새 프로필을 만들지 않고 예전 내 프로필로 들어가요. 같은 사람이 둘로 보이지 않아요.</p>
+      <button class="btn ${k==="kakao"?"btn-kakao":"btn-ghost"}" data-act="join-existing" data-v="${k}">${k==="kakao"?ic("talk"):""}${loginName(k)}로 확인하고 예전 프로필로 들어가기</button></div>`)(myKind()==="kakao"?"google":"kakao"):""}
     ${S.group?`<p style="margin-top:20px"><button class="link-btn" data-act="cancel-onboard">${ic("back")}지금 가족으로 돌아가기</button></p>`:""}
     <p style="margin-top:12px"><button class="link-btn" data-act="signout">${ic("out")}로그아웃</button></p>
   </div></main>`;
@@ -2757,11 +2786,13 @@ function backup(kind){
 }
 // 로그인 연결: 내 프로필일 때만, 구글 · 카카오 중 아직 없는 쪽을 '연결하기'로
 function loginLinkRow(){
-  if(!S.user || S.me?.uid!==S.user.uid) return "";
+  if(!isMine(S.me)) return "";
   const pv=B.providers(); if(!pv.length) return "";
-  const item=(id,name,kind)=>pv.includes(id)?`<span class="chip" style="padding:0 14px">${name} ✓ 연결됨</span>`:`<button class="btn ${kind==="kakao"?"btn-kakao":"btn-ghost"} sm" data-act="link-login" data-v="${kind}">${kind==="kakao"?ic("talk"):""}${name}도 연결하기</button>`;
+  const item=(id,name,kind)=>pv.includes(id)||(S.me.mergedKinds||[]).includes(kind)?`<span class="chip" style="padding:0 14px">${name} ✓ 연결됨</span>`:`<button class="btn ${kind==="kakao"?"btn-kakao":"btn-ghost"} sm" data-act="link-login" data-v="${kind}">${kind==="kakao"?ic("talk"):""}${name}도 연결하기</button>`;
   return `<div class="login-link" style="margin-top:16px"><p class="muted" style="font-size:14px;margin:0 0 8px">로그인 방법 · 연결해 두면 구글이나 카카오 어느 쪽으로 들어와도 같은 일기장이 열려요.</p>
-    <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}</div></div>`;
+    <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}</div>
+    ${S.mergeKind?`<p style="margin:10px 0 0"><button class="btn btn-primary sm" data-act="merge-login" data-v="${S.mergeKind}">${loginName(S.mergeKind)}로 만든 프로필과 합치기</button></p>`:""}
+    <p class="muted" style="font-size:13px;margin:8px 0 0">구글 · 카카오로 따로 들어와서 같은 사람이 둘로 보이면, 한쪽으로 로그인해 다른 쪽 '연결하기'를 눌러 하나로 합쳐 주세요.</p></div>`;
 }
 function viewFamily(){
   const g=S.group, ps=sortedProfiles(), link=`https://${SITE_ADDRESS}/?join=${g.inviteCode}`;
@@ -2817,10 +2848,10 @@ function viewFamily(){
           <button class="btn btn-ghost sm" data-act="signout">${ic("out")}로그아웃</button>
         </div>
         ${loginLinkRow()}
-        ${S.user&&!S.user.isAnonymous&&S.me?.uid===S.user.uid?`<div style="margin-top:14px">${keepBox()}</div>`:""}
+        ${S.user&&!S.user.isAnonymous&&isMine(S.me)?`<div style="margin-top:14px">${keepBox()}</div>`:""}
         ${groups.length>1&&isParent()?`<label style="margin-top:16px">내 가족 그룹<select data-pref="group">${groups.map(id=>`<option value="${esc(id)}" ${id===S.gid?"selected":""}>${id===S.gid?esc(g.name):"다른 가족 ("+esc(id.slice(0,6))+")"}</option>`).join("")}</select></label>`:""}
         <div class="acc-foot">
-          ${isParent()||S.me.uid===S.user?.uid?`<button class="btn btn-ghost sm danger" data-act="delete-account">${ic("trash")}내 계정과 기록 지우기</button>`:""}
+          ${isParent()||isMine(S.me)?`<button class="btn btn-ghost sm danger" data-act="delete-account">${ic("trash")}내 계정과 기록 지우기</button>`:""}
           <span class="row" style="gap:4px 14px"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span>
         </div>
         ${DEMO?`<p class="muted" style="font-size:14px;margin:16px 0 0">체험 모드예요. <button class="link-btn" data-act="reset-demo">체험 내용을 처음 상태로 되돌리기</button></p>`:""}
@@ -2863,13 +2894,21 @@ const acts = {
     if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
     throw e; } }),
   "link-login": el => guard(async()=>{
-    try{ await B.link(el.dataset.v); }
+    const kind=el.dataset.v;
+    try{ await B.link(kind); }
     catch(e){
-      if(/credential-already-in-use|account-exists|email-already-in-use/.test(e.code||"")) throw new Error("이 계정은 이미 따로 가입되어 있어요. 그 계정으로 로그인해 '내 계정과 기록 지우기'를 한 뒤 다시 연결해 주세요.");
+      if(/credential-already-in-use|account-exists|email-already-in-use/.test(e.code||"")){
+        // 이미 따로 가입된 계정: 그 계정을 확인하고 두 프로필을 하나로 합쳐요
+        const cred=B.credFromError(kind,e);
+        if(cred){ await mergeOtherLogin(kind,cred); return; }
+        S.mergeKind=kind; render(); toast(`${loginName(kind)} 계정이 따로 있어요. 아래 '합치기'를 눌러 주세요`); return;
+      }
       if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
       throw e;
     }
     render(); toast("연결했어요. 이제 어느 쪽으로 로그인해도 같은 일기장이에요"); }),
+  "merge-login": el => guard(()=>mergeOtherLogin(el.dataset.v,null)),
+  "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => guard(async()=>{ ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
   tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
@@ -3067,6 +3106,76 @@ async function wipeProfiles(gid,pids,all){
   await rm("aiReports",aiReports.filter(r=>has(r.profileId)));
   await rm("profiles",profiles.filter(p=>has(p.id)));
 }
+/* ---------- 구글 · 카카오 로그인 하나로 합치기 ----------
+   같은 사람이 구글과 카카오로 따로 가입하면 파이어베이스 계정이 둘이라 프로필도 둘이 돼요.
+   다른 쪽 로그인을 확인한 뒤, 그 계정도 지금 프로필을 쓰게 하고(uids) 기록은 지금 프로필로 옮겨요. */
+const loginName = kind => kind==="kakao" ? "카카오" : "구글";
+async function mergeOtherLogin(kind,cred){
+  if(DEMO){ toast("체험 모드에서는 로그인을 합칠 수 없어요"); return; }
+  const o=await B.otherLogin(kind,cred);
+  try{
+    if(ownsProfile(S.me,o.uid)){ toast("이미 하나로 합쳐져 있어요"); return; }
+    await reloadAll(); const me=prof(S.me.id);
+    const other=S.profiles.find(p=>p.id!==me.id && ownsProfile(p,o.uid));
+    if(other && other.type!==me.type) throw new Error("어른 프로필과 아이 프로필은 합칠 수 없어요. 아이 프로필은 '우리 가족 설정'에서 지워 주세요.");
+    const cnt=c=>S[c].filter(x=>x.profileId===other?.id).length;
+    const msg = other
+      ? `'${other.name}'(${loginName(kind)}로 들어온 프로필)을 지금의 '${me.name}'과 하나로 합칠까요?\n\n· ${other.name}의 일기 ${cnt("diaries")}편, 댓글 ${cnt("comments")}개, 일정 ${cnt("schedules")}개가 '${me.name}'으로 옮겨져요.\n· 앞으로 구글 · 카카오 어느 쪽으로 들어와도 같은 '${me.name}'이에요.\n· 합친 뒤에는 되돌릴 수 없어요.`
+      : `${loginName(kind)}로 들어와도 '${me.name}' 프로필이 열리게 할까요?`;
+    if(!confirm(msg)) return;
+    const uids=[...new Set([...(me.uids||[]), o.uid, ...(other?[other.uid,...(other.uids||[])]:[])])].filter(x=>x && x!==me.uid);
+    const kinds=[...new Set([...(me.mergedKinds||[]), kind])];
+    await B.update(S.gid,"profiles",me.id,{uids,mergedKinds:kinds});
+    const g=await B.getGroup(S.gid);
+    await B.updateGroup(S.gid,{memberUids:[...new Set([...(g.memberUids||[]), o.uid])]});
+    await o.addUserGroup(S.gid);
+    if(other) await mergeProfiles(other.id,me.id);
+  } finally { await o.done(); S.mergeKind=null; }
+  await reloadAll(); S.me=prof(S.me.id)||S.me; render();
+  toast(`하나로 합쳤어요. 이제 구글 · 카카오 어느 쪽으로 들어와도 '${S.me.name}'이에요`);
+}
+// 기록 옮기기: from 프로필의 일기 · 댓글 · 일정 · 즐겨찾기 · 받아쓰기 · 하트 · 도장을 to 프로필로, 그다음 from 프로필 지우기
+async function mergeProfiles(from,to){
+  const gid=S.gid;
+  for(const d of S.diaries){
+    const up={};
+    if(d.hearts?.[from]){ const h={...d.hearts}; delete h[from]; h[to]=true; up.hearts=h; }
+    if(d.stampBy===from) up.stampBy=to;
+    if(d.profileId===from){
+      const same=S.diaries.find(x=>x.profileId===to && x.date===d.date);
+      if(same){ // 같은 날 둘 다 썼으면 한 편으로 합쳐요
+        const h={...(same.hearts||{}),...(up.hearts||d.hearts||{})}; delete h[from];
+        await B.update(gid,"diaries",same.id,{text:[same.text,d.text].filter(Boolean).join("\n\n"),photos:[...(same.photos||[]),...(d.photos||[])].slice(0,MAX_PHOTOS),tags:[...new Set([...(same.tags||[]),...(d.tags||[])])],hearts:h,audio:same.audio||d.audio||null,updatedAt:Date.now()});
+        for(const c of S.comments.filter(c=>c.diaryId===d.id)) await B.update(gid,"comments",c.id,{diaryId:same.id});
+        await B.remove(gid,"diaries",d.id); continue; }
+      up.profileId=to;
+    }
+    if(Object.keys(up).length) await B.update(gid,"diaries",d.id,up);
+  }
+  for(const c of S.comments.filter(x=>x.profileId===from)) await B.update(gid,"comments",c.id,{profileId:to});
+  for(const s of S.schedules.filter(x=>x.profileId===from)) await B.update(gid,"schedules",s.id,{profileId:to});
+  for(const l of S.links.filter(x=>x.createdBy===from)) await B.update(gid,"links",l.id,{createdBy:to});
+  for(const w of S.quizWords.filter(x=>x.profileId===from)) await B.update(gid,"quizWords",w.id,{profileId:to});
+  try{ for(const r of (await B.list(gid,"aiReports")).filter(x=>x.profileId===from)) await B.update(gid,"aiReports",r.id,{profileId:to}); }catch(e){}
+  await B.remove(gid,"profiles",from);
+}
+// 가족에 처음 들어올 때: 전에 다른 로그인으로 들어온 적 있으면 그 프로필로 바로 들어가요 (초대 코드 · 새 프로필 없이)
+async function joinWithOtherLogin(kind){
+  if(DEMO){ toast("체험 모드에서는 쓸 수 없어요"); return; }
+  const o=await B.otherLogin(kind,null); let gid=null, pid=null;
+  try{
+    if(o.uid===S.user.uid) throw new Error("지금과 같은 계정이에요. 초대 코드로 들어와 주세요.");
+    const ud=await o.getUser()||{};
+    for(const g of [ud.lastGroupId,...(ud.groupIds||[])].filter(Boolean)){ pid=await o.adopt(g,S.user.uid).catch(()=>null); if(pid){ gid=g; break; } }
+    if(!gid) throw new Error(`${loginName(kind)} 계정으로 들어간 가족을 찾지 못했어요. 초대 코드로 들어와 주세요.`);
+    await B.update(gid,"profiles",pid,{mergedKinds:F_arrayAdd((await B.list(gid,"profiles")).find(p=>p.id===pid)?.mergedKinds,myKind())});
+  } finally { await o.done(); }
+  await B.addUserGroup(S.user.uid,gid); S.userDoc=await B.getUser(S.user.uid);
+  S.joinCode=""; history.replaceState(null,"",location.pathname); ls.set("iinote-pid-"+gid,pid);
+  await enterGroup(gid); toast("예전 프로필로 들어왔어요. 이제 어느 쪽으로 로그인해도 같은 프로필이에요");
+}
+const F_arrayAdd = (arr,v) => [...new Set([...(arr||[]),v].filter(Boolean))];
+const myKind = () => (B.providers?.()||[]).includes("oidc.kakao") ? "kakao" : "google";
 function deleteMyAccount(){
   const word=prompt("내 계정과 기록을 지우면 되돌릴 수 없어요.\n\n· 내 프로필, 내가 쓴 일기 · 사진 · 소리 · 댓글 · 일정 · 즐겨찾기가 지워져요.\n· 가족 그룹에서 나가요.\n· 가족에 나 혼자 남아 있었다면 그 가족의 기록이 모두 지워져요.\n\n계속하려면 '지우기'라고 써 주세요.");
   if(word===null) return;
@@ -3078,7 +3187,10 @@ function deleteMyAccount(){
     for(const gid of gids){
       const g=await B.getGroup(gid).catch(()=>null); if(!g) continue;
       const alone=!(g.memberUids||[]).some(u=>u!==uid);
-      const mine=(await B.list(gid,"profiles")).filter(p=>p.uid===uid).map(p=>p.id);
+      const mineP=(await B.list(gid,"profiles")).filter(p=>ownsProfile(p,uid)), mine=[];
+      for(const p of mineP){ // 구글 · 카카오를 합친 프로필이면, 이 로그인만 빼고 프로필과 기록은 남겨요
+        const rest=[p.uid,...(p.uids||[])].filter(x=>x&&x!==uid);
+        if(rest.length) await B.update(gid,"profiles",p.id,{uid:rest[0],uids:rest.slice(1)}); else mine.push(p.id); }
       await wipeProfiles(gid,mine,alone);
       await B.leaveGroup(gid,uid);
       ls.del("iinote-pid-"+gid);
@@ -3240,7 +3352,7 @@ const forms = {
   "create-group": fd => guard(async()=>{ const gid=await B.createGroup(fd.name.trim(),S.user,fd.me.trim()); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid); toast("가족을 만들었어요. 초대 코드는 '우리 가족'에 있어요"); }),
   "join-group": fd => guard(async()=>{ const role = fd.role==="child" ? {type:"child",grade:Number(fd.grade),pin:""} : {type:"parent"};
     const gid=await B.joinGroup(fd.code.trim().toUpperCase(),S.user,fd.me.trim(),role); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid);
-    const mine=S.profiles.find(p=>p.uid===S.user.uid); if(mine && S.phase==="picker") enterAs(mine); toast("가족에 들어왔어요"); }),
+    const mine=S.profiles.find(isMine); if(mine && S.phase==="picker") enterAs(mine); toast("가족에 들어왔어요"); }),
   pin: (fd,f) => { const p=prof(f.dataset.id); if(p && String(fd.pin)===String(p.pin)) enterAs(p); else { toast("비밀번호가 달라요. 다시 입력해 주세요"); f.reset(); f.querySelector("input")?.focus(); } },
   schedule: (fd,f) => guard(async()=>{ const p=parseSchedule(fd.title); if(fd.time) p.time=fd.time;
     // 저장이 조금 걸릴 때도 바로 알 수 있게: 단추를 잠그고 "저장 중…" → "저장되었어요!"
