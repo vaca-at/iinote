@@ -28,6 +28,11 @@
 - 예전 주소 jsun.site/iinote (저장소 vaca-at/jsun 의 iinote 폴더, 로컬 Downloads\jsun)는 옮기기 전 버전
 - FIREBASE_CONFIG의 apiKey가 "여기에"로 시작하면 localStorage로 도는 체험 모드
 - 데이터: users/{uid}, invites/{code}, groups/{gid} 아래 profiles(homeStyle 포함), diaries, comments, schedules, links, quizWords, aiReports(이상한 AI 답변 신고)
+- 🎙 이야기로 일기 쓰기 (5~7세, 2026-09-28): 아이 일기 쓰기 위 칸(talkOK). 엄마 · 아빠와 대화 녹음(최대 3분, recStart(true)) → 녹음은 d.audio 로 일기에 남음 → toWav16k 로 16kHz WAV → 워커 POST /transcribe (Workers AI @cf/openai/whisper-large-v3-turbo, 워커에 AI 바인딩 필요) → 워커 mode "talk" (Claude, TALK_BASE: 아이가 한 말만으로 "나는~" 일기, dialog · diary · mood · note) → 일기 칸에 넣고 부모가 고쳐 제출. diaries.talk = {transcript, dialog, note, diary, made}. 이야기 일기는 글자 수 · 빨간펜 조건 없이 제출. 일기당 만들기 3번(TALK_MAX_MAKE)
+- 백업: 우리 가족 설정(부모만) → 일기 · 댓글 CSV (엑셀용 BOM, =+-@ 로 시작하는 칸은 ' 붙임)
+- 자동 로그아웃: 첫 화면 · 계정에 '이 기기에서 로그인 유지'(iinote-keep). 켜면 local 저장 + 30일(KEEP_DAYS) 뒤, 끄면 session 저장 + 30분(IDLE_MIN) 안 쓰면. 일기 쓰는 중엔 기다림. 익명(아이 휴대폰 연결) 계정은 제외
+- 위쪽 머리: 맨 위 홈 단추(.home-btn) · 휴대폰은 1줄(홈 · 제목 · 🎨) + 2줄(나 · 즐겨찾기 · 로그아웃), 🎨 누르면 화면 구성 → 디자인 → 글씨
+- 운영 현황판: 워커 GET /usage 로 AI 횟수 · 토큰 · 예상 금액(Opus 5 입력 $5 · 출력 $25 /100만 토큰, 1달러≈1,400원). /usage 는 아이 이름 없이 who {iinote, other} 만
 - 카카오 로그인 (2026-09-28): 파이어베이스 Identity Platform 업그레이드 + 로그인 방법 OpenID Connect(이름 kakao → oidc.kakao, 코드 흐름, 발급자 https://kauth.kakao.com, 클라이언트 ID = 카카오 REST API 키, 비밀번호 = 카카오 클라이언트 시크릿). 카카오 쪽: 카카오 로그인 · OpenID Connect ON, 리다이렉트 URI https://iinote.firebaseapp.com/__/auth/handler, 동의항목 닉네임만(이메일 안 받음). 코드: signInKakao = signInWithPopup(OAuthProvider("oidc.kakao")), reauth도 카카오 계정이면 카카오로. 구글 · 카카오는 서로 다른 계정. OIDC는 한 달 로그인 50명까지 무료
 - 카카오톡 공유: 카카오 JS SDK(t1.kakaocdn.net, 사용자가 요청해서 넣음) + KAKAO_JS_KEY(공개용 JavaScript 키) → Kakao.Share.sendScrap(SHARE_URL). 카드 내용은 OG 태그 (og.png 1200×630: 버터 판 2분할 · 왼쪽 제목 + 키워드 4개(매일 일기 습관 · AI 빨간펜 · 맞춤법 공부 · 성장 기록), 오른쪽 로고 + iinote.co.kr. 원본 _local/og/final.html + chips.css · url.css. 아이콘: 📒 매일 일기 습관 · 👩‍🏫 AI 빨간펜 · ✏️ 맞춤법 공부 · 🌱 성장 기록, 주소는 흰 알약 + 🌐 + iinote(코랄).co.kr). 바꾸면 카카오 공유 디버거(developers.kakao.com/tool/debugger/sharing)에서 캐시 초기화. 카카오 개발자 > 플랫폼 > Web에 https://iinote.co.kr, https://jsun.site 등록 필요
 - 아이 일기 규칙: 말로 쓰기(한 번에 10글자 이상 들어오면 되돌림) · 붙여넣기 · 끌어다 놓기 막음, 브라우저 맞춤법 밑줄 끔
