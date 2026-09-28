@@ -41,7 +41,7 @@
   --diary:"Gowun Batang","AppleMyungjo","Batang",serif;
   --diary-size:19px; --diary-lh:36px;
 }
-[data-dfont="pen"]{ --diary:"OwnglyphYuntaeng","Nanum Pen Script","Gowun Batang",serif; --diary-size:22px; --diary-lh:38px; --hand-ui:"Cafe24AnemoneAir","OmuDaye","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OmuDaye","OwnglyphYuntaeng","Pretendard Variable",sans-serif; }
+[data-dfont="pen"]{ --diary:"OwnglyphYuntaeng","Nanum Pen Script","Gowun Batang",serif; --diary-size:22px; --diary-lh:38px; --hand-ui:"OwnglyphYuntaeng","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OmuDaye","OwnglyphYuntaeng","Pretendard Variable",sans-serif; }
 [data-dfont="gothic"]{ --diary:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; --diary-size:18px; --diary-lh:34px; }
 [data-dfont="dodum"]{ --diary:"Gowun Dodum","Pretendard Variable",sans-serif; --diary-size:18px; --diary-lh:35px; }
 [data-theme="dark"]{
@@ -296,11 +296,12 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .today-date{font-family:var(--diary);font-size:clamp(32px,5vw,46px);line-height:1.15;margin:4px 0 0;letter-spacing:-1px}
 .home-grid{display:grid;gap:20px}
 .col{display:grid;gap:20px;align-content:start}
-@media (min-width:1100px){.home-grid{grid-template-columns:1.35fr 1fr}}
+@media (min-width:1100px){.home-grid{grid-template-columns:1.35fr 1fr;align-items:stretch} .home-grid>.col:first-child{align-content:stretch} .home-grid>.col:first-child>.block{height:100%}}
 .block{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:20px}
 .block-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
 .block-h h2{font-size:18px;margin:0;letter-spacing:-.3px}
-.st-list{list-style:none;padding:0;margin:0 0 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.st-list{list-style:none;padding:0;margin:0 0 18px;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:10px}
+@media (max-width:640px){ .st-list{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .st-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--paper)}
 .st-name{font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .week{border-top:1px dashed var(--line);padding-top:14px;overflow-x:auto}
@@ -319,7 +320,8 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink3);margin-top:10px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 /* 달력형 첫 화면 */
-.ct-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.ct-grid{display:grid;gap:10px;grid-template-columns:repeat(var(--n,4),minmax(0,1fr))}
+@media (max-width:640px){ .ct-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .ct-card{border-radius:16px;background:var(--paper);padding:12px 14px;border-left:5px solid var(--pc)}
 .ct-top{display:flex;align-items:center;gap:10px}
 .ct-top b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -353,6 +355,23 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .cd-h{font-size:15px;margin:18px 0 8px;color:var(--ink2)}
 #cal-day{margin-top:20px;scroll-margin-top:80px}
 #cal-day+.block{margin-top:20px}
+/* 달력: 예전 가족일기장처럼 귀엽게 (하늘색 테두리 · 일기 글씨 숫자 · 가족 모두의 점: 쓴 날은 진하게, 안 쓴 날은 흐리게) */
+.cal-cell{border:1.5px solid color-mix(in srgb,var(--sky) 40%,var(--line));border-radius:16px;background:var(--surface);transition:transform .12s,box-shadow .12s}
+.cal-cell:hover{border-color:var(--sky);transform:translateY(-1px);box-shadow:0 4px 12px rgba(31,42,68,.08)}
+.cal-cell.future{background:color-mix(in srgb,var(--sky-soft) 45%,var(--surface))}
+.cal-cell.today{border:2.5px solid var(--coral)}
+.cal-n{font-family:var(--diary);font-weight:700;font-size:20px}
+.cal-n small{font-family:var(--sans)}
+.cal-w{font-family:var(--diary);font-size:15px}
+.cal-dots i{background:var(--c);opacity:.22}
+.cal-dots i.on{opacity:1}
+/* 달력 카드 안 일정 (한 줄 입력: "14시 태권도") */
+.cal-sch{margin-top:14px;border-top:1.5px dashed var(--line);padding-top:12px}
+.cal-sch .cd-h{margin:0 0 6px}
+.sch-line{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.sch-line input[name=title]{flex:1;min-width:11em}
+.sch-scope{flex:none;gap:4px}
+.sch-scope span{min-height:36px;padding:0 12px}
 .cal+.block:not(#cal-day){margin-top:20px}
 @media (max-width:640px){
   .ct-grid{grid-template-columns:1fr 1fr;gap:8px}
@@ -534,7 +553,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .date-l{max-width:220px}
 .w-title{font-family:var(--diary);font-size:26px;font-weight:700;border:0;border-bottom:2px solid var(--ink);border-radius:0;background:transparent;padding:10px 4px;margin-bottom:14px}
 .w-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);min-height:calc(var(--diary-lh) * 10);border:1.5px solid var(--line);border-radius:16px;padding:6px 16px;background-color:var(--surface);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh));background-position:0 6px;background-attachment:local}
-/* 일기 칸 아래 이모지 줄 */.emo-bar{display:flex;gap:4px;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:thin}.emo{flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-size:21px;line-height:1;padding:0}.emo:hover{border-color:var(--coral);background:var(--coral-soft)}.emo:active{transform:scale(.92)}
+/* 일기 칸 아래 이모지 줄 */.emo-bar{display:flex;flex-wrap:wrap;gap:4px;padding:8px 2px 4px}.emo{flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-size:21px;line-height:1;padding:0}.emo:hover{border-color:var(--coral);background:var(--coral-soft)}.emo:active{transform:scale(.92)}
 .w-count{text-align:right;font-size:13px;margin-top:4px}
 .w-acts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
 .ai-box{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-top:18px;padding:18px 20px;border-radius:18px;background:var(--butter-soft)}
@@ -831,12 +850,13 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 :root[data-design="wongoji"] .sheet::before{width:1px;box-shadow:4px 0 0 var(--margin)}
 .dsw.wongoji{border-color:#1E1E24;background:linear-gradient(#F4CFCA 1px,transparent 1px) 0 0/6px 6px,linear-gradient(90deg,#F4CFCA 1px,transparent 1px) 0 0/6px 6px,#FFFFFF;box-shadow:inset 3px 0 0 #D7263D}
 /* ═════════ 손글씨 글씨: 화면 전체를 손글씨로 (눈누 무료 폰트 3가지 · 모두 웹 임베딩 허용 확인 2026-09-28) ═════════
-   메뉴 · 제목 = 오뮤 다예쁨체 / 일기 본문 = 온글잎 윤탱체 / 작은 설명 · 단추 = 카페24 아네모네 에어 (기호는 Pretendard 로) */
+   거의 전부 = 온글잎 윤탱체 (사용자 요청), 큰 화면 제목만 = 오뮤 다예쁨체 (기호는 Pretendard 로). 카페24 아네모네 에어는 불러 두기만 (지금은 안 씀) */
 @font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'OmuDaye';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');font-weight:normal;font-display:swap}
 @font-face{font-family:'Cafe24AnemoneAir';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202@1.0/Cafe24Ohsquareair.woff') format('woff');font-weight:normal;font-display:swap;unicode-range:U+0020-007E,U+2018-201D,U+2026,U+3131-318E,U+AC00-D7A3}
 :root[data-dfont="pen"] body,:root[data-dfont="pen"] :is(button,input,select,textarea,label,small,p,li,span,a,td,th,summary,legend){font-family:var(--hand-ui)}
-:root[data-dfont="pen"] :is(h1,h2,h3,.mast-t,.page-h h1,.block-h h2,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name,.hb-g b){font-family:var(--hand-head)}
+:root[data-dfont="pen"] :is(.mast-t,.page-h h1,.land h1){font-family:var(--hand-head)}
+:root[data-dfont="pen"] :is(h2,h3,.block-h h2,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name){font-family:var(--hand-ui)}
 :root[data-dfont="pen"] :is(.w-text,.w-hl,.paper-lines,.today-date,.dcard-ex,.al.txt strong,.cmt-text,.fix-list,.ais-text,.ct-title,.qn-x){font-family:var(--diary)}
 :root[data-dfont="pen"] .hb-g span:not(.pen){font-family:var(--sans)}
 </style>
@@ -1532,7 +1552,7 @@ function viewHomeDiary(){
   <div class="home-grid">
     <div class="col">
       <section class="block" aria-labelledby="h-st"><div class="block-h"><h2 id="h-st">오늘의 일기</h2><span class="muted">${ps.filter(p=>findDiary(p.id,t)?.status==="submitted").length}/${ps.length}명 썼어요</span></div>
-        <ul class="st-list">${rows}</ul>
+        <ul class="st-list" style="--n:${Math.min(ps.length,4)}">${rows}</ul>
         <div class="week"><div class="wk-row wk-head"><span></span>${head}</div>${wrows}
           <div class="legend"><span><i class="wk-dot on"></i>썼어요</span><span><i class="wk-dot half"></i>쓰는 중</span><span>내 줄 동그라미를 누르면 그날 일기를 써요</span></div></div>
       </section>
@@ -1576,10 +1596,10 @@ function viewHomeCalendar(){
     return `<button class="${cls}" data-act="cal-day" data-v="${d}" aria-label="${fmtLong(d)}${hol?" "+hol:""}, 일정 ${list.length}개, ${who.length}명 씀">
       <span class="cal-n">${+d.slice(8)}${hol?`<small>${hol}</small>`:""}</span>
       <span class="cal-sc">${list.slice(0,2).map(s=>`<em>${s.time?esc(s.time)+" ":""}${esc(s.title)}</em>`).join("")}${list.length>2?`<em class="more">+${list.length-2}</em>`:""}</span>
-      <span class="cal-dots">${who.map(p=>`<i style="background:${p.color||"var(--ink)"}"></i>`).join("")}</span></button>`; }).join("");
+      <span class="cal-dots">${d<=t?ps.map(p=>`<i class="${submittedOn(p.id,d)?"on":""}" style="--c:${p.color||"var(--ink)"}"></i>`).join(""):""}</span></button>`; }).join("");
   return `<section class="hero-date"><div><p class="muted">오늘</p><h2 class="today-date">${fmtLong(t)}</h2></div>${homeCta(mine)}</section>
   <section class="block" aria-labelledby="h-ct"><div class="block-h"><h2 id="h-ct">오늘</h2><span class="muted">${ps.filter(p=>submittedOn(p.id,t)).length}/${ps.length}명 썼어요</span></div>
-    <div class="ct-grid">${today}</div></section>
+    <div class="ct-grid" style="--n:${Math.min(ps.length,5)}">${today}</div></section>
   <section class="block cal" aria-labelledby="h-cal">
     <div class="cal-h"><button class="icon-btn" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("back")}</button>
       <h2 id="h-cal">${yy}년 ${mm}월</h2><button class="icon-btn flip" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("back")}</button>
@@ -1587,7 +1607,8 @@ function viewHomeCalendar(){
     <div class="cal-legend">${legend}</div>
     <div class="cal-grid">${DAYS.map((w,i)=>`<span class="cal-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}
       ${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
-    <p class="muted" style="font-size:13px;margin:10px 0 0">날짜를 누르면 그날 가족 일기와 일정을 볼 수 있어요.</p>
+    ${viewCalSchedule(S.calDay||t)}
+    <p class="muted" style="font-size:13px;margin:10px 0 0">날짜를 누르면 그날 일정과 아래에 그날 가족 일기가 보여요.</p>
   </section>
   ${viewCalDay(S.calDay||todayStr())}`;   // 날짜를 안 눌러도 오늘 칸(일기 · 일정 추가)이 늘 보여요
 }
@@ -1675,6 +1696,30 @@ function viewHomeAlbum(){
     ${html?`<div class="album">${html}</div>`:`<p class="empty">아직 올린 일기가 없어요. 사진과 함께 첫 일기를 올려 보세요.</p>`}
     <p class="muted" style="font-size:13px;margin:12px 0 0">사진이나 일기를 누르면 그날 일기가 열려요. 사진이 없는 일기는 쓴 사람 색깔 카드로 보여요.</p>`;
 }
+// 한 줄 일정: "14시 태권도" · "15:30 피아노" · "오후 3시 수영" · "14시 30분 학원" → 시간은 떼어서 시간 칸으로 (없으면 하루 종일)
+function parseSchedule(s){
+  s=String(s||"").trim();
+  const m=s.match(/^(오전|오후)?\s*(\d{1,2})\s*(?::\s*(\d{2})|시\s*(?:(\d{1,2})\s*분|반)?)\s*(.+)$/);
+  if(m){ let h=+m[2], mi=m[3]!=null?+m[3]:m[4]!=null?+m[4]:/시\s*반/.test(s)?30:0;
+    if(m[1]==="오후" && h<12) h+=12; if(m[1]==="오전" && h===12) h=0;
+    if(h<24 && mi<60) return {time:`${pad(h)}:${pad(mi)}`, title:m[5].trim()}; }
+  return {time:"", title:s};
+}
+// 달력 카드 안의 일정: 고른 날(안 고르면 오늘)의 일정 목록 + 일정 추가 (달력과 한 세트)
+function viewCalSchedule(d){
+  const sch=mySchedules().filter(s=>s.date===d).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+  return `<div class="cal-sch">
+    <h3 class="cd-h">${fmtShort(d)} 일정</h3>
+    ${sch.length?`<ul class="sc-list">${sch.map(s=>{ const del=s.profileId===S.me.id || isParent();
+      return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span><span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${del?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; }).join("")}</ul>`:`<p class="muted" style="margin:0">이날 일정이 없어요.</p>`}
+    <form class="sch-line" data-form="schedule">
+      <input type="hidden" name="date" value="${d}">
+      <label class="sr" for="sch-${d}">일정</label><input id="sch-${d}" name="title" required maxlength="40" placeholder="예: 14시 태권도" autocomplete="off">
+      <div class="seg sch-scope" role="radiogroup" aria-label="누가 볼 일정인가요"><label><input type="radio" name="scope" value="family" checked><span>가족</span></label><label><input type="radio" name="scope" value="personal"><span>나만</span></label></div>
+      <button class="btn btn-primary sm">${ic("plus")}추가</button>
+    </form>
+  </div>`;
+}
 function viewCalDay(d){
   const t=todayStr(), hol=HOLIDAYS[d], mine=findDiary(S.me.id,d);
   const list=S.diaries.filter(x=>x.date===d && (x.status==="submitted" || x.profileId===S.me.id))
@@ -1684,19 +1729,6 @@ function viewCalDay(d){
   return `<section class="block" id="cal-day" aria-labelledby="h-cd"><div class="block-h"><h2 id="h-cd">${fmtLong(d)}${hol?` <span class="tag family">${hol}</span>`:""}</h2>
       <div class="row">${write}${S.calDay?`<button class="icon-btn" data-act="cal-day" data-v="${d}" aria-label="닫기">${ic("x")}</button>`:""}</div></div>
     ${list.length?`<div class="feed">${list.map(dcard).join("")}</div>`:`<p class="empty">${d>t?"아직 오지 않은 날이에요.":"이날 쓴 가족 일기가 없어요."}</p>`}
-    <h3 class="cd-h">일정</h3>
-    ${sch.length?`<ul class="sc-list">${sch.map(s=>{ const del=s.profileId===S.me.id || isParent();
-      return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span><span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${del?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; }).join("")}</ul>`:`<p class="muted" style="margin:0">이날 일정이 없어요.</p>`}
-    <details class="add"><summary>${ic("plus")}이날 일정 추가</summary>
-      <form class="form-grid" data-form="schedule">
-        <input type="hidden" name="date" value="${d}">
-        <label>시간 (선택)<input type="time" name="time"></label>
-        <label>할 일<input name="title" required maxlength="40" placeholder="예: 태권도 승급 심사"></label>
-        <fieldset class="seg span2"><legend>누구와 볼 일정인가요?</legend>
-          <label><input type="radio" name="scope" value="family" checked><span>가족 모두</span></label>
-          <label><input type="radio" name="scope" value="personal"><span>나만 보기</span></label></fieldset>
-        <button class="btn btn-primary span2">일정 추가</button>
-      </form></details>
   </section>`;
 }
 
@@ -2117,7 +2149,7 @@ function viewWrite(){
   </div>`;
 }
 /* 일기 칸 아래 이모지 줄: 누르면 커서 자리에 쏙. 이 기기에서 자주 쓴 이모지가 앞으로 와요 */
-const EMOJIS = ["😊","😆","🥰","😢","😡","😴","🤔","😋","👍","❤️","🎉","⭐","🌈","☀️","🌧️","❄️","🍕","🍦","⚽","🎮","📚","🏫","🐶","🐱","🚗","✨"];
+const EMOJIS = ["😊","😀","😆","😄","🥰","😍","😘","🤗","😋","😎","🤩","🥳","😇","🙂","😉","🤭","😴","🤔","❤️","🧡","💛","💚","💙","💜","💕","💖","✨"];   // 표정(웃는 얼굴 위주) · 하트
 function emoList(){
   let use={}; try{ use=JSON.parse(ls.get("iinote-emoji-use","{}"))||{}; }catch(e){}
   return [...EMOJIS].sort((a,b)=>(use[b]||0)-(use[a]||0));
@@ -2727,7 +2759,8 @@ const forms = {
     const gid=await B.joinGroup(fd.code.trim().toUpperCase(),S.user,fd.me.trim(),role); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid);
     const mine=S.profiles.find(p=>p.uid===S.user.uid); if(mine && S.phase==="picker") enterAs(mine); toast("가족에 들어왔어요"); }),
   pin: (fd,f) => { const p=prof(f.dataset.id); if(p && String(fd.pin)===String(p.pin)) enterAs(p); else { toast("비밀번호가 달라요. 다시 입력해 주세요"); f.reset(); f.querySelector("input")?.focus(); } },
-  schedule: (fd,f) => guard(async()=>{ await B.add(S.gid,"schedules",{date:fd.date,time:fd.time||"",title:fd.title.trim(),scope:fd.scope||"family",profileId:S.me.id,createdAt:Date.now()}); await reload("schedules"); render(); toast("일정을 추가했어요"); }),
+  schedule: (fd,f) => guard(async()=>{ const p=parseSchedule(fd.title); if(fd.time) p.time=fd.time;
+    await B.add(S.gid,"schedules",{date:fd.date,time:p.time,title:p.title,scope:fd.scope||"family",profileId:S.me.id,createdAt:Date.now()}); await reload("schedules"); render(); toast("일정을 추가했어요"); }),
   link: fd => guard(async()=>{ let u=fd.url.trim(); if(!/^https?:\/\//i.test(u)) u="https://"+u; try{ new URL(u); }catch(e){ toast("주소를 다시 확인해 주세요"); return; }
     await B.add(S.gid,"links",{title:fd.title.trim(),url:u,createdBy:S.me.id,createdAt:Date.now()}); await reload("links"); render(); toast("즐겨찾기를 추가했어요"); }),
   comment: (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
