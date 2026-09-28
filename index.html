@@ -235,15 +235,21 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 
 /* 위쪽 머리: 제목 + 모양 · 글씨 고르기 + 즐겨찾기 + 폴더 탭 */
 .frame{max-width:1320px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 16px 0}
-.mast{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}
-.mast-l{display:flex;align-items:center;gap:12px;min-width:0}
+.mast{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px}
+.mast-l{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+/* 맨 위 홈 단추: 어디서든 한 번에 홈으로 */
+.home-btn{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:42px;padding:0 16px 0 12px;border:0;border-radius:999px;background:var(--ink);color:var(--paper);font-weight:800;font-size:15px;cursor:pointer}
+.home-btn .ic{color:currentColor;width:20px;height:20px}
+.home-btn[aria-current]{background:var(--coral);color:#fff}
+.prefs-btn{display:none;flex:none;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font-size:19px;cursor:pointer}
+.prefs-btn.on{background:var(--ink);border-color:var(--ink)}
 .mast-t{font-family:var(--diary);font-size:26px;line-height:1.2;margin:0;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prefs{display:grid;gap:6px;justify-items:end;max-width:100%}
-.mast-sub{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:12px 0 0}
+.mast-sub{display:flex;align-items:center;gap:8px 12px;margin:12px 0 0}
+.mast-sub .me-chip{flex:none}
 .mast-sub .me-chip small{color:var(--ink3);font-weight:600;font-size:12px}
-.mast-sub .nav-addr{font-size:13px;color:var(--ink3)}
-.mast-sub .nav-addr strong{color:var(--ink);margin-left:4px}
-.mast-sub .link-btn{margin-left:auto}
+.mast-sub .link-btn{margin-left:auto;flex:none}
+.mast-sub .fav-row{flex:1;min-width:0;margin:0}
 .fav-row{display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 6px;margin-top:10px}
 .fav-row::-webkit-scrollbar{display:none}
 .fav-h{display:inline-flex;align-items:center;gap:6px;font-size:15px;white-space:nowrap;margin-right:4px}
@@ -287,9 +293,17 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
   .qm-who .av{width:36px!important;height:36px!important;font-size:15px!important}
 }
 @media (max-width:759px){
-  .mast-l .logo-wrap{width:36px!important;height:36px!important}
-  .prefs{justify-items:start;width:100%}
-  .mast-sub .nav-addr{display:none}
+  /* 휴대폰: 1줄 = 홈 · 제목 · 🎨, 2줄 = 나 · 즐겨찾기 · 로그아웃. 고르기 칸은 🎨 를 누르면 펼쳐져요 */
+  .mast{flex-wrap:wrap}
+  .mast-l .logo-wrap{width:32px!important;height:32px!important}
+  .mast-t{font-size:21px}
+  .home-btn{min-height:38px;padding:0 12px 0 10px}
+  .prefs-btn{display:block;width:38px;height:38px;font-size:17px}
+  .prefs{display:none;width:100%;order:9}
+  .prefs.open{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start}
+  .mast-sub{margin-top:10px;gap:6px}
+  .mast-sub .me-chip small,.fav-h span,.fav.add span,.mast-sub .out span{display:none}
+  .fav.add{padding:0 10px}
   .sheet{padding:18px 0 120px}
 }
 
@@ -1608,17 +1622,18 @@ function prefBar(){
   const st = isParent() ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양">${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
   const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨">${DFONTS.map(([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`).join("")}</div>`;
   const dz = `<div class="seg hb-g" role="radiogroup" aria-label="디자인">${DESIGNS.map(([k,l])=>`<label title="${l}"><input type="radio" name="design" value="${k}" aria-label="${l}" ${S.design===k?"checked":""} data-pref="design"><span><i class="dsw ${k}"></i></span></label>`).join("")}</div>`;
-  return `<div class="prefs">${dz}${st}${ft}</div>`;
+  // 순서: 화면 구성(어른) → 디자인 → 글씨. 휴대폰에서는 🎨 단추를 눌러야 펼쳐져요
+  return `<button class="prefs-btn ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 · 디자인 · 글씨 고르기">🎨</button>
+    <div class="prefs ${S.prefsOpen?"open":""}">${st}${dz}${ft}</div>`;
 }
 // 즐겨찾기 줄: 누르면 바로 열리고, 어른은 추가 · 편집
 function favRow(){
   const list=[...S.links].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
   const chips=list.map((l,i)=>{ const c=COLORS[i%COLORS.length], ok=/^https?:\/\//.test(l.url);
     return `<a class="fav" href="${ok?esc(l.url):"#"}" target="_blank" rel="noopener noreferrer" title="${esc(host(l.url))}"><span class="lk-mark" style="background:${c};color:${onColor(c)}">${esc((l.title||"?").slice(0,1))}</span>${esc(l.title)}</a>`; }).join("");
-  return `<div class="fav-row"><b class="fav-h"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg>즐겨찾기</b>
+  return `<div class="fav-row"><b class="fav-h" title="즐겨찾기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg><span>즐겨찾기</span></b>
     ${chips||`<span class="muted" style="font-size:14px;white-space:nowrap">${isParent()?"자주 가는 누리집을 모아 두세요":"아직 즐겨찾기가 없어요"}</span>`}
-    ${isParent()?`<button class="fav add ${S.favEdit?"on":""}" data-act="fav-edit" aria-expanded="${!!S.favEdit}">${ic("plus")}추가 · 편집</button>`:""}</div>
-    ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}`;
+    ${isParent()?`<button class="fav add ${S.favEdit?"on":""}" data-act="fav-edit" aria-expanded="${!!S.favEdit}" aria-label="즐겨찾기 추가 · 편집">${ic("plus")}<span>추가 · 편집</span></button>`:""}</div>`;
 }
 function viewShell(){
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
@@ -1633,15 +1648,16 @@ function viewShell(){
   return `<div class="shell">
     <div class="frame">
       <header class="mast">
+        <button class="home-btn" data-act="tab" data-v="home" ${S.tab==="home"&&!S.sub?'aria-current="page"':""}>${ic("home")}<span>홈</span></button>
         <div class="mast-l">${logo(44)}<h1 class="mast-t">${esc(S.group.name)} 일기장</h1></div>
         ${prefBar()}
       </header>
       <div class="mast-sub">
         <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>
-        <span class="nav-addr">컴퓨터에서도 이 주소로<strong>${esc(SITE_ADDRESS)}</strong></span>
-        ${isParent()?`<button class="link-btn" data-act="signout">${ic("out")}로그아웃</button>`:""}
+        ${favRow()}
+        ${isParent()?`<button class="link-btn out" data-act="signout" aria-label="로그아웃">${ic("out")}<span>로그아웃</span></button>`:""}
       </div>
-      ${favRow()}
+      ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
       <main class="sheet" id="main" style="--tl:${tone[1]}">${viewMain()}</main>
     </div>
@@ -2870,6 +2886,7 @@ const acts = {
     try{ if(!K.isInitialized()) K.init(KAKAO_JS_KEY); K.Share.sendScrap({requestUrl:SHARE_URL}); }
     catch(e){ console.error(e); toast("카카오톡 공유를 열지 못했어요"); } },
   "fav-edit": () => { S.favEdit=!S.favEdit; render(); },
+  "prefs-open": () => { S.prefsOpen=!S.prefsOpen; render(); },
   grow: el => { S.growId=el.dataset.v; render(); },
   "del-schedule": el => guard(async()=>{ await B.remove(S.gid,"schedules",el.dataset.id); await reload("schedules"); render(); toast("일정을 지웠어요"); }),
   "del-link": el => guard(async()=>{ if(!confirm("이 즐겨찾기를 지울까요?")) return; await B.remove(S.gid,"links",el.dataset.id); await reload("links"); render(); toast("즐겨찾기를 지웠어요"); }),
