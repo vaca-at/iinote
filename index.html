@@ -771,6 +771,10 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .thumb{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--surface2)}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .thumb .icon-btn{position:absolute;top:4px;right:4px;width:28px;height:28px;background:rgba(20,26,40,.62);color:#fff}
+.thumb .fav-btn{position:absolute;left:4px;top:4px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(20,26,40,.62);color:#fff;font-size:16px;line-height:28px;padding:0;cursor:pointer}
+.thumb .fav-btn.on{background:var(--butter);color:var(--ink)}
+.dcard-ph.two{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:220px}
+.dcard-ph.two img{min-width:0}
 .thumb-add{position:relative;display:grid;place-items:center;align-content:center;gap:4px;aspect-ratio:1;border-radius:12px;border:2px dashed var(--line);color:var(--ink3);font-size:13px;font-weight:650;cursor:pointer}
 .thumb-add input{position:absolute;opacity:0;width:1px;height:1px}
 .thumb-add:focus-within{outline:3px solid var(--focus)}
@@ -1375,9 +1379,14 @@ const myWords = () => S.quizWords.filter(w=>w.profileId===S.me.id);
 async function reloadAll(){
   const names=["profiles","diaries","comments","schedules","links","quizWords"];
   const res = await Promise.all(names.map(c=>B.list(S.gid,c)));
-  names.forEach((c,i)=>S[c]=res[i]);
+  names.forEach((c,i)=>S[c]=safeList(c,res[i]));
 }
-async function reload(c){ S[c] = await B.list(S.gid,c); }
+async function reload(c){ S[c] = safeList(c, await B.list(S.gid,c)); }
+// 프로필 색은 style 속성에 그대로 들어가니, 색 모양(#abc · #aabbcc · var(--이름))이 아니면 기본색으로
+function safeList(c,list){
+  if(c==="profiles") list.forEach(p=>{ if(!/^(#[0-9a-f]{3,8}|var\(--[a-z0-9-]+\))$/i.test(String(p.color||""))) p.color=COLORS[0]; });
+  return list;
+}
 
 async function enterGroup(gid){
   S.gid=gid; S.group=await B.getGroup(gid);
@@ -1432,9 +1441,12 @@ const LAYOUT = {
   5:[[3,3],[3,3],[2,2],[2,2],[2,2]], 6:Array(6).fill([2,2]),
   7:[[2,2],[2,2],[2,2],[3,2],[3,2],[3,2],[3,2]], 8:[[2,2],[2,2],[2,2],[3,2],[3,2],[2,2],[2,2],[2,2]], 9:Array(9).fill([2,2])
 };
+// 목록 카드 미리보기: 1장이면 그 사진, 2장 이상이면 ★ 고른 사진 먼저 두 장 (세로 사진도 반씩 나란히)
+const coverPhotos = ph => ph.length<2 ? ph.slice(0,1) : [...ph.filter(x=>x.fav).sort((a,b)=>a.fav-b.fav), ...ph.filter(x=>!x.fav)].slice(0,2);
 const photoGrid = (photos,did) => { const L=LAYOUT[Math.min(photos.length,9)];
-  return `<div class="pg"><div class="pg-in">${photos.slice(0,9).map((p,i)=>`<button class="pg-cell" style="grid-column:span ${L[i][0]};grid-row:span ${L[i][1]}" data-act="lb-open" data-id="${did}" data-i="${i}" aria-label="사진 ${i+1} 크게 보기"><img src="${esc(photos.length<=4||L[i][0]*L[i][1]>1?p.url:(p.thumb||p.url))}" alt="" loading="lazy"></button>`).join("")}</div></div>`; }; /* 사진이 크게 보이는 칸(4장 이하 · 큰 칸)은 원본 1280px, 작은 칸만 미리보기 400px */
-const tagify = t => esc(t).replace(TAG_RE,(m,g)=>`<button class="tag-inline" data-act="tag" data-v="${g}">#${g}</button>`);
+  return `<div class="pg"><div class="pg-in">${photos.slice(0,9).map((p,i)=>`<button class="pg-cell" style="grid-column:span ${L[i][0]};grid-row:span ${L[i][1]}" data-act="lb-open" data-id="${did}" data-i="${i}" aria-label="사진 ${i+1} 크게 보기"><img src="${esc(photos.length<=4||L[i][0]*L[i][1]>4?p.url:(p.thumb||p.url))}" alt="" loading="lazy"></button>`).join("")}</div></div>`; }; /* 사진이 크게 보이는 칸(4장 이하 · 큰 칸)은 원본 1280px, 작은 칸만 미리보기 400px */
+// #태그를 단추로: 원래 글에서 태그를 찾고 나머지는 esc() (먼저 esc 하면 ' → &#39; 의 #39 가 태그로 잡힘)
+const tagify = t => { const s=String(t||""); let o="",p=0; for(const m of s.matchAll(TAG_RE)){ o+=esc(s.slice(p,m.index))+`<button class="tag-inline" data-act="tag" data-v="${esc(m[1])}">#${esc(m[1])}</button>`; p=m.index+m[0].length; } return o+esc(s.slice(p)); };
 function viewLightbox(){
   const l=S.lb, p=l.photos[l.i], many=l.photos.length>1;
   return `<div class="lb" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
@@ -1900,7 +1912,7 @@ function dcard(d){
   let ai=""; if(isParent() && p?.type==="child" && d.status==="submitted"){ const a=aiSummary(d);
     ai = !d.aiResult ? `<span class="ai-sum none">${ic("spark")}맞춤법 확인 안 받음</span>` : a.n ? `<span class="ai-sum">${ic("spark")}틀린 곳 ${a.n}개 · 스스로 고침 ${a.fixed}개</span>` : `<span class="ai-sum">${ic("spark")}맞춤법 모두 맞았어요</span>`; }
   return `<button class="dcard" data-act="open-diary" data-id="${d.id}">
-    ${ph.length?`<span class="dcard-ph"><img src="${esc(ph[0].thumb||ph[0].url)}" alt="" loading="lazy">${ph.length>1?`<em>사진 ${ph.length}장</em>`:""}</span>`:""}
+    ${ph.length?`<span class="dcard-ph ${ph.length>1?"two":""}">${coverPhotos(ph).map(x=>`<img src="${esc(x.url||x.thumb)}" alt="" loading="lazy">`).join("")}${ph.length>1?`<em>사진 ${ph.length}장</em>`:""}</span>`:""}
     <span class="dcard-top">${av(p,28)}<span class="dcard-name">${esc(p?.name||"알 수 없음")}</span>${d.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}<span class="dcard-date">${fmtShort(d.date)}</span></span>
     <span class="dcard-ex">${esc(d.text.slice(0,140))}</span>
     ${(d.location||tags.length||d.audio)?`<span class="dcard-meta">${d.location?`<span>${ic("pin")}${esc(d.location.name)}</span>`:""}${d.audio?`<span>${ic("mic")}소리</span>`:""}${tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join("")}</span>`:""}
@@ -2416,7 +2428,7 @@ function insertEmoji(e){
 function viewMedia(d){
   const secs=[];
   if(allow("photos")) secs.push(`<section class="media-sec" aria-label="사진"><div class="media-h">사진<span>${d.photos.length}/${MAX_PHOTOS}장</span></div>
-    <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.thumb||p.url)}" alt="${i+1}번째 사진"><button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button></div>`).join("")}
+    <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.thumb||p.url)}" alt="${i+1}번째 사진">${d.photos.length>1?`<button type="button" class="fav-btn ${p.fav?"on":""}" data-act="photo-fav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${i+1}번째 사진 미리보기로 고르기" title="목록 미리보기에 보일 사진 (2장까지)">${p.fav?"★":"☆"}</button>`:""}<button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button></div>`).join("")}
     ${d.photos.length<MAX_PHOTOS?`<label class="thumb-add">${ic("image")}<span>사진 추가</span><input type="file" id="w-photos" accept="image/*" multiple></label>`:""}</div>
     ${d.photos.length>1?`<p class="muted" style="margin:10px 0 0;font-size:13px">${d.photos.length}장은 일기장에 ${d.photos.length}분할로 보이고, 누르면 크게 볼 수 있어요.</p>`:""}</section>`);
   if(allow("location")){ const l=d.location;
@@ -2669,11 +2681,14 @@ async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catc
 const acts = {
   signin: () => guard(()=>B.signIn()),
   "signin-kid": () => guard(()=>B.signInKid()),
-  "signin-kakao": () => guard(()=>B.signInKakao()),
+  "signin-kakao": () => guard(async()=>{ try{ await B.signInKakao(); }catch(e){
+    if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '우리 가족 설정 → 계정'에서 카카오를 연결해 주세요.");
+    if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
+    throw e; } }),
   "link-login": el => guard(async()=>{
     try{ await B.link(el.dataset.v); }
     catch(e){
-      if(/credential-already-in-use|account-exists/.test(e.code||"")) throw new Error("이 계정은 이미 따로 가입되어 있어요. 그 계정으로 로그인해 '내 계정과 기록 지우기'를 한 뒤 다시 연결해 주세요.");
+      if(/credential-already-in-use|account-exists|email-already-in-use/.test(e.code||"")) throw new Error("이 계정은 이미 따로 가입되어 있어요. 그 계정으로 로그인해 '내 계정과 기록 지우기'를 한 뒤 다시 연결해 주세요.");
       if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
       throw e;
     }
@@ -2764,6 +2779,10 @@ const acts = {
   "reset-demo": () => { if(!confirm("체험 내용을 처음 상태로 되돌릴까요?")) return; B.reset(); location.reload(); },
   noop: () => {},
   tag: el => go(()=>{ const v=el.dataset.v; S.tag=(S.tag===v && S.tab==="shelf" && !S.sub)?"":v; S.tab="shelf"; S.sub=null; S.filter="all"; S.search=""; S.lb=null; }),
+  // 사진 즐겨찾기(★): 목록 카드 미리보기에 보일 사진, 2장까지 (세 번째를 고르면 먼저 고른 것이 빠져요)
+  "photo-fav": el => { const ps=S.draft.photos, p=ps.find(x=>x.id===el.dataset.id); if(!p) return;
+    if(p.fav){ delete p.fav; } else { const on=ps.filter(x=>x.fav).sort((a,b)=>a.fav-b.fav); if(on.length>=2) delete on[0].fav; p.fav=Date.now(); }
+    render(); },
   "photo-del": el => { const d=S.draft, p=d.photos.find(x=>x.id===el.dataset.id); if(p?.path) d.removed.push(p.path); if(p?.thumbPath) d.removed.push(p.thumbPath); d.photos=d.photos.filter(x=>x.id!==el.dataset.id); render(); },
   "loc-here": () => guard(async()=>{
     if(!navigator.geolocation){ toast("이 기기에서는 위치를 찾을 수 없어요. 직접 써 주세요"); return; }
@@ -2823,8 +2842,8 @@ async function uploadPending(d){
   for(const p of d.photos){
     if(p.blob){ const r=await B.uploadMedia(`${base}/${p.id}.jpg`,p.blob);
       const t=p.tblob ? await B.uploadMedia(`${base}/${p.id}_t.jpg`,p.tblob) : null;
-      out.push({id:p.id,url:r.url,path:r.path,thumb:t?.url||"",thumbPath:t?.path||"",w:p.w||0,h:p.h||0}); }
-    else out.push({id:p.id,url:p.url,path:p.path||"",thumb:p.thumb||"",thumbPath:p.thumbPath||"",w:p.w||0,h:p.h||0});
+      out.push({id:p.id,url:r.url,path:r.path,thumb:t?.url||"",thumbPath:t?.path||"",w:p.w||0,h:p.h||0,...(p.fav?{fav:p.fav}:{})}); }
+    else out.push({id:p.id,url:p.url,path:p.path||"",thumb:p.thumb||"",thumbPath:p.thumbPath||"",w:p.w||0,h:p.h||0,...(p.fav?{fav:p.fav}:{})});
   }
   d.photos=out;
   if(d.audio?.blob){ const t=d.audio.blob.type||""; const ext=t.includes("mp4")||t.includes("m4a")?"m4a":t.includes("mpeg")?"mp3":t.includes("wav")?"wav":"webm";
@@ -2835,7 +2854,7 @@ async function uploadPending(d){
 }
 function enterAs(p){
   S.me=p; S.pinFor=null; S.phase="app"; S.sub=null; S.filter="all";
-  if(S.tab==="quiz" && p.type!=="child") S.tab="home";
+  if((S.tab==="quiz" && p.type!=="child") || (["kids","report"].includes(S.tab) && p.type==="child")) S.tab="home";
   ls.set("iinote-pid-"+S.gid,p.id); render(); window.scrollTo(0,0);
 }
 

@@ -108,7 +108,7 @@ async function load(){
   const fams=await Promise.all(groups.map(async g=>{
     const dcol=F.collection(db,"groups",g.id,"diaries");
     const [profiles,total,today_,w,m]=await Promise.all([
-      F.getDocs(F.collection(db,"groups",g.id,"profiles")).then(s=>s.docs.map(d=>{ const p=d.data(); return {id:d.id,type:p.type,grade:p.grade,linked:!!p.uid};   // 이름은 가져오지 않아요 })),
+      F.getDocs(F.collection(db,"groups",g.id,"profiles")).then(s=>s.docs.map(d=>{ const p=d.data(); return {id:d.id,type:p.type,grade:p.grade,linked:!!p.uid}; /* 이름은 쓰지 않아요 */ })),
       count(dcol), count(F.query(dcol,F.where("date","==",today))),
       count(F.query(dcol,F.where("date",">=",d7))), count(F.query(dcol,F.where("date",">=",d30)))]);
     const members=await Promise.all(profiles.map(async p=>{
