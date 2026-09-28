@@ -532,6 +532,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .date-l{max-width:220px}
 .w-title{font-family:var(--diary);font-size:26px;font-weight:700;border:0;border-bottom:2px solid var(--ink);border-radius:0;background:transparent;padding:10px 4px;margin-bottom:14px}
 .w-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);min-height:calc(var(--diary-lh) * 10);border:1.5px solid var(--line);border-radius:16px;padding:6px 16px;background-color:var(--surface);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh));background-position:0 6px;background-attachment:local}
+/* 일기 칸 아래 이모지 줄 */.emo-bar{display:flex;gap:4px;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:thin}.emo{flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-size:21px;line-height:1;padding:0}.emo:hover{border-color:var(--coral);background:var(--coral-soft)}.emo:active{transform:scale(.92)}
 .w-count{text-align:right;font-size:13px;margin-top:4px}
 .w-acts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
 .ai-box{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-top:18px;padding:18px 20px;border-radius:18px;background:var(--butter-soft)}
@@ -2042,7 +2043,7 @@ function viewDiaryDetail(){
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(p?.name||"")}의 하루에 답해 주세요.</p>`}
-      <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea><div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
+      <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea><div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
     </section></article>`;
 }
 function renderThread(cs,parent,depth){
@@ -2052,10 +2053,10 @@ function renderThread(cs,parent,depth){
     return `<li class="cmt">${av(p,32)}<div class="cmt-body">
       <div class="cmt-meta"><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${relTime(c.createdAt)}${c.edited?" (수정됨)":""}</span></div>
       ${editing
-        ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" maxlength="500" required>${esc(c.text)}</textarea><div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
+        ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea><div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">(지운 댓글이에요)</p>`
         : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}수정</button><button class="link-btn" data-act="del-comment" data-id="${c.id}">${ic("trash")}지우기</button>`:""}</div>`}
-      ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea><div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
+      ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea><div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
 }
@@ -2088,8 +2089,9 @@ function viewWrite(){
     <label class="date-l">날짜<input type="date" id="w-date" value="${d.date}" max="${todayStr()}"></label>
     <fieldset class="moods"><legend>오늘 기분</legend>${MOODS.map(([k,l,c])=>`<label class="mood"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""}><span><i style="background:${c}"></i>${l}</span></label>`).join("")}</fieldset>
     ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} 아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요.</p>`:""}
-    <label class="sr" for="w-title">제목</label><input id="w-title" class="w-title" maxlength="40" placeholder="제목" value="${esc(d.title)}" ${child?'spellcheck="false" autocomplete="off" autocorrect="off"':""}>
-    <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 써 보세요" ${child?'spellcheck="false" autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
+    <label class="sr" for="w-title">제목</label><input id="w-title" class="w-title" maxlength="40" placeholder="제목" value="${esc(d.title)}" spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>
+    <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 써 보세요" spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
+    ${viewEmoBar()}
     <div class="w-count muted"><span id="w-len">${d.text.length}</span>자</div>
     ${viewMedia(d)}
     ${child?viewPen(d):""}
@@ -2097,6 +2099,24 @@ function viewWrite(){
       ? `<button class="btn btn-primary" data-act="save-diary" data-v="submitted">고친 내용 저장</button>`
       : `<button class="btn btn-ghost" data-act="save-diary" data-v="draft">임시 저장</button><button class="btn btn-accent" data-act="save-diary" data-v="submitted">${child?"제출하기":"올리기"}</button>`}</div>
   </div>`;
+}
+/* 일기 칸 아래 이모지 줄: 누르면 커서 자리에 쏙. 이 기기에서 자주 쓴 이모지가 앞으로 와요 */
+const EMOJIS = ["😊","😆","🥰","😢","😡","😴","🤔","😋","👍","❤️","🎉","⭐","🌈","☀️","🌧️","❄️","🍕","🍦","⚽","🎮","📚","🏫","🐶","🐱","🚗","✨"];
+function emoList(){
+  let use={}; try{ use=JSON.parse(ls.get("iinote-emoji-use","{}"))||{}; }catch(e){}
+  return [...EMOJIS].sort((a,b)=>(use[b]||0)-(use[a]||0));
+}
+const viewEmoBar = () => `<div class="emo-bar" role="group" aria-label="이모지 넣기">${emoList().map(e=>`<button type="button" class="emo" data-act="emo" data-v="${e}" aria-label="${e} 넣기">${e}</button>`).join("")}</div>`;
+function insertEmoji(e){
+  const ta=document.getElementById("w-text"); if(!ta || !S.draft) return;
+  const s=ta.selectionStart ?? ta.value.length, en=ta.selectionEnd ?? s;
+  ta.setRangeText(e, s, en, "end");
+  S.draft.text=ta.value;
+  const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length;
+  if(S.me?.type==="child") refreshPen();
+  ta.focus();
+  let use={}; try{ use=JSON.parse(ls.get("iinote-emoji-use","{}"))||{}; }catch(x){}
+  use[e]=(use[e]||0)+1; ls.set("iinote-emoji-use", JSON.stringify(use));
 }
 function viewMedia(d){
   const secs=[];
@@ -2357,6 +2377,7 @@ const acts = {
   back: () => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.sub=null; S.draft=null; S.lb=null; }),
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
+  emo: el => insertEmoji(el.dataset.v),
   pdf: () => go(()=>{ S.sub={type:"pdf"}; }),
   "pdf-range": el => pdfRange(el.dataset.v),
   heart: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
