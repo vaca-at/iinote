@@ -82,6 +82,9 @@ a{color:var(--coral-ink)}
 .btn.danger{color:var(--coral-ink)}
 .btn.danger:hover{border-color:var(--coral);background:var(--coral-soft)}
 .acc-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.home-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin-top:28px;padding-top:16px;border-top:1px dashed var(--line)}
+.home-foot .share-row{margin:0}
+.home-foot .links{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
 .ai-report{margin:10px 0 0;text-align:right}
 .ai-report .link-btn{font-size:13px}
 .btn.wide{width:100%}
@@ -1616,6 +1619,8 @@ function viewMain(){
   if(S.sub?.type==="write") return viewWrite();
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
+  // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
+  if(!S.tab || S.tab==="home") return viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
