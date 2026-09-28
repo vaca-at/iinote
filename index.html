@@ -872,6 +872,8 @@ const SHARE_URL = "https://iinote.co.kr";
 // 기능별 사용 대상: "parent" = 어른만, "all" = 모두
 const FEATURES = { photos:"parent", location:"parent", audio:"all", tags:"all" };
 // 사진 · 소리는 파이어베이스 Storage에 저장돼요. (Storage는 Blaze 요금제에서 켤 수 있어요)
+// MEDIA_READY: Storage 를 켜고 storage.rules 를 적용하면 true 로 바꾸기. false 면 사진 · 소리 올리기 칸을 숨기고 "곧 열려요" 안내만 보여요 (체험 모드는 늘 보임)
+const MEDIA_READY = false;
 const MAX_PHOTOS = 9, MAX_AUDIO_SEC = 180, MAX_AUDIO_MB = 10;
 
 const DEMO = !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith("여기");
@@ -1241,7 +1243,7 @@ const sortedProfiles = () => [...S.profiles].sort((a,b)=>(a.type===b.type?0:a.ty
 const findDiary = (pid,date) => S.diaries.find(d=>d.profileId===pid && d.date===date);
 const canUse = p => p.type==="child" || (S.user && p.uid===S.user.uid);
 const isParent = () => S.me && S.me.type==="parent";
-const allow = f => FEATURES[f]==="all" || (S.me && S.me.type==="parent");
+const allow = f => (["photos","audio"].includes(f) && !MEDIA_READY && !DEMO) ? false : (FEATURES[f]==="all" || (S.me && S.me.type==="parent"));
 const myWords = () => S.quizWords.filter(w=>w.profileId===S.me.id);
 
 async function reloadAll(){
@@ -2136,6 +2138,7 @@ function viewMedia(d){
       :`<div class="row"><button class="btn btn-ghost sm" data-act="rec-start">${ic("mic")}녹음하기</button><label class="btn btn-ghost sm file-btn">${ic("plus")}소리 파일 올리기<input type="file" id="w-audio" accept="audio/*"></label></div>`}</section>`); }
   if(allow("tags")) secs.push(`<section class="media-sec" aria-label="태그"><div class="media-h">태그<span>일기 속 #낱말도 저절로 모여요</span></div>
     <div class="tag-in">${d.tags.map(t=>`<button class="htag" data-act="tag-del" data-v="${esc(t)}" aria-label="#${esc(t)} 태그 빼기">#${esc(t)}${ic("x")}</button>`).join("")}<label class="sr" for="w-tag">태그 추가</label><input id="w-tag" maxlength="21" placeholder="${d.tags.length?"태그 더하기":"예: 운동회 쓰고 엔터"}" enterkeyhint="done" autocomplete="off"></div></section>`);
+  if(!MEDIA_READY && !DEMO) secs.unshift(`<section class="media-sec media-soon" aria-label="사진 · 소리"><div class="media-h">📷 사진 · 🎙 소리 올리기<span>곧 열려요</span></div><p class="muted" style="margin:0;font-size:14px">사진과 목소리를 저장할 공간을 준비하고 있어요. 조금만 기다려 주세요. 글과 태그는 지금도 저장돼요.</p></section>`);
   return secs.length?`<div class="media">${secs.join("")}</div>`:"";
 }
 // 빨간펜 칸: 부르기 전(글자 수 게이지) → 검사 뒤(칭찬 · 응원 + 고칠 곳 목록)
