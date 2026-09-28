@@ -497,7 +497,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .dcard-name{font-weight:700}
 .dcard-date{color:var(--ink3);margin-left:auto}
 .dcard-title{font-family:var(--diary);font-size:21px;margin:4px 0 0;line-height:1.35}
-.dcard-ex{margin:0;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dcard-ex{margin:0;font-family:var(--diary);font-size:calc(var(--diary-size) * .82);line-height:1.5;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .dcard-foot{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--ink3);margin-top:4px}
 .mood-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink2)}
 .mood-chip i{width:10px;height:10px;border-radius:50%}
@@ -743,7 +743,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 [data-design="clean"][data-theme="dark"]{--accent:#6E9BFF;--accent-soft:#1F2C44}
 [data-design="bright"][data-theme="dark"]{--accent:#FF8A5F;--accent-soft:#3A2525}
 :root:is([data-design="clean"],[data-design="bright"]) body{background-image:none}
-:root:is([data-design="clean"],[data-design="bright"]) :is(.mast-t,.page-h h1,.block-h h2,.today-date){font-family:'GMarketSans',var(--sans);font-weight:700;letter-spacing:-.5px}
+:root:is([data-design="clean"],[data-design="bright"]) :is(.mast-t,.page-h h1,.block-h h2){font-family:'GMarketSans',var(--sans);font-weight:700;letter-spacing:-.5px}
 :root:is([data-design="clean"],[data-design="bright"]) .btn-primary{background:var(--accent);color:#fff;box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 26%,transparent)}
 :root[data-design="clean"] .block{border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(22,33,58,.04),0 6px 16px rgba(22,33,58,.06)}
 :root[data-design="clean"] .chip.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
@@ -808,7 +808,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 [data-design="wongoji"]{--brand:#D7263D;--brand-deep:#1E1E24;--on-brand:#FFFFFF}
 [data-design="wongoji"][data-theme="dark"]{--brand:#F0566A;--brand-deep:#000;--card-line:var(--line);--card-shadow:0 3px 0 #000;--sheet-shadow:0 10px 30px rgba(0,0,0,.4)}
 :root[data-design="wongoji"]:not([data-theme="dark"]) body{background-image:linear-gradient(transparent 29px,var(--paper) 29px),linear-gradient(var(--grid) 1px,transparent 1px,transparent 28px,var(--grid) 28px,var(--grid) 29px,transparent 29px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:100% 38px,28px 38px,28px 38px}
-:root[data-design="wongoji"] :is(.mast-t,.today-date,.page-h h1){font-family:var(--sans);font-weight:800;letter-spacing:-.5px}
+:root[data-design="wongoji"] :is(.mast-t,.page-h h1){font-family:var(--sans);font-weight:800;letter-spacing:-.5px}
 :root[data-design="wongoji"] .block-h h2{font-weight:800;letter-spacing:-.2px}
 :root[data-design="wongoji"] .btn{border-radius:6px}
 :root[data-design="wongoji"] :is(.btn-primary,.btn-accent){background:var(--brand);color:var(--on-brand);box-shadow:0 3px 0 var(--brand-deep)}
@@ -1346,7 +1346,7 @@ function viewLanding(){
       <div class="land-brand">${logo(44)}<span>아이아이노트</span></div>
       <h1>가족이 함께 쓰고,<br>서로 읽어 주는 일기장</h1>
       <p class="land-lead"><strong>아이의 일기는 AI 빨간펜 선생님이 맞춤법을 봐 주고 칭찬과 응원을 해 줘요.</strong><br>엄마 아빠와 아이 모두 휴대폰 · 아이패드 · 컴퓨터에서 쉽게 일기를 쓰고 서로 댓글을 남길 수 있어요.</p>
-      <p class="app-soon"><b>앱은 곧 출시돼요!</b> 조금만 기다려 주세요. 지금은 휴대폰 · 아이패드 · 컴퓨터 어디서나 웹으로 바로 쓸 수 있어요.</p>
+      <p class="app-soon"><b>안드로이드 앱은 10월 중 출시 예정이에요!</b> 조금만 기다려 주세요. 지금은 휴대폰 · 아이패드 · 컴퓨터 어디서나 웹으로 바로 쓸 수 있어요.</p>
       <ul class="land-badges" aria-label="아이아이노트의 약속">
         <li>${ic("check")}광고 없음</li><li>${ic("check")}아이는 계정 없이</li><li>${ic("check")}아이는 붙여넣기 없이 직접 타이핑</li><li>${ic("check")}휴대폰 · 아이패드 · 컴퓨터 함께</li>
       </ul>
@@ -1522,7 +1522,7 @@ function viewHomeDiary(){
     </div>
     <div class="col">${viewSchedules()}
       <section class="block any-mini" aria-labelledby="h-any"><div class="block-h"><h2 id="h-any">어디서든 같은 일기장</h2></div>
-        <p>휴대폰과 아이패드에서는 앱으로(출시 준비 중), 컴퓨터와 노트북에서는 주소로 들어와요. 어디서 써도 바로 함께 보여요.</p>${addrBox()}${kakaoBtn(true)}</section>
+        <p>휴대폰과 아이패드에서는 앱으로(안드로이드 10월 중 출시 예정), 컴퓨터와 노트북에서는 주소로 들어와요. 어디서 써도 바로 함께 보여요.</p>${addrBox()}${kakaoBtn(true)}</section>
     </div>
   </div>`;
 }
@@ -1555,7 +1555,7 @@ function viewHomeCalendar(){
   const sch = mySchedules();
   const cells = dates.map(d=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], list=sch.filter(s=>s.date===d).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
     const who=ps.filter(p=>submittedOn(p.id,d));
-    const cls=["cal-cell", d===t?"today":"", d===S.calDay?"sel":"", d>t?"future":"", (dow===0||hol)?"red":dow===6?"blue":""].join(" ");
+    const cls=["cal-cell", d===t?"today":"", d===(S.calDay||t)?"sel":"", d>t?"future":"", (dow===0||hol)?"red":dow===6?"blue":""].join(" ");
     return `<button class="${cls}" data-act="cal-day" data-v="${d}" aria-label="${fmtLong(d)}${hol?" "+hol:""}, 일정 ${list.length}개, ${who.length}명 씀">
       <span class="cal-n">${+d.slice(8)}${hol?`<small>${hol}</small>`:""}</span>
       <span class="cal-sc">${list.slice(0,2).map(s=>`<em>${s.time?esc(s.time)+" ":""}${esc(s.title)}</em>`).join("")}${list.length>2?`<em class="more">+${list.length-2}</em>`:""}</span>
@@ -1572,7 +1572,7 @@ function viewHomeCalendar(){
       ${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
     <p class="muted" style="font-size:13px;margin:10px 0 0">날짜를 누르면 그날 가족 일기와 일정을 볼 수 있어요.</p>
   </section>
-  ${S.calDay?viewCalDay(S.calDay):""}`;
+  ${viewCalDay(S.calDay||todayStr())}`;   // 날짜를 안 눌러도 오늘 칸(일기 · 일정 추가)이 늘 보여요
 }
 
 /* ---------- 첫 화면: 4분할형 (컴퓨터 · 아이패드 가로는 한 화면에 네 칸, 휴대폰은 세로로 한 칸씩) ---------- */
@@ -1665,7 +1665,7 @@ function viewCalDay(d){
   const sch=mySchedules().filter(s=>s.date===d).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
   const write = d>t ? "" : mine?.status==="submitted" ? "" : `<button class="btn btn-primary sm" data-act="write" data-date="${d}">${ic("pen")}${mine?"이어 쓰기":"이날 일기 쓰기"}</button>`;
   return `<section class="block" id="cal-day" aria-labelledby="h-cd"><div class="block-h"><h2 id="h-cd">${fmtLong(d)}${hol?` <span class="tag family">${hol}</span>`:""}</h2>
-      <div class="row">${write}<button class="icon-btn" data-act="cal-day" data-v="${d}" aria-label="닫기">${ic("x")}</button></div></div>
+      <div class="row">${write}${S.calDay?`<button class="icon-btn" data-act="cal-day" data-v="${d}" aria-label="닫기">${ic("x")}</button>`:""}</div></div>
     ${list.length?`<div class="feed">${list.map(dcard).join("")}</div>`:`<p class="empty">${d>t?"아직 오지 않은 날이에요.":"이날 쓴 가족 일기가 없어요."}</p>`}
     <h3 class="cd-h">일정</h3>
     ${sch.length?`<ul class="sc-list">${sch.map(s=>{ const del=s.profileId===S.me.id || isParent();
@@ -2308,7 +2308,7 @@ function viewFamily(){
     </div>
     <div class="col">
       <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
-        <div class="dev-rows" style="margin:0 0 14px"><div class="dev-row"><b>휴대폰 · 아이패드</b><span>아이아이노트 앱(출시 준비 중) 또는 브라우저 공유 메뉴에서 홈 화면에 추가</span></div>
+        <div class="dev-rows" style="margin:0 0 14px"><div class="dev-row"><b>휴대폰 · 아이패드</b><span>아이아이노트 안드로이드 앱(10월 중 출시 예정) 또는 브라우저 공유 메뉴에서 홈 화면에 추가</span></div>
         <div class="dev-row"><b>컴퓨터 · 노트북</b><span>아래 주소를 브라우저에 입력하고 같은 구글 계정으로 로그인</span></div></div>${addrBox()}${kakaoBtn(true)}
       </section>
       <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
