@@ -75,6 +75,15 @@ const gradeName = g => { if(g===undefined || g===null || g==="") return ""; cons
 const fmtDate = ms => ms ? new Date(ms).toLocaleDateString("ko-KR",{year:"numeric",month:"short",day:"numeric"}) : "-";
 // 개수만 세요: 문서 내용은 받아 오지 않아요
 const count = async q => (await F.getCountFromServer(q)).data().count;
+// AI 사용량: 빨간펜 워커가 달마다 세어 둔 횟수 · 토큰 (GET /usage). 아이 이름은 보여 주지 않고 iinote / 공부방으로만 나눠요
+const USAGE_API = "https://family-spell.bellachord.workers.dev/usage";
+// Claude Opus 5 요금 (100만 토큰당 달러): 입력 5 · 출력 25 · 캐시 읽기 0.5 · 캐시 쓰기 6.25. 환율은 대략으로
+const PRICE = { input:5, output:25, cacheRead:0.5, cacheWrite:6.25 }, KRW = 1400;
+// 음성 인식(Workers AI Whisper)은 3분 녹음 한 번에 약 0.0015달러, 하루 무료 범위(약 70번) 안이면 0원
+const STT_USD = 0.0015;
+const usd = m => ((m.input||0)*PRICE.input + (m.output||0)*PRICE.output + (m.cacheRead||0)*PRICE.cacheRead + (m.cacheWrite||0)*PRICE.cacheWrite)/1e6;
+const won = d => Math.round(d*KRW).toLocaleString("ko-KR")+"원";
+const AI_KINDS = [["spell","빨간펜"],["similar","비슷한 낱말 퀴즈"],["report","AI 총평"],["transcribe","목소리 → 글"],["talk","이야기 일기"]];
 
 // 관리자 계정이 숫자를 셀 수 있게 하는 파이어베이스 규칙 (콘솔 > Firestore > 규칙에 이미 있는 match 들 옆에 추가)
 const RULES = `// 아이아이노트 운영 현황판 (bellachord 계정만 · 숫자 세기용)
@@ -104,6 +113,7 @@ async function load(){
   try{ groups=(await F.getDocs(F.collection(db,"groups"))).docs.map(d=>({id:d.id,...d.data()})); }
   catch(e){ return showRuleHelp(e); }
   let users="-"; try{ users=await count(F.collection(db,"users")); }catch(e){}
+  let usage=null; try{ usage=await (await fetch(USAGE_API,{cache:"no-store"})).json(); }catch(e){}
   const idxErrs=new Set();
   const fams=await Promise.all(groups.map(async g=>{
     const dcol=F.collection(db,"groups",g.id,"diaries");
@@ -121,10 +131,26 @@ async function load(){
     }));
     return {...g,members,total,today:today_,w,m};
   }));
-  render(fams,users,[...idxErrs]);
+  render(fams,users,[...idxErrs],usage);
 }
 
-function render(fams,users,idx){
+// AI 사용 횟수와 예상 금액 (이번 달 + 지난 두 달)
+function aiCard(usage){
+  const months=(usage?.months||[]);
+  if(!months.length) return `<div class="card"><h2>🤖 AI 사용량 · 예상 금액</h2><p class="z">사용량을 불러오지 못했어요.</p></div>`;
+  const calls=m=>AI_KINDS.reduce((s,[k])=>s+(m[k]||0),0);
+  const cost=m=>usd(m)+(m.transcribe||0)*STT_USD;
+  const rows=months.map(m=>{ const iinote=(m.who||{}).iinote||0, all=calls(m);
+    return `<tr><td class="l"><b>${esc(m.month)}</b></td>${AI_KINDS.map(([k])=>`<td>${m[k]||'<span class="z">0</span>'}</td>`).join("")}
+      <td><b>${all}</b><br><span class="sub">iinote ${iinote} · 공부방 ${Math.max(0,all-iinote)}</span></td>
+      <td class="sub">${Math.round((m.input||0)/1000).toLocaleString()}k / ${Math.round((m.output||0)/1000).toLocaleString()}k</td>
+      <td><b>${won(cost(m))}</b><br><span class="sub">$${cost(m).toFixed(2)}</span></td></tr>`; }).join("");
+  return `<div class="card"><h2>🤖 AI 사용량 · 예상 금액</h2><div class="scroll"><table>
+    <tr><th class="l">달</th>${AI_KINDS.map(([,l])=>`<th>${l}</th>`).join("")}<th>합계 횟수</th><th>토큰 (입력 / 출력)</th><th>예상 금액</th></tr>${rows}</table></div>
+    <p class="note">모델 ${esc(usage.model||"")} · 100만 토큰당 입력 $${PRICE.input} · 출력 $${PRICE.output}, 1달러 ≈ ${KRW.toLocaleString()}원으로 어림한 금액이에요. 정확한 청구액은 Anthropic 콘솔(Billing)에서 확인하세요. 횟수는 공부방 · 예전 일기장 사용도 함께 세요 (아이 이름은 보이지 않아요).</p></div>`;
+}
+
+function render(fams,users,idx,usage){
   const sum=k=>fams.reduce((s,f)=>s+f[k],0), ms=fams.flatMap(f=>f.members);
   const kids=ms.filter(p=>p.type==="child"), maxW=Math.max(1,...fams.map(f=>f.w));
   const active=fams.filter(f=>f.w>0).length;
@@ -142,13 +168,16 @@ function render(fams,users,idx){
     <div class="tiles">
       <div class="tile"><b>${fams.length}</b><span>가족</span></div>
       <div class="tile"><b>${active}</b><span>이번 주 쓴 가족</span></div>
-      <div class="tile"><b>${users}</b><span>가입한 구글 계정</span></div>
+      <div class="tile"><b>${users}</b><span>가입한 계정 (구글 · 카카오)</span></div>
       <div class="tile"><b>${ms.length-kids.length} · ${kids.length}</b><span>보호자 · 아이 프로필</span></div>
       <div class="tile"><b>${sum("today")}</b><span>오늘 일기</span></div>
       <div class="tile"><b>${sum("w")}</b><span>최근 7일 일기</span></div>
       <div class="tile"><b>${sum("m")}</b><span>최근 30일 일기</span></div>
       <div class="tile"><b>${kids.reduce((s,p)=>s+(p.pen||0),0)}</b><span>빨간펜 받은 아이 일기</span></div>
+      ${(()=>{ const m=usage?.months?.[0]; if(!m) return ""; const n=AI_KINDS.reduce((s,[k])=>s+(m[k]||0),0);
+        return `<div class="tile"><b>${n}</b><span>이번 달 AI 사용 횟수</span></div><div class="tile"><b>${won(usd(m)+(m.transcribe||0)*STT_USD)}</b><span>이번 달 AI 예상 금액</span></div>`; })()}
     </div>
+    ${aiCard(usage)}
     <div class="card"><h2>가족별</h2><div class="scroll"><table>
       <tr><th class="l">가족 (누르면 사람별)</th><th>만든 날</th><th>보호자 · 아이</th><th>오늘</th><th class="l">최근 7일</th><th>30일</th><th>전체</th></tr>${rows||'<tr><td colspan="7" class="z">아직 가족이 없어요</td></tr>'}
     </table></div>
