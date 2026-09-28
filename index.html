@@ -164,6 +164,26 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .anywhere{background:var(--surface);border:1.5px solid var(--line);border-radius:28px;padding:28px}
 .anywhere h2{font-size:20px;margin:0 0 4px;letter-spacing:-.3px}
 .anywhere>p{margin:0 0 18px;color:var(--ink2)}
+/* 첫 화면: AI 빨간펜 피드백 예시 카드 */
+.land>*{min-width:0}
+.land-side{display:grid;gap:22px;align-content:start;min-width:0}
+.ai-sample{position:relative;margin:0;background:var(--surface);border:1.5px solid var(--line);border-radius:28px;padding:22px 24px 18px;box-shadow:0 14px 34px rgba(31,42,68,.10);transform:rotate(1.2deg)}
+.ais-tag{display:inline-block;margin:0 0 12px;padding:4px 12px;border-radius:999px;background:var(--coral-soft);color:var(--coral-ink);font-size:13px;font-weight:800}
+.ais-top{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.ais-av{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--sage);color:var(--paper);font-size:14px}
+.ais-date{margin-left:auto;color:var(--ink3);font-weight:600;font-size:13px}
+.ais-text{margin:10px 0 0;font-family:"Nanum Pen Script",cursive;font-size:25px;line-height:36px;background-image:repeating-linear-gradient(transparent 0,transparent 35px,var(--rule) 35px,var(--rule) 36px)}
+.ais-text mark{color:inherit;border-radius:4px;padding:0 2px}
+.ais-text mark.ais-ok{background:rgba(80,200,120,.35)}
+.ais-text mark.ais-fix{background:rgba(255,214,51,.6)}
+.ais-stamp{position:absolute;right:22px;bottom:12px;transform:rotate(-10deg);color:var(--coral-ink);border:2.5px solid var(--coral);border-radius:48% 52% 45% 55%/55% 45% 55% 45%;padding:5px 10px;font-family:var(--diary);font-weight:700;font-size:15px;background:var(--surface)}
+.ais-pen{margin-top:12px;border:2px solid var(--coral);border-radius:16px;padding:10px 14px;display:grid;gap:6px;font-size:14px;line-height:1.5;color:var(--ink2)}
+.ais-pen p{margin:0}
+.ais-pen b{display:inline-block;margin-right:6px;color:var(--coral-ink)}
+.ais-pen s{color:var(--coral-ink)}
+.ais-pen strong{color:var(--sage)}
+.ais-heart{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--coral-ink)}
+@media (max-width:760px){ .ai-sample{transform:none} }
 .devices{width:100%;height:auto;display:block;margin:4px 0 18px}
 .addr{display:flex;align-items:center;justify-content:space-between;gap:12px;border:2px dashed var(--ink);border-radius:16px;padding:12px 12px 12px 18px;background:var(--paper)}
 .addr-t{display:flex;flex-direction:column}
@@ -1309,7 +1329,7 @@ function viewLanding(){
     <section>
       <div class="land-brand">${logo(44)}<span>아이아이노트</span></div>
       <h1>가족이 함께 쓰고,<br>서로 읽어 주는 일기장</h1>
-      <p class="land-lead"><strong>아이의 일기장을 AI 선생님이 맞춤법 검사를 해주고 피드백을 해줘요.</strong><br>엄마 아빠는 앱에서, 아이는 웹에서 쉽게 일기를 쓰고 서로 댓글을 남길 수도 있어요.</p>
+      <p class="land-lead"><strong>아이의 일기는 AI 빨간펜 선생님이 맞춤법을 봐 주고 칭찬과 응원을 해 줘요.</strong><br>엄마 아빠와 아이 모두 휴대폰 · 아이패드 · 컴퓨터에서 쉽게 일기를 쓰고 서로 댓글을 남길 수 있어요.</p>
       <p class="app-soon"><b>앱은 곧 출시돼요!</b> 조금만 기다려 주세요. 지금은 휴대폰 · 아이패드 · 컴퓨터 어디서나 웹으로 바로 쓸 수 있어요.</p>
       <ul class="land-badges" aria-label="아이아이노트의 약속">
         <li>${ic("check")}광고 없음</li><li>${ic("check")}아이는 계정 없이</li><li>${ic("check")}아이는 말로 쓰기 · 붙여넣기 없이 직접</li><li>${ic("check")}휴대폰 · 아이패드 · 컴퓨터 함께</li>
@@ -1325,6 +1345,19 @@ function viewLanding(){
       <p class="demo-note"><a href="terms.html">이용약관</a> · <a href="privacy.html">개인정보처리방침</a></p>
       ${DEMO?`<p class="demo-note">지금은 체험 모드예요. 예시 가족으로 모든 기능을 눌러 볼 수 있고, 내용은 이 기기에만 저장돼요.</p>`:""}
     </section>
+    <div class="land-side">
+    <figure class="ai-sample" aria-label="AI 빨간펜 선생님 피드백 예시">
+      <figcaption class="ais-tag">👩‍🏫 AI 빨간펜 선생님 · 이런 피드백을 받아요</figcaption>
+      <div class="ais-top"><span class="ais-av">하</span>하랑 · 4학년<span class="ais-date">9월 28일</span></div>
+      <p class="ais-text">오늘 운동회 연습을 했다. 이어달리기에서 2등을 해서 기분이 <mark class="ais-ok">좋았다</mark>. 내일은 꼭 1등을 <mark class="ais-fix">할꺼다</mark>.</p>
+      <div class="ais-stamp">참 잘했어요</div>
+      <div class="ais-pen">
+        <p><b>👏 칭찬</b>"기분이 좋았다"라는 말에 마음이 잘 담겼어요! 이어달리기 장면이 눈에 그려져요.</p>
+        <p><b>🖍 고칠 곳</b><s>할꺼다</s> → <strong>할 거다</strong> · '거'는 앞말과 띄어 써요. 한 번만 더 볼까요?</p>
+        <p><b>💪 응원</b>한 군데만 고치면 완벽한 일기예요!</p>
+      </div>
+      <p class="ais-heart">❤️ 엄마 · 아빠</p>
+    </figure>
     <section class="anywhere" aria-labelledby="any-h">
       <h2 id="any-h">휴대폰, 아이패드, 컴퓨터 어디서든</h2>
       <p>휴대폰에서 쓰던 일기를 컴퓨터에서는 주소 하나로 그대로 열어요.</p>
@@ -1335,6 +1368,7 @@ function viewLanding(){
         <div class="dev-row"><b>컴퓨터 · 노트북</b><span>브라우저 주소창에 위 주소 입력</span></div>
       </div>
     </section>
+    </div>
   </div></main>`;
 }
 
