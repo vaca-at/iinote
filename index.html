@@ -253,6 +253,15 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .mast-sub .me-chip small{color:var(--ink3);font-weight:600;font-size:12px}
 .mast-sub .link-btn{margin-left:auto;flex:none}
 .mast-sub .fav-row{flex:1;min-width:0;margin:0}
+/* 부모 폰으로 아이가 쓰기 */
+.kid-bar{display:flex;align-items:center;gap:6px 8px;margin:8px 0 0;overflow-x:auto;scrollbar-width:none;padding:2px}
+.kid-bar::-webkit-scrollbar{display:none}
+.kid-bar b{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink2);white-space:nowrap;margin-right:2px}
+.kid-bar b .ic{width:16px;height:16px;color:var(--coral)}
+.kq{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:36px;padding:0 12px 0 4px;border-radius:999px;border:1.5px solid var(--coral);background:var(--coral-soft);color:var(--ink);font-weight:700;font-size:14px;cursor:pointer}
+.kq small{font-size:11px}
+.kid-now{background:var(--butter-soft);border-radius:14px;padding:6px 10px}
+.kq.back{border-color:var(--ink);background:var(--surface)}
 .fav-row{display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 6px;margin-top:10px}
 .fav-row::-webkit-scrollbar{display:none}
 .fav-h{display:inline-flex;align-items:center;gap:6px;font-size:15px;white-space:nowrap;margin-right:4px}
@@ -1681,6 +1690,19 @@ function favRow(){
     ${chips||`<span class="muted" style="font-size:14px;white-space:nowrap">${isParent()?"자주 가는 누리집을 모아 두세요":"아직 즐겨찾기가 없어요"}</span>`}
     ${isParent()?`<button class="fav add ${S.favEdit?"on":""}" data-act="fav-edit" aria-expanded="${!!S.favEdit}" aria-label="즐겨찾기 추가 · 편집">${ic("plus")}<span>추가 · 편집</span></button>`:""}</div>`;
 }
+// 부모 폰으로 아이가 쓸 때: 부모 화면에는 '아이가 쓰기' 단추, 아이로 쓰는 중에는 '부모로 돌아가기'
+// 받침에 따라 "로" · "으로" (ㄹ 받침은 "로")
+const ro = w => { const c=String(w||"").slice(-1).charCodeAt(0)-0xAC00; const j=c>=0&&c<11172?c%28:0; return j&&j!==8?"으로":"로"; };
+const myParentProfile = () => S.profiles.find(p=>p.type==="parent" && isMine(p));
+function kidBar(){
+  if(isParent()){
+    const kids=sortedProfiles().filter(p=>p.type==="child"); if(!kids.length) return "";
+    return `<div class="kid-bar"><b>${ic("pen")}아이가 쓰기</b>${kids.map(k=>`<button class="kq" data-act="kid-write" data-id="${k.id}" aria-label="${esc(k.name)}${ro(k.name)} 바꿔서 일기 쓰기">${av(k,26)}<span>${esc(k.name)}</span>${k.pin?'<small>🔒</small>':""}</button>`).join("")}</div>`;
+  }
+  const pp = S.me?.type==="child" && S.user && !S.user.isAnonymous ? myParentProfile() : null;
+  if(!pp) return "";
+  return `<div class="kid-bar kid-now"><b>${esc(S.me.name)}${hasBatchim(S.me.name)?"이가":"가"} 쓰는 중</b><button class="kq back" data-act="back-parent">${av(pp,26)}<span>${esc(pp.name)}${ro(pp.name)} 돌아가기</span></button></div>`;
+}
 function viewShell(){
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
@@ -1703,6 +1725,7 @@ function viewShell(){
         ${favRow()}
         ${isParent()?`<button class="link-btn out" data-act="signout" aria-label="로그아웃">${ic("out")}<span>로그아웃</span></button>`:""}
       </div>
+      ${kidBar()}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
       <main class="sheet" id="main" style="--tl:${tone[1]}">${viewMain()}</main>
@@ -2922,7 +2945,12 @@ const acts = {
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
     if(p.type==="child" && p.pin){ S.pinFor=p.id; render(); return; }
     enterAs(p); },
-  "switch-profile": () => go(()=>{ S.phase="picker"; S.pinFor=null; S.sub=null; }),
+  "switch-profile": () => go(()=>{ S.phase="picker"; S.pinFor=null; S.afterPin=null; S.sub=null; }),
+  // 부모 화면의 '아이가 쓰기': 그 아이로 바꾸고 바로 오늘 일기 쓰기 (비밀번호가 있으면 먼저 물어요)
+  "kid-write": el => { const p=prof(el.dataset.id); if(!p) return;
+    if(p.pin){ S.phase="picker"; S.pinFor=p.id; S.afterPin="write"; S.sub=null; render(); return; }
+    enterAs(p); openKidWrite(); },
+  "back-parent": () => { const p=myParentProfile(); if(p){ S.draft=null; enterAs(p); toast(`${p.name}${ro(p.name)} 돌아왔어요`); } },
   "open-diary": el => go(()=>{ S.sub={type:"diary",id:el.dataset.id}; S.replyTo=null; S.editing=null; }),
   back: () => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.sub=null; S.draft=null; S.talkBusy=null; S.lb=null; }),
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
@@ -3084,6 +3112,7 @@ async function uploadPending(d){
   for(const path of d.removed) await B.deleteMedia(path);
   d.removed=[];
 }
+function openKidWrite(){ S.tab="home"; loadDraft(todayStr()); S.sub={type:"write"}; render(); window.scrollTo(0,0); toast(`${S.me.name}의 일기를 써요`); }
 function enterAs(p){
   S.me=p; S.pinFor=null; S.phase="app"; S.sub=null; S.filter="all";
   if((S.tab==="quiz" && p.type!=="child") || (["kids","report"].includes(S.tab) && p.type==="child")) S.tab="home";
@@ -3360,7 +3389,7 @@ const forms = {
   "join-group": fd => guard(async()=>{ const role = fd.role==="child" ? {type:"child",grade:Number(fd.grade),pin:""} : {type:"parent"};
     const gid=await B.joinGroup(fd.code.trim().toUpperCase(),S.user,fd.me.trim(),role); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid);
     const mine=S.profiles.find(isMine); if(mine && S.phase==="picker") enterAs(mine); toast("가족에 들어왔어요"); }),
-  pin: (fd,f) => { const p=prof(f.dataset.id); if(p && String(fd.pin)===String(p.pin)) enterAs(p); else { toast("비밀번호가 달라요. 다시 입력해 주세요"); f.reset(); f.querySelector("input")?.focus(); } },
+  pin: (fd,f) => { const p=prof(f.dataset.id); if(p && String(fd.pin)===String(p.pin)){ enterAs(p); if(S.afterPin==="write"){ S.afterPin=null; openKidWrite(); } } else { toast("비밀번호가 달라요. 다시 입력해 주세요"); f.reset(); f.querySelector("input")?.focus(); } },
   schedule: (fd,f) => guard(async()=>{ const p=parseSchedule(fd.title); if(fd.time) p.time=fd.time;
     // 저장이 조금 걸릴 때도 바로 알 수 있게: 단추를 잠그고 "저장 중…" → "저장되었어요!"
     const btn=f?.querySelector("button"); if(btn){ btn.disabled=true; btn.dataset.label=btn.innerHTML; btn.textContent="저장 중…"; } toast("💾 일정을 저장하는 중…");
