@@ -302,7 +302,8 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .block-h h2{font-size:18px;margin:0;letter-spacing:-.3px}
 .st-list{list-style:none;padding:0;margin:0 0 18px;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:10px}
 @media (max-width:640px){ .st-list{grid-template-columns:repeat(2,minmax(0,1fr))} }
-.st-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--paper)}
+.st-row{display:flex;flex-wrap:wrap;row-gap:6px;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--paper)}
+.st-name{white-space:nowrap;font-weight:700}
 .st-name{font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .week{border-top:1px dashed var(--line);padding-top:14px;overflow-x:auto}
 .wk-row{display:grid;grid-template-columns:4.5em repeat(7,minmax(28px,1fr));align-items:center;gap:4px;min-height:32px}
@@ -1411,7 +1412,7 @@ function viewLightbox(){
     <button class="lb-x" data-act="lb-close" aria-label="닫기">${ic("x")}</button></div>`;
 }
 const moodChip = k => { const m=MOODS.find(x=>x[0]===k); return m?`<span class="mood-chip"><i style="background:${m[2]}"></i>${m[1]}</span>`:"<span></span>"; };
-const addrBox = () => `<div class="addr"><span class="addr-t"><small>컴퓨터 · 노트북에서는 이 주소로</small><strong>${esc(SITE_ADDRESS)}</strong></span><button class="btn btn-ghost sm" data-act="copy" data-v="https://${esc(SITE_ADDRESS)}">${ic("copy")}복사</button></div>`;
+const addrBox = () => `<div class="addr"><span class="addr-t"><small>휴대폰 · 아이패드 · 컴퓨터 · 노트북 모두 이 주소로</small><strong>${esc(SITE_ADDRESS)}</strong></span><button class="btn btn-ghost sm" data-act="copy" data-v="https://${esc(SITE_ADDRESS)}">${ic("copy")}복사</button></div>`;
 const kakaoBtn = (sm) => `<div class="share-row"><button class="btn btn-kakao ${sm?"sm":""}" data-act="kakao-share">${ic("talk")}카카오톡 공유하기</button><button class="btn btn-ghost ${sm?"sm":""}" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button></div>`;
 const devicesArt = () => `<svg class="devices" viewBox="0 0 400 210" aria-hidden="true" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round">
   <rect x="14" y="30" width="206" height="136" rx="10" fill="var(--paper)"/><path d="M2 176h230l-12 14H14z" fill="var(--surface2)"/>
@@ -1598,7 +1599,7 @@ function viewHome(){
   return viewHomeDiary();
 }
 function viewHomeDiary(){
-  const t=todayStr(), ps=sortedProfiles(), week=weekDates(), mine=findDiary(S.me.id,t);
+  const t=todayStr(), ps=sortedProfiles(), week=[...Array(7)].map((_,i)=>addDays(t,i-3)), mine=findDiary(S.me.id,t);   // 사흘 전 ~ 오늘 ~ 사흘 뒤 (어제 쓴 일기도 보이게)
   const rows = ps.map(p=>{ const d=findDiary(p.id,t); const st=d?(d.status==="submitted"?["done","썼어요"]:["draft","쓰는 중"]):["none","아직이에요"];
     return `<li class="st-row">${av(p)}<span class="st-name">${esc(p.name)}</span><span class="pill ${st[0]}">${st[1]}</span></li>`; }).join("");
   const head = week.map(d=>`<span class="wk-h ${d===t?"today":""}">${DAYS[toDate(d).getDay()]}<b>${+d.slice(8)}</b></span>`).join("");
@@ -1619,7 +1620,7 @@ function viewHomeDiary(){
     </div>
     <div class="col">${viewSchedules()}
       <section class="block any-mini" aria-labelledby="h-any"><div class="block-h"><h2 id="h-any">어디서든 같은 일기장</h2></div>
-        <p>휴대폰과 아이패드에서는 앱으로(안드로이드 10월 중 출시 예정), 컴퓨터와 노트북에서는 주소로 들어와요. 어디서 써도 바로 함께 보여요.</p>${addrBox()}${kakaoBtn(true)}</section>
+        <p>휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와요. 어디서 써도 바로 함께 보여요. (안드로이드 앱은 10월 중 출시 예정)</p>${addrBox()}${kakaoBtn(true)}</section>
     </div>
   </div>`;
 }
@@ -2551,8 +2552,7 @@ function viewFamily(){
     </div>
     <div class="col">
       <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
-        <div class="dev-rows" style="margin:0 0 14px"><div class="dev-row"><b>휴대폰 · 아이패드</b><span>아이아이노트 안드로이드 앱(10월 중 출시 예정) 또는 브라우저 공유 메뉴에서 홈 화면에 추가</span></div>
-        <div class="dev-row"><b>컴퓨터 · 노트북</b><span>아래 주소를 브라우저에 입력하고 같은 구글 계정으로 로그인</span></div></div>${addrBox()}${kakaoBtn(true)}
+        <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 같은 구글 계정으로 로그인하면 돼요. 휴대폰에서는 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들 수 있어요. (안드로이드 앱은 10월 중 출시 예정)</p>${addrBox()}${kakaoBtn(true)}
       </section>
       <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
         <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
