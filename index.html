@@ -251,6 +251,9 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .prefs-btn.on{background:var(--ink);border-color:var(--ink)}
 .mast-t{font-family:var(--diary);font-size:26px;line-height:1.2;margin:0;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prefs{display:grid;gap:6px;justify-items:end;max-width:100%}
+/* 화면 구성 · 디자인 · 글씨 고르기: 폴더 탭 바로 아래, 종이 판 맨 위 오른쪽 */
+.sheet-prefs{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 10px}
+@media (min-width:760px){ .sheet-prefs{margin:-20px -24px 12px 0} }
 .mast-sub{display:flex;align-items:center;gap:8px 12px;margin:12px 0 0}
 .mast-sub .me-chip{flex:none}
 .mast-sub .me-chip small{color:var(--ink3);font-weight:600;font-size:12px}
@@ -314,6 +317,7 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
   .mast-t{font-size:21px}
   .home-btn{min-height:38px;padding:0 12px 0 10px}
   .prefs-btn{display:block;width:38px;height:38px;font-size:17px}
+  .sheet-prefs{margin:-6px 0 8px}
   .prefs{display:none;width:100%;order:9}
   .prefs.open{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start}
   .mast-sub{margin-top:10px;gap:6px}
@@ -537,7 +541,7 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 /* 가로 화면(컴퓨터 · 아이패드 가로)에서는 네 칸이 한 화면에 다 들어오게.
    1 · 3 · 4칸은 내용을 줄여서 스크롤 없이, 2칸(교환일기)만 길면 스크롤 */
 @media (min-width:760px) and (orientation:landscape){
-  .quad{grid-template-rows:repeat(2,minmax(0,1fr));height:calc(100dvh - 350px);min-height:340px}
+  .quad{grid-template-rows:repeat(2,minmax(0,1fr));height:calc(100dvh - 384px);min-height:320px}
   .sheet:has(.quad){padding-top:20px;padding-bottom:20px;margin-bottom:12px}
   .quad .block{padding:14px 18px}
   .quad .block-h{margin-bottom:10px}
@@ -551,8 +555,8 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
   @container (max-height:110px){ .qg-words{display:none} }
 }
 /* 높이가 낮은 가로 화면: 머리 부분이 납작해진 만큼 네 칸을 더 크게 */
-@media (min-width:760px) and (orientation:landscape) and (max-height:900px){ .quad{height:calc(100dvh - 290px);min-height:320px} }
-@media (min-width:760px) and (orientation:landscape) and (max-height:700px){ .quad{height:calc(100dvh - 305px);min-height:300px} }
+@media (min-width:760px) and (orientation:landscape) and (max-height:900px){ .quad{height:calc(100dvh - 324px);min-height:300px} }
+@media (min-width:760px) and (orientation:landscape) and (max-height:700px){ .quad{height:calc(100dvh - 339px);min-height:280px} }
 /* 앨범형 첫 화면 */
 .album{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-rows:150px;grid-auto-flow:dense}
 .al{position:relative;overflow:hidden;border:0;padding:0;border-radius:14px;background:var(--pc);color:var(--pt);text-align:left}
@@ -648,6 +652,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .date-l{max-width:220px}
 .w-title{font-family:var(--diary);font-size:26px;font-weight:700;border:0;border-bottom:2px solid var(--ink);border-radius:0;background:transparent;padding:10px 4px;margin-bottom:14px}
 .w-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);min-height:calc(var(--diary-lh) * 10);border:1.5px solid var(--line);border-radius:16px;padding:6px 16px;background-color:var(--surface);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh));background-position:0 6px;background-attachment:local}
+/* 댓글 칸 아래 하트 줄: 한 줄로 옆으로 밀어 보기 */.heart-bar{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;padding:6px 2px 4px}.heart-bar .emo{width:34px;height:34px;font-size:18px;border-radius:9px}
 /* 일기 칸 아래 이모지 줄 */.emo-bar{display:flex;flex-wrap:wrap;gap:4px;padding:8px 2px 4px}.emo{flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-size:21px;line-height:1;padding:0}.emo:hover{border-color:var(--coral);background:var(--coral-soft)}.emo:active{transform:scale(.92)}
 .w-count{text-align:right;font-size:13px;margin-top:4px}
 .w-acts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
@@ -1724,7 +1729,6 @@ function viewShell(){
       <header class="mast">
         <button class="home-btn" data-act="tab" data-v="home" ${S.tab==="home"&&!S.sub?'aria-current="page"':""}>${ic("home")}<span>홈</span></button>
         <h1 class="mast-h"><button class="mast-l" data-act="tab" data-v="home" title="홈으로">${logo(44)}<span class="mast-t">${esc(S.group.name)} 일기장</span></button></h1>
-        ${prefBar()}
       </header>
       <div class="mast-sub">
         <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>
@@ -1734,7 +1738,7 @@ function viewShell(){
       ${kidBar()}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
-      <main class="sheet" id="main" style="--tl:${tone[1]}">${viewMain()}</main>
+      <main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${viewMain()}</main>
     </div>
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`).join("")}</div>
@@ -2468,7 +2472,7 @@ function viewDiaryDetail(){
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(p?.name||"")}의 하루에 답해 주세요.</p>`}
-      <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea><div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
+      <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
     </section></article>`;
 }
 function renderThread(cs,parent,depth){
@@ -2478,10 +2482,10 @@ function renderThread(cs,parent,depth){
     return `<li class="cmt">${av(p,32)}<div class="cmt-body">
       <div class="cmt-meta"><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${relTime(c.createdAt)}${c.edited?" (수정됨)":""}</span></div>
       ${editing
-        ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea><div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
+        ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">(지운 댓글이에요)</p>`
         : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button><button class="link-btn" data-act="del-comment" data-id="${c.id}">${ic("trash")}${labelDel()}</button>`:""}</div>`}
-      ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea><div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
+      ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
 }
@@ -2618,6 +2622,9 @@ function emoList(){
   let use={}; try{ use=JSON.parse(ls.get("iinote-emoji-use","{}"))||{}; }catch(e){}
   return [...EMOJIS].sort((a,b)=>(use[b]||0)-(use[a]||0));
 }
+// 댓글 · 답글 칸 아래 하트 줄: 색깔별 하트와 여러 모양 하트를 눌러서 쏙
+const HEARTS = ["❤️","🩷","🧡","💛","💚","🩵","💙","💜","🤎","🖤","🩶","🤍","💖","💗","💓","💞","💕","💘","💝","💟","❣️","❤️‍🔥","🫶","🥰","😍","😘"];
+const heartBar = () => `<div class="heart-bar" role="group" aria-label="하트 넣기">${HEARTS.map(e=>`<button type="button" class="emo" data-act="cmt-heart" data-v="${e}" aria-label="${e} 넣기">${e}</button>`).join("")}</div>`;
 const viewEmoBar = () => `<div class="emo-bar" role="group" aria-label="이모지 넣기">${emoList().map(e=>`<button type="button" class="emo" data-act="emo" data-v="${e}" aria-label="${e} 넣기">${e}</button>`).join("")}</div>`;
 function insertEmoji(e){
   const ta=document.getElementById("w-text"); if(!ta || !S.draft) return;
@@ -2973,6 +2980,7 @@ const acts = {
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
   emo: el => insertEmoji(el.dataset.v),
+  "cmt-heart": el => { const ta=el.closest("form")?.querySelector("textarea"); if(!ta) return; const s=ta.selectionStart ?? ta.value.length, en=ta.selectionEnd ?? s; ta.setRangeText(el.dataset.v, s, en, "end"); ta.focus(); },
   dtab: el => go(()=>{ S.dtab=el.dataset.v; }),
   "home-day": el => { const n=+el.dataset.v, t=todayStr(); S.homeDay = n ? (()=>{ const d=addDays(homeDay(),n); return d>t?t:d; })() : t; render(); },
   "day-open": el => go(()=>{ S.tab="day"; S.dayView=el.dataset.v; }),
