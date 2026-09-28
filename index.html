@@ -293,6 +293,9 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 /* ============ 홈 ============ */
 .hero-date{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px}
 .hero-date p{margin:0;font-weight:600}
+.hero-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hero-nav .flip .ic{transform:scaleX(-1)}
+.hero-nav .icon-btn:disabled{opacity:.3}
 .today-date{font-family:var(--diary);font-size:clamp(32px,5vw,46px);line-height:1.15;margin:4px 0 0;letter-spacing:-1px}
 .home-grid{display:grid;gap:20px}
 .col{display:grid;gap:20px;align-content:start}
@@ -364,8 +367,8 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .cal-n{font-family:var(--diary);font-weight:700;font-size:20px}
 .cal-n small{font-family:var(--sans)}
 .cal-w{font-family:var(--diary);font-size:15px}
-.cal-dots i{background:var(--c);opacity:.22}
-.cal-dots i.on{opacity:1}
+.cal-dots i{background:var(--surface);border:1.2px solid var(--ink);opacity:.55;box-sizing:border-box}   /* 안 쓴 날: 얇은 검정 테두리 + 흰 바탕 */
+.cal-dots i.on{background:var(--c);border-color:var(--c);opacity:1}
 /* 일기 탭의 하위 탭 (내 일기 · 아이들 현황 · 하루 펼쳐보기 · 책장 · 리포트) */
 .dtabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 18px}
 .dtab{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:700;font-size:15px}
@@ -1003,16 +1006,28 @@ const mmss = s => `${Math.floor(s/60)}:${pad(s%60)}`;
 const TAG_RE = /#([0-9A-Za-z가-힣_]{1,20})/g;
 const extractTags = t => [...String(t||"").matchAll(TAG_RE)].map(m=>m[1]);
 const cleanTag = t => String(t||"").replace(/^#+/,"").replace(/[^0-9A-Za-z가-힣_]/g,"").slice(0,20);
-async function compressImage(file, max, q){
-  let img = null;
-  try { img = await createImageBitmap(file); } catch(e) {
-    img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error("사진을 읽지 못했어요. 다른 사진으로 해 보세요.")); i.src=URL.createObjectURL(file); });
-  }
-  const sc = Math.min(1, max/Math.max(img.width,img.height));
-  const c = document.createElement("canvas"); c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+// 사진 읽기: 사진 속 방향 정보(EXIF)대로 돌려서 읽어요. 아이폰 HEIC 는 브라우저가 열 수 있으면 JPEG 로 바뀌어요
+async function decodeImage(file){
+  try{ return await createImageBitmap(file,{imageOrientation:"from-image"}); }catch(e){}
+  return await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i);
+    i.onerror=()=>rej(new Error("사진을 불러올 수 없어요. (아이폰 HEIC 사진이면 아이폰 설정 > 카메라 > 포맷에서 '높은 호환성'을 고르거나, 다른 사진으로 해 보세요)"));
+    i.src=URL.createObjectURL(file); });
+}
+// 긴 변을 max 로 줄여 JPEG 로
+function drawJpeg(img,max,q){
+  const sc=Math.min(1, max/Math.max(img.width,img.height)), c=document.createElement("canvas");
+  c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
   c.getContext("2d").drawImage(img,0,0,c.width,c.height);
-  const blob = await new Promise(r=>c.toBlob(r,"image/jpeg",q));
-  return { blob, w:c.width, h:c.height };
+  return new Promise(r=>c.toBlob(b=>r({blob:b,w:c.width,h:c.height}),"image/jpeg",q));
+}
+async function compressImage(file, max, q){ return drawJpeg(await decodeImage(file), max, q); }
+// 일기 사진: 큰 사진(긴 변 1280px · 0.7, 약 200KB) + 미리보기(긴 변 400px · 0.6, 약 30KB)
+const PHOTO_BIG=[1280,.7], PHOTO_THUMB=[400,.6];
+async function makePhotoPair(file){
+  const img=await decodeImage(file);
+  const big=await drawJpeg(img,...PHOTO_BIG), thumb=await drawJpeg(img,...PHOTO_THUMB);
+  if(!big.blob) throw new Error("사진을 불러올 수 없어요");
+  return {big, thumb};
 }
 async function reverseGeocode(lat,lng){
   try{
@@ -1172,7 +1187,7 @@ async function makeFirebase(){
     async add(gid,c,data){ const r=await F.addDoc(col(gid,c),data); return r.id; },
     async update(gid,c,id,data){ await F.updateDoc(F.doc(db,"groups",gid,c,id),data); },
     async remove(gid,c,id){ await F.deleteDoc(F.doc(db,"groups",gid,c,id)); },
-    async uploadMedia(path,blob){ const r=ST.ref(storage,path); await ST.uploadBytes(r,blob,{contentType:blob.type||"application/octet-stream"}); return { url: await ST.getDownloadURL(r), path }; },
+    async uploadMedia(path,blob){ const r=ST.ref(storage,path); await ST.uploadBytes(r,blob,{contentType:blob.type||"application/octet-stream",cacheControl:"public, max-age=31536000"}); /* 한 번 본 사진은 다시 받지 않게 */ return { url: await ST.getDownloadURL(r), path }; },
     async deleteMedia(path){ try{ await ST.deleteObject(ST.ref(storage,path)); }catch(e){} },
     async leaveGroup(gid,uid){ await F.updateDoc(F.doc(db,"groups",gid),{memberUids:F.arrayRemove(uid)}); },
     async deleteUserDoc(uid){ await F.deleteDoc(F.doc(db,"users",uid)); },
@@ -1339,6 +1354,9 @@ const findDiary = (pid,date) => S.diaries.find(d=>d.profileId===pid && d.date===
 const canUse = p => p.type==="child" || (S.user && p.uid===S.user.uid);
 const isParent = () => S.me && S.me.type==="parent";
 const allow = f => (["photos","audio"].includes(f) && !MEDIA_READY && !DEMO) ? false : (FEATURES[f]==="all" || (S.me && S.me.type==="parent"));
+// 고치기 · 지우기 단추 이름: 아이는 '고쳐 쓰기 · 지우기', 어른은 '수정 · 삭제'
+const labelEdit = () => S.me?.type==="child" ? "고쳐 쓰기" : "수정";
+const labelDel = () => S.me?.type==="child" ? "지우기" : "삭제";
 const myWords = () => S.quizWords.filter(w=>w.profileId===S.me.id);
 
 async function reloadAll(){
@@ -1402,7 +1420,7 @@ const LAYOUT = {
   7:[[2,2],[2,2],[2,2],[3,2],[3,2],[3,2],[3,2]], 8:[[2,2],[2,2],[2,2],[3,2],[3,2],[2,2],[2,2],[2,2]], 9:Array(9).fill([2,2])
 };
 const photoGrid = (photos,did) => { const L=LAYOUT[Math.min(photos.length,9)];
-  return `<div class="pg"><div class="pg-in">${photos.slice(0,9).map((p,i)=>`<button class="pg-cell" style="grid-column:span ${L[i][0]};grid-row:span ${L[i][1]}" data-act="lb-open" data-id="${did}" data-i="${i}" aria-label="사진 ${i+1} 크게 보기"><img src="${esc(p.url)}" alt="" loading="lazy"></button>`).join("")}</div></div>`; };
+  return `<div class="pg"><div class="pg-in">${photos.slice(0,9).map((p,i)=>`<button class="pg-cell" style="grid-column:span ${L[i][0]};grid-row:span ${L[i][1]}" data-act="lb-open" data-id="${did}" data-i="${i}" aria-label="사진 ${i+1} 크게 보기"><img src="${esc(p.thumb||p.url)}" alt="" loading="lazy"></button>`).join("")}</div></div>`; };
 const tagify = t => esc(t).replace(TAG_RE,(m,g)=>`<button class="tag-inline" data-act="tag" data-v="${g}">#${g}</button>`);
 function viewLightbox(){
   const l=S.lb, p=l.photos[l.i], many=l.photos.length>1;
@@ -1526,7 +1544,7 @@ function viewPicker(){
 }
 
 // 폴더 탭 색: [바탕색, 선 색]
-const TAB_TONE = {report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
+const TAB_TONE = {mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
 // 일기 글씨 4가지
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
@@ -1550,9 +1568,14 @@ function favRow(){
     ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}`;
 }
 function viewShell(){
-  const tabs=[["home","홈","home"],["diary","일기","book"]];
+  // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
+  if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
+  const tabs=[["home","홈","home"],["mine","내 일기","pen"]];
+  if(isParent()) tabs.push(["kids","아이들 현황","spark"]);
+  tabs.push(["day","하루 펼쳐보기","cal"],["shelf","책장","book"]);
+  if(isParent()) tabs.push(["report","AI 리포트","chart"]);
   if(S.me.type==="child") tabs.push(["quiz","받아쓰기 퀴즈","quiz"]);
-  tabs.push(["family","우리 가족","people"]);
+  tabs.push(["family","우리 가족 설정","people"]);
   const tone=TAB_TONE[S.tab]||TAB_TONE.home;
   return `<div class="shell">
     <div class="frame">
@@ -1581,7 +1604,7 @@ function viewMain(){
   if(S.sub?.type==="write") return viewWrite();
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
-  return ({home:viewHome,diary:viewDiaryTab,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
+  return ({home:viewHome,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -1609,7 +1632,7 @@ function viewHomeDiary(){
       ? `<button class="wk-dot ${c}" data-act="open-diary" data-id="${x.id}" title="${tip}" aria-label="${tip}, 일기 보기"></button>`
       : `<button class="wk-dot ${c}" data-act="write" data-date="${d}" title="${tip}" aria-label="${tip}, 일기 쓰기"></button>`;
     return `<span class="wk-dot ${c}" title="${tip}"></span>`; }).join("")}</div>`).join("");
-  return `<section class="hero-date"><div><p class="muted">오늘</p><h2 class="today-date">${fmtLong(t)}</h2></div>${homeCta(mine)}</section>
+  return `${heroDate()}
   <div class="home-grid">
     <div class="col">
       <section class="block" aria-labelledby="h-st"><div class="block-h"><h2 id="h-st">오늘의 일기</h2><span class="muted">${ps.filter(p=>findDiary(p.id,t)?.status==="submitted").length}/${ps.length}명 썼어요</span></div>
@@ -1639,16 +1662,27 @@ const HOLIDAYS = {
 };
 const mySchedules = () => S.schedules.filter(s=>s.scope==="family" || s.profileId===S.me.id);
 const submittedOn = (pid,date) => findDiary(pid,date)?.status==="submitted";
+// 홈 날짜 넘기기: ◀ ▶ 로 어제 · 그저께도 보고 (오늘 뒤로는 못 가요), '오늘' 단추로 돌아와요
+const homeDay = () => { const t=todayStr(); return S.homeDay && S.homeDay<t ? S.homeDay : t; };
+function heroDate(){
+  const t=todayStr(), hd=homeDay(), mine=findDiary(S.me.id,hd);
+  const cta = hd===t ? homeCta(mine) : mine?.status==="submitted"
+    ? `<button class="btn btn-ghost" data-act="open-diary" data-id="${mine.id}">${ic("book")}이날 내 일기 보기</button>`
+    : `<button class="btn btn-primary" data-act="write" data-date="${hd}">${ic("pen")}${mine?"이날 일기 이어 쓰기":"이날 일기 쓰기"}</button>`;
+  return `<section class="hero-date"><div><p class="muted">${hd===t?"오늘":hd===addDays(t,-1)?"어제":"지난 날"}</p>
+    <div class="hero-nav"><button class="icon-btn" data-act="home-day" data-v="-1" aria-label="전날">${ic("back")}</button><h2 class="today-date">${fmtLong(hd)}</h2><button class="icon-btn flip" data-act="home-day" data-v="1" aria-label="다음 날" ${hd>=t?"disabled":""}>${ic("back")}</button>${hd!==t?`<button class="btn btn-ghost sm" data-act="home-day" data-v="0">오늘</button>`:""}</div></div>${cta}</section>`;
+}
 function viewHomeCalendar(){
   const t=todayStr(), ps=sortedProfiles(), mine=findDiary(S.me.id,t);
   const month=S.calMonth||t.slice(0,7), [yy,mm]=month.split("-").map(Number);
   const first=`${month}-01`, lead=toDate(first).getDay(), days=new Date(yy,mm,0).getDate();
   const dates=[...Array(days)].map((_,i)=>`${month}-${pad(i+1)}`);
-  const today = ps.map(p=>{ const d=findDiary(p.id,t); const st=d?(d.status==="submitted"?["done","썼어요"]:["draft","쓰는 중"]):["none","아직이에요"];
+  const hd=homeDay(), isT=hd===t;
+  const today = ps.map(p=>{ const d=findDiary(p.id,hd); const st=d?(d.status==="submitted"?["done","썼어요"]:["draft","쓰는 중"]):["none","아직이에요"];
     const open = d && (d.status==="submitted" || p.id===S.me.id);
     return `<div class="ct-card" style="--pc:${p.color||"var(--ink)"}"><div class="ct-top">${av(p,34)}<b>${esc(p.name)}</b><span class="pill ${st[0]}">${st[1]}</span></div>
-      <div class="ct-body"><span class="ct-title">${d?esc((d.text||"").slice(0,30)||"오늘 쓴 일기"):'<span class="muted">오늘 일기를 기다려요</span>'}</span>
-      ${open?(d.status==="submitted"?`<button class="btn btn-ghost sm" data-act="open-diary" data-id="${d.id}">읽기</button>`:`<button class="btn btn-ghost sm" data-act="write">이어 쓰기</button>`):""}</div></div>`; }).join("");
+      <div class="ct-body"><span class="ct-title">${d?esc((d.text||"").slice(0,30)||"쓴 일기"):`<span class="muted">${isT?"오늘 일기를 기다려요":"이날 쓴 일기가 없어요"}</span>`}</span>
+      ${open?(d.status==="submitted"?`<button class="btn btn-ghost sm" data-act="open-diary" data-id="${d.id}">읽기</button>`:`<button class="btn btn-ghost sm" data-act="write" data-date="${hd}">이어 쓰기</button>`):""}</div></div>`; }).join("");
   const legend = ps.map(p=>`<span><i style="background:${p.color||"var(--ink)"}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("");
   const sch = mySchedules();
   const cells = dates.map(d=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], list=sch.filter(s=>s.date===d).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
@@ -1658,8 +1692,8 @@ function viewHomeCalendar(){
       <span class="cal-n">${+d.slice(8)}${hol?`<small>${hol}</small>`:""}</span>
       <span class="cal-sc">${list.slice(0,2).map(s=>`<em>${s.time?esc(s.time)+" ":""}${esc(s.title)}</em>`).join("")}${list.length>2?`<em class="more">+${list.length-2}</em>`:""}</span>
       <span class="cal-dots">${d<=t?ps.map(p=>`<i class="${submittedOn(p.id,d)?"on":""}" style="--c:${p.color||"var(--ink)"}"></i>`).join(""):""}</span></button>`; }).join("");
-  return `<section class="hero-date"><div><p class="muted">오늘</p><h2 class="today-date">${fmtLong(t)}</h2></div>${homeCta(mine)}</section>
-  <section class="block" aria-labelledby="h-ct"><div class="block-h"><h2 id="h-ct">오늘</h2><span class="muted">${ps.filter(p=>submittedOn(p.id,t)).length}/${ps.length}명 썼어요</span></div>
+  return `${heroDate()}
+  <section class="block" aria-labelledby="h-ct"><div class="block-h"><h2 id="h-ct">${isT?"오늘":fmtShort(hd)}</h2><span class="muted">${ps.filter(p=>submittedOn(p.id,hd)).length}/${ps.length}명 썼어요</span></div>
     <div class="ct-grid" style="--n:${Math.min(ps.length,5)}">${today}</div></section>
   <section class="block cal" aria-labelledby="h-cal">
     <div class="cal-h"><button class="icon-btn" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("back")}</button>
@@ -1747,7 +1781,7 @@ function viewHomeAlbum(){
   const t=todayStr(), list=visibleDiaries().filter(d=>d.status==="submitted").sort((a,b)=>b.date.localeCompare(a.date)||(b.updatedAt||0)-(a.updatedAt||0));
   const tiles=[]; let nPh=0;
   list.forEach(d=>{ const p=prof(d.profileId), c=p?.color||"#1F2A44", ph=d.photos||[];
-    if(ph.length) ph.forEach(x=>{ nPh++; tiles.push({d,c,url:x.url}); });
+    if(ph.length) ph.forEach(x=>{ nPh++; tiles.push({d,c,url:x.thumb||x.url}); });
     else tiles.push({d,c}); });
   const html=tiles.slice(0,80).map((x,i)=>{ const big=i%7===0, lab=`${fmtShort(x.d.date)} ${prof(x.d.profileId)?.name||""}`;
     return x.url
@@ -1849,7 +1883,7 @@ function dcard(d){
   let ai=""; if(isParent() && p?.type==="child" && d.status==="submitted"){ const a=aiSummary(d);
     ai = !d.aiResult ? `<span class="ai-sum none">${ic("spark")}맞춤법 확인 안 받음</span>` : a.n ? `<span class="ai-sum">${ic("spark")}틀린 곳 ${a.n}개 · 스스로 고침 ${a.fixed}개</span>` : `<span class="ai-sum">${ic("spark")}맞춤법 모두 맞았어요</span>`; }
   return `<button class="dcard" data-act="open-diary" data-id="${d.id}">
-    ${ph.length?`<span class="dcard-ph"><img src="${esc(ph[0].url)}" alt="" loading="lazy">${ph.length>1?`<em>사진 ${ph.length}장</em>`:""}</span>`:""}
+    ${ph.length?`<span class="dcard-ph"><img src="${esc(ph[0].thumb||ph[0].url)}" alt="" loading="lazy">${ph.length>1?`<em>사진 ${ph.length}장</em>`:""}</span>`:""}
     <span class="dcard-top">${av(p,28)}<span class="dcard-name">${esc(p?.name||"알 수 없음")}</span>${d.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}<span class="dcard-date">${fmtShort(d.date)}</span></span>
     <span class="dcard-ex">${esc(d.text.slice(0,140))}</span>
     ${(d.location||tags.length||d.audio)?`<span class="dcard-meta">${d.location?`<span>${ic("pin")}${esc(d.location.name)}</span>`:""}${d.audio?`<span>${ic("mic")}소리</span>`:""}${tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join("")}</span>`:""}
@@ -1864,7 +1898,7 @@ function viewFeed(){
 function viewDiaryList(){
   const ps=sortedProfiles(), tags=popularTags().slice(0,12);
   const chips=`<div class="chips" role="group" aria-label="누구의 일기"><button class="chip all ${S.filter==="all"?"on":""}" data-act="filter" data-v="all" aria-pressed="${S.filter==="all"}">모두</button>${ps.map(p=>`<button class="chip ${S.filter===p.id?"on":""}" data-act="filter" data-v="${p.id}" aria-pressed="${S.filter===p.id}">${av(p,28)}${esc(p.name)}</button>`).join("")}</div>`;
-  return `<div class="page-h"><h1>가족 일기</h1><div class="row"><button class="btn btn-ghost" data-act="pdf">📄 PDF로 저장</button><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div></div>
+  return `<div class="page-h"><h1>책장</h1><div class="row"><button class="btn btn-ghost" data-act="pdf">📄 PDF로 저장</button><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div></div>
     <div class="search">${ic("search")}<label class="sr" for="q">일기 찾기</label><input type="search" id="q" value="${esc(S.search)}" placeholder="일기 본문 속 낱말, #태그, 장소로 찾기" autocomplete="off"></div>
     ${chips}
     ${tags.length?`<div class="tags-row" role="group" aria-label="태그로 모아 보기">${tags.map(([t,n])=>`<button class="htag ${S.tag===t?"on":""}" data-act="tag" data-v="${esc(t)}" aria-pressed="${S.tag===t}">#${esc(t)} <small>${n}</small></button>`).join("")}</div>`:""}
@@ -2170,7 +2204,7 @@ function viewDayOpen(){
     return `<article class="day-col" style="--pc:${c}">
       <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${m?`<span class="mood-chip"><i style="background:${m[2]}"></i>${esc(m[1])}</span>`:""}${x.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}${x.stamp?`<span class="stamp-mini">${esc(x.stamp)}</span>`:""}</div>
       <div class="day-text">${esc(x.text||"")}</div>
-      ${(x.photos||[]).length?`<div class="day-ph">${x.photos.slice(0,4).map(ph=>`<img src="${esc(ph.url)}" alt="" loading="lazy">`).join("")}</div>`:""}
+      ${(x.photos||[]).length?`<div class="day-ph">${x.photos.slice(0,4).map(ph=>`<img src="${esc(ph.thumb||ph.url)}" alt="" loading="lazy">`).join("")}</div>`:""}
       ${hs.length?`<p class="day-hearts">❤️ ${hs.map(esc).join(" · ")}</p>`:""}
       ${cs.length?`<ul class="day-cmts">${cs.map(k=>{ const q=prof(k.profileId); return `<li><b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${esc(k.text)}</li>`; }).join("")}</ul>`:""}
       <button class="link-btn" data-act="open-diary" data-id="${x.id}">💬 자세히 보기 · 댓글 쓰기</button>
@@ -2277,7 +2311,7 @@ function viewDiaryDetail(){
   const showAI = d.aiResult && (mine || isParent());
   const cs=S.comments.filter(c=>c.diaryId===d.id);
   return `<article class="detail">
-    <div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}목록으로</button><div class="row">${mine?`<button class="btn btn-ghost sm" data-act="write" data-date="${d.date}">${ic("pen")}고쳐 쓰기</button>`:""}${mine||(isParent()&&p?.type==="child")?`<button class="btn btn-ghost sm danger" data-act="del-diary" data-id="${d.id}">${ic("trash")}지우기</button>`:""}</div></div>
+    <div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}목록으로</button><div class="row">${mine?`<button class="btn btn-ghost sm" data-act="write" data-date="${d.date}">${ic("pen")}${labelEdit()}</button>`:""}${mine||(isParent()&&p?.type==="child")?`<button class="btn btn-ghost sm danger" data-act="del-diary" data-id="${d.id}">${ic("trash")}${labelDel()}</button>`:""}</div></div>
     <header class="detail-h">${av(p,44)}<div><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${fmtLong(d.date)}${d.status!=="submitted"?" (쓰는 중이라 나만 보여요)":""}</span></div>${moodChip(d.mood)}</header>
     ${(d.location||(d.tags||[]).length)?`<div class="meta-row">${d.location?`<a class="loc" href="${esc(mapLink(d.location))}" target="_blank" rel="noopener noreferrer">${ic("pin")}${esc(d.location.name)}</a>`:""}${(d.tags||[]).map(t=>`<button class="htag" data-act="tag" data-v="${esc(t)}">#${esc(t)}</button>`).join("")}</div>`:""}
     ${(d.photos||[]).length?photoGrid(d.photos,d.id):""}
@@ -2299,7 +2333,7 @@ function renderThread(cs,parent,depth){
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea><div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">(지운 댓글이에요)</p>`
-        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}수정</button><button class="link-btn" data-act="del-comment" data-id="${c.id}">${ic("trash")}지우기</button>`:""}</div>`}
+        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button><button class="link-btn" data-act="del-comment" data-id="${c.id}">${ic("trash")}${labelDel()}</button>`:""}</div>`}
       ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea><div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
@@ -2365,7 +2399,7 @@ function insertEmoji(e){
 function viewMedia(d){
   const secs=[];
   if(allow("photos")) secs.push(`<section class="media-sec" aria-label="사진"><div class="media-h">사진<span>${d.photos.length}/${MAX_PHOTOS}장</span></div>
-    <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.url)}" alt="${i+1}번째 사진"><button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button></div>`).join("")}
+    <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.thumb||p.url)}" alt="${i+1}번째 사진"><button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button></div>`).join("")}
     ${d.photos.length<MAX_PHOTOS?`<label class="thumb-add">${ic("image")}<span>사진 추가</span><input type="file" id="w-photos" accept="image/*" multiple></label>`:""}</div>
     ${d.photos.length>1?`<p class="muted" style="margin:10px 0 0;font-size:13px">${d.photos.length}장은 일기장에 ${d.photos.length}분할로 보이고, 누르면 크게 볼 수 있어요.</p>`:""}</section>`);
   if(allow("location")){ const l=d.location;
@@ -2622,7 +2656,8 @@ const acts = {
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
   emo: el => insertEmoji(el.dataset.v),
   dtab: el => go(()=>{ S.dtab=el.dataset.v; }),
-  "day-open": el => go(()=>{ S.dtab="day"; S.dayView=el.dataset.v; }),
+  "home-day": el => { const n=+el.dataset.v, t=todayStr(); S.homeDay = n ? (()=>{ const d=addDays(homeDay(),n); return d>t?t:d; })() : t; render(); },
+  "day-open": el => go(()=>{ S.tab="day"; S.dayView=el.dataset.v; }),
   "day-move": el => { const n=+el.dataset.v, t=todayStr(); S.dayView = n ? (()=>{ const d=addDays(S.dayView||t,n); return d>t?t:d; })() : t; render(); },
   "rep-mode": el => { S.rep={mode:el.value, off:0}; render(); },
   "rep-move": el => { const n=+el.dataset.v; S.rep=S.rep||{mode:"week",off:0}; S.rep.off = n ? Math.min(0, S.rep.off+n) : 0; render(); },
@@ -2693,8 +2728,8 @@ const acts = {
   "cancel-onboard": () => go(()=>{ S.phase = S.me ? "app" : "picker"; }),
   "reset-demo": () => { if(!confirm("체험 내용을 처음 상태로 되돌릴까요?")) return; B.reset(); location.reload(); },
   noop: () => {},
-  tag: el => go(()=>{ const v=el.dataset.v; S.tag=(S.tag===v && S.tab==="diary" && !S.sub)?"":v; S.tab="diary"; S.sub=null; S.filter="all"; S.search=""; S.lb=null; }),
-  "photo-del": el => { const d=S.draft, p=d.photos.find(x=>x.id===el.dataset.id); if(p?.path) d.removed.push(p.path); d.photos=d.photos.filter(x=>x.id!==el.dataset.id); render(); },
+  tag: el => go(()=>{ const v=el.dataset.v; S.tag=(S.tag===v && S.tab==="shelf" && !S.sub)?"":v; S.tab="shelf"; S.sub=null; S.filter="all"; S.search=""; S.lb=null; }),
+  "photo-del": el => { const d=S.draft, p=d.photos.find(x=>x.id===el.dataset.id); if(p?.path) d.removed.push(p.path); if(p?.thumbPath) d.removed.push(p.thumbPath); d.photos=d.photos.filter(x=>x.id!==el.dataset.id); render(); },
   "loc-here": () => guard(async()=>{
     if(!navigator.geolocation){ toast("이 기기에서는 위치를 찾을 수 없어요. 직접 써 주세요"); return; }
     toast("지금 있는 곳을 찾고 있어요");
@@ -2721,8 +2756,11 @@ async function addPhotos(files){
   const d=S.draft, room=MAX_PHOTOS-d.photos.length;
   if(room<=0){ toast(`사진은 ${MAX_PHOTOS}장까지 넣을 수 있어요`); return; }
   if(files.length>room) toast(`사진은 ${MAX_PHOTOS}장까지라 앞의 ${room}장만 넣을게요`);
-  await guard(async()=>{ for(const f of files.slice(0,room)){ if(!f.type.startsWith("image/")) continue;
-    const {blob,w,h}=await compressImage(f, DEMO?1000:1600, DEMO?.7:.82); d.photos.push({id:rid(),blob,url:URL.createObjectURL(blob),w,h}); } });
+  const pick=files.slice(0,room).filter(f=>f.type.startsWith("image/") || /\.(hei[cf])$/i.test(f.name||""));
+  await guard(async()=>{ for(let i=0;i<pick.length;i++){
+    toast(`사진 줄이는 중… (${i+1}/${pick.length})`);
+    const {big,thumb}=await makePhotoPair(pick[i]);
+    d.photos.push({id:rid(),blob:big.blob,tblob:thumb.blob,url:URL.createObjectURL(big.blob),thumb:URL.createObjectURL(thumb.blob),w:big.w,h:big.h}); } });
   render();
 }
 function addAudioFile(f){
@@ -2748,8 +2786,10 @@ async function uploadPending(d){
   const base=`groups/${S.gid}/diaries/${d.id}`;
   const out=[];
   for(const p of d.photos){
-    if(p.blob){ const r=await B.uploadMedia(`${base}/${p.id}.jpg`,p.blob); out.push({id:p.id,url:r.url,path:r.path,w:p.w||0,h:p.h||0}); }
-    else out.push({id:p.id,url:p.url,path:p.path||"",w:p.w||0,h:p.h||0});
+    if(p.blob){ const r=await B.uploadMedia(`${base}/${p.id}.jpg`,p.blob);
+      const t=p.tblob ? await B.uploadMedia(`${base}/${p.id}_t.jpg`,p.tblob) : null;
+      out.push({id:p.id,url:r.url,path:r.path,thumb:t?.url||"",thumbPath:t?.path||"",w:p.w||0,h:p.h||0}); }
+    else out.push({id:p.id,url:p.url,path:p.path||"",thumb:p.thumb||"",thumbPath:p.thumbPath||"",w:p.w||0,h:p.h||0});
   }
   d.photos=out;
   if(d.audio?.blob){ const t=d.audio.blob.type||""; const ext=t.includes("mp4")||t.includes("m4a")?"m4a":t.includes("mpeg")?"mp3":t.includes("wav")?"wav":"webm";
@@ -2766,7 +2806,7 @@ function enterAs(p){
 
 /* ---------- 지우기: 일기 · 아이 프로필 · 내 계정 ---------- */
 async function removeDiary(gid,d,comments){
-  for(const ph of d.photos||[]) if(ph.path) await B.deleteMedia(ph.path);
+  for(const ph of d.photos||[]){ if(ph.path) await B.deleteMedia(ph.path); if(ph.thumbPath) await B.deleteMedia(ph.thumbPath); }
   if(d.audio?.path) await B.deleteMedia(d.audio.path);
   await Promise.all(comments.filter(c=>c.diaryId===d.id).map(c=>B.remove(gid,"comments",c.id)));
   await B.remove(gid,"diaries",d.id);
@@ -2961,7 +3001,9 @@ const forms = {
     const mine=S.profiles.find(p=>p.uid===S.user.uid); if(mine && S.phase==="picker") enterAs(mine); toast("가족에 들어왔어요"); }),
   pin: (fd,f) => { const p=prof(f.dataset.id); if(p && String(fd.pin)===String(p.pin)) enterAs(p); else { toast("비밀번호가 달라요. 다시 입력해 주세요"); f.reset(); f.querySelector("input")?.focus(); } },
   schedule: (fd,f) => guard(async()=>{ const p=parseSchedule(fd.title); if(fd.time) p.time=fd.time;
-    await B.add(S.gid,"schedules",{date:fd.date,time:p.time,title:p.title,scope:fd.scope||"family",profileId:S.me.id,createdAt:Date.now()}); await reload("schedules"); render(); toast("일정을 추가했어요"); }),
+    // 저장이 조금 걸릴 때도 바로 알 수 있게: 단추를 잠그고 "저장 중…" → "저장되었어요!"
+    const btn=f?.querySelector("button"); if(btn){ btn.disabled=true; btn.dataset.label=btn.innerHTML; btn.textContent="저장 중…"; } toast("💾 일정을 저장하는 중…");
+    await B.add(S.gid,"schedules",{date:fd.date,time:p.time,title:p.title,scope:fd.scope||"family",profileId:S.me.id,createdAt:Date.now()}); await reload("schedules"); render(); toast(`✅ 저장되었어요! ${p.time?p.time+" ":""}${p.title}`); }).finally(()=>{ const b=f?.querySelector("button"); if(b?.dataset.label){ b.disabled=false; b.innerHTML=b.dataset.label; } }),
   link: fd => guard(async()=>{ let u=fd.url.trim(); if(!/^https?:\/\//i.test(u)) u="https://"+u; try{ new URL(u); }catch(e){ toast("주소를 다시 확인해 주세요"); return; }
     await B.add(S.gid,"links",{title:fd.title.trim(),url:u,createdBy:S.me.id,createdAt:Date.now()}); await reload("links"); render(); toast("즐겨찾기를 추가했어요"); }),
   comment: (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
