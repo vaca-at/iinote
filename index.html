@@ -1419,17 +1419,22 @@ function variants(word){
    5. 상태
    ========================================================= */
 const B = DEMO ? makeDemo() : await makeFirebase();
+// 아이 휴대폰 연결 링크: 새 모양 ?k=초대코드-아이번호&n=이름 (문자 앱이 & 뒤를 잘라도 열리게), 예전 모양 ?join=…&kid=…&n=… 도 그대로
+const QS = new URLSearchParams(location.search), KQ = (QS.get("k")||"").split("-");
 const S = {
   phase:"loading", user:null, userDoc:null, gid:null, group:null,
   profiles:[], diaries:[], comments:[], schedules:[], links:[], quizWords:[],
   me:null, tab:"home", sub:null, filter:"all", draft:null,
   replyTo:null, editing:null, quiz:null, pinFor:null, busy:false,
   search:"", tag:"", lb:null, rec:null, locEdit:false,
-  joinCode:(new URLSearchParams(location.search).get("join")||"").toUpperCase(),
-  kidId:new URLSearchParams(location.search).get("kid")||"", kidName:new URLSearchParams(location.search).get("n")||"",
+  joinCode:(QS.get("join")||KQ[0]||"").toUpperCase(),
+  kidId:QS.get("kid")||KQ[1]||"", kidName:QS.get("n")||"",
   wantWrite:new URLSearchParams(location.search).has("write"), penBusy:false, penFailed:false,
   theme:ls.get("iinote-theme","light"), dfont:ls.get("iinote-dfont","batang"), design:ls.get("iinote-design","note")
 };
+// 아이 링크로 들어온 기기는 링크를 기억해 둬요: 나중에 로그인이 풀려도 '시작하기' 화면으로 다시 들어오게
+if(S.joinCode && S.kidId) ls.set("iinote-kidlink",JSON.stringify({join:S.joinCode,kid:S.kidId,n:S.kidName}));
+function useSavedKidLink(){ try{ const k=JSON.parse(ls.get("iinote-kidlink","null")); if(k?.join && k?.kid && !S.joinCode){ S.joinCode=k.join; S.kidId=k.kid; S.kidName=k.n||""; } }catch(e){} }
 if(!["batang","pen","gothic","dodum"].includes(S.dfont)) S.dfont="batang";
 if(!["note","clean","bright","wongoji"].includes(S.design)) S.design="note";
 function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
@@ -1557,6 +1562,7 @@ function viewLanding(){
       <p class="muted">우리 가족 일기장에 들어가요. 아래 버튼을 한 번만 누르면 돼요.</p>
       <button class="btn btn-accent wide" data-act="signin-kid">${esc(n)}(으)로 시작하기</button>
       <p class="muted" style="font-size:14px;margin-top:20px">크롬 메뉴(⋮)에서 '홈 화면에 추가'를 누르면 다음부터 아이콘으로 바로 들어올 수 있어요.</p>
+      <p style="margin-top:16px"><button class="link-btn" data-act="not-kid">${esc(n)}${hasBatchim(n)?"이가":"가"} 아니에요 · 처음 화면으로</button></p>
     </div></main>`; }
   return `<main class="landing"><div class="land">
     <section>
@@ -2806,7 +2812,7 @@ function viewFamily(){
         <div class="row" style="margin-top:12px"><button class="btn btn-ghost sm" data-act="copy" data-v="${esc(link)}">${ic("link")}초대 링크 복사</button></div>
       </section>
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
-        <ul class="mem-list">${ps.map(p=>`<li class="mem">${av(p)}<span>${esc(p.name)}</span><small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`${link}&kid=${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>`).join("")}</ul>
+        <ul class="mem-list">${ps.map(p=>`<li class="mem">${av(p)}<span>${esc(p.name)}</span><small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`https://${SITE_ADDRESS}/?k=${g.inviteCode}-${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>`).join("")}</ul>
         ${isParent()&&ps.some(p=>p.type==="child"&&!p.uid)?`<p class="muted" style="margin:0 0 8px;font-size:13px">초대 문자를 복사해 아이 휴대폰에 문자로 보내면, 구글 계정 없이 크롬에서 바로 일기를 써요. 이 링크가 있으면 누구나 가족 일기장에 들어올 수 있으니 아이에게만 보내고, 걱정되면 비밀번호를 걸어 주세요.</p>`:""}
         ${isParent()&&ps.some(p=>p.type==="child")?`<details class="add"><summary>${ic("pen")}아이 일기 최소 글자 수</summary>
           <form class="form-grid" data-form="kid-goal">
@@ -2889,6 +2895,7 @@ async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catc
 const acts = {
   signin: () => guard(()=>B.signIn()),
   "signin-kid": () => guard(()=>B.signInKid()),
+  "not-kid": () => { ls.del("iinote-kidlink"); S.joinCode=""; S.kidId=""; S.kidName=""; history.replaceState(null,"",location.pathname); render(); },
   "signin-kakao": () => guard(async()=>{ try{ await B.signInKakao(); }catch(e){
     if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '우리 가족 설정 → 계정'에서 카카오를 연결해 주세요.");
     if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
@@ -3446,7 +3453,8 @@ const keepBox = () => DEMO ? "" : `<label class="keep-login"><input type="checkb
 B.onAuth(async u => {
   S.isOperator = await isOperatorUser(u);
   S.user=u;
-  if(!u){ ls.del("iinote-login"); S.phase="landing"; S.me=null; render(); return; }
+  if(!u){ ls.del("iinote-login"); useSavedKidLink(); S.phase="landing"; S.me=null; render(); return; }
+  if(!u.isAnonymous && !(S.joinCode && S.kidId)) ls.del("iinote-kidlink");   // 어른이 구글 · 카카오로 들어오면 기억한 아이 링크는 지워요
   if(await autoLogoutCheck()) return;
   S.phase="loading"; render();
   try{
@@ -3454,6 +3462,7 @@ B.onAuth(async u => {
     if(S.joinCode && S.kidId){ // 아이 휴대폰 연결 링크: 가족에 들어가서 그 아이 프로필로 바로 열기
       const gid=await B.joinGroup(S.joinCode,u,"",null), kid=S.kidId;
       S.joinCode=""; S.kidId=""; history.replaceState(null,"",location.pathname);
+      if(!u.isAnonymous) ls.del("iinote-kidlink");   // 부모 폰에서 눌렀으면 이번만 아이 화면으로 열고 기억하지 않아요
       S.userDoc=await B.getUser(u.uid); ls.set("iinote-pid-"+gid,kid); await enterGroup(gid);
       const p=prof(kid); if(S.phase==="picker" && p && p.pin){ S.pinFor=kid; render(); }
       return;
