@@ -1,0 +1,6 @@
+{
+  // index.html 한 파일 구조를 자동 정리(줄바꿈)가 흐트러뜨리지 않게
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": false
+}
