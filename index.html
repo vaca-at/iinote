@@ -365,6 +365,65 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .cal-w{font-family:var(--diary);font-size:15px}
 .cal-dots i{background:var(--c);opacity:.22}
 .cal-dots i.on{opacity:1}
+/* 일기 탭의 하위 탭 (내 일기 · 아이들 현황 · 하루 펼쳐보기 · 책장 · 리포트) */
+.dtabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 18px}
+.dtab{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:700;font-size:15px}
+.dtab:hover{border-color:var(--dc)}
+.dtab.on{background:var(--dc);border-color:var(--dc);color:var(--ink)}
+/* 아이들 현황 */
+.kid-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.kid-card{border-top:5px solid var(--pc)}
+.kid-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.kid-h div{display:grid;flex:1}
+.kid-h b{font-size:18px}
+.kid-stats{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--ink2);margin-bottom:12px}
+.kid-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.kc-w{font-size:12px;color:var(--ink3)}
+.kc-d{position:relative;aspect-ratio:1;border-radius:9px;border:1.5px solid var(--line);background:var(--surface);font-size:13px;color:var(--ink2);padding:0}
+.kc-d.w{background:color-mix(in srgb,var(--pc) 22%,var(--surface));border-color:var(--pc);color:var(--ink);font-weight:700}
+.kc-d.today{box-shadow:0 0 0 2px var(--coral)}
+.kc-d:disabled{opacity:.45}
+.kc-d i{position:absolute;right:-3px;top:-6px;font-style:normal;font-size:12px}
+/* 하루 펼쳐보기 */
+.day-nav{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+.day-nav h1{font-family:var(--diary);font-size:clamp(24px,3.4vw,32px);margin:0}
+.day-nav .flip .ic{transform:scaleX(-1)}
+.day-cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));align-items:start}
+.day-col{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--pc);border-radius:18px;padding:14px 16px;box-shadow:0 1px 2px rgba(31,42,68,.04),0 8px 20px rgba(31,42,68,.06)}
+.day-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.day-h b{color:var(--pc);font-size:16px}
+.day-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:break-word;background-image:repeating-linear-gradient(transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))}
+.day-ph{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.day-ph img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}
+.day-hearts{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--coral-ink)}
+.day-cmts{list-style:none;margin:10px 0 6px;padding:10px 0 0;border-top:1.5px dashed var(--line);display:grid;gap:6px;font-family:var(--diary);font-size:calc(var(--diary-size) * .8)}
+.day-col .link-btn{font-size:13px}
+/* 주간 · 월간 리포트 */
+.rep-mode span{min-height:36px;padding:0 16px}
+.rep-nav{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+.rep-nav b{font-size:17px}
+.rep-nav .flip .ic{transform:scaleX(-1)}
+.rep-card{border-top:5px solid var(--pc);margin-bottom:18px}
+.rep-card .block-h h2{display:flex;align-items:center;gap:8px}
+.rep-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.rep-stats div{background:var(--paper);border-radius:14px;padding:12px 14px;display:grid;gap:2px}
+.rep-stats span{font-size:13px;color:var(--ink3)}
+.rep-stats b{font-size:21px}
+.rep-stats small{font-size:12px;color:var(--ink3)}
+.rep-two{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;margin-top:10px}
+.rep-box{background:var(--paper);border-radius:14px;padding:12px 14px}
+.rep-box h3,.rep-ai h3{font-size:15px;margin:0 0 10px}
+.rep-bars{position:relative;display:flex;align-items:flex-end;gap:6px;height:130px;padding-top:18px}
+.rep-bars::after{content:"";position:absolute;left:0;right:0;bottom:calc(20px + (100% - 38px) * 0);border-top:1.5px dashed var(--coral);bottom:calc(20px + var(--goal) * .78)}
+.rb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;min-width:0}
+.rb i{display:block;width:70%;max-width:34px;min-height:2px;border-radius:6px 6px 2px 2px;background:var(--pc)}
+.rb em{font-style:normal;font-size:11px;color:var(--ink3)}
+.rb span{font-size:12px;color:var(--ink2);height:16px}
+.rep-top{margin:0;padding-left:1.3em;display:grid;gap:4px;font-family:var(--diary)}
+.rep-top small{font-family:var(--sans);color:var(--ink3);font-size:12px}
+.rep-ai{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.rep-ai p{margin:0 0 8px;line-height:1.7;color:var(--ink2)}
+@media (max-width:640px){ .rep-stats{grid-template-columns:1fr} .rep-two{grid-template-columns:1fr} }
 /* 달력 카드 안 일정 (한 줄 입력: "14시 태권도") */
 .cal-sch{margin-top:14px;border-top:1.5px dashed var(--line);padding-top:12px}
 .cal-sch .cd-h{margin:0 0 6px}
@@ -1315,6 +1374,7 @@ const ICONS = {
   people:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.3-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.6c2.6.2 4.4 2 5 4.9"/>',
   plus:'<path d="M12 5v14M5 12h14"/>', back:'<path d="M15 5l-7 7 7 7"/>', arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
   pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>', reply:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v4"/>',
+  chart:'<path d="M4 20V11M10 20V5M16 20v-8M21 20H3"/>',
   flag:'<path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/>',
   trash:'<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>',
   copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
@@ -1465,7 +1525,7 @@ function viewPicker(){
 }
 
 // 폴더 탭 색: [바탕색, 선 색]
-const TAB_TONE = {home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
+const TAB_TONE = {report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
 // 일기 글씨 4가지
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
@@ -1520,7 +1580,7 @@ function viewMain(){
   if(S.sub?.type==="write") return viewWrite();
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
-  return ({home:viewHome,diary:viewDiaryList,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
+  return ({home:viewHome,diary:viewDiaryTab,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -2058,6 +2118,141 @@ const PDF_CSS_LAND = `@page{size:A4 landscape;margin:0}
 .side-tx{overflow:hidden}
 .side-tx .d-text{font-size:12pt;line-height:8.5mm;background-image:repeating-linear-gradient(transparent 0,transparent calc(8.5mm - .3mm),var(--line) calc(8.5mm - .3mm),var(--line) 8.5mm)}
 .cover .b1{right:-20mm}`;
+/* ---------- 일기 탭: 예전 가족일기장처럼 하위 탭 5개 ----------
+   내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장(가족 일기 목록) · 리포트(부모) */
+function diaryTabs(){
+  const t=[["mine","📔","내 일기","var(--butter)"],["kids","👧","아이들 현황","var(--coral)"],["day","📖","하루 펼쳐보기","var(--sage)"],["shelf","📚","책장","var(--sky)"],["report","📈","리포트","var(--lilac)"]];
+  return t.filter(([k])=>isParent() || !["kids","report"].includes(k));
+}
+function viewDiaryTab(){
+  const tabs=diaryTabs(); if(!tabs.some(x=>x[0]===S.dtab)) S.dtab="shelf";
+  const nav=`<nav class="dtabs" aria-label="일기 보기">${tabs.map(([k,e,l,c])=>`<button class="dtab ${S.dtab===k?"on":""}" style="--dc:${c}" data-act="dtab" data-v="${k}" ${S.dtab===k?'aria-current="page"':""}><span aria-hidden="true">${e}</span>${l}</button>`).join("")}</nav>`;
+  const body={mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,report:viewReport}[S.dtab]();
+  return nav+body;
+}
+// 📔 내 일기: 내가 쓴 일기만 (쓰는 중 포함)
+function viewMyDiary(){
+  const list=S.diaries.filter(d=>d.profileId===S.me.id).sort((a,b)=>b.date.localeCompare(a.date));
+  const month=todayStr().slice(0,7), n=list.filter(d=>d.status==="submitted" && d.date.startsWith(month)).length;
+  return `<div class="page-h"><h1>내 일기</h1><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div>
+    <p class="muted" style="margin:-6px 0 16px">이번 달 ${n}편 · 🔥 ${streakOf(S.me.id)}일 연속</p>
+    ${list.length?`<div class="feed">${list.map(dcard).join("")}</div>`:`<p class="empty">아직 쓴 일기가 없어요. 오늘 첫 일기를 써 보세요.</p>`}`;
+}
+// 👧 아이들 현황: 아이마다 오늘 · 이번 달 · 작은 달력
+function viewKidsStatus(){
+  const t=todayStr(), month=t.slice(0,7), [yy,mm]=month.split("-").map(Number), last=new Date(yy,mm,0).getDate(), lead=toDate(`${month}-01`).getDay();
+  const kids=sortedProfiles().filter(p=>p.type==="child");
+  if(!kids.length) return `<div class="page-h"><h1>아이들 현황</h1></div><p class="empty">우리 가족 탭에서 아이 프로필을 추가하면 여기에서 아이들의 일기 현황을 볼 수 있어요.</p>`;
+  return `<div class="page-h"><h1>아이들 현황</h1><span class="muted">${mm}월</span></div><div class="kid-grid">${kids.map(p=>{
+    const td=findDiary(p.id,t), st=td?.status==="submitted"?["done","오늘 썼어요 ✏️"]:td?["draft","쓰는 중"]:["none","아직이에요"];
+    const mon=S.diaries.filter(d=>d.profileId===p.id && d.status==="submitted" && d.date.startsWith(month));
+    const lens=mon.map(d=>countChars(d.text)), avg=lens.length?Math.round(lens.reduce((a,b)=>a+b,0)/lens.length):0;
+    const fixes=mon.reduce((s,d)=>s+(d.aiResult?.corrections||[]).filter(c=>!(d.text||"").includes(c.wrong)).length,0);
+    let cal=DAYS.map(w=>`<span class="kc-w">${w}</span>`).join("")+(lead?`<span style="grid-column:span ${lead}"></span>`:"");
+    for(let i=1;i<=last;i++){ const ds=`${month}-${pad(i)}`, x=mon.find(d=>d.date===ds);
+      cal+=`<button class="kc-d ${x?"w":""} ${ds===t?"today":""}" data-act="day-open" data-v="${ds}" ${ds>t?"disabled":""} title="${fmtShort(ds)}${x?" 일기 있음":""}">${i}${x?.stamp?`<i>⭐</i>`:""}</button>`; }
+    return `<section class="block kid-card" style="--pc:${p.color||"#1F2A44"}">
+      <div class="kid-h">${av(p,40)}<div><b>${esc(p.name)}</b><small class="muted">${esc(gradeName(p.grade))}</small></div><span class="pill ${st[0]}">${st[1]}</span></div>
+      <div class="kid-stats"><span>📔 <b>${mon.length}</b>편</span><span>🔥 <b>${streakOf(p.id)}</b>일 연속</span><span>✏️ 평균 <b>${avg}</b>자</span><span>🖍 고친 곳 <b>${fixes}</b></span></div>
+      <div class="kid-cal">${cal}</div>
+      <p class="muted" style="font-size:12px;margin:8px 0 0">색칠된 날 = 일기 쓴 날 · ⭐ = 칭찬 도장. 날짜를 누르면 그날 가족 일기를 펼쳐 봐요.</p>
+    </section>`; }).join("")}</div>`;
+}
+// 📖 하루 펼쳐보기: 한 날짜의 가족 일기를 나란히
+function viewDayOpen(){
+  const t=todayStr(), d=S.dayView||t;
+  const list=sortedProfiles().map(p=>({p, x:S.diaries.find(y=>y.profileId===p.id && y.date===d && (y.status==="submitted" || y.profileId===S.me.id))})).filter(o=>o.x);
+  const nav=`<div class="day-nav"><button class="icon-btn" data-act="day-move" data-v="-1" aria-label="전날">${ic("back")}</button><h1>${fmtLong(d)}</h1><button class="icon-btn flip" data-act="day-move" data-v="1" aria-label="다음 날" ${d>=t?"disabled":""}>${ic("back")}</button>${d!==t?`<button class="btn btn-ghost sm" data-act="day-move" data-v="0">오늘</button>`:""}</div>`;
+  if(!list.length) return nav+`<p class="empty">${d===t?"오늘은 아직 아무도 일기를 쓰지 않았어요.":"이날은 가족이 쓴 일기가 없어요."}</p>`;
+  return nav+`<div class="day-cols">${list.map(({p,x})=>{ const c=p.color||"#1F2A44", m=MOODS.find(k=>k[0]===x.mood), hs=heartsOf(x).map(id=>prof(id)?.name).filter(Boolean);
+    const cs=S.comments.filter(k=>k.diaryId===x.id && !k.deleted).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    return `<article class="day-col" style="--pc:${c}">
+      <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${m?`<span class="mood-chip"><i style="background:${m[2]}"></i>${esc(m[1])}</span>`:""}${x.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}${x.stamp?`<span class="stamp-mini">${esc(x.stamp)}</span>`:""}</div>
+      <div class="day-text">${esc(x.text||"")}</div>
+      ${(x.photos||[]).length?`<div class="day-ph">${x.photos.slice(0,4).map(ph=>`<img src="${esc(ph.url)}" alt="" loading="lazy">`).join("")}</div>`:""}
+      ${hs.length?`<p class="day-hearts">❤️ ${hs.map(esc).join(" · ")}</p>`:""}
+      ${cs.length?`<ul class="day-cmts">${cs.map(k=>{ const q=prof(k.profileId); return `<li><b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${esc(k.text)}</li>`; }).join("")}</ul>`:""}
+      <button class="link-btn" data-act="open-diary" data-id="${x.id}">💬 자세히 보기 · 댓글 쓰기</button>
+    </article>`; }).join("")}</div>`;
+}
+/* ---------- 주간 · 월간 리포트 (부모만) ----------
+   아이마다: 일기 쓴 날 · 글자 수 · 목표 달성 · 빨간펜 고친 곳 · 글자 수 막대 · 자주 틀린 맞춤법 · AI 선생님 총평
+   총평은 빨간펜 워커(mode:"report")로 만들고 아이 프로필에 저장해요 (report_기간키). 다시 만들 때만 AI 요금이 들어요 */
+function repPeriod(){
+  const r=S.rep||(S.rep={mode:"week",off:0}), t=todayStr(), d=toDate(t);
+  if(r.mode==="week"){
+    const mon=addDays(t, -((d.getDay()+6)%7) + r.off*7), sun=addDays(mon,6);
+    const a=toDate(mon), b=toDate(sun);
+    return {mode:"week", start:mon, end:sun, key:`w${mon.replace(/-/g,"_")}`, label:`${a.getMonth()+1}월 ${a.getDate()}일 ~ ${b.getMonth()+1}월 ${b.getDate()}일`,
+      days:[...Array(7)].map((_,i)=>addDays(mon,i))};
+  }
+  const m=new Date(d.getFullYear(), d.getMonth()+r.off, 1), y=m.getFullYear(), mo=m.getMonth()+1, last=new Date(y,mo,0).getDate();
+  const start=`${y}-${pad(mo)}-01`, end=`${y}-${pad(mo)}-${pad(last)}`;
+  return {mode:"month", start, end, key:`m${y}_${pad(mo)}`, label:`${y}년 ${mo}월`, days:[...Array(last)].map((_,i)=>addDays(start,i))};
+}
+function repStats(p,per){
+  const t=todayStr(), goal=penGoalOf(p);
+  const list=S.diaries.filter(x=>x.profileId===p.id && x.status==="submitted" && x.date>=per.start && x.date<=per.end).sort((a,b)=>a.date.localeCompare(b.date));
+  const lens=list.map(x=>countChars(x.text)), sum=lens.reduce((a,b)=>a+b,0);
+  const passed=per.days.filter(d=>d<=t).length;
+  const cs=list.flatMap(x=>(x.aiResult?.corrections||[]).map(c=>({...c, fixed:!(x.text||"").includes(c.wrong)})));
+  const tally={}; cs.forEach(c=>{ const k=`${c.wrong} → ${c.right}`; tally[k]=(tally[k]||0)+1; });
+  const top=Object.entries(tally).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  // 막대: 주간은 날마다, 월간은 주마다 평균
+  let bars;
+  if(per.mode==="week") bars=per.days.map(d=>({lab:`${DAYS[toDate(d).getDay()]}`, v:countChars(list.find(x=>x.date===d)?.text||"")}));
+  else { bars=[]; for(let i=0;i<per.days.length;i+=7){ const ds=per.days.slice(i,i+7), ls=list.filter(x=>ds.includes(x.date)).map(x=>countChars(x.text));
+    bars.push({lab:`${bars.length+1}주`, v:ls.length?Math.round(ls.reduce((a,b)=>a+b,0)/ls.length):0}); } }
+  return {list, n:list.length, passed, avg:list.length?Math.round(sum/list.length):0, max:lens.length?Math.max(...lens):0, goal,
+    met:lens.filter(v=>v>=goal).length, fixes:cs.filter(c=>c.fixed).length, self:cs.filter(c=>c.fixed && (c.how||"self")==="self").length, left:cs.filter(c=>!c.fixed).length, top, bars};
+}
+function viewReport(){
+  const per=repPeriod(), r=S.rep, kids=sortedProfiles().filter(p=>p.type==="child");
+  const head=`<div class="page-h"><h1>${r.mode==="week"?"주간":"월간"} 리포트</h1>
+    <div class="seg rep-mode" role="radiogroup" aria-label="리포트 기간"><label><input type="radio" name="repmode" value="week" ${r.mode==="week"?"checked":""} data-act="rep-mode"><span>주간</span></label><label><input type="radio" name="repmode" value="month" ${r.mode==="month"?"checked":""} data-act="rep-mode"><span>월간</span></label></div></div>
+    <div class="rep-nav"><button class="icon-btn" data-act="rep-move" data-v="-1" aria-label="이전">${ic("back")}</button><b>${per.label}</b><button class="icon-btn flip" data-act="rep-move" data-v="1" aria-label="다음" ${r.off>=0?"disabled":""}>${ic("back")}</button>${r.off?`<button class="btn btn-ghost sm" data-act="rep-move" data-v="0">이번 ${r.mode==="week"?"주":"달"}</button>`:""}</div>`;
+  if(!kids.length) return head+`<p class="empty">아이 프로필이 있으면 아이마다 리포트가 만들어져요. 우리 가족 탭에서 아이 프로필을 추가해 보세요.</p>`;
+  return head+kids.map(p=>{ const s=repStats(p,per), c=p.color||"#1F2A44", mx=Math.max(1,s.goal,...s.bars.map(b=>b.v));
+    const saved=p[`report_${per.key}`], busy=S.repBusy===p.id;
+    return `<section class="block rep-card" style="--pc:${c}">
+      <div class="block-h"><h2>${av(p,30)} ${esc(p.name)} <small class="muted">${esc(gradeName(p.grade))}</small></h2><span class="muted">${per.label}</span></div>
+      <div class="rep-stats">
+        <div><span>📔 일기 쓴 날</span><b>${s.n}일</b><small>${s.passed}일 중 · 목표 달성 ${s.met}일</small></div>
+        <div><span>✏️ 평균 · 최고 글자</span><b>${s.avg}자 · ${s.max}자</b><small>목표 ${s.goal}자</small></div>
+        <div><span>👩‍🏫 AI 빨간펜</span><b>고친 곳 ${s.fixes}개</b><small>스스로 ${s.self}개${s.left?` · 남은 곳 ${s.left}개`:""}</small></div>
+      </div>
+      <div class="rep-two">
+        <div class="rep-box"><h3>📊 ${per.mode==="week"?"날마다":"주별 평균"} 글자 수</h3>
+          <div class="rep-bars" style="--goal:${Math.round(s.goal/mx*100)}%">${s.bars.map(b=>`<div class="rb"><em>${b.v||"–"}</em><i style="height:${Math.round(b.v/mx*100)}%"></i><span>${b.lab}</span></div>`).join("")}</div>
+          <p class="muted" style="font-size:12px;margin:6px 0 0">점선은 목표 ${s.goal}자예요.</p></div>
+        <div class="rep-box"><h3>🖍 자주 고친 맞춤법 TOP 5</h3>
+          ${s.top.length?`<ol class="rep-top">${s.top.map(([k,n])=>`<li>${esc(k)} <small>${n}번</small></li>`).join("")}</ol>`:`<p class="muted" style="margin:0">이 기간에 고친 맞춤법이 없어요.</p>`}</div>
+      </div>
+      <div class="rep-ai"><h3>👩‍🏫 AI 선생님 총평</h3>
+        ${saved?`<p>${esc(saved.summary)}</p>${saved.highlight?`<p>🌟 ${esc(saved.highlight)}</p>`:""}${saved.tip?`<p>💡 ${esc(saved.tip)}</p>`:""}<p class="muted" style="font-size:12px">${new Date(saved.at).toLocaleDateString("ko-KR")}에 만든 총평</p>`
+          :`<p class="muted" style="margin:0 0 8px">${s.n?"일기를 읽고 칭찬과 성장 이야기를 담은 총평을 써 줘요.":"이 기간에 쓴 일기가 없어서 총평을 만들 수 없어요."}</p>`}
+        ${s.n?`<button class="btn ${saved?"btn-ghost":"btn-primary"} sm" data-act="rep-ai" data-id="${esc(p.id)}" ${busy?"disabled":""}>${busy?"AI 선생님이 읽는 중…":saved?"🔄 총평 다시 만들기":"✨ AI 총평 만들기"}</button>`:""}
+      </div></section>`; }).join("");
+}
+async function repMakeAI(pid){
+  const p=prof(pid), per=repPeriod(), s=repStats(p,per); if(!p || !s.n || S.repBusy) return;
+  S.repBusy=pid; render();
+  try{
+    let data;
+    if(DEMO){ await new Promise(r=>setTimeout(r,800));
+      data={summary:`${p.name}은(는) 이번 기간에 ${s.n}편의 일기를 썼어요. 하루의 일을 차근차근 적는 힘이 자라고 있어요.`, highlight:`${fmtShort(s.list[s.list.length-1].date)} 일기가 특히 생생했어요.`, tip:"다음엔 그날 느낀 마음을 한 문장 더 적어 보자고 격려해 주세요."}; }
+    else {
+      const r=await fetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"report",name:p.name,level:gradeLevel(p.grade),period:`${per.mode==="week"?"한 주":"한 달"} (${per.label})`,
+        stats:{일기쓴날:s.n,기간일수:s.passed,평균글자:s.avg,최고글자:s.max,목표글자:s.goal,목표달성:s.met,고친곳:s.fixes,스스로고침:s.self,자주고친말:s.top.map(t=>t[0])},
+        entries:s.list.map(x=>({date:x.date,title:"",content:x.text||""}))})});
+      data=await r.json().catch(()=>null);
+      if(!r.ok || !data?.summary) throw new Error(`AI 총평을 만들지 못했어요 (${data?.error||r.status})`);
+    }
+    const rep={summary:data.summary, highlight:data.highlight||"", tip:data.tip||"", at:Date.now()};
+    await B.update(S.gid,"profiles",pid,{[`report_${per.key}`]:rep}); p[`report_${per.key}`]=rep;
+  }catch(e){ console.error(e); toast(e.message||"AI 총평을 만들지 못했어요"); }
+  finally{ S.repBusy=null; render(); }
+}
 /* ---------- 칭찬 도장 · 하트 ----------
    도장: 부모가 아이 일기에 하나 찍어요 (같은 도장을 다시 누르면 지워져요). 하트: 가족 누구나 (diaries.hearts = {프로필id:true}) */
 const STAMPS = ["참 잘했어요","최고예요","멋진 생각","글씨왕"];
@@ -2426,6 +2621,12 @@ const acts = {
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
   emo: el => insertEmoji(el.dataset.v),
+  dtab: el => go(()=>{ S.dtab=el.dataset.v; }),
+  "day-open": el => go(()=>{ S.dtab="day"; S.dayView=el.dataset.v; }),
+  "day-move": el => { const n=+el.dataset.v, t=todayStr(); S.dayView = n ? (()=>{ const d=addDays(S.dayView||t,n); return d>t?t:d; })() : t; render(); },
+  "rep-mode": el => { S.rep={mode:el.value, off:0}; render(); },
+  "rep-move": el => { const n=+el.dataset.v; S.rep=S.rep||{mode:"week",off:0}; S.rep.off = n ? Math.min(0, S.rep.off+n) : 0; render(); },
+  "rep-ai": el => repMakeAI(el.dataset.id),
   pdf: () => go(()=>{ S.sub={type:"pdf"}; }),
   "pdf-range": el => pdfRange(el.dataset.v),
   heart: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
