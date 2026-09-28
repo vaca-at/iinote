@@ -971,7 +971,7 @@ const SHARE_URL = "https://iinote.co.kr";
 const FEATURES = { photos:"parent", location:"parent", audio:"all", tags:"all" };
 // 사진 · 소리는 파이어베이스 Storage에 저장돼요. (Storage는 Blaze 요금제에서 켤 수 있어요)
 // MEDIA_READY: Storage 를 켜고 storage.rules 를 적용하면 true 로 바꾸기. false 면 사진 · 소리 올리기 칸을 숨기고 "곧 열려요" 안내만 보여요 (체험 모드는 늘 보임)
-const MEDIA_READY = false;
+const MEDIA_READY = true;
 const MAX_PHOTOS = 9, MAX_AUDIO_SEC = 180, MAX_AUDIO_MB = 10;
 
 const DEMO = !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith("여기");
