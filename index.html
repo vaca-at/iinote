@@ -1108,6 +1108,7 @@ function makeDemo(){
     onAuth(f){ cb=f; setTimeout(()=>f(signed?user:null),0); },
     async signIn(){ signed=true; ls.set("iinote-demo-signed","1"); cb && cb(user); },
     async signInKid(){ return api.signIn(); },
+    async signInKakao(){ return api.signIn(); },
     async signOut(){ signed=false; ls.del("iinote-demo-signed"); cb && cb(null); },
     async getIdToken(){ return "demo"; },
     async getUser(uid){ return db.users[uid] || null; },
@@ -1153,6 +1154,8 @@ async function makeFirebase(){
     onAuth(f){ AU.onAuthStateChanged(auth,f); },
     // 앱(Capacitor)으로 포장할 때는 이 함수만 앱용 로그인으로 바꾸면 돼요.
     async signIn(){ await AU.signInWithPopup(auth,new AU.GoogleAuthProvider()); },
+    // 카카오 로그인: 파이어베이스 로그인 방법에 OpenID Connect(oidc.kakao)로 등록해 둠
+    async signInKakao(){ await AU.signInWithPopup(auth,new AU.OAuthProvider("oidc.kakao")); },
     // 휴대폰 연결 링크로 들어온 아이: 구글 계정 없이 이 브라우저를 익명 계정으로 기억해요.
     async signInKid(){ await AU.signInAnonymously(auth); },
     async signOut(){ await AU.signOut(auth); },
@@ -1192,7 +1195,9 @@ async function makeFirebase(){
     async leaveGroup(gid,uid){ await F.updateDoc(F.doc(db,"groups",gid),{memberUids:F.arrayRemove(uid)}); },
     async deleteUserDoc(uid){ await F.deleteDoc(F.doc(db,"users",uid)); },
     // 계정 삭제 전 본인 확인: 구글 계정은 로그인 창을 한 번 더 띄워요 (익명 계정은 필요 없음)
-    async reauth(){ const u=auth.currentUser; if(u && !u.isAnonymous) await AU.reauthenticateWithPopup(u,new AU.GoogleAuthProvider()); },
+    async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return;
+      const kakao=u.providerData.some(p=>p.providerId==="oidc.kakao");
+      await AU.reauthenticateWithPopup(u,kakao?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     async deleteAccount(){ if(auth.currentUser) await AU.deleteUser(auth.currentUser); }
   };
   return api;
@@ -1473,7 +1478,9 @@ function viewLanding(){
         <li><span class="dot" style="background:var(--sky)"></span>칭찬 스티커판과 성장 기록으로 커 가는 모습을 한눈에</li>
         <li><span class="dot" style="background:var(--ink)"></span>사진 추가, 장소와 태그 추가하여 하루를 더욱 풍성하게</li>
       </ul>
-      <div class="land-cta"><button class="btn btn-primary" data-act="signin">구글 계정으로 시작하기</button>${kakaoBtn()}</div>
+      <div class="land-cta"><button class="btn btn-primary" data-act="signin">구글 계정으로 시작하기</button><button class="btn btn-kakao" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button></div>
+      <p class="demo-note">처음 고른 방법으로 계속 로그인해 주세요. 구글과 카카오는 서로 다른 계정이에요.</p>
+      ${kakaoBtn()}
       <p class="demo-note"><a href="terms.html">이용약관</a> · <a href="privacy.html">개인정보처리방침</a></p>
       ${DEMO?`<p class="demo-note">지금은 체험 모드예요. 예시 가족으로 모든 기능을 눌러 볼 수 있고, 내용은 이 기기에만 저장돼요.</p>`:""}
     </section>
@@ -2586,7 +2593,7 @@ function viewFamily(){
     </div>
     <div class="col">
       <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
-        <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 같은 구글 계정으로 로그인하면 돼요. 휴대폰에서는 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들 수 있어요. (안드로이드 앱은 10월 중 출시 예정)</p>${addrBox()}${kakaoBtn(true)}
+        <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. 휴대폰에서는 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들 수 있어요. (안드로이드 앱은 10월 중 출시 예정)</p>${addrBox()}${kakaoBtn(true)}
       </section>
       <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
         <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
@@ -2643,6 +2650,7 @@ async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catc
 const acts = {
   signin: () => guard(()=>B.signIn()),
   "signin-kid": () => guard(()=>B.signInKid()),
+  "signin-kakao": () => guard(()=>B.signInKakao()),
   signout: () => guard(async()=>{ S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
   tab: el => go(()=>{ S.tab=el.dataset.v; S.sub=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
