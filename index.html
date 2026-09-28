@@ -1110,11 +1110,18 @@ function contextOf(text, wrong){
    1 · 2학년은 빨간펜이 바로 고쳐 줘요(초록 형광펜). 다 고쳐야 제출할 수 있어요. 칭찬 · 응원 한마디(AI 피드백)도 함께.
    워커: { text, level:"grade4", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer } */
 const PEN_MAX_CHECK = 3;   // 일기 하나에 빨간펜 검사는 세 번까지
-// 아이 일기 최소 글자 수: 학년별 기본값 (공부방과 같게 2학년 60자 · 4학년 150자). 부모가 우리 가족 탭에서 아이마다 바꿀 수 있어요 (profiles.diaryGoal)
-const PEN_GOAL_DEFAULT = {1:40,2:60,3:100,4:150,5:200,6:250};
-const penGoalDefault = p => PEN_GOAL_DEFAULT[Number(p?.grade)] || 60;
+// 학년(profiles.grade): 숫자 하나로 -2~0 = 5~7세, 1~6 = 초1~초6, 7~9 = 중1~중3, 10~12 = 고1~고3 (예전 1~6학년 값은 그대로 초1~초6)
+const GRADES = [[-2,"5세"],[-1,"6세"],[0,"7세"],[1,"초1"],[2,"초2"],[3,"초3"],[4,"초4"],[5,"초5"],[6,"초6"],[7,"중1"],[8,"중2"],[9,"중3"],[10,"고1"],[11,"고2"],[12,"고3"]];
+const hasGrade = g => g!==undefined && g!==null && g!=="" && !Number.isNaN(Number(g));
+const gradeName = g => hasGrade(g) ? (GRADES.find(x=>x[0]===Number(g))?.[1] || "") : "";
+const gradeOptions = (sel=1) => GRADES.map(([v,l])=>`<option value="${v}" ${v===Number(sel)?"selected":""}>${l}</option>`).join("");
+// AI 빨간펜 워커에 보내는 학년 이름: age5~7 · grade1~6 · middle1~3 · high1~3
+const gradeLevel = g => { const n=hasGrade(g)?Number(g):2; return n<=0?`age${n+7}`:n<=6?`grade${n}`:n<=9?`middle${n-6}`:`high${n-9}`; };
+// 아이 일기 최소 글자 수: 학년별 기본값 (공부방과 같게 초2 60자 · 초4 150자). 부모가 우리 가족 탭에서 아이마다 바꿀 수 있어요 (profiles.diaryGoal)
+const PEN_GOAL_DEFAULT = {"-2":10,"-1":20,0:30,1:40,2:60,3:100,4:150,5:200,6:250,7:300,8:300,9:300,10:400,11:400,12:400};
+const penGoalDefault = p => (hasGrade(p?.grade) && PEN_GOAL_DEFAULT[Number(p.grade)]) || 60;
 const penGoalOf = p => Number(p?.diaryGoal) || penGoalDefault(p);
-const penAuto = g => (g||2) <= 2;
+const penAuto = g => (hasGrade(g)?Number(g):2) <= 2;   // 7세 이하 · 초1 · 초2는 빨간펜이 바로 고쳐 줘요
 const countChars = s => String(s||"").replace(/\s/g,"").length;
 const PEN_ENDS = /[.?!…~。)"'”’\]]$|\p{Extended_Pictographic}$/u;
 const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"AI 빨간펜이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
@@ -1183,7 +1190,7 @@ async function callPen(text){
   let last;
   for(let i=0;i<2;i++){   // 선생님이 가끔 바빠서 못 받을 때가 있어요: 한 번 더 불러요
     try{
-      const r=await fetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,level:"grade"+(S.me.grade||2),name:S.me.name})});
+      const r=await fetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,level:gradeLevel(S.me.grade),name:S.me.name})});
       if(r.ok) return await r.json();
       last=new Error("빨간펜 "+r.status);
     }catch(e){ last=e; }
@@ -1396,7 +1403,7 @@ function viewOnboard(){
           <label><input type="radio" name="role" value="child"><span>아이</span></label>
         </fieldset>
         <label>나를 부르는 이름<input name="me" required maxlength="10" placeholder="예: 아빠, 이모, 하랑"></label>
-        <label class="child-only">학년<select name="grade">${[1,2,3,4,5,6].map(n=>`<option value="${n}">${n}학년</option>`).join("")}</select></label>
+        <label class="child-only">학년 · 나이<select name="grade">${gradeOptions(1)}</select></label>
         <button class="btn btn-accent wide">가족에 들어가기</button>
       </form>
     </div>
@@ -1413,7 +1420,7 @@ function viewPicker(){
     <h1>누가 쓰나요?</h1>
     <p class="muted">${esc(S.group?.name||"")} 가족</p>
     <div class="pick-grid">${ps.map(p=>{ const ok=canUse(p);
-      return `<button class="pick" data-act="pick" data-id="${p.id}" ${ok?"":"disabled"}>${av(p,88)}<strong>${esc(p.name)}</strong><small>${p.type==="child"?`${p.grade?p.grade+"학년":"어린이"}${p.pin?" (비밀번호)":""}`:ok?"나":"본인 계정으로 접속"}</small></button>`; }).join("")}</div>
+      return `<button class="pick" data-act="pick" data-id="${p.id}" ${ok?"":"disabled"}>${av(p,88)}<strong>${esc(p.name)}</strong><small>${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:ok?"나":"본인 계정으로 접속"}</small></button>`; }).join("")}</div>
     ${pinP?`<form class="pin-box stack" data-form="pin" data-id="${pinP.id}"><label>${esc(pinP.name)}의 비밀번호 네 자리<input name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" required autofocus></label><button class="btn btn-primary wide">들어가기</button></form>`:""}
     <p><button class="link-btn" data-act="signout">${ic("out")}로그아웃</button></p>
   </div></main>`;
@@ -2261,18 +2268,18 @@ function viewFamily(){
         <div class="row" style="margin-top:12px"><button class="btn btn-ghost sm" data-act="copy" data-v="${esc(link)}">${ic("link")}초대 링크 복사</button></div>
       </section>
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
-        <ul class="mem-list">${ps.map(p=>`<li class="mem">${av(p)}<span>${esc(p.name)}</span><small class="muted">${p.type==="child"?`${p.grade?p.grade+"학년":"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`${link}&kid=${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>`).join("")}</ul>
+        <ul class="mem-list">${ps.map(p=>`<li class="mem">${av(p)}<span>${esc(p.name)}</span><small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`${link}&kid=${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>`).join("")}</ul>
         ${isParent()&&ps.some(p=>p.type==="child"&&!p.uid)?`<p class="muted" style="margin:0 0 8px;font-size:13px">초대 문자를 복사해 아이 휴대폰에 문자로 보내면, 구글 계정 없이 크롬에서 바로 일기를 써요. 이 링크가 있으면 누구나 가족 일기장에 들어올 수 있으니 아이에게만 보내고, 걱정되면 비밀번호를 걸어 주세요.</p>`:""}
         ${isParent()&&ps.some(p=>p.type==="child")?`<details class="add"><summary>${ic("pen")}아이 일기 최소 글자 수</summary>
           <form class="form-grid" data-form="kid-goal">
-            <p class="muted span2" style="margin:0;font-size:13px">이만큼 써야 AI 빨간펜 선생님을 부르고 제출할 수 있어요. 비워 두면 학년 기본값을 써요 (1학년 40 · 2학년 60 · 3학년 100 · 4학년 150 · 5학년 200 · 6학년 250자, 띄어쓰기 빼고).</p>
+            <p class="muted span2" style="margin:0;font-size:13px">이만큼 써야 AI 빨간펜 선생님을 부르고 제출할 수 있어요. 비워 두면 학년 기본값을 써요 (5세 10 · 6세 20 · 7세 30 · 초1 40 · 초2 60 · 초3 100 · 초4 150 · 초5 200 · 초6 250 · 중학생 300 · 고등학생 400자, 띄어쓰기 빼고).</p>
             ${ps.filter(p=>p.type==="child").map(p=>`<label>${esc(p.name)} <small class="muted">(기본 ${penGoalDefault(p)}자)</small><input name="${esc(p.id)}" type="number" inputmode="numeric" min="10" max="1000" step="10" value="${p.diaryGoal?Number(p.diaryGoal):""}" placeholder="${penGoalDefault(p)}"></label>`).join("")}
             <button class="btn btn-primary span2">저장</button>
           </form></details>`:""}
         ${isParent()?`<details class="add"><summary>${ic("plus")}아이 프로필 추가</summary>
           <form class="form-grid" data-form="child">
             <label>이름<input name="name" required maxlength="10" placeholder="예: 하랑"></label>
-            <label>학년<select name="grade">${[1,2,3,4,5,6].map(n=>`<option value="${n}">${n}학년</option>`).join("")}</select></label>
+            <label>학년 · 나이<select name="grade">${gradeOptions(1)}</select></label>
             <label class="span2">비밀번호 네 자리 (선택)<input name="pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="비워 두면 바로 들어가요"></label>
             <p class="muted span2" style="margin:0;font-size:13px">아이는 구글 계정 없이 이 프로필로 써요. 엄마 · 아빠 휴대폰에서 '프로필 바꾸기'로 쓰거나, 추가한 뒤 '초대 문자 복사'로 아이 휴대폰에 보내 주세요.</p>
             <button class="btn btn-primary span2">아이 프로필 추가</button>
@@ -2632,7 +2639,7 @@ async function saveDiary(status){
 }
 
 async function penCheck(){
-  const d=S.draft, g=S.me.grade||2, goal=penGoalOf(S.me), n=countChars(d.text);
+  const d=S.draft, g=S.me.grade, goal=penGoalOf(S.me), n=countChars(d.text);
   if(S.penBusy) return;
   if(n<goal){ toast(`${goal}자를 다 쓰면 AI 빨간펜 선생님을 부를 수 있어요! (지금 ${n}자)`); return; }
   if(d.pen && d.pen.checks>=PEN_MAX_CHECK){ toast(`빨간펜 검사는 일기 하나에 ${PEN_MAX_CHECK}번까지예요`); return; }
