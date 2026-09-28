@@ -136,6 +136,8 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .land-feats .dot{width:10px;height:10px;border-radius:50%;margin-top:8px;flex:none}
 .land-cta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .land-cta .share-row{margin:0}
+.dup-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 16px;padding:12px 16px;border-radius:14px;border:1.5px solid var(--butter);background:var(--butter-soft);font-size:14px}
+.dup-bar span{flex:1;min-width:14em}
 .keep-login{display:flex;align-items:flex-start;gap:8px;margin:12px 0 0;font-weight:650;font-size:14px;cursor:pointer}
 .keep-login input{width:18px;height:18px;margin:1px 0 0;flex:none;accent-color:var(--ink)}
 .keep-login small{display:block;font-weight:500;color:var(--ink3);font-size:12.5px;margin-top:2px}
@@ -251,6 +253,9 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .prefs-btn.on{background:var(--ink);border-color:var(--ink)}
 .mast-t{font-family:var(--diary);font-size:26px;line-height:1.2;margin:0;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prefs{display:grid;gap:6px;justify-items:end;max-width:100%}
+/* 고르기 칸: 얇은 검은 테두리 상자 + 칸마다 이름(레이아웃 · 디자인 · 글씨) */
+.prefs{border:1px solid var(--ink);border-radius:14px;padding:6px 10px;background:var(--surface)}
+.prefs .hb-g b{font-size:12.5px;font-weight:750;color:var(--ink);margin:0 2px 0 0}
 /* 화면 구성 · 디자인 · 글씨 고르기: 폴더 탭 바로 아래, 종이 판 맨 위 오른쪽 */
 .sheet-prefs{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 10px}
 @media (min-width:760px){ .sheet-prefs{margin:-20px -24px 12px 0} }
@@ -642,7 +647,23 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 
 /* ============ 일기 쓰기 ============ */
 .write{max-width:780px}
+/* 날씨 · 기분 고르기: 이름 + 그림 7개, 고른 것 이름은 오른쪽에 */
+.wm{display:grid;gap:8px;margin:16px 0}
+.wm-row{display:flex;align-items:center;gap:10px;margin:0;padding:0;border:0;min-width:0}
+.wm-row legend{float:left;flex:none;width:2.6em;padding:0;font-weight:700;font-size:14px;color:var(--ink2)}
+.wm-opts{display:flex;flex-wrap:wrap;gap:6px}
+.wm-o{position:relative}
+.wm-o input{position:absolute;opacity:0;width:1px;height:1px}
+.wm-o span{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font-size:26px;line-height:1;cursor:pointer;border:2px solid transparent;transition:transform .12s;filter:saturate(.9)}
+.wm-o span:hover{transform:scale(1.08)}
+.wm-o input:checked+span{border-color:var(--ink);background:var(--butter-soft);transform:scale(1.1)}
+.wm-o input:focus-visible+span{outline:3px solid var(--focus);outline-offset:2px}
+.wm-now{font-style:normal;font-size:13px;font-weight:650;color:var(--ink3);white-space:nowrap}
+.emo-i{font-weight:400;font-size:1.25em;line-height:1}
+@media (max-width:759px){ .wm-o span{width:38px;height:38px;font-size:23px} .wm-opts{gap:2px} .wm-now{display:none} }
 .moods{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+/* 비밀번호 숫자는 ●●●● 로 가려요 */
+.pin-in{-webkit-text-security:disc;text-security:disc;letter-spacing:6px}
 .mood{position:relative}
 .mood input{position:absolute;opacity:0;width:1px;height:1px}
 .mood span{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;font-size:14px;color:var(--ink2)}
@@ -1048,7 +1069,11 @@ const DEMO = !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith("여�
    ========================================================= */
 const DAYS = ["일","월","화","수","목","금","토"];
 const COLORS = ["#EF6F53","#F4BE45","#3F7F70","#1F2A44","#8DA9C4","#C98BB9"];
-const MOODS = [["great","신나요","#F4BE45"],["good","좋아요","#EF6F53"],["calm","그저 그래요","#B9B1A3"],["sad","속상해요","#8DA9C4"],["tired","피곤해요","#3F7F70"]];
+// 기분 7가지 [키, 이름, 색, 얼굴]. 예전 일기의 great · good · calm · sad · tired 도 그대로 보여요
+const MOODS = [["good","좋아요","#EF6F53","😊"],["great","신나요","#F4BE45","😆"],["love","행복해요","#E88AA8","🥰"],["calm","그저 그래요","#B9B1A3","😐"],["sad","속상해요","#8DA9C4","😢"],["angry","화나요","#D9674E","😠"],["tired","피곤해요","#3F7F70","😴"]];
+// 날씨 7가지 [키, 이름, 그림]
+const WEATHERS = [["sunny","맑음","☀️"],["partly","구름 조금","🌤️"],["cloudy","흐림","☁️"],["rain","비","🌧️"],["storm","천둥 번개","⛈️"],["snow","눈","❄️"],["rainbow","무지개","🌈"]];
+const weatherOf = k => WEATHERS.find(w=>w[0]===k);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const pad = n => String(n).padStart(2,"0");
 const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -1336,7 +1361,8 @@ const gradeOptions = (sel=1) => GRADES.map(([v,l])=>`<option value="${v}" ${v===
 // AI 빨간펜 워커에 보내는 학년 이름: age5~7 · grade1~6 · middle1~3 · high1~3
 const gradeLevel = g => { const n=hasGrade(g)?Number(g):2; return n<=0?`age${n+7}`:n<=6?`grade${n}`:n<=9?`middle${n-6}`:`high${n-9}`; };
 // 아이 일기 최소 글자 수: 학년별 기본값 (공부방과 같게 초2 60자 · 초4 150자). 부모가 우리 가족 탭에서 아이마다 바꿀 수 있어요 (profiles.diaryGoal)
-const PEN_GOAL_DEFAULT = {"-2":10,"-1":20,0:30,1:40,2:60,3:100,4:150,5:200,6:250,7:300,8:300,9:300,10:400,11:400,12:400};
+// 학년별 기본 최소 글자 수 (2026-09-29 낮춤: 초3 80 · 초4 100 · 초5~6 150)
+const PEN_GOAL_DEFAULT = {"-2":10,"-1":20,0:30,1:40,2:60,3:80,4:100,5:150,6:150,7:300,8:300,9:300,10:400,11:400,12:400};
 const penGoalDefault = p => (hasGrade(p?.grade) && PEN_GOAL_DEFAULT[Number(p.grade)]) || 60;
 const penGoalOf = p => Number(p?.diaryGoal) || penGoalDefault(p);
 const penAuto = g => (hasGrade(g)?Number(g):2) <= 2;   // 7세 이하 · 초1 · 초2는 빨간펜이 바로 고쳐 줘요
@@ -1466,7 +1492,10 @@ const ownsProfile = (p,uid) => !!(p && uid) && (p.uid===uid || (p.uids||[]).incl
 const isMine = p => !!S.user && ownsProfile(p,S.user.uid);
 const canUse = p => p.type==="child" || isMine(p);
 const isParent = () => S.me && S.me.type==="parent";
-const allow = f => (["photos","audio"].includes(f) && !MEDIA_READY && !DEMO) ? false : (FEATURES[f]==="all" || (S.me && S.me.type==="parent"));
+const allow = f => (["photos","audio"].includes(f) && !MEDIA_READY && !DEMO) ? false
+  // 목소리 · 소리는 아이 중에서는 7세 이하만 (초 · 중 · 고 학생 화면에는 아예 안 보여요)
+  : (f==="audio" && S.me?.type==="child" && !(hasGrade(S.me.grade) && Number(S.me.grade)<=0)) ? false
+  : (FEATURES[f]==="all" || (S.me && S.me.type==="parent"));
 // 고치기 · 지우기 단추 이름: 아이는 '고쳐 쓰기 · 지우기', 어른은 '수정 · 삭제'
 const labelEdit = () => S.me?.type==="child" ? "고쳐 쓰기" : "수정";
 const labelDel = () => S.me?.type==="child" ? "지우기" : "삭제";
@@ -1552,7 +1581,9 @@ function viewLightbox(){
     ${many?`<span class="lb-c">${l.i+1} / ${l.photos.length}</span><button class="lb-p" data-act="lb-prev" aria-label="이전 사진">${ic("left")}</button><button class="lb-n" data-act="lb-next" aria-label="다음 사진">${ic("right")}</button>`:""}
     <button class="lb-x" data-act="lb-close" aria-label="닫기">${ic("x")}</button></div>`;
 }
-const moodChip = k => { const m=MOODS.find(x=>x[0]===k); return m?`<span class="mood-chip"><i style="background:${m[2]}"></i>${m[1]}</span>`:"<span></span>"; };
+// 기분(과 날씨) 표시: 😊 좋아요 · ☀️ 맑음
+const moodChip = (k,w) => { const m=MOODS.find(x=>x[0]===k), we=weatherOf(w);
+  return (m||we)?`<span class="mood-chip">${we?`<b class="emo-i" title="${we[1]}">${we[2]}</b>`:""}${m?`<b class="emo-i">${m[3]}</b>${m[1]}`:we[1]}</span>`:"<span></span>"; };
 const addrBox = () => `<div class="addr"><span class="addr-t"><small>휴대폰 · 아이패드 · 컴퓨터 · 노트북 모두 이 주소로</small><strong>${esc(SITE_ADDRESS)}</strong></span><button class="btn btn-ghost sm" data-act="copy" data-v="https://${esc(SITE_ADDRESS)}">${ic("copy")}복사</button></div>`;
 const kakaoBtn = (sm) => `<div class="share-row"><button class="btn btn-kakao ${sm?"sm":""}" data-act="kakao-share">${ic("talk")}카카오톡 공유하기</button><button class="btn btn-ghost ${sm?"sm":""}" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button></div>`;
 const devicesArt = () => `<svg class="devices" viewBox="0 0 400 210" aria-hidden="true" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round">
@@ -1668,7 +1699,7 @@ function viewPicker(){
     <p class="muted">${esc(S.group?.name||"")} 가족</p>
     <div class="pick-grid">${ps.map(p=>{ const ok=canUse(p);
       return `<button class="pick" data-act="pick" data-id="${p.id}" ${ok?"":"disabled"}>${av(p,88)}<strong>${esc(p.name)}</strong><small>${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:ok?(p.pin&&S.me?.type==="child"?"🔒 나":"나"):"본인 계정으로 접속"}</small></button>`; }).join("")}</div>
-    ${pinP?`<form class="pin-box stack" data-form="pin" data-id="${pinP.id}"><label>${esc(pinP.name)}의 비밀번호 네 자리<input name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" required autofocus></label><button class="btn btn-primary wide">들어가기</button>
+    ${pinP?`<form class="pin-box stack" data-form="pin" data-id="${pinP.id}"><label>${esc(pinP.name)}의 비밀번호 네 자리<input name="pin" class="pin-in" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" required autofocus></label><button class="btn btn-primary wide">들어가기</button>
       ${pinP.type==="parent"?`<button type="button" class="link-btn" data-act="pin-reauth" data-id="${pinP.id}" style="justify-self:center">비밀번호를 잊었어요 · 로그인으로 확인하기</button>`:""}</form>`:""}
     <p><button class="link-btn" data-act="signout">${ic("out")}로그아웃</button></p>
   </div></main>`;
@@ -1683,9 +1714,9 @@ const DESIGNS = [["note","노트"],["clean","깔끔"],["bright","산뜻"],["wong
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
 function prefBar(){
   // 글자 대신 그림으로: 모양은 도형, 글씨는 그 글씨체로 쓴 '가'. 이름은 마우스를 올리면 보여요
-  const st = isParent() ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양">${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
-  const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨">${DFONTS.map(([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`).join("")}</div>`;
-  const dz = `<div class="seg hb-g" role="radiogroup" aria-label="디자인">${DESIGNS.map(([k,l])=>`<label title="${l}"><input type="radio" name="design" value="${k}" aria-label="${l}" ${S.design===k?"checked":""} data-pref="design"><span><i class="dsw ${k}"></i></span></label>`).join("")}</div>`;
+  const st = isParent() ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양"><b>레이아웃</b>${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
+  const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨"><b>글씨</b>${DFONTS.map(([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`).join("")}</div>`;
+  const dz = `<div class="seg hb-g" role="radiogroup" aria-label="디자인"><b>디자인</b>${DESIGNS.map(([k,l])=>`<label title="${l}"><input type="radio" name="design" value="${k}" aria-label="${l}" ${S.design===k?"checked":""} data-pref="design"><span><i class="dsw ${k}"></i></span></label>`).join("")}</div>`;
   // 순서: 화면 구성(어른) → 디자인 → 글씨. 휴대폰에서는 🎨 단추를 눌러야 펼쳐져요
   return `<button class="prefs-btn ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 · 디자인 · 글씨 고르기">🎨</button>
     <div class="prefs ${S.prefsOpen?"open":""}">${st}${dz}${ft}</div>`;
@@ -1738,7 +1769,7 @@ function viewShell(){
       ${kidBar()}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
-      <main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${viewMain()}</main>
+      <main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${dupBanner()}${viewMain()}</main>
     </div>
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`).join("")}</div>
@@ -2038,7 +2069,7 @@ function dcard(d){
     <span class="dcard-ex">${esc(d.text.slice(0,140))}</span>
     ${(d.location||tags.length||d.audio)?`<span class="dcard-meta">${d.location?`<span>${ic("pin")}${esc(d.location.name)}</span>`:""}${d.audio?`<span>${ic("mic")}소리</span>`:""}${tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join("")}</span>`:""}
     ${ai}
-    <span class="dcard-foot">${moodChip(d.mood)}${d.stamp?`<span class="stamp-mini">${esc(d.stamp)}</span>`:""}${heartsOf(d).length?`<span>❤️ ${heartsOf(d).length}</span>`:""}<span>댓글 ${n}</span></span></button>`;
+    <span class="dcard-foot">${moodChip(d.mood,d.weather)}${d.stamp?`<span class="stamp-mini">${esc(d.stamp)}</span>`:""}${heartsOf(d).length?`<span>❤️ ${heartsOf(d).length}</span>`:""}<span>댓글 ${n}</span></span></button>`;
 }
 function viewFeed(){
   const list=filteredDiaries();
@@ -2151,7 +2182,7 @@ function makePdf(form){
   const chip=p=>`<span class="who" style="--pc:${colorOf(p)};--pt:${onColor(colorOf(p))}"><i>${esc((p?.name||"?").slice(0,1))}</i>${esc(p?.name||"")}</span>`;
   // 일기 한 편의 조각들
   const head=d=>{ const p=prof(d.profileId), m=MOODS.find(x=>x[0]===d.mood);
-    return `<header class="d-h"><div><p class="d-date">${fmtLong(d.date)}</p>${chip(p)}${m?`<span class="mood"><i style="background:${m[2]}"></i>${esc(m[1])}</span>`:""}</div>${d.stamp?`<div class="stamp">${esc(d.stamp)}</div>`:""}</header>`; };
+    return `<header class="d-h"><div><p class="d-date">${fmtLong(d.date)}</p>${chip(p)}${m||weatherOf(d.weather)?`<span class="mood">${weatherOf(d.weather)?.[2]||""}${m?` ${m[3]} ${esc(m[1])}`:""}</span>`:""}</div>${d.stamp?`<div class="stamp">${esc(d.stamp)}</div>`:""}</header>`; };
   const title=d=>"";   // 제목 기능은 쓰지 않아요
   const text=(d,cls="")=>`<div class="d-text ${cls}">${esc(d.text)}</div>`;
   const photos=(d,n)=>{ const ph=withPh?(d.photos||[]).slice(0,n):[]; return ph.length?`<div class="photos n${ph.length}">${ph.map(x=>`<img src="${esc(x.url)}" alt="">`).join("")}</div>`:""; };
@@ -2352,7 +2383,7 @@ function viewDayOpen(){
   return nav+`<div class="day-cols">${list.map(({p,x})=>{ const c=p.color||"#1F2A44", m=MOODS.find(k=>k[0]===x.mood), hs=heartsOf(x).map(id=>prof(id)?.name).filter(Boolean);
     const cs=S.comments.filter(k=>k.diaryId===x.id && !k.deleted).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
     return `<article class="day-col" style="--pc:${c}">
-      <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${m?`<span class="mood-chip"><i style="background:${m[2]}"></i>${esc(m[1])}</span>`:""}${x.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}${x.stamp?`<span class="stamp-mini">${esc(x.stamp)}</span>`:""}</div>
+      <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${moodChip(x.mood,x.weather)}${x.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}${x.stamp?`<span class="stamp-mini">${esc(x.stamp)}</span>`:""}</div>
       <div class="day-text">${esc(x.text||"")}</div>
       ${(x.photos||[]).length?`<div class="day-ph">${x.photos.slice(0,4).map(ph=>`<img src="${esc(ph.thumb||ph.url)}" alt="" loading="lazy">`).join("")}</div>`:""}
       ${hs.length?`<p class="day-hearts">❤️ ${hs.map(esc).join(" · ")}</p>`:""}
@@ -2462,7 +2493,7 @@ function viewDiaryDetail(){
   const cs=S.comments.filter(c=>c.diaryId===d.id);
   return `<article class="detail">
     <div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}목록으로</button><div class="row">${mine?`<button class="btn btn-ghost sm" data-act="write" data-date="${d.date}">${ic("pen")}${labelEdit()}</button>`:""}${mine||(isParent()&&p?.type==="child")?`<button class="btn btn-ghost sm danger" data-act="del-diary" data-id="${d.id}">${ic("trash")}${labelDel()}</button>`:""}</div></div>
-    <header class="detail-h">${av(p,44)}<div><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${fmtLong(d.date)}${d.status!=="submitted"?" (쓰는 중이라 나만 보여요)":""}</span></div>${moodChip(d.mood)}</header>
+    <header class="detail-h">${av(p,44)}<div><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${fmtLong(d.date)}${d.status!=="submitted"?" (쓰는 중이라 나만 보여요)":""}</span></div>${moodChip(d.mood,d.weather)}</header>
     ${(d.location||(d.tags||[]).length)?`<div class="meta-row">${d.location?`<a class="loc" href="${esc(mapLink(d.location))}" target="_blank" rel="noopener noreferrer">${ic("pin")}${esc(d.location.name)}</a>`:""}${(d.tags||[]).map(t=>`<button class="htag" data-act="tag" data-v="${esc(t)}">#${esc(t)}</button>`).join("")}</div>`:""}
     ${(d.photos||[]).length?photoGrid(d.photos,d.id):""}
     <div class="paper-lines">${tagify(d.text)}</div>
@@ -2494,9 +2525,9 @@ function renderThread(cs,parent,depth){
 function loadDraft(date){
   const d=findDiary(S.me.id,date);
   S.locEdit=false; S.penFailed=false;
-  S.draft = d ? {id:d.id,date,mood:d.mood||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,pen:penFromResult(d.aiResult),
+  S.draft = d ? {id:d.id,date,mood:d.mood||"",weather:d.weather||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,pen:penFromResult(d.aiResult),
                  photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[],talk:d.talk?{...d.talk}:null}
-              : {id:null,date,mood:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null};
+              : {id:null,date,mood:"",weather:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null};
   S.talkBusy=null;
 }
 // 쓰는 중에 날짜를 바꾸면 내용은 그대로 두고 날짜만 옮겨요. 그날 쓴 일기가 이미 있으면 불러올지 물어봐요.
@@ -2517,7 +2548,10 @@ function viewWrite(){
   return `<div class="write">
     <div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${submitted?(child?"제출한 일기를 고치고 있어요":"올린 일기를 고치고 있어요"):d.status==="draft"?"임시 저장된 일기예요":"새 일기"}</span></div>
     <label class="date-l">날짜<input type="date" id="w-date" value="${d.date}" max="${todayStr()}"></label>
-    <fieldset class="moods"><legend>오늘 기분</legend>${MOODS.map(([k,l,c])=>`<label class="mood"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""}><span><i style="background:${c}"></i>${l}</span></label>`).join("")}</fieldset>
+    <div class="wm">
+      <fieldset class="wm-row"><legend>날씨</legend><div class="wm-opts">${WEATHERS.map(([k,l,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="weather" value="${k}" ${d.weather===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-weather">${weatherOf(d.weather)?.[1]||""}</em></fieldset>
+      <fieldset class="wm-row"><legend>기분</legend><div class="wm-opts">${MOODS.map(([k,l,,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-mood">${MOODS.find(m=>m[0]===d.mood)?.[1]||""}</em></fieldset>
+    </div>
     ${child&&talkOK(S.me)?viewTalk(d):""}
     ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} ${talkOK(S.me)?"직접 쓰거나, 위의 '이야기로 일기 쓰기'로 엄마 · 아빠와 함께 만들어요. 붙여넣기는 안 돼요.":"아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요."}</p>`:""}
 
@@ -2814,11 +2848,11 @@ function backup(kind){
       rows.push([d?.date||"",prof(d?.profileId)?.name||"",prof(c.profileId)?.name||"",c.parentId?"답글":"",c.deleted?"":c.text,fmtTime(c.createdAt),c.edited?"고침":"",c.deleted?"지움":""]); });
     downloadCSV(`아이아이노트_${fam}_댓글_${day}.csv`,rows); toast(`댓글 ${rows.length-1}개를 저장했어요`); return;
   }
-  const rows=[["날짜","쓴 사람","구분","상태","기분","일기","태그","장소","사진 수","사진 주소","소리 주소","AI 빨간펜 칭찬","AI 빨간펜 응원","고친 곳","이야기 일기 대화","도장","하트","댓글 수","처음 쓴 때","마지막으로 고친 때"]];
+  const rows=[["날짜","쓴 사람","구분","상태","날씨","기분","일기","태그","장소","사진 수","사진 주소","소리 주소","AI 빨간펜 칭찬","AI 빨간펜 응원","고친 곳","이야기 일기 대화","도장","하트","댓글 수","처음 쓴 때","마지막으로 고친 때"]];
   const cmt={}; S.comments.forEach(c=>{ if(!c.deleted) cmt[c.diaryId]=(cmt[c.diaryId]||0)+1; });
   [...S.diaries].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).forEach(d=>{ const p=prof(d.profileId), r=d.aiResult;
     rows.push([d.date, p?.name||"", whoKind(p), d.status==="submitted"?(p?.type==="child"?"제출":"올림"):"쓰는 중",
-      MOODS.find(m=>m[0]===d.mood)?.[1]||"", d.text||"", (d.tags||[]).map(t=>"#"+t).join(" "), d.location?.name||"",
+      weatherOf(d.weather)?.[1]||"", MOODS.find(m=>m[0]===d.mood)?.[1]||"", d.text||"", (d.tags||[]).map(t=>"#"+t).join(" "), d.location?.name||"",
       (d.photos||[]).length, (d.photos||[]).map(x=>x.url).join("\n"), d.audio?.url||"",
       r?.praise||"", r?.feedback||"", (r?.corrections||[]).map(c=>`${c.wrong} → ${c.right}`).join("\n"),
       (d.talk?.dialog||[]).map(t=>`${t.who==="아이"?"아이":"엄마 · 아빠"}: ${t.text}`).join("\n"),
@@ -2835,6 +2869,30 @@ function loginLinkRow(){
     <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}</div>
     ${S.mergeKind?`<p style="margin:10px 0 0"><button class="btn btn-primary sm" data-act="merge-login" data-v="${S.mergeKind}">${loginName(S.mergeKind)}로 만든 프로필과 합치기</button></p>`:""}
     <p class="muted" style="font-size:13px;margin:8px 0 0">구글 · 카카오로 따로 들어와서 같은 사람이 둘로 보이면, 한쪽으로 로그인해 다른 쪽 '연결하기'를 눌러 하나로 합쳐 주세요.</p></div>`;
+}
+/* ---------- 이름이 같은 어른 프로필 하나로 합치기 ----------
+   구글 · 카카오로 따로 들어와 '아빠'가 둘이 되면, 가족의 어른 누구나 한 번 눌러 합쳐요 (다른 쪽 로그인 확인 없이).
+   남는 프로필 = 일기가 더 많은 쪽(같으면 먼저 만든 쪽). 합친 뒤에는 두 로그인 모두 그 프로필로 들어와요. */
+const dupParents = () => { const by={};
+  S.profiles.filter(p=>p.type==="parent").forEach(p=>{ const k=String(p.name||"").trim(); if(k) (by[k]=by[k]||[]).push(p); });
+  return Object.entries(by).filter(([,a])=>a.length>1).map(([name,a])=>({name,list:a})); };
+const dupBanner = () => { if(!isParent() || S.sub) return ""; const d=dupParents(); if(!d.length) return "";
+  return `<div class="dup-bar" role="status">👥 <span>${d.map(x=>`<b>${esc(x.name)}</b> ${x.list.length}개`).join(", ")}가 따로 보여요. 구글 · 카카오로 따로 들어와서 생긴 거예요.</span>${d.map(x=>`<button class="btn btn-primary sm" data-act="merge-dup" data-v="${esc(x.name)}">${esc(x.name)} 하나로 합치기</button>`).join("")}</div>`; };
+async function mergeSameName(name){
+  await reloadAll();
+  const same=S.profiles.filter(p=>p.type==="parent" && String(p.name||"").trim()===name);
+  if(same.length<2){ render(); return; }
+  const cnt=p=>S.diaries.filter(d=>d.profileId===p.id).length;
+  const keep=[...same].sort((a,b)=>cnt(b)-cnt(a)||(a.createdAt||0)-(b.createdAt||0))[0], others=same.filter(p=>p.id!==keep.id);
+  const moved=others.reduce((s,o)=>s+cnt(o),0);
+  if(!confirm(`'${name}' 프로필 ${same.length}개를 하나로 합칠까요?\n\n· 따로 있던 일기 ${moved}편과 댓글 · 일정 · 하트가 '${name}' 프로필 하나로 모여요. 같은 날 쓴 일기는 한 편으로 이어 붙여요.\n· 앞으로 구글 · 카카오 어느 쪽으로 들어와도 같은 '${name}' 프로필이 열려요.\n· 합친 뒤에는 되돌릴 수 없어요.`)) return;
+  const uids=[...new Set([...(keep.uids||[]), ...others.flatMap(o=>[o.uid,...(o.uids||[])])])].filter(x=>x && x!==keep.uid);
+  const kinds=[...new Set([...(keep.mergedKinds||[]), ...others.flatMap(o=>o.mergedKinds||[])])];
+  await B.update(S.gid,"profiles",keep.id,{uids,mergedKinds:kinds});
+  for(const o of others){ await mergeProfiles(o.id,keep.id); await reloadAll(); }
+  if(others.some(o=>o.id===S.me?.id)){ ls.set("iinote-pid-"+S.gid,keep.id); }
+  S.me=prof(S.me?.id)||prof(keep.id)||S.me; render();
+  toast(`'${name}' 프로필을 하나로 합쳤어요`);
 }
 function viewFamily(){
   const g=S.group, ps=sortedProfiles(), link=`https://${SITE_ADDRESS}/?join=${g.inviteCode}`;
@@ -2860,7 +2918,7 @@ function viewFamily(){
           <form class="form-grid" data-form="child">
             <label>이름<input name="name" required maxlength="10" placeholder="예: 하랑"></label>
             <label>학년 · 나이<select name="grade">${gradeOptions(1)}</select></label>
-            <label class="span2">비밀번호 네 자리 (선택)<input name="pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="비워 두면 바로 들어가요"></label>
+            <label class="span2">비밀번호 네 자리 (선택)<input name="pin" class="pin-in" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="비워 두면 바로 들어가요"></label>
             <p class="muted span2" style="margin:0;font-size:13px">아이는 구글 계정 없이 이 프로필로 써요. 엄마 · 아빠 휴대폰에서 '프로필 바꾸기'로 쓰거나, 추가한 뒤 '초대 문자 복사'로 아이 휴대폰에 보내 주세요.</p>
             <button class="btn btn-primary span2">아이 프로필 추가</button>
           </form></details>`:""}
@@ -2892,7 +2950,7 @@ function viewFamily(){
         ${loginLinkRow()}
         ${isParent()&&isMine(S.me)?`<form class="parent-pin" data-form="parent-pin" style="margin-top:16px">
           <p class="muted" style="font-size:14px;margin:0 0 8px">${S.me.pin?"🔒 부모 비밀번호가 걸려 있어요.":"부모 비밀번호"} · 내 폰으로 아이가 일기를 쓴 뒤 '${esc(S.me.name)}${ro(S.me.name)} 돌아가기'를 누르면 이 비밀번호를 물어요.</p>
-          <div class="row"><label class="sr" for="pp-pin">부모 비밀번호 네 자리</label><input id="pp-pin" name="pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="숫자 네 자리" style="width:9em;letter-spacing:4px">
+          <div class="row"><label class="sr" for="pp-pin">부모 비밀번호 네 자리</label><input id="pp-pin" name="pin" class="pin-in" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="숫자 네 자리" style="width:9em;letter-spacing:4px">
           <button class="btn btn-primary sm">${S.me.pin?"바꾸기":"정하기"}</button>${S.me.pin?`<button type="button" class="btn btn-ghost sm" data-act="parent-pin-clear">비밀번호 없애기</button>`:""}</div></form>`:""}
         ${S.user&&!S.user.isAnonymous&&isMine(S.me)?`<div style="margin-top:14px">${keepBox()}</div>`:""}
         ${groups.length>1&&isParent()?`<label style="margin-top:16px">내 가족 그룹<select data-pref="group">${groups.map(id=>`<option value="${esc(id)}" ${id===S.gid?"selected":""}>${id===S.gid?esc(g.name):"다른 가족 ("+esc(id.slice(0,6))+")"}</option>`).join("")}</select></label>`:""}
@@ -2955,6 +3013,7 @@ const acts = {
     }
     render(); toast("연결했어요. 이제 어느 쪽으로 로그인해도 같은 일기장이에요"); }),
   "merge-login": el => guard(()=>mergeOtherLogin(el.dataset.v,null)),
+  "merge-dup": el => guard(()=>mergeSameName(el.dataset.v)),
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => guard(async()=>{ ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
   tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
@@ -3348,7 +3407,7 @@ async function saveDiary(status){
     if(!d.pen && !S.penFailed && !confirm("AI 빨간펜 선생님께 아직 보여 주지 않았어요. 그래도 제출할까요?")) return;
   }
   const pend=document.getElementById("w-tag")?.value; if(pend){ const t=cleanTag(pend); if(t && !d.tags.includes(t)) d.tags.push(t); }
-  const data={profileId:S.me.id,date:d.date,mood:d.mood,title:d.title.trim(),text:d.text,status,updatedAt:Date.now()};
+  const data={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",title:d.title.trim(),text:d.text,status,updatedAt:Date.now()};
   if(d.pen){ data.aiChecked=true; data.aiResult=penResult(d); }
   else if(d.aiChecked){ data.aiChecked=true; data.aiResult=d.aiResult; }
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
@@ -3382,7 +3441,7 @@ async function penCheck(){
     d.pen={praise:data.praise||"", cheer:data.cheer||"", errors, checks:(prev?.checks||0)+1, original:prev?.original||text, auto:penAuto(g)};
     if(d.pen.auto){ for(const er of errors) if(penAt(er,d.text)>=0){ penApplyOne(er); er.auto=true; er._left=false; } }
     // 검사 결과를 일기에 바로 붙여 둬요 (나갔다 와도 그대로)
-    const base={profileId:S.me.id,date:d.date,mood:d.mood,title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now(),aiChecked:true,aiResult:penResult(d)};
+    const base={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now(),aiChecked:true,aiResult:penResult(d)};
     if(d.id) await B.update(S.gid,"diaries",d.id,base);
     else { base.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...base,photos:[],audio:null,location:null,tags:[]}); d.status="draft"; }
     d.aiChecked=true; d.aiResult=base.aiResult;
@@ -3457,7 +3516,8 @@ document.addEventListener("change", e => {
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
-  if(t.name==="mood" && S.draft){ S.draft.mood=t.value; return; }
+  if(t.name==="mood" && S.draft){ S.draft.mood=t.value; const n=document.getElementById("wm-mood"); if(n) n.textContent=MOODS.find(m=>m[0]===t.value)?.[1]||""; return; }
+  if(t.name==="weather" && S.draft){ S.draft.weather=t.value; const n=document.getElementById("wm-weather"); if(n) n.textContent=weatherOf(t.value)?.[1]||""; return; }
   if(t.dataset.pref==="keep"){ ls.set("iinote-keep",t.checked?"1":""); if(S.user) ls.set("iinote-login",JSON.stringify({uid:S.user.uid,at:Date.now()})); markActive(true); toast(t.checked?`이 기기에서 ${KEEP_DAYS}일 동안 로그인을 유지해요`:`${IDLE_MIN}분 동안 안 쓰면 로그아웃해요`); }
   if(t.dataset.pref==="theme"){ S.theme=t.value; ls.set("iinote-theme",t.value); applyPrefs(); }
   if(t.dataset.pref==="dfont"){ S.dfont=t.value; ls.set("iinote-dfont",t.value); applyPrefs(); }
