@@ -853,6 +853,14 @@ const OLD_DIARY_CONFIG = {
   appId: "1:124372121061:web:b1596628daae0bb08eab0c"
 };
 const OLD_PEOPLE = [["me","엄마"],["doyun","도윤"],["dojin","도진"]];   // 예전 일기장의 author 값과 이름
+// '예전 가족일기장 가져오기'는 운영자 가족만 써요: 운영자 구글 계정일 때만 보여요 (이메일은 코드에 적지 않고 SHA-256 값으로만 비교)
+const OPERATOR_EMAIL_SHA256 = "22fa372a479af0929cadcbf6b12b6c2dace34800344067ef44b21a0c187487fb";
+async function isOperatorUser(u){
+  const em=String(u?.email||"").trim().toLowerCase();
+  if(!em || !globalThis.crypto?.subtle) return false;
+  const b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(em));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")===OPERATOR_EMAIL_SHA256;
+}
 // 빨간펜(AI 맞춤법 · 칭찬 · 응원) 클라우드플레어 워커: 공부방 빨간펜과 같은 워커 (API 키는 워커에만 보관)
 const SPELL_API = "https://family-spell.bellachord.workers.dev";
 // 컴퓨터에서 접속하는 쉬운 주소 (화면 곳곳에 안내돼요)
@@ -2280,7 +2288,7 @@ function viewFamily(){
         <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
         <p class="muted" style="font-size:13px;margin:10px 0 0">첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요.</p>
       </section>
-      ${isParent()&&!DEMO?`<section class="block" aria-labelledby="h-old"><div class="block-h"><h2 id="h-old">예전 가족일기장 가져오기</h2></div>
+      ${isParent()&&!DEMO&&S.isOperator?`<section class="block" aria-labelledby="h-old"><div class="block-h"><h2 id="h-old">예전 가족일기장 가져오기</h2></div>
         <p class="muted" style="margin:0 0 12px;font-size:14px">jsun.site/diary 와 공부방에서 쓴 일기 · 댓글을 옮겨 와요. 예전 일기장 구글 계정으로 한 번 더 로그인해요. 다시 누르면 그 뒤에 새로 쓴 것만 들어와요.</p>
         <form class="form-grid" data-form="old-import">${OLD_PEOPLE.map(([k,n])=>`<label>${n}의 일기를<select name="${k}"><option value="">가져오지 않기</option>${ps.map(p=>`<option value="${esc(p.id)}" ${p.name===n?"selected":""}>${esc(p.name)} 일기로</option>`).join("")}</select></label>`).join("")}
           <button class="btn btn-primary span2">${ic("download")}가져오기</button></form>
@@ -2735,6 +2743,7 @@ document.addEventListener("touchend", e => { if(S.lb && touchX!==null){ const dx
    10. 시작
    ========================================================= */
 B.onAuth(async u => {
+  S.isOperator = await isOperatorUser(u);
   S.user=u;
   if(!u){ S.phase="landing"; S.me=null; render(); return; }
   S.phase="loading"; render();
