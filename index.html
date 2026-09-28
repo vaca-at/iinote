@@ -1050,7 +1050,7 @@ const kidInviteMsg = (kid,url) => `${kid.name}${hasBatchim(kid.name)?"아":"야"
 const onColor = hex => { const n=parseInt(hex.slice(1),16); const r=n>>16&255,g=n>>8&255,b=n&255; return (0.299*r+0.587*g+0.114*b)>140?"#1F2A44":"#FFFFFF"; };
 const relTime = ts => { if(!ts) return ""; const m=Math.floor((Date.now()-ts)/60000); if(m<1) return "방금"; if(m<60) return `${m}분 전`; const h=Math.floor(m/60); if(h<24) return `${h}시간 전`; const d=Math.floor(h/24); if(d<7) return `${d}일 전`; return fmtShort(ymd(new Date(ts))); };
 const host = u => { try { return new URL(u).hostname.replace(/^www\./,""); } catch(e) { return u; } };
-// 자동 로그아웃: '로그인 유지'를 켜면 30일 뒤, 끄면 브라우저를 닫거나 30분 동안 아무것도 안 하면 (일기를 쓰는 중에는 기다려요)
+// 자동 로그아웃: '로그인 유지'를 켜면 30일 뒤, 끄면 30분 동안 아무것도 안 하면 (일기를 쓰는 중에는 기다려요). 브라우저를 다시 열었을 때도 같은 시간으로 판단
 // 아이 휴대폰 연결(익명) 계정은 로그아웃하면 연결 링크로 다시 들어와야 해서 빼요
 const KEEP_DAYS = 30, IDLE_MIN = 30;
 const keepLogin = () => ls.get("iinote-keep")==="1";
@@ -1213,8 +1213,8 @@ async function makeFirebase(){
     async signIn(){ await AU.signInWithPopup(auth,new AU.GoogleAuthProvider()); },
     // 카카오 로그인: 파이어베이스 로그인 방법에 OpenID Connect(oidc.kakao)로 등록해 둠
     async signInKakao(){ await AU.signInWithPopup(auth,new AU.OAuthProvider("oidc.kakao")); },
-    // 로그인 유지: 켜면 브라우저를 닫아도 기억(local), 끄면 브라우저를 닫으면 로그아웃(session)
-    setKeep(k){ return AU.setPersistence(auth, k?AU.browserLocalPersistence:AU.browserSessionPersistence); },
+    // 로그인은 늘 이 브라우저에 기억해요(새 탭 · 공부방 링크에서도 그대로). 로그아웃 시간은 autoLogoutCheck 가 정해요
+    async setKeep(){},
     // 한 계정에 구글 · 카카오 둘 다 연결: 어느 쪽으로 로그인해도 같은 계정(uid)
     providers(){ const u=auth.currentUser; return u&&!u.isAnonymous ? u.providerData.map(p=>p.providerId) : []; },
     async link(kind){ await AU.linkWithPopup(auth.currentUser, kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
@@ -1262,10 +1262,6 @@ async function makeFirebase(){
       await AU.reauthenticateWithPopup(u,kakao?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     async deleteAccount(){ if(auth.currentUser) await AU.deleteUser(auth.currentUser); }
   };
-  // 아이 휴대폰 연결(익명) 계정은 늘 기억해요. 나머지는 '로그인 유지' 설정대로
-  try{ await auth.authStateReady?.(); }catch(e){}
-  if(!auth.currentUser?.isAnonymous) await api.setKeep(keepLogin()).catch(()=>{});
-  api.signInKid = async () => { await AU.setPersistence(auth,AU.browserLocalPersistence).catch(()=>{}); await AU.signInAnonymously(auth); };
   return api;
 }
 
@@ -2523,7 +2519,8 @@ async function talkFetch(url,opt){
 }
 async function talkMake(textOnly){
   const d=S.draft; if(!d || S.talkBusy) return;
-  const demo=DEMO;
+  if((d.talk?.made||0)>=TALK_MAX_MAKE){ toast(`이야기 일기는 일기 하나에 ${TALK_MAX_MAKE}번까지 만들 수 있어요`); return; }
+  const demo=DEMO, gone=()=>S.draft!==d;   // 기다리는 동안 다른 화면으로 가면 아무것도 바꾸지 않아요
   try{
     let transcript=d.talk?.transcript||"";
     if(!textOnly){
@@ -2531,12 +2528,14 @@ async function talkMake(textOnly){
       S.talkBusy="🎧 목소리를 글자로 바꾸고 있어요…"; render();
       if(demo){ await wait(900); transcript="오늘 뭐가 제일 재미있었어? 놀이터에서 미끄럼틀 탔어. 누구랑 탔어? 지우랑. 엄청 빨랐어. 기분이 어땠어? 신났어! 또 가고 싶어."; }
       else transcript=String((await talkFetch(SPELL_API+"/transcribe",{method:"POST",headers:{"Content-Type":"audio/wav"},body:await toWav16k(d.audio.blob)})).text||"").trim();
+      if(gone()) return;
       if(countChars(transcript)<4) throw new Error("말소리를 잘 알아듣지 못했어요. 휴대폰을 조금 더 가까이 두고 또박또박 다시 녹음해 볼까요?");
     }
     S.talkBusy="✏️ AI 선생님이 아이가 한 말로 일기를 쓰고 있어요…"; render();
     const r = demo ? (await wait(900), {dialog:[{who:"어른",text:"오늘 뭐가 제일 재미있었어?"},{who:"아이",text:"놀이터에서 미끄럼틀 탔어."},{who:"어른",text:"누구랑 탔어?"},{who:"아이",text:"지우랑. 엄청 빨랐어."},{who:"어른",text:"기분이 어땠어?"},{who:"아이",text:"신났어! 또 가고 싶어."}],
         diary:"나는 오늘 놀이터에서 지우랑 미끄럼틀을 탔다. 미끄럼틀이 엄청 빨랐다. 정말 신났다. 또 가고 싶다.", mood:"great", note:"아이가 말한 놀이터 이야기로 네 문장을 썼어요. (체험 모드 예시)"})
       : await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"talk",transcript,level:gradeLevel(S.me.grade),name:S.me.name})});
+    if(gone()) return;
     S.talkBusy=null;
     const prevAI=d.talk?.diary||"", made=(d.talk?.made||0)+1;
     d.talk={transcript:transcript.slice(0,6000),dialog:(r.dialog||[]).slice(0,80).map(t=>({who:t.who==="아이"?"아이":"어른",text:String(t.text||"").slice(0,400)})),note:String(r.note||""),diary:String(r.diary||""),made,at:Date.now()};
@@ -2547,7 +2546,7 @@ async function talkMake(textOnly){
     }
     render(); toast(r.diary?"일기를 만들었어요. 읽어 보고 고쳐 주세요":"이번 이야기로는 일기를 만들지 못했어요");
     document.getElementById("w-text")?.scrollIntoView({behavior:"smooth",block:"center"});
-  }catch(e){ S.talkBusy=null; render(); toast(e.message||"문제가 생겼어요. 다시 눌러 주세요"); }
+  }catch(e){ if(gone()) return; S.talkBusy=null; render(); toast(e.message||"문제가 생겼어요. 다시 눌러 주세요"); }
 }
 /* 일기 칸 아래 이모지 줄: 누르면 커서 자리에 쏙. 이 기기에서 자주 쓴 이모지가 앞으로 와요 */
 const EMOJIS = ["😊","😀","😆","😄","🥰","😍","😘","🤗","😋","😎","🤩","🥳","😇","🙂","😉","🤭","😴","🤔","❤️","🧡","💛","💚","💙","💜","💕","💖","✨"];   // 표정(웃는 얼굴 위주) · 하트
@@ -2872,14 +2871,14 @@ const acts = {
     }
     render(); toast("연결했어요. 이제 어느 쪽으로 로그인해도 같은 일기장이에요"); }),
   signout: () => guard(async()=>{ ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
-  tab: el => go(()=>{ S.tab=el.dataset.v; S.sub=null; S.replyTo=null; S.editing=null; }),
+  tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
     if(p.type==="child" && p.pin){ S.pinFor=p.id; render(); return; }
     enterAs(p); },
   "switch-profile": () => go(()=>{ S.phase="picker"; S.pinFor=null; S.sub=null; }),
   "open-diary": el => go(()=>{ S.sub={type:"diary",id:el.dataset.id}; S.replyTo=null; S.editing=null; }),
-  back: () => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.sub=null; S.draft=null; S.lb=null; }),
+  back: () => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.sub=null; S.draft=null; S.talkBusy=null; S.lb=null; }),
   write: el => go(()=>{ loadDraft(el.dataset.date||todayStr()); S.sub={type:"write"}; }),
   "save-diary": el => guard(()=>saveDiary(el.dataset.v)),
   emo: el => insertEmoji(el.dataset.v),
@@ -3009,17 +3008,17 @@ async function recStart(talk){
   let stream; try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }catch(e){ toast("마이크를 쓸 수 없어요. 마이크 권한을 확인해 주세요"); return; }
   const mime=["audio/webm;codecs=opus","audio/mp4","audio/webm"].find(m=>MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m))||"";
   const mr=new MediaRecorder(stream, mime?{mimeType:mime,audioBitsPerSecond:64000}:undefined);
-  const chunks=[], t0=Date.now();
+  const chunks=[], t0=Date.now(), d0=S.draft;   // 녹음을 시작한 그 일기에만 붙여요
   const timer=setInterval(()=>{ const sec=Math.floor((Date.now()-t0)/1000); const el=document.getElementById("rec-t"); if(el) el.textContent=mmss(sec);
     const bar=document.getElementById("rec-bar"); if(bar) bar.style.width=Math.min(100,sec/MAX_AUDIO_SEC*100)+"%";
     if(sec>=MAX_AUDIO_SEC && mr.state!=="inactive") mr.stop(); },500);
   mr.ondataavailable=e=>{ if(e.data && e.data.size) chunks.push(e.data); };
-  mr.onstop=()=>{ stream.getTracks().forEach(t=>t.stop()); clearInterval(timer); S.rec=null; if(!S.draft) return;
+  mr.onstop=()=>{ stream.getTracks().forEach(t=>t.stop()); clearInterval(timer); S.rec=null; if(!S.draft || S.draft!==d0){ render(); return; }
     const blob=new Blob(chunks,{type:mr.mimeType||mime||"audio/webm"}), d=S.draft;
     if(d.audio?.path) d.removed.push(d.audio.path);
     d.audio={id:rid(),blob,url:URL.createObjectURL(blob),duration:Math.round((Date.now()-t0)/1000),type:blob.type};
     // 이야기 녹음이면: 새 이야기이니 예전 대화 기록은 비우고, 바로 글로 바꿔 일기를 만들어요
-    if(talk){ d.talk=null; render(); if(blob.size>2000) talkMake(); else toast("녹음이 너무 짧아요. 다시 해 볼까요?"); }
+    if(talk){ d.talk=d.talk?.made?{made:d.talk.made}:null; /* 새 이야기: 대화 기록은 비우고 만든 횟수는 이어서 세요 */ render(); if(blob.size>2000) talkMake(); else toast("녹음이 너무 짧아요. 다시 해 볼까요?"); }
     else render(); };
   S.rec={mr,talk:!!talk}; mr.start(1000); render();
 }
@@ -3168,7 +3167,7 @@ async function saveDiary(status){
   // 빨간펜: 노란 형광펜이 남아 있으면 제출 못 해요 (선생님이 쉬는 중이면 그냥 제출 가능)
   if(S.rec||S.talkBusy){ toast("녹음이나 일기 만들기가 끝나면 저장할 수 있어요"); return; }
   // 이야기로 만든 일기(5~7세)는 엄마 · 아빠가 확인하고 저장하니 글자 수 · 빨간펜 조건 없이 제출돼요
-  if(status==="submitted" && child && !d.talk?.transcript){
+  if(status==="submitted" && child && !d.talk?.diary){
     const goal=penGoalOf(S.me), n=countChars(d.text);
     if(n<goal){ toast(`${goal}자를 채우면 제출할 수 있어요! (지금 ${n}자)`); return; }
     const left=(d.pen?.errors||[]).filter(er=>penLeft(er,d.text)).length;
@@ -3282,7 +3281,7 @@ document.addEventListener("change", e => {
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
   if(t.name==="mood" && S.draft){ S.draft.mood=t.value; return; }
-  if(t.dataset.pref==="keep"){ ls.set("iinote-keep",t.checked?"1":""); B.setKeep(t.checked).catch(()=>{}); markActive(true); toast(t.checked?`이 기기에서 ${KEEP_DAYS}일 동안 로그인을 유지해요`:`브라우저를 닫거나 ${IDLE_MIN}분 동안 안 쓰면 로그아웃해요`); }
+  if(t.dataset.pref==="keep"){ ls.set("iinote-keep",t.checked?"1":""); if(S.user) ls.set("iinote-login",JSON.stringify({uid:S.user.uid,at:Date.now()})); markActive(true); toast(t.checked?`이 기기에서 ${KEEP_DAYS}일 동안 로그인을 유지해요`:`${IDLE_MIN}분 동안 안 쓰면 로그아웃해요`); }
   if(t.dataset.pref==="theme"){ S.theme=t.value; ls.set("iinote-theme",t.value); applyPrefs(); }
   if(t.dataset.pref==="dfont"){ S.dfont=t.value; ls.set("iinote-dfont",t.value); applyPrefs(); }
   if(t.dataset.pref==="design"){ S.design=t.value; ls.set("iinote-design",t.value); applyPrefs(); }
@@ -3330,12 +3329,12 @@ async function autoLogoutCheck(){
 }
 setInterval(()=>{ autoLogoutCheck().catch(()=>{}); },60000);
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) autoLogoutCheck().catch(()=>{}); });
-const keepBox = () => DEMO ? "" : `<label class="keep-login"><input type="checkbox" data-pref="keep" ${keepLogin()?"checked":""}> 이 기기에서 로그인 유지 <small>(${KEEP_DAYS}일 · 내 휴대폰이나 집 컴퓨터일 때만 켜 주세요. 끄면 브라우저를 닫거나 ${IDLE_MIN}분 동안 안 쓰면 로그아웃돼요)</small></label>`;
+const keepBox = () => DEMO ? "" : `<label class="keep-login"><input type="checkbox" data-pref="keep" ${keepLogin()?"checked":""}> 이 기기에서 로그인 유지 <small>(${KEEP_DAYS}일 · 내 휴대폰이나 집 컴퓨터일 때만 켜 주세요. 끄면 ${IDLE_MIN}분 동안 안 쓰면 로그아웃돼요)</small></label>`;
 
 B.onAuth(async u => {
   S.isOperator = await isOperatorUser(u);
   S.user=u;
-  if(!u){ S.phase="landing"; S.me=null; render(); return; }
+  if(!u){ ls.del("iinote-login"); S.phase="landing"; S.me=null; render(); return; }
   if(await autoLogoutCheck()) return;
   S.phase="loading"; render();
   try{
