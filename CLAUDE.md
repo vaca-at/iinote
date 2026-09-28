@@ -32,7 +32,7 @@
 - 아이 일기 규칙: 말로 쓰기(한 번에 10글자 이상 들어오면 되돌림) · 붙여넣기 · 끌어다 놓기 막음, 브라우저 맞춤법 밑줄 끔
 - 설정값: FEATURES(기능별 어른만/모두), MAX_PHOTOS=9, MAX_AUDIO_SEC=180, SPELL_API(빨간펜 워커 family-spell.bellachord.workers.dev, 키 없이 { text, level:"gradeN", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer }), GRADES(profiles.grade 숫자: -2~0 = 5~7세, 1~6 = 초1~6, 7~9 = 중1~3, 10~12 = 고1~3, gradeName · gradeLevel(워커에 age5~7 · grade1~6 · middle1~3 · high1~3)), PEN_GOAL_DEFAULT(5세 10 · 6세 20 · 7세 30 · 초1 40 · 초2 60 · 초3 100 · 초4 150 · 초5 200 · 초6 250 · 중 300 · 고 400, 부모가 우리 가족 탭에서 아이마다 바꿈 → profiles.diaryGoal), SITE_ADDRESS
 - 디자인: 색은 모두 :root CSS 변수. 아이보리 #FBF6EE, 네이비 #1F2A44, 코랄 #EF6F53, 버터 #F4BE45, 모눈 배경, 컴퓨터 화면의 노트 여백선
-- 글꼴: Pretendard(화면), Gowun Batang / Nanum Pen Script(일기 글씨). 앱 안에서 밝게 · 어둡게, 바탕체 · 손글씨 전환 버튼
+- 글꼴: Pretendard(화면), 일기 글씨 4가지(바탕 · 손글씨 · 고딕 · 동글). 손글씨를 고르면 화면 전체가 손글씨: 메뉴 · 제목 = 오뮤 다예쁨체, 일기 본문 = 온글잎 윤탱체, 작은 글 · 단추 = 카페24 아네모네 에어 (눈누, 셋 다 웹 임베딩 허용 확인). 디자인 제목 글씨 G마켓 산스. 일기 제목 기능은 쓰지 않음(사용자 결정 2026-09-28, 화면에서 모두 뺌)
 
 ## 다른 PC에서 이어서 작업하기
 - `git clone https://github.com/vaca-at/iinote.git` 로 받은 폴더를 VS Code로 열고 그 폴더에서 바로 작업 (저장소 루트 = 작업 폴더)

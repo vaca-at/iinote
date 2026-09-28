@@ -41,7 +41,7 @@
   --diary:"Gowun Batang","AppleMyungjo","Batang",serif;
   --diary-size:19px; --diary-lh:36px;
 }
-[data-dfont="pen"]{ --diary:"Nanum Pen Script","Gowun Batang",serif; --diary-size:26px; --diary-lh:38px; }
+[data-dfont="pen"]{ --diary:"OwnglyphYuntaeng","Nanum Pen Script","Gowun Batang",serif; --diary-size:22px; --diary-lh:38px; --hand-ui:"Cafe24AnemoneAir","OmuDaye","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OmuDaye","OwnglyphYuntaeng","Pretendard Variable",sans-serif; }
 [data-dfont="gothic"]{ --diary:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; --diary-size:18px; --diary-lh:34px; }
 [data-dfont="dodum"]{ --diary:"Gowun Dodum","Pretendard Variable",sans-serif; --diary-size:18px; --diary-lh:35px; }
 [data-theme="dark"]{
@@ -446,10 +446,12 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .al img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
 .al:hover img{transform:scale(1.04)}
 .al-t{position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(20,26,40,.6))}
-.al.txt{display:flex;flex-direction:column;justify-content:space-between;padding:12px;background:linear-gradient(135deg,var(--pc),color-mix(in srgb,var(--pc) 55%,var(--paper)))}
-.al.txt strong{font-family:var(--diary);font-size:17px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-.al.big.txt strong{font-size:24px;-webkit-line-clamp:5}
-.al.txt small{font-size:12px;font-weight:650;opacity:.85}
+/* 사진 없는 일기: 흰 카드 + 쓴 사람 색 띠 · 이름표 (배경색 없이 읽기 쉽게) */
+.al.txt{display:flex;flex-direction:column;justify-content:flex-start;gap:8px;padding:14px 14px 12px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-top:5px solid var(--pc);box-shadow:0 1px 2px rgba(31,42,68,.04),0 6px 16px rgba(31,42,68,.06)}
+.al.txt:hover{box-shadow:0 2px 4px rgba(31,42,68,.06),0 10px 24px rgba(31,42,68,.10)}
+.al.txt strong{font-family:var(--diary);font-size:calc(var(--diary-size) * .9);font-weight:400;line-height:1.55;color:var(--ink);overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
+.al.big.txt strong{font-size:var(--diary-size);-webkit-line-clamp:9}
+.al.txt small{align-self:flex-start;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--pc);color:var(--pt)}
 @media (max-width:640px){ .album{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:31vw;gap:5px} .al.txt strong{font-size:14px} .al.big.txt strong{font-size:19px} }
 .sc-day{margin:0 0 12px}
 .sc-day h3{font-size:14px;margin:0 0 6px;color:var(--ink2)}
@@ -538,17 +540,21 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .ai-box{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-top:18px;padding:18px 20px;border-radius:18px;background:var(--butter-soft)}
 .ai-box strong{display:inline-flex;align-items:center;gap:6px}
 .ai-box p{margin:4px 0 0;font-size:14px;color:var(--ink2);max-width:34em}
-.ai-res{margin-top:22px;padding:20px 22px;border-radius:18px;background:var(--surface);border:1.5px solid var(--butter)}
-.ai-res h2{display:flex;align-items:center;gap:8px;font-size:17px;margin:0 0 8px}
-.ai-res>p{margin:6px 0}
-.ai-praise{font-weight:650}
-.fix-list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
-.fix{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 14px;border-radius:12px;background:var(--paper)}
-.fix-w{text-decoration:line-through;text-decoration-color:var(--coral);text-decoration-thickness:2px;color:var(--ink2);font-weight:600}
-.fix-r{font-weight:800;font-size:17px}
-.fix-st{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--coral-ink)}
-.fix.fixed .fix-st{color:var(--sage)}
-.fix-e{flex-basis:100%;margin:0;font-size:14px;color:var(--ink2)}
+/* 일기 아래 AI 빨간펜 기록: 예전 가족일기장처럼 가볍게 (카드 하나, 칸 배경 없음) */
+.ai-res{margin-top:22px;padding:16px 20px 12px;border-radius:20px;background:var(--surface);border:1px solid var(--line);box-shadow:0 1px 2px rgba(31,42,68,.04),0 8px 22px rgba(31,42,68,.06)}
+.ai-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:0 0 6px}
+.ai-head b{font-size:15px;color:var(--coral-ink)}
+.ai-head span{font-size:13.5px;color:var(--ink3)}
+.ai-res>p.ai-praise,.ai-res>p.ai-cheer{margin:4px 0;font-size:14.5px;color:var(--ink2);line-height:1.6}
+.ai-praise{font-weight:600}
+.fix-list{margin:10px 0 0;padding-left:1.3em;display:grid;gap:2px;font-family:var(--diary);font-size:calc(var(--diary-size) * .88);line-height:1.8}
+.fix{padding:0;background:none}
+.fix::marker{color:var(--coral)}
+.fix-w{text-decoration:line-through;text-decoration-color:var(--coral);color:var(--coral-ink)}
+.fix-r{background:rgba(80,200,120,.3);border-radius:4px;padding:0 3px;color:var(--ink);font-weight:700}
+.fix-st{margin-left:8px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink3)}
+.fix:not(.fixed) .fix-st{color:var(--coral-ink)}
+.fix-e{display:none}
 /* AI 빨간펜 선생님: 일기 칸 위 형광펜 + 빨간펜 칸 (공부방 빨간펜과 같은 모양) */
 .w-ed{position:relative}
 .w-ed .w-text{overflow:hidden;resize:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal}
@@ -824,6 +830,15 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 :root[data-design="wongoji"] .sheet .pill.none{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
 :root[data-design="wongoji"] .sheet::before{width:1px;box-shadow:4px 0 0 var(--margin)}
 .dsw.wongoji{border-color:#1E1E24;background:linear-gradient(#F4CFCA 1px,transparent 1px) 0 0/6px 6px,linear-gradient(90deg,#F4CFCA 1px,transparent 1px) 0 0/6px 6px,#FFFFFF;box-shadow:inset 3px 0 0 #D7263D}
+/* ═════════ 손글씨 글씨: 화면 전체를 손글씨로 (눈누 무료 폰트 3가지 · 모두 웹 임베딩 허용 확인 2026-09-28) ═════════
+   메뉴 · 제목 = 오뮤 다예쁨체 / 일기 본문 = 온글잎 윤탱체 / 작은 설명 · 단추 = 카페24 아네모네 에어 (기호는 Pretendard 로) */
+@font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'OmuDaye';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');font-weight:normal;font-display:swap}
+@font-face{font-family:'Cafe24AnemoneAir';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202@1.0/Cafe24Ohsquareair.woff') format('woff');font-weight:normal;font-display:swap;unicode-range:U+0020-007E,U+2018-201D,U+2026,U+3131-318E,U+AC00-D7A3}
+:root[data-dfont="pen"] body,:root[data-dfont="pen"] :is(button,input,select,textarea,label,small,p,li,span,a,td,th,summary,legend){font-family:var(--hand-ui)}
+:root[data-dfont="pen"] :is(h1,h2,h3,.mast-t,.page-h h1,.block-h h2,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name,.hb-g b){font-family:var(--hand-head)}
+:root[data-dfont="pen"] :is(.w-text,.w-hl,.paper-lines,.today-date,.dcard-ex,.al.txt strong,.cmt-text,.fix-list,.ais-text,.ct-title,.qn-x){font-family:var(--diary)}
+:root[data-dfont="pen"] .hb-g span:not(.pen){font-family:var(--sans)}
 </style>
 </head>
 <body>
@@ -1432,7 +1447,7 @@ function viewPicker(){
 // 폴더 탭 색: [바탕색, 선 색]
 const TAB_TONE = {home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
 // 일기 글씨 4가지
-const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
+const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
 const DESIGNS = [["note","노트"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
@@ -1551,7 +1566,7 @@ function viewHomeCalendar(){
   const today = ps.map(p=>{ const d=findDiary(p.id,t); const st=d?(d.status==="submitted"?["done","썼어요"]:["draft","쓰는 중"]):["none","아직이에요"];
     const open = d && (d.status==="submitted" || p.id===S.me.id);
     return `<div class="ct-card" style="--pc:${p.color||"var(--ink)"}"><div class="ct-top">${av(p,34)}<b>${esc(p.name)}</b><span class="pill ${st[0]}">${st[1]}</span></div>
-      <div class="ct-body"><span class="ct-title">${d?esc(d.title||"제목 없는 일기"):'<span class="muted">오늘 일기를 기다려요</span>'}</span>
+      <div class="ct-body"><span class="ct-title">${d?esc((d.text||"").slice(0,30)||"오늘 쓴 일기"):'<span class="muted">오늘 일기를 기다려요</span>'}</span>
       ${open?(d.status==="submitted"?`<button class="btn btn-ghost sm" data-act="open-diary" data-id="${d.id}">읽기</button>`:`<button class="btn btn-ghost sm" data-act="write">이어 쓰기</button>`):""}</div></div>`; }).join("");
   const legend = ps.map(p=>`<span><i style="background:${p.color||"var(--ink)"}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("");
   const sch = mySchedules();
@@ -1600,7 +1615,7 @@ function quadNews(){
     const what = par&&par.profileId===S.me.id ? "내 댓글에 답글" : d.profileId===S.me.id ? "내 일기에 댓글" : `${owner?.name||""} 일기에 댓글`;
     items.push({ts:c.createdAt||0,p:prof(c.profileId),what,text:c.text,id:d.id}); });
   S.diaries.forEach(d=>{ if(d.status!=="submitted" || d.profileId===S.me.id) return;
-    items.push({ts:d.updatedAt||d.createdAt||0,p:prof(d.profileId),what:"새 일기",text:d.title||"제목 없는 일기",id:d.id}); });
+    items.push({ts:d.updatedAt||d.createdAt||0,p:prof(d.profileId),what:"새 일기",text:(d.text||"").slice(0,40),id:d.id}); });
   items.sort((a,b)=>b.ts-a.ts);
   const list=items.slice(0,12).map(x=>`<li><button class="qn" data-act="open-diary" data-id="${x.id}">${av(x.p,32)}<span class="qn-t"><span class="qn-h"><b>${esc(x.p?.name||"")}</b>${esc(x.what)}<time>${relTime(x.ts)}</time></span><span class="qn-x">${esc(x.text)}</span></span></button></li>`).join("");
   const fresh=items.filter(x=>Date.now()-x.ts<864e5).length;
@@ -1655,7 +1670,7 @@ function viewHomeAlbum(){
   const html=tiles.slice(0,80).map((x,i)=>{ const big=i%7===0, lab=`${fmtShort(x.d.date)} ${prof(x.d.profileId)?.name||""}`;
     return x.url
       ? `<button class="al ${big?"big":""}" style="--pc:${x.c}" data-act="open-diary" data-id="${x.d.id}" aria-label="${esc(lab)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><span class="al-t">${esc(lab)}</span></button>`
-      : `<button class="al txt ${big?"big":""}" style="--pc:${x.c};--pt:${onColor(x.c)}" data-act="open-diary" data-id="${x.d.id}"><small>${esc(lab)}</small><strong>${esc(x.d.title||(x.d.text||"").slice(0,40)||"제목 없는 일기")}</strong></button>`; }).join("");
+      : `<button class="al txt ${big?"big":""}" style="--pc:${x.c};--pt:${onColor(x.c)}" data-act="open-diary" data-id="${x.d.id}"><small>${esc(lab)}</small><strong>${esc((x.d.text||"").slice(0,60))}</strong></button>`; }).join("");
   return `<section class="hero-date"><div><p class="muted">우리 가족 앨범 · 사진 ${nPh}장 · 일기 ${list.length}편</p><h2 class="today-date">${fmtLong(t)}</h2></div>${homeCta(findDiary(S.me.id,t))}</section>
     ${html?`<div class="album">${html}</div>`:`<p class="empty">아직 올린 일기가 없어요. 사진과 함께 첫 일기를 올려 보세요.</p>`}
     <p class="muted" style="font-size:13px;margin:12px 0 0">사진이나 일기를 누르면 그날 일기가 열려요. 사진이 없는 일기는 쓴 사람 색깔 카드로 보여요.</p>`;
@@ -1743,7 +1758,6 @@ function dcard(d){
   return `<button class="dcard" data-act="open-diary" data-id="${d.id}">
     ${ph.length?`<span class="dcard-ph"><img src="${esc(ph[0].url)}" alt="" loading="lazy">${ph.length>1?`<em>사진 ${ph.length}장</em>`:""}</span>`:""}
     <span class="dcard-top">${av(p,28)}<span class="dcard-name">${esc(p?.name||"알 수 없음")}</span>${d.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}<span class="dcard-date">${fmtShort(d.date)}</span></span>
-    <span class="dcard-title">${esc(d.title||"제목 없는 일기")}</span>
     <span class="dcard-ex">${esc(d.text.slice(0,140))}</span>
     ${(d.location||tags.length||d.audio)?`<span class="dcard-meta">${d.location?`<span>${ic("pin")}${esc(d.location.name)}</span>`:""}${d.audio?`<span>${ic("mic")}소리</span>`:""}${tags.slice(0,4).map(t=>`<span>#${esc(t)}</span>`).join("")}</span>`:""}
     ${ai}
@@ -1758,7 +1772,7 @@ function viewDiaryList(){
   const ps=sortedProfiles(), tags=popularTags().slice(0,12);
   const chips=`<div class="chips" role="group" aria-label="누구의 일기"><button class="chip all ${S.filter==="all"?"on":""}" data-act="filter" data-v="all" aria-pressed="${S.filter==="all"}">모두</button>${ps.map(p=>`<button class="chip ${S.filter===p.id?"on":""}" data-act="filter" data-v="${p.id}" aria-pressed="${S.filter===p.id}">${av(p,28)}${esc(p.name)}</button>`).join("")}</div>`;
   return `<div class="page-h"><h1>가족 일기</h1><div class="row"><button class="btn btn-ghost" data-act="pdf">📄 PDF로 저장</button><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div></div>
-    <div class="search">${ic("search")}<label class="sr" for="q">일기 찾기</label><input type="search" id="q" value="${esc(S.search)}" placeholder="낱말, #태그, 장소로 찾기" autocomplete="off"></div>
+    <div class="search">${ic("search")}<label class="sr" for="q">일기 찾기</label><input type="search" id="q" value="${esc(S.search)}" placeholder="일기 본문 속 낱말, #태그, 장소로 찾기" autocomplete="off"></div>
     ${chips}
     ${tags.length?`<div class="tags-row" role="group" aria-label="태그로 모아 보기">${tags.map(([t,n])=>`<button class="htag ${S.tag===t?"on":""}" data-act="tag" data-v="${esc(t)}" aria-pressed="${S.tag===t}">#${esc(t)} <small>${n}</small></button>`).join("")}</div>`:""}
     <div id="feed-wrap">${viewFeed()}</div>`;
@@ -1861,7 +1875,7 @@ function makePdf(form){
   // 일기 한 편의 조각들
   const head=d=>{ const p=prof(d.profileId), m=MOODS.find(x=>x[0]===d.mood);
     return `<header class="d-h"><div><p class="d-date">${fmtLong(d.date)}</p>${chip(p)}${m?`<span class="mood"><i style="background:${m[2]}"></i>${esc(m[1])}</span>`:""}</div>${d.stamp?`<div class="stamp">${esc(d.stamp)}</div>`:""}</header>`; };
-  const title=d=>d.title?`<h2 class="d-title">${esc(d.title)}</h2>`:"";
+  const title=d=>"";   // 제목 기능은 쓰지 않아요
   const text=(d,cls="")=>`<div class="d-text ${cls}">${esc(d.text)}</div>`;
   const photos=(d,n)=>{ const ph=withPh?(d.photos||[]).slice(0,n):[]; return ph.length?`<div class="photos n${ph.length}">${ph.map(x=>`<img src="${esc(x.url)}" alt="">`).join("")}</div>`:""; };
   const bigPhoto=d=>{ const ph=withPh?(d.photos||[]).slice(0,2):[];
@@ -1888,11 +1902,11 @@ function makePdf(form){
   }else{
     pages=list.map(d=>{
       if(lay==="top") return page(`${bigPhoto(d)}${head(d)}${title(d)}${text(d)}${meta(d)}${cmts(d)}`,d,"topp");
-      if(lay==="topv") return page(`${bigPhoto(d)}${head(d)}<div class="vbox"><div class="vtext" style="font-size:${vSize(d)}">${d.title?`<b>${esc(d.title)}</b>\n`:""}${esc(d.text)}</div></div>`,d,"topp");
+      if(lay==="topv") return page(`${bigPhoto(d)}${head(d)}<div class="vbox"><div class="vtext" style="font-size:${vSize(d)}">${esc(d.text)}</div></div>`,d,"topp");
       if(lay==="left"||lay==="right"){ const ph=`<div class="side-ph">${bigPhoto(d)}</div>`, tx=`<div class="side-tx">${head(d)}${title(d)}${text(d)}${meta(d)}${cmts(d)}</div>`;
         return page(`<div class="side">${lay==="left"?ph+tx:tx+ph}</div>`,d,"landp"); }
-      if(lay==="picture") return page(`${head(d)}${withPh&&(d.photos||[])[0]?`<div class="pic-frame"><img src="${esc(d.photos[0].url)}" alt=""></div>`:""}${d.title?`<p class="pic-title">제목: ${esc(d.title)}</p>`:""}${pdfWongoji(d.text,14)}`,d,"picp");
-      if(lay==="grid") return page(`${head(d)}${d.title?`<p class="pic-title">${esc(d.title)}</p>`:""}${pdfWongoji(d.text,20)}${cmts(d)}`,d,"gridp");
+      if(lay==="picture") return page(`${head(d)}${withPh&&(d.photos||[])[0]?`<div class="pic-frame"><img src="${esc(d.photos[0].url)}" alt=""></div>`:""}${pdfWongoji(d.text,14)}`,d,"picp");
+      if(lay==="grid") return page(`${head(d)}${pdfWongoji(d.text,20)}${cmts(d)}`,d,"gridp");
       if(lay==="album"){ const ph=withPh?(d.photos||[]).slice(0,4):[];
         return page(`${head(d)}${ph.length?`<div class="album n${ph.length}">${ph.map(x=>`<img src="${esc(x.url)}" alt="">`).join("")}</div>`:""}<div class="caption">${title(d)}<p>${esc(d.text.length>220?d.text.slice(0,220)+"…":d.text)}</p></div>`,d,"albp"); }
       return page(`${head(d)}${title(d)}${text(d)}${photos(d,4)}${meta(d)}${cmts(d)}`,d,"basicp");
@@ -1917,6 +1931,7 @@ ${cover}${pages}
 }
 // PDF 모양 (새 창 안에서만 쓰는 색 · 크기)
 const PDF_CSS = `@page{size:A4;margin:0}
+@font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-display:swap}
 :root{--ivory:#FBF6EE;--paper:#FFFDF9;--navy:#1F2A44;--ink2:#4E5870;--ink3:#767E91;--coral:#EF6F53;--coral-ink:#B8452D;--butter:#F4BE45;--sage:#3F7F70;--sky:#6F9BD8;--line:#E9DCC8;--margin:#F2B5A4;--grid:#F2B5A4;--pw:210mm;--ph:297mm}
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{margin:0;background:#E9EBF0;color:var(--navy);font-family:"Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif;word-break:keep-all}
@@ -2036,7 +2051,6 @@ function viewDiaryDetail(){
   return `<article class="detail">
     <div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}목록으로</button><div class="row">${mine?`<button class="btn btn-ghost sm" data-act="write" data-date="${d.date}">${ic("pen")}고쳐 쓰기</button>`:""}${mine||(isParent()&&p?.type==="child")?`<button class="btn btn-ghost sm danger" data-act="del-diary" data-id="${d.id}">${ic("trash")}지우기</button>`:""}</div></div>
     <header class="detail-h">${av(p,44)}<div><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${fmtLong(d.date)}${d.status!=="submitted"?" (쓰는 중이라 나만 보여요)":""}</span></div>${moodChip(d.mood)}</header>
-    <h1 class="detail-title">${esc(d.title||"제목 없는 일기")}</h1>
     ${(d.location||(d.tags||[]).length)?`<div class="meta-row">${d.location?`<a class="loc" href="${esc(mapLink(d.location))}" target="_blank" rel="noopener noreferrer">${ic("pin")}${esc(d.location.name)}</a>`:""}${(d.tags||[]).map(t=>`<button class="htag" data-act="tag" data-v="${esc(t)}">#${esc(t)}</button>`).join("")}</div>`:""}
     ${(d.photos||[]).length?photoGrid(d.photos,d.id):""}
     <div class="paper-lines">${tagify(d.text)}</div>
@@ -2091,7 +2105,7 @@ function viewWrite(){
     <label class="date-l">날짜<input type="date" id="w-date" value="${d.date}" max="${todayStr()}"></label>
     <fieldset class="moods"><legend>오늘 기분</legend>${MOODS.map(([k,l,c])=>`<label class="mood"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""}><span><i style="background:${c}"></i>${l}</span></label>`).join("")}</fieldset>
     ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} 아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요.</p>`:""}
-    <label class="sr" for="w-title">제목</label><input id="w-title" class="w-title" maxlength="40" placeholder="제목" value="${esc(d.title)}" spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>
+
     <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 써 보세요" spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
     ${viewEmoBar()}
     <div class="w-count muted"><span id="w-len">${d.text.length}</span>자</div>
@@ -2200,20 +2214,19 @@ function penApplyOne(er){
 function penSyncText(){ const ta=document.getElementById("w-text"); if(ta) ta.value=S.draft.text; const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length; }
 // 맞춤법 요약: 찾은 곳 몇 개 중 몇 개를 스스로 고쳤는지
 const aiSummary = d => { const cs=d.aiResult?.corrections||[]; return {n:cs.length, fixed:cs.filter(c=>!(d.text||"").includes(c.wrong)).length}; };
+// 일기 아래 AI 빨간펜 기록: 예전 가족일기장처럼 요약 한 줄 + 고친 곳을 일기 글씨로 한 줄씩 (칸 배경 없이 카드 하나)
+const PEN_HOW_SHORT = {self:"👍 스스로", hint:"💡 정답 보고", ai:"🖍 빨간펜이", other:"✏️ 다르게", kept:"🙆 그대로 둠", left:"그대로예요"};
 function viewAIResult(r,text,live){
-  const cs=r.corrections||[]; let fixedN=0;
-  const parentView = !live && isParent();
-  const items=cs.map(c=>{ const fixed=!text.includes(c.wrong); if(fixed) fixedN++;
-    const how = c.how || (fixed?"self":"left");   // 빨간펜 기록이 있으면 어떻게 고쳤는지 그대로
-    const st = live ? (fixed?ic("check")+"고쳤어요":"고쳐 볼까요?") : (fixed?ic("check"):"")+PEN_HOW[how];
-    return `<li class="fix ${fixed?"fixed":""}"><span class="fix-w">${esc(c.wrong)}</span>${ic("arrow")}<span class="fix-r">${esc(c.right)}</span><span class="fix-st">${st}</span>${c.explain?`<p class="fix-e">${esc(c.explain)}</p>`:""}</li>`; }).join("");
-  return `<section class="ai-res" id="ai-res" aria-live="polite"><h2>${ic("spark")}${parentView?"AI 빨간펜 선생님 기록":"AI 빨간펜 선생님의 한마디"}</h2>
-    ${parentView?`<p class="muted" style="margin:0 0 8px;font-size:14px">${cs.length?`틀린 곳 ${cs.length}개 중 ${fixedN}개를 고쳤어요 (스스로 ${cs.filter(c=>(c.how||(text.includes(c.wrong)?"left":"self"))==="self").length}개).`:"틀린 곳 없이 잘 썼어요."} 틀린 낱말은 받아쓰기 퀴즈에 들어가요.</p>`:""}
-    <p class="ai-praise">${esc(r.praise||"")}</p><p>${esc(r.feedback||"")}</p>
+  const cs=r.corrections||[];
+  const how=c=>c.how || (text.includes(c.wrong)?"left":"self");
+  const fixedN=cs.filter(c=>!text.includes(c.wrong)).length, selfN=cs.filter(c=>how(c)==="self").length;
+  const items=cs.map(c=>{ const h=how(c);
+    return `<li class="fix ${h==="left"?"":"fixed"}"><span class="fix-w">${esc(c.wrong)}</span> → <span class="fix-r">${esc(c.right)}</span><span class="fix-st">${PEN_HOW_SHORT[h]||""}</span></li>`; }).join("");
+  return `<section class="ai-res" id="ai-res" aria-live="polite">
+    <p class="ai-head"><b>👩‍🏫 AI 빨간펜 선생님</b><span>✏️ ${countChars(text)}자 · ${cs.length?`🖍 고친 곳 ${fixedN}군데${fixedN<cs.length?` / 남은 곳 ${cs.length-fixedN}`:""} (스스로 ${selfN})`:"💯 틀린 곳 없이 잘 썼어요"}</span></p>
+    ${r.praise?`<p class="ai-praise">👏 ${esc(r.praise)}</p>`:""}${r.feedback?`<p class="ai-cheer">💪 ${esc(r.feedback)}</p>`:""}
     ${cs.length?`<ul class="fix-list">${items}</ul>`:""}
-    ${parentView && r.original && r.original!==text?`<details class="pen-orig"><summary>처음 쓴 글 보기 (빨간펜을 부르기 전)</summary><p>${esc(r.original)}</p></details>`:""}
-    ${live&&cs.length?`<p class="muted">${fixedN===cs.length?"모두 고쳤어요! 이제 제출해 볼까요?":`${cs.length}개 중 ${fixedN}개 고쳤어요`}</p>`:""}
-    ${live?`<p class="muted" style="font-size:13px;margin:6px 0 0">AI 선생님의 답변은 부모님도 함께 봐요.</p>`:""}
+    ${!live && isParent() && r.original && r.original!==text?`<details class="pen-orig"><summary>처음 쓴 글 보기 (빨간펜을 부르기 전)</summary><p>${esc(r.original)}</p></details>`:""}
     <p class="ai-report"><button class="link-btn" data-act="ai-report">${ic("flag")}이상한 답변 알리기</button></p></section>`;
 }
 
@@ -2402,7 +2415,7 @@ const acts = {
   "edit-comment": el => { S.editing=el.dataset.id; S.replyTo=null; render(); document.getElementById("e-"+el.dataset.id)?.focus(); },
   "cancel-edit": () => { S.editing=null; render(); },
   "del-diary": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
-    if(!confirm(`「${d.title||"제목 없는 일기"}」 일기를 지울까요?\n사진 · 소리와 달린 댓글도 함께 지워지고 되돌릴 수 없어요.`)) return;
+    if(!confirm(`${fmtShort(d.date)} 일기를 지울까요?\n사진 · 소리와 달린 댓글도 함께 지워지고 되돌릴 수 없어요.`)) return;
     guard(async()=>{ await removeDiary(S.gid,d,S.comments); await Promise.all([reload("diaries"),reload("comments")]); S.sub=null; render(); window.scrollTo(0,0); toast("일기를 지웠어요"); }); },
   "del-comment": el => { const c=S.comments.find(x=>x.id===el.dataset.id); if(!c || !confirm("이 댓글을 지울까요?")) return;
     guard(async()=>{ // 답글이 달려 있으면 자리는 남기고 내용만 지워요
