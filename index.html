@@ -784,6 +784,29 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .tag-in:focus-within{outline:3px solid var(--focus);outline-offset:1px}
 .rec{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .rec-dot{width:12px;height:12px;border-radius:50%;background:var(--coral);animation:blink 1s infinite}
+/* 🎙 이야기로 일기 쓰기 (5~7세) */
+.talk{margin:0 0 14px;padding:16px 18px;border-radius:18px;border:2.5px dashed var(--butter);background:var(--butter-soft)}
+.talk h3{margin:0 0 6px;font-size:17px}
+.talk p{margin:0 0 10px;font-size:14px;color:var(--ink2);line-height:1.6}
+.talk-q{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:0;list-style:none}
+.talk-q li{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line)}
+.talk-rec{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.talk-rec strong{font-size:22px;font-variant-numeric:tabular-nums}
+.talk-bar{height:8px;border-radius:999px;background:var(--surface);margin-top:10px;overflow:hidden}
+.talk-bar i{display:block;height:100%;width:0;background:var(--coral);transition:width .5s linear}
+.talk-busy{display:flex;align-items:center;gap:10px;font-weight:650}
+.talk-spin{width:18px;height:18px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--coral);animation:talkspin .8s linear infinite}
+@keyframes talkspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.talk-spin{animation:none}}
+.talk .audio-card{margin:0 0 10px}
+.talk-note{padding:10px 12px;border-radius:12px;background:var(--surface)}
+.talk-log{margin:0 0 10px}
+.talk-log summary{cursor:pointer;font-weight:650;font-size:14px}
+.talk-lines{display:flex;flex-direction:column;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.talk-lines li{max-width:85%;padding:7px 12px;border-radius:14px;font-size:14px;line-height:1.5;background:var(--surface);border:1.5px solid var(--line)}
+.talk-lines li.kid{align-self:flex-end;background:var(--coral-soft);border-color:transparent}
+.talk-lines li b{display:block;font-size:11px;color:var(--ink3)}
+.detail .talk-log{margin:14px 0 0;padding:12px 14px;border-radius:16px;background:var(--surface);border:1.5px solid var(--line)}
 @keyframes blink{50%{opacity:.25}}
 .file-btn{position:relative;overflow:hidden}
 .file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
@@ -969,6 +992,9 @@ async function isOperatorUser(u){
 }
 // 빨간펜(AI 맞춤법 · 칭찬 · 응원) 클라우드플레어 워커: 공부방 빨간펜과 같은 워커 (API 키는 워커에만 보관)
 const SPELL_API = "https://family-spell.bellachord.workers.dev";
+// 🎙 이야기로 일기 쓰기: 5~7세 아이가 엄마 · 아빠와 이야기(3분 이내)를 녹음 → 워커 /transcribe 로 글자 → mode "talk" 로 아이 말투 일기
+const TALK_MAX_MAKE = 3;   // 일기 하나에 AI 일기 만들기는 세 번까지
+const wait = ms => new Promise(r=>setTimeout(r,ms));
 // 컴퓨터에서 접속하는 쉬운 주소 (화면 곳곳에 안내돼요)
 const SITE_ADDRESS = "iinote.co.kr";
 // 카카오톡 공유: JavaScript 키 (카카오 개발자 > 앱 > 플랫폼 > Web에 사이트 도메인을 등록해야 동작해요)
@@ -2346,6 +2372,7 @@ function viewDiaryDetail(){
     ${(d.photos||[]).length?photoGrid(d.photos,d.id):""}
     <div class="paper-lines">${tagify(d.text)}</div>
     ${d.audio?`<div class="audio-card">${ic("mic")}<audio controls preload="none" src="${esc(d.audio.url)}"></audio></div>`:""}
+    ${d.talk?.dialog?.length?`<details class="talk-log"><summary>🎙 엄마 · 아빠와 나눈 이야기로 쓴 일기예요 · 이야기 보기</summary>${talkLines(d.talk.dialog)}</details>`:""}
     ${viewReact(d,mine)}
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
@@ -2373,8 +2400,9 @@ function loadDraft(date){
   const d=findDiary(S.me.id,date);
   S.locEdit=false; S.penFailed=false;
   S.draft = d ? {id:d.id,date,mood:d.mood||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,pen:penFromResult(d.aiResult),
-                 photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[]}
-              : {id:null,date,mood:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[]};
+                 photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[],talk:d.talk?{...d.talk}:null}
+              : {id:null,date,mood:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null};
+  S.talkBusy=null;
 }
 // 쓰는 중에 날짜를 바꾸면 내용은 그대로 두고 날짜만 옮겨요. 그날 쓴 일기가 이미 있으면 불러올지 물어봐요.
 function changeDraftDate(input){
@@ -2395,7 +2423,8 @@ function viewWrite(){
     <div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${submitted?(child?"제출한 일기를 고치고 있어요":"올린 일기를 고치고 있어요"):d.status==="draft"?"임시 저장된 일기예요":"새 일기"}</span></div>
     <label class="date-l">날짜<input type="date" id="w-date" value="${d.date}" max="${todayStr()}"></label>
     <fieldset class="moods"><legend>오늘 기분</legend>${MOODS.map(([k,l,c])=>`<label class="mood"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""}><span><i style="background:${c}"></i>${l}</span></label>`).join("")}</fieldset>
-    ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} 아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요.</p>`:""}
+    ${child&&talkOK(S.me)?viewTalk(d):""}
+    ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} ${talkOK(S.me)?"직접 쓰거나, 위의 '이야기로 일기 쓰기'로 엄마 · 아빠와 함께 만들어요. 붙여넣기는 안 돼요.":"아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요."}</p>`:""}
 
     <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 써 보세요" spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
     ${viewEmoBar()}
@@ -2406,6 +2435,88 @@ function viewWrite(){
       ? `<button class="btn btn-primary" data-act="save-diary" data-v="submitted">고친 내용 저장</button>`
       : `<button class="btn btn-ghost" data-act="save-diary" data-v="draft">임시 저장</button><button class="btn btn-accent" data-act="save-diary" data-v="submitted">${child?"제출하기":"올리기"}</button>`}</div>
   </div>`;
+}
+/* ---------- 🎙 이야기로 일기 쓰기 (5~7세) ----------
+   엄마 · 아빠와 이야기(3분 이내) 녹음 → 녹음은 일기의 '목소리'로 남음 → 글자로 바꾸기 → 아이 대답 중심의 일기 → 부모가 확인 · 고친 뒤 저장 */
+const talkOK = p => p?.type==="child" && hasGrade(p.grade) && Number(p.grade)<=0 && allow("audio");
+const TALK_QS = ["오늘 뭐가 제일 재미있었어?","누구랑 같이 했어?","그때 기분이 어땠어?","무슨 소리가 났어?","내일은 뭐 하고 싶어?"];
+const talkLines = dialog => `<ul class="talk-lines">${(dialog||[]).map(t=>`<li class="${t.who==="아이"?"kid":""}"><b>${t.who==="아이"?"아이":"엄마 · 아빠"}</b>${esc(t.text)}</li>`).join("")}</ul>`;
+function viewTalk(d){
+  const t=d.talk, a=d.audio, made=t?.made||0;
+  let body;
+  if(S.rec?.talk) body=`<div class="talk-rec" role="status"><span class="rec-dot" aria-hidden="true"></span><strong id="rec-t">0:00</strong><span class="muted">/ ${mmss(MAX_AUDIO_SEC)} · 이야기를 듣고 있어요</span><button class="btn btn-primary sm" data-act="rec-stop">${ic("stop")}다 했어요</button></div><div class="talk-bar" aria-hidden="true"><i id="rec-bar"></i></div>`;
+  else if(S.talkBusy) body=`<p class="talk-busy" role="status"><span class="talk-spin" aria-hidden="true"></span>${esc(S.talkBusy)}</p>`;
+  else if(t?.transcript) body=`${a?.url?`<div class="audio-card">${ic("mic")}<audio controls preload="none" src="${esc(a.url)}"></audio></div>`:""}
+    ${t.dialog?.length?`<details class="talk-log" ${t.dialog.length<=8?"open":""}><summary>나눈 이야기 ${t.dialog.length}마디</summary>${talkLines(t.dialog)}</details>`:""}
+    ${t.note?`<p class="talk-note">👩‍🏫 ${esc(t.note)}</p>`:""}
+    <p>아래 일기 칸에 들어갔어요. 엄마 · 아빠가 읽어 보고 고친 뒤 <b>제출하기</b>를 누르면 저장돼요.</p>
+    <div class="row">${made<TALK_MAX_MAKE?`<button class="btn btn-ghost sm" data-act="talk-make" data-v="text">✨ 일기 다시 만들기 (${TALK_MAX_MAKE-made}번 남음)</button>`:""}<button class="btn btn-ghost sm" data-act="talk-rec">${ic("mic")}새로 이야기하기</button></div>`;
+  else if(a?.blob) body=`<div class="audio-card">${ic("mic")}<audio controls src="${esc(a.url)}"></audio></div>
+    <p>녹음이 남았어요. 이 이야기로 일기를 만들어 볼까요?</p>
+    <div class="row"><button class="btn btn-accent sm" data-act="talk-make">✨ 글로 바꾸고 일기 만들기</button><button class="btn btn-ghost sm" data-act="talk-rec">${ic("mic")}다시 녹음</button></div>`;
+  else body=`<p>엄마나 아빠가 묻고 아이가 대답해요. <b>3분 안에</b> 이야기를 나누면, 녹음은 일기에 목소리로 남고 AI 선생님이 <b>아이가 한 말로</b> 일기를 써 줘요.</p>
+    <ul class="talk-q" aria-label="이렇게 물어봐요">${TALK_QS.map(q=>`<li>${q}</li>`).join("")}</ul>
+    <button class="btn btn-accent" data-act="talk-rec">${ic("mic")}이야기 녹음 시작</button>`;
+  return `<section class="talk" aria-label="이야기로 일기 쓰기"><h3>🎙 엄마 · 아빠랑 이야기로 일기 쓰기</h3>${body}</section>`;
+}
+// 녹음을 16kHz 한 채널 WAV 로 바꿔요 (어느 휴대폰의 녹음이든 음성 인식이 잘 알아듣게). 안 되면 원래 파일 그대로
+async function toWav16k(blob){
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC || !window.OfflineAudioContext) return blob;
+  const ac=new AC();
+  try{
+    const src=await ac.decodeAudioData(await blob.arrayBuffer());
+    const rate=16000, len=Math.max(1,Math.ceil(src.duration*rate));
+    const off=new OfflineAudioContext(1,len,rate), s=off.createBufferSource();
+    s.buffer=src; s.connect(off.destination); s.start();
+    const pcm=(await off.startRendering()).getChannelData(0);
+    const buf=new ArrayBuffer(44+pcm.length*2), v=new DataView(buf), w=(o,str)=>{ for(let i=0;i<str.length;i++) v.setUint8(o+i,str.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4,36+pcm.length*2,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,rate,true); v.setUint32(28,rate*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,"data"); v.setUint32(40,pcm.length*2,true);
+    for(let i=0;i<pcm.length;i++){ const x=Math.max(-1,Math.min(1,pcm[i])); v.setInt16(44+i*2,x<0?x*0x8000:x*0x7fff,true); }
+    return new Blob([buf],{type:"audio/wav"});
+  }catch(e){ console.warn("WAV 바꾸기 실패, 원래 녹음으로 보내요",e); return blob; }
+  finally{ try{ ac.close(); }catch(e){} }
+}
+async function talkFetch(url,opt){
+  let last;
+  for(let i=0;i<2;i++){   // 잠깐 바쁘면 한 번 더
+    try{ const r=await fetch(url,opt); const data=await r.json().catch(()=>({}));
+      if(r.ok && !data.error) return data;
+      if(data.error==="no-ai") throw new Error("음성 인식을 준비하고 있어요. 조금 뒤에 다시 해 주세요.");
+      last=new Error(data.error==="too long"?"녹음이 너무 길어요. 3분 안으로 다시 녹음해 주세요.":"AI 선생님이 잠깐 바빠요. 조금 뒤에 다시 눌러 주세요.");
+      if(r.status<500 && r.status!==429) break;
+    }catch(e){ last=e.message?.includes("준비")?e:new Error("인터넷 연결을 확인하고 다시 눌러 주세요."); if(e.message?.includes("준비")) break; }
+  }
+  throw last;
+}
+async function talkMake(textOnly){
+  const d=S.draft; if(!d || S.talkBusy) return;
+  const demo=DEMO;
+  try{
+    let transcript=d.talk?.transcript||"";
+    if(!textOnly){
+      if(!d.audio?.blob){ toast("새로 녹음해 주세요"); return; }
+      S.talkBusy="🎧 목소리를 글자로 바꾸고 있어요…"; render();
+      if(demo){ await wait(900); transcript="오늘 뭐가 제일 재미있었어? 놀이터에서 미끄럼틀 탔어. 누구랑 탔어? 지우랑. 엄청 빨랐어. 기분이 어땠어? 신났어! 또 가고 싶어."; }
+      else transcript=String((await talkFetch(SPELL_API+"/transcribe",{method:"POST",headers:{"Content-Type":"audio/wav"},body:await toWav16k(d.audio.blob)})).text||"").trim();
+      if(countChars(transcript)<4) throw new Error("말소리를 잘 알아듣지 못했어요. 휴대폰을 조금 더 가까이 두고 또박또박 다시 녹음해 볼까요?");
+    }
+    S.talkBusy="✏️ AI 선생님이 아이가 한 말로 일기를 쓰고 있어요…"; render();
+    const r = demo ? (await wait(900), {dialog:[{who:"어른",text:"오늘 뭐가 제일 재미있었어?"},{who:"아이",text:"놀이터에서 미끄럼틀 탔어."},{who:"어른",text:"누구랑 탔어?"},{who:"아이",text:"지우랑. 엄청 빨랐어."},{who:"어른",text:"기분이 어땠어?"},{who:"아이",text:"신났어! 또 가고 싶어."}],
+        diary:"나는 오늘 놀이터에서 지우랑 미끄럼틀을 탔다. 미끄럼틀이 엄청 빨랐다. 정말 신났다. 또 가고 싶다.", mood:"great", note:"아이가 말한 놀이터 이야기로 네 문장을 썼어요. (체험 모드 예시)"})
+      : await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"talk",transcript,level:gradeLevel(S.me.grade),name:S.me.name})});
+    S.talkBusy=null;
+    const prevAI=d.talk?.diary||"", made=(d.talk?.made||0)+1;
+    d.talk={transcript:transcript.slice(0,6000),dialog:(r.dialog||[]).slice(0,80).map(t=>({who:t.who==="아이"?"아이":"어른",text:String(t.text||"").slice(0,400)})),note:String(r.note||""),diary:String(r.diary||""),made,at:Date.now()};
+    if(r.diary){
+      const typed=d.text.trim() && d.text!==prevAI;
+      if(!typed || confirm("지금 일기 칸에 쓴 글을 AI 선생님이 만든 일기로 바꿀까요?\n(취소를 누르면 쓴 글은 그대로 두고, 만든 일기는 이야기 칸에서 볼 수 있어요)")) d.text=r.diary;
+      if(!d.mood && MOODS.some(m=>m[0]===r.mood)) d.mood=r.mood;
+    }
+    render(); toast(r.diary?"일기를 만들었어요. 읽어 보고 고쳐 주세요":"이번 이야기로는 일기를 만들지 못했어요");
+    document.getElementById("w-text")?.scrollIntoView({behavior:"smooth",block:"center"});
+  }catch(e){ S.talkBusy=null; render(); toast(e.message||"문제가 생겼어요. 다시 눌러 주세요"); }
 }
 /* 일기 칸 아래 이모지 줄: 누르면 커서 자리에 쏙. 이 기기에서 자주 쓴 이모지가 앞으로 와요 */
 const EMOJIS = ["😊","😀","😆","😄","🥰","😍","😘","🤗","😋","😎","🤩","🥳","😇","🙂","😉","🤭","😴","🤔","❤️","🧡","💛","💚","💙","💜","💕","💖","✨"];   // 표정(웃는 얼굴 위주) · 하트
@@ -2438,7 +2549,8 @@ function viewMedia(d){
         :(l?"":`<div class="row"><button class="btn btn-ghost sm" data-act="loc-here">${ic("pin")}지금 있는 곳</button><button class="btn btn-ghost sm" data-act="loc-edit">${ic("pen")}직접 쓰기</button></div>`)}</section>`); }
   if(allow("audio")){ const a=d.audio;
     secs.push(`<section class="media-sec" aria-label="소리"><div class="media-h">목소리 · 소리<span>최대 ${MAX_AUDIO_SEC/60}분</span></div>
-      ${S.rec?`<div class="rec" role="status"><span class="rec-dot" aria-hidden="true"></span><strong id="rec-t">0:00</strong><span class="muted">녹음하고 있어요</span><button class="btn btn-primary sm" data-act="rec-stop">${ic("stop")}멈추기</button></div>`
+      ${S.rec?.talk?`<p class="muted" style="margin:0;font-size:14px">위의 '이야기로 일기 쓰기'에서 녹음하고 있어요.</p>`
+      :S.rec?`<div class="rec" role="status"><span class="rec-dot" aria-hidden="true"></span><strong id="rec-t">0:00</strong><span class="muted">녹음하고 있어요</span><button class="btn btn-primary sm" data-act="rec-stop">${ic("stop")}멈추기</button></div>`
       :a?`<div class="audio-card" style="margin:0">${ic("mic")}<audio controls src="${esc(a.url)}"></audio><button class="icon-btn" data-act="audio-del" aria-label="소리 빼기">${ic("x")}</button></div>`
       :`<div class="row"><button class="btn btn-ghost sm" data-act="rec-start">${ic("mic")}녹음하기</button><label class="btn btn-ghost sm file-btn">${ic("plus")}소리 파일 올리기<input type="file" id="w-audio" accept="audio/*"></label></div>`}</section>`); }
   if(allow("tags")) secs.push(`<section class="media-sec" aria-label="태그"><div class="media-h">태그<span>일기 속 #낱말도 저절로 모여요</span></div>
@@ -2796,6 +2908,8 @@ const acts = {
   "loc-clear": () => { S.draft.location=null; S.locEdit=false; render(); },
   "tag-del": el => { S.draft.tags=S.draft.tags.filter(t=>t!==el.dataset.v); render(); document.getElementById("w-tag")?.focus(); },
   "rec-start": () => recStart(),
+  "talk-rec": () => { if(S.rec||S.talkBusy) return; if(S.draft?.talk && !confirm("새로 이야기를 녹음할까요? 앞의 녹음과 대화 기록은 바뀌어요.")) return; recStart(true); },
+  "talk-make": el => talkMake(el.dataset.v==="text"),
   "rec-stop": () => { if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); },
   "audio-del": () => { const a=S.draft.audio; if(a?.path) S.draft.removed.push(a.path); S.draft.audio=null; render(); },
   "lb-open": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return; S.lb={photos:d.photos,i:+el.dataset.i}; render(); document.querySelector(".lb-x")?.focus(); },
@@ -2822,19 +2936,24 @@ function addAudioFile(f){
   const d=S.draft; if(d.audio?.path) d.removed.push(d.audio.path);
   d.audio={id:rid(),blob:f,url:URL.createObjectURL(f),duration:0,type:f.type}; render();
 }
-async function recStart(){
+async function recStart(talk){
   if(!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder==="undefined"){ toast("이 브라우저에서는 녹음이 안 돼요. 소리 파일을 올려 주세요"); return; }
   let stream; try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }catch(e){ toast("마이크를 쓸 수 없어요. 마이크 권한을 확인해 주세요"); return; }
   const mime=["audio/webm;codecs=opus","audio/mp4","audio/webm"].find(m=>MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m))||"";
   const mr=new MediaRecorder(stream, mime?{mimeType:mime,audioBitsPerSecond:64000}:undefined);
   const chunks=[], t0=Date.now();
-  const timer=setInterval(()=>{ const sec=Math.floor((Date.now()-t0)/1000); const el=document.getElementById("rec-t"); if(el) el.textContent=mmss(sec); if(sec>=MAX_AUDIO_SEC && mr.state!=="inactive") mr.stop(); },500);
+  const timer=setInterval(()=>{ const sec=Math.floor((Date.now()-t0)/1000); const el=document.getElementById("rec-t"); if(el) el.textContent=mmss(sec);
+    const bar=document.getElementById("rec-bar"); if(bar) bar.style.width=Math.min(100,sec/MAX_AUDIO_SEC*100)+"%";
+    if(sec>=MAX_AUDIO_SEC && mr.state!=="inactive") mr.stop(); },500);
   mr.ondataavailable=e=>{ if(e.data && e.data.size) chunks.push(e.data); };
   mr.onstop=()=>{ stream.getTracks().forEach(t=>t.stop()); clearInterval(timer); S.rec=null; if(!S.draft) return;
     const blob=new Blob(chunks,{type:mr.mimeType||mime||"audio/webm"}), d=S.draft;
     if(d.audio?.path) d.removed.push(d.audio.path);
-    d.audio={id:rid(),blob,url:URL.createObjectURL(blob),duration:Math.round((Date.now()-t0)/1000),type:blob.type}; render(); };
-  S.rec={mr}; mr.start(1000); render();
+    d.audio={id:rid(),blob,url:URL.createObjectURL(blob),duration:Math.round((Date.now()-t0)/1000),type:blob.type};
+    // 이야기 녹음이면: 새 이야기이니 예전 대화 기록은 비우고, 바로 글로 바꿔 일기를 만들어요
+    if(talk){ d.talk=null; render(); if(blob.size>2000) talkMake(); else toast("녹음이 너무 짧아요. 다시 해 볼까요?"); }
+    else render(); };
+  S.rec={mr,talk:!!talk}; mr.start(1000); render();
 }
 async function uploadPending(d){
   const base=`groups/${S.gid}/diaries/${d.id}`;
@@ -2979,7 +3098,9 @@ async function saveDiary(status){
   const d=S.draft, child=S.me.type==="child";
   if(!d.text.trim()){ toast("일기 내용을 써 주세요"); return; }
   // 빨간펜: 노란 형광펜이 남아 있으면 제출 못 해요 (선생님이 쉬는 중이면 그냥 제출 가능)
-  if(status==="submitted" && child){
+  if(S.rec||S.talkBusy){ toast("녹음이나 일기 만들기가 끝나면 저장할 수 있어요"); return; }
+  // 이야기로 만든 일기(5~7세)는 엄마 · 아빠가 확인하고 저장하니 글자 수 · 빨간펜 조건 없이 제출돼요
+  if(status==="submitted" && child && !d.talk?.transcript){
     const goal=penGoalOf(S.me), n=countChars(d.text);
     if(n<goal){ toast(`${goal}자를 채우면 제출할 수 있어요! (지금 ${n}자)`); return; }
     const left=(d.pen?.errors||[]).filter(er=>penLeft(er,d.text)).length;
@@ -2993,7 +3114,7 @@ async function saveDiary(status){
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
   if(d.photos.some(p=>p.blob) || d.audio?.blob) toast("사진과 소리를 올리고 있어요");
   await uploadPending(d);
-  Object.assign(data,{ photos:d.photos, audio:d.audio||null, location:d.location||null,
+  Object.assign(data,{ photos:d.photos, audio:d.audio||null, location:d.location||null, talk:d.talk||null,
     tags:[...new Set([...d.tags,...extractTags(d.title+" "+d.text)])].slice(0,20) });
   await B.update(S.gid,"diaries",d.id,data);
   d.status=status;
