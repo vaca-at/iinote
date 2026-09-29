@@ -647,6 +647,39 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 
 /* ============ 일기 쓰기 ============ */
 .write{max-width:780px}
+/* ✏️ 초6까지 아이의 일기 쓰기 (공부방 일기장처럼) */
+.kw{padding:18px 20px 22px;border-radius:24px;background:var(--surface);border:2px solid var(--butter-soft);box-shadow:0 12px 30px -24px rgba(31,42,68,.35)}
+.kw .sub-top{margin-bottom:8px}
+.kw-head{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+.kw-hl{flex:1;min-width:0}
+.kw-hl h2{margin:0;font-size:22px;letter-spacing:-.3px}
+.kw-hl small{color:var(--ink3);font-size:13px}
+.kw-streak{flex:none;padding:6px 14px;border-radius:999px;background:var(--butter-soft);font-weight:750;font-size:13px;white-space:nowrap}
+.kw-due{margin:0 0 12px;padding:12px 16px;border-radius:14px;border:1.5px solid var(--butter);background:var(--butter-soft);font-weight:750}
+.kw-day{display:flex;align-items:center;gap:8px;margin:0 0 6px}
+.kw-dchip{min-height:36px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:650;cursor:pointer}
+.kw-dchip.on{border-color:var(--sage);background:color-mix(in srgb,var(--sage) 14%,var(--surface));color:var(--sage)}
+.kw-day b{margin-left:4px}
+.kw-q{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 12px;padding:12px 16px;border-radius:12px;border-left:5px solid var(--butter);background:var(--butter-soft)}
+.kw-q b{flex:1;min-width:12em;font-weight:700}
+.kw-q label{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;white-space:nowrap}
+.kw-q .link-btn{white-space:nowrap}
+.kw-q-i{font-size:20px}
+.kw .w-text,.kw .w-hl{padding-left:62px}
+.kw .w-text{border-radius:14px;background-image:linear-gradient(to right,transparent 46px,var(--coral) 46px,var(--coral) 47.5px,transparent 47.5px),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh));background-attachment:local}
+.kw-prog{display:flex;align-items:center;gap:10px;margin:10px 0 0}
+.kw-track{position:relative;flex:1;height:12px;border-radius:99px;background:var(--line)}
+.kw-track i{display:block;height:100%;border-radius:99px;background:var(--sky);transition:width .3s}
+.kw-prog.done .kw-track i{background:var(--sage)}
+.kw-track em{position:absolute;top:-12px;font-style:normal;font-size:20px;transition:left .3s;pointer-events:none}
+.kw-msg{flex:none;font-size:13px;font-weight:650;color:var(--ink2)}
+.kw-pen{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border:0;padding:0;background:none;margin-top:16px}
+.kw-lock{min-height:46px;padding:0 20px;border-radius:14px;border:2px dashed var(--coral);background:var(--surface);color:var(--coral);font-weight:750;font-size:15px;opacity:.85}
+.kw-pen-t{font-size:13px;color:var(--ink2)}
+.kw-done{min-height:50px;padding:0 24px;border-radius:14px;border:0;background:var(--sage);color:#fff;font-weight:800;font-size:17px;box-shadow:0 6px 0 -2px color-mix(in srgb,var(--sage) 60%,#000)}
+.kw-done:hover{filter:brightness(1.05)}
+.kw-qshow{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:var(--butter-soft);font-weight:650;font-size:14px}
+@media (max-width:759px){ .kw{padding:14px 12px 18px;border-radius:18px} .kw .w-text,.kw .w-hl{padding-left:44px} .kw .w-text{background-image:linear-gradient(to right,transparent 32px,var(--coral) 32px,var(--coral) 33.5px,transparent 33.5px),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))} .kw-msg{flex-basis:100%;order:3} }
 /* 날씨 · 기분 고르기: 이름 + 그림 7개, 고른 것 이름은 오른쪽에 */
 .wm{display:grid;gap:8px;margin:16px 0}
 .wm-row{display:flex;align-items:center;gap:10px;margin:0;padding:0;border:0;min-width:0}
@@ -2496,7 +2529,7 @@ function viewDiaryDetail(){
     <header class="detail-h">${av(p,44)}<div><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${fmtLong(d.date)}${d.status!=="submitted"?" (쓰는 중이라 나만 보여요)":""}</span></div>${moodChip(d.mood,d.weather)}</header>
     ${(d.location||(d.tags||[]).length)?`<div class="meta-row">${d.location?`<a class="loc" href="${esc(mapLink(d.location))}" target="_blank" rel="noopener noreferrer">${ic("pin")}${esc(d.location.name)}</a>`:""}${(d.tags||[]).map(t=>`<button class="htag" data-act="tag" data-v="${esc(t)}">#${esc(t)}</button>`).join("")}</div>`:""}
     ${(d.photos||[]).length?photoGrid(d.photos,d.id):""}
-    <div class="paper-lines">${tagify(d.text)}</div>
+    ${d.prompt?`<p class="kw-qshow">💡 ${esc(d.prompt)}</p>`:""}<div class="paper-lines">${tagify(d.text)}</div>
     ${d.audio?`<div class="audio-card">${ic("mic")}<audio controls preload="none" src="${esc(d.audio.url)}"></audio></div>`:""}
     ${d.talk?.dialog?.length?`<details class="talk-log"><summary>🎙 엄마 · 아빠와 나눈 이야기로 쓴 일기예요 · 이야기 보기</summary>${talkLines(d.talk.dialog)}</details>`:""}
     ${viewReact(d,mine)}
@@ -2525,10 +2558,10 @@ function renderThread(cs,parent,depth){
 function loadDraft(date){
   const d=findDiary(S.me.id,date);
   S.locEdit=false; S.penFailed=false;
-  S.draft = d ? {id:d.id,date,mood:d.mood||"",weather:d.weather||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,pen:penFromResult(d.aiResult),
+  S.draft = d ? {id:d.id,date,mood:d.mood||"",weather:d.weather||"",prompt:d.prompt||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,pen:penFromResult(d.aiResult),
                  photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[],talk:d.talk?{...d.talk}:null}
-              : {id:null,date,mood:"",weather:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null};
-  S.talkBusy=null;
+              : {id:null,date,mood:"",weather:"",prompt:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null};
+  S.talkBusy=null; S.kwQ=null;
 }
 // 쓰는 중에 날짜를 바꾸면 내용은 그대로 두고 날짜만 옮겨요. 그날 쓴 일기가 이미 있으면 불러올지 물어봐요.
 function changeDraftDate(input){
@@ -2543,26 +2576,59 @@ function changeDraftDate(input){
   }
   d.date=date;
 }
+/* ---------- 초6까지 아이의 일기 쓰기: 공부방 일기장처럼 귀엽게 ----------
+   머리(○○의 일기장 · 학년 · 날짜 · 🔥 연속), 8시 알림 띠, 오늘/어제, 날씨 · 기분, 💡 오늘의 질문, 공책 줄 일기 칸, ✏️ 글자 수 막대, 🔒 빨간펜, 💾 다 썼어요! */
+const kidUI = () => S.me?.type==="child" && !(hasGrade(S.me.grade) && Number(S.me.grade)>6);
+const KID_QS = ["오늘 가장 웃겼던 일은 무엇인가요?","내가 동물이 된다면 무엇이 되고 싶나요?","오늘 먹은 음식 중에 제일 맛있었던 것은?","친구에게 고마웠던 일이 있었나요?","내가 마법을 쓸 수 있다면 무엇을 하고 싶나요?","오늘 새로 알게 된 것은 무엇인가요?","요즘 가장 좋아하는 놀이는 무엇인가요?","가족과 함께 한 일 중에 기억에 남는 것은?","하루 동안 투명 인간이 된다면 무엇을 할까요?","오늘 나를 칭찬해 준다면 무엇을 칭찬할까요?","가 보고 싶은 곳이 있다면 어디인가요?","오늘 속상했던 일이 있었나요? 어떻게 했나요?","내가 선생님이 된다면 어떤 수업을 하고 싶나요?","10년 뒤 나는 어떤 모습일까요?","오늘 본 것 중에 가장 예뻤던 것은?","내가 만든 발명품이 있다면 무엇일까요?","주말에 하고 싶은 일은 무엇인가요?","요즘 읽은 책이나 본 영상 이야기를 해 볼까요?","내 방에서 가장 좋아하는 물건은?","오늘 날씨는 내 기분과 비슷했나요?"];
+const kwStreak = () => { const days=new Set(S.diaries.filter(x=>x.profileId===S.me.id && (x.text||"").trim()).map(x=>x.date));
+  let d=days.has(todayStr())?todayStr():addDays(todayStr(),-1), n=0; while(days.has(d)){ n++; d=addDays(d,-1); } return n; };
+function kwProgress(){
+  const goal=penGoalOf(S.me), n=countChars(S.draft?.text), pct=Math.min(100,Math.round(n/goal*100));
+  const msg=!n?`첫 글자를 써 볼까요? (목표 ${goal}자)`:n<goal?`${n}자 썼어요! ${goal-n}자만 더 써 봐요`:`🎉 ${goal}자 성공! (${n}자)`;
+  return {pct,msg,done:n>=goal};
+}
+function syncLen(){
+  const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length;
+  const bar=document.getElementById("kw-bar"); if(!bar) return; const p=kwProgress();
+  bar.style.width=p.pct+"%"; bar.parentElement.classList.toggle("done",p.done);
+  const pen=document.getElementById("kw-pencil"); if(pen) pen.style.left=`calc(${p.pct}% - 12px)`;
+  const m=document.getElementById("kw-msg"); if(m) m.textContent=p.msg;
+}
+function kwHead(d){
+  const t=todayStr(), y=addDays(t,-1), st=kwStreak(), sub=d.status==="submitted";
+  return `<div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${sub?"제출한 일기를 고치고 있어요":d.status==="draft"?"임시 저장된 일기예요":""}</span></div>
+    <header class="kw-head">${av(S.me,48)}<div class="kw-hl"><h2>${esc(S.me.name)}의 일기장</h2><small>${gradeName(S.me.grade)?gradeName(S.me.grade)+" · ":""}${fmtLong(d.date)}</small></div><span class="kw-streak">🔥 ${st?`${st}일째 쓰는 중!`:"오늘부터 시작!"}</span></header>
+    ${d.date===t&&!sub?`<div class="kw-due">📓 오늘 일기는 저녁 8시 전에 써요!</div>`:""}
+    <div class="kw-day"><button class="kw-dchip ${d.date===t?"on":""}" data-act="w-day" data-v="${t}">오늘</button><button class="kw-dchip ${d.date===y?"on":""}" data-act="w-day" data-v="${y}">어제</button><b>${fmtLong(d.date)}</b></div>`;
+}
+function kwQuestion(d){
+  if(S.kwQ==null) S.kwQ=Math.floor(Math.random()*KID_QS.length);
+  const q=d.prompt||KID_QS[S.kwQ%KID_QS.length];
+  return `<div class="kw-q"><span class="kw-q-i" aria-hidden="true">💡</span><b>${esc(q)}</b><label><input type="checkbox" data-kwq="${esc(q)}" ${d.prompt?"checked":""}> 이 질문으로 쓸래요</label>${d.prompt?"":`<button class="link-btn" data-act="kw-q-next">다른 질문</button>`}</div>`;
+}
 function viewWrite(){
-  const d=S.draft, child=S.me.type==="child", submitted=d.status==="submitted";
-  return `<div class="write">
-    <div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${submitted?(child?"제출한 일기를 고치고 있어요":"올린 일기를 고치고 있어요"):d.status==="draft"?"임시 저장된 일기예요":"새 일기"}</span></div>
-    <label class="date-l">날짜<input type="date" id="w-date" value="${d.date}" max="${todayStr()}"></label>
+  const d=S.draft, child=S.me.type==="child", submitted=d.status==="submitted", kid=kidUI();
+  const kp=kid?kwProgress():null;
+  return `<div class="write ${kid?"kw":""}">
+    ${kid?kwHead(d):`<div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${submitted?(child?"제출한 일기를 고치고 있어요":"올린 일기를 고치고 있어요"):d.status==="draft"?"임시 저장된 일기예요":"새 일기"}</span></div>
+    <label class="date-l">날짜<input type="date" id="w-date" value="${d.date}" max="${todayStr()}"></label>`}
     <div class="wm">
       <fieldset class="wm-row"><legend>날씨</legend><div class="wm-opts">${WEATHERS.map(([k,l,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="weather" value="${k}" ${d.weather===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-weather">${weatherOf(d.weather)?.[1]||""}</em></fieldset>
       <fieldset class="wm-row"><legend>기분</legend><div class="wm-opts">${MOODS.map(([k,l,,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-mood">${MOODS.find(m=>m[0]===d.mood)?.[1]||""}</em></fieldset>
     </div>
     ${child&&talkOK(S.me)?viewTalk(d):""}
+    ${kid?kwQuestion(d):""}
     ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} ${talkOK(S.me)?"직접 쓰거나, 위의 '이야기로 일기 쓰기'로 엄마 · 아빠와 함께 만들어요. 붙여넣기는 안 돼요.":"아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요."}</p>`:""}
 
-    <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 써 보세요" spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
+    <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 적어 보세요." spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
     ${viewEmoBar()}
-    <div class="w-count muted"><span id="w-len">${d.text.length}</span>자</div>
+    ${kid?`<div class="kw-prog ${kp.done?"done":""}"><span aria-hidden="true">✏️</span><div class="kw-track"><i id="kw-bar" style="width:${kp.pct}%"></i><em id="kw-pencil" style="left:calc(${kp.pct}% - 12px)" aria-hidden="true">✏️</em></div><span id="kw-msg" class="kw-msg">${kp.msg}</span><span class="sr"><span id="w-len">${d.text.length}</span>자</span></div>`
+      :`<div class="w-count muted"><span id="w-len">${d.text.length}</span>자</div>`}
     ${viewMedia(d)}
     ${child?viewPen(d):""}
     <div class="w-acts">${submitted
       ? `<button class="btn btn-primary" data-act="save-diary" data-v="submitted">고친 내용 저장</button>`
-      : `<button class="btn btn-ghost" data-act="save-diary" data-v="draft">임시 저장</button><button class="btn btn-accent" data-act="save-diary" data-v="submitted">${child?"제출하기":"올리기"}</button>`}</div>
+      : `<button class="btn btn-ghost" data-act="save-diary" data-v="draft">임시 저장</button><button class="btn ${kid?"kw-done":"btn-accent"}" data-act="save-diary" data-v="submitted">${kid?"💾 다 썼어요!":child?"제출하기":"올리기"}</button>`}</div>
   </div>`;
 }
 /* ---------- 🎙 이야기로 일기 쓰기 (5~7세) ----------
@@ -2665,7 +2731,7 @@ function insertEmoji(e){
   const s=ta.selectionStart ?? ta.value.length, en=ta.selectionEnd ?? s;
   ta.setRangeText(e, s, en, "end");
   S.draft.text=ta.value;
-  const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length;
+  syncLen();
   if(S.me?.type==="child") refreshPen();
   ta.focus();
   let use={}; try{ use=JSON.parse(ls.get("iinote-emoji-use","{}"))||{}; }catch(x){}
@@ -2698,6 +2764,10 @@ function viewPen(d){
   const goal=penGoalOf(S.me), n=countChars(d.text), p=d.pen, text=d.text;
   const call=label=>`<button class="btn btn-pen sm" data-act="pen-check" ${S.penBusy?"disabled":""}>${S.penBusy?"🖍 AI 선생님이 읽는 중…":label}</button>`;
   const rest=S.penFailed?`<p class="pen-warn">AI 빨간펜 선생님이 잠깐 쉬는 중이에요. 조금 있다가 다시 눌러 보세요. 제출은 지금도 할 수 있어요.</p>`:"";
+  // 초6까지: 글자를 다 채우기 전에는 🔒 잠긴 빨간펜 단추, 다 채우면 열려요 (글자 수 막대는 일기 칸 바로 아래)
+  if(!p && kidUI()) return `<section class="pen kw-pen" id="pen">${n<goal
+      ? `<button class="kw-lock" type="button" disabled>🔒 AI 빨간펜 (${goal-n}자 더 쓰면 열려요)</button>`
+      : `${call("🖍 AI 빨간펜 선생님 부르기")}<span class="kw-pen-t">틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요!</span>`}${rest}</section>`;
   if(!p) return `<section class="pen" id="pen"><div class="pen-h"><h3>🖍 AI 빨간펜 선생님</h3>${call("🖍 빨간펜 검사")}</div>
     <p>${n>=goal?"다 썼으면 AI 빨간펜 선생님을 불러 보세요. 틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요.":`${goal}자를 다 쓰면 AI 빨간펜 선생님을 부를 수 있어요.`}</p>
     <div class="pen-gauge ${n>=goal?"full":""}"><i style="width:${Math.min(100,n/goal*100)}%"></i></div><p class="pen-cnt">${n>=goal?`${n}자 👍`:`${n} / ${goal}자`}</p>${rest}</section>`;
@@ -2749,7 +2819,7 @@ function penApplyOne(er){
   d.text=d.text.slice(0,i)+er.right+d.text.slice(i+er.wrong.length);
   er.applied=true; er.shown=true; er.at=i;
 }
-function penSyncText(){ const ta=document.getElementById("w-text"); if(ta) ta.value=S.draft.text; const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length; }
+function penSyncText(){ const ta=document.getElementById("w-text"); if(ta) ta.value=S.draft.text; syncLen(); }
 // 맞춤법 요약: 찾은 곳 몇 개 중 몇 개를 스스로 고쳤는지
 const aiSummary = d => { const cs=d.aiResult?.corrections||[]; return {n:cs.length, fixed:cs.filter(c=>!(d.text||"").includes(c.wrong)).length}; };
 // 일기 아래 AI 빨간펜 기록: 예전 가족일기장처럼 요약 한 줄 + 고친 곳을 일기 글씨로 한 줄씩 (칸 배경 없이 카드 하나)
@@ -3093,6 +3163,8 @@ const acts = {
     try{ if(!K.isInitialized()) K.init(KAKAO_JS_KEY); K.Share.sendScrap({requestUrl:SHARE_URL}); }
     catch(e){ console.error(e); toast("카카오톡 공유를 열지 못했어요"); } },
   "fav-edit": () => { S.favEdit=!S.favEdit; render(); },
+  "w-day": el => { if(!S.draft) return; const box={value:el.dataset.v}; changeDraftDate(box); render(); },
+  "kw-q-next": () => { S.kwQ=(S.kwQ||0)+1; render(); },
   "prefs-open": () => { S.prefsOpen=!S.prefsOpen; render(); },
   backup: el => { if(!isParent()) return; try{ backup(el.dataset.v); }catch(e){ console.error(e); toast("파일을 만들지 못했어요. 다시 눌러 주세요"); } },
   grow: el => { S.growId=el.dataset.v; render(); },
@@ -3407,7 +3479,7 @@ async function saveDiary(status){
     if(!d.pen && !S.penFailed && !confirm("AI 빨간펜 선생님께 아직 보여 주지 않았어요. 그래도 제출할까요?")) return;
   }
   const pend=document.getElementById("w-tag")?.value; if(pend){ const t=cleanTag(pend); if(t && !d.tags.includes(t)) d.tags.push(t); }
-  const data={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",title:d.title.trim(),text:d.text,status,updatedAt:Date.now()};
+  const data={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",prompt:d.prompt||"",title:d.title.trim(),text:d.text,status,updatedAt:Date.now()};
   if(d.pen){ data.aiChecked=true; data.aiResult=penResult(d); }
   else if(d.aiChecked){ data.aiChecked=true; data.aiResult=d.aiResult; }
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
@@ -3441,7 +3513,7 @@ async function penCheck(){
     d.pen={praise:data.praise||"", cheer:data.cheer||"", errors, checks:(prev?.checks||0)+1, original:prev?.original||text, auto:penAuto(g)};
     if(d.pen.auto){ for(const er of errors) if(penAt(er,d.text)>=0){ penApplyOne(er); er.auto=true; er._left=false; } }
     // 검사 결과를 일기에 바로 붙여 둬요 (나갔다 와도 그대로)
-    const base={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now(),aiChecked:true,aiResult:penResult(d)};
+    const base={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",prompt:d.prompt||"",title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now(),aiChecked:true,aiResult:penResult(d)};
     if(d.id) await B.update(S.gid,"diaries",d.id,base);
     else { base.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...base,photos:[],audio:null,location:null,tags:[]}); d.status="draft"; }
     d.aiChecked=true; d.aiResult=base.aiResult;
@@ -3508,7 +3580,7 @@ document.addEventListener("input", e => {
     const prev = e.target.id==="w-text" ? S.draft.text : S.draft.title;
     if(e.target.value.length-prev.length >= KID_MAX_BURST){ e.target.value=prev; toast(KID_TYPE_MSG); return; }
   }
-  if(e.target.id==="w-text"){ S.draft.text=e.target.value; const n=document.getElementById("w-len"); if(n) n.textContent=S.draft.text.length; refreshPen(); }
+  if(e.target.id==="w-text"){ S.draft.text=e.target.value; syncLen(); refreshPen(); }
   else if(e.target.id==="w-title") S.draft.title=e.target.value;
 });
 document.addEventListener("change", e => {
@@ -3517,6 +3589,7 @@ document.addEventListener("change", e => {
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
   if(t.name==="mood" && S.draft){ S.draft.mood=t.value; const n=document.getElementById("wm-mood"); if(n) n.textContent=MOODS.find(m=>m[0]===t.value)?.[1]||""; return; }
+  if(t.dataset.kwq!=null && S.draft){ S.draft.prompt=t.checked?t.dataset.kwq:""; render(); return; }
   if(t.name==="weather" && S.draft){ S.draft.weather=t.value; const n=document.getElementById("wm-weather"); if(n) n.textContent=weatherOf(t.value)?.[1]||""; return; }
   if(t.dataset.pref==="keep"){ ls.set("iinote-keep",t.checked?"1":""); if(S.user) ls.set("iinote-login",JSON.stringify({uid:S.user.uid,at:Date.now()})); markActive(true); toast(t.checked?`이 기기에서 ${KEEP_DAYS}일 동안 로그인을 유지해요`:`${IDLE_MIN}분 동안 안 쓰면 로그아웃해요`); }
   if(t.dataset.pref==="theme"){ S.theme=t.value; ls.set("iinote-theme",t.value); applyPrefs(); }
