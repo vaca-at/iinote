@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
 Sitemap: https://iinote.co.kr/sitemap.xml
+#DaumWebMasterTool:728777ff1137a0340b08cf7a4614ffd09a93ab25162fc4915677bef55e756225:XDr1VT379Dqot/oNh7sGGw==
