@@ -1922,9 +1922,10 @@ const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨"
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
 const DESIGNS = [["note","노트"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
+// 레이아웃(첫 화면 모양)은 홈 화면에서만 보여요 (다른 탭에서는 바뀌는 게 없고, 누르면 홈으로 가 버려서)
 function prefBar(){
   // 글자 대신 그림으로: 모양은 도형, 글씨는 그 글씨체로 쓴 '가'. 이름은 마우스를 올리면 보여요
-  const st = isParent() ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양"><b>레이아웃</b>${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
+  const st = isParent() && (!S.tab || S.tab==="home") && !S.sub ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양"><b>레이아웃</b>${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
   const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨"><b>글씨</b>${DFONTS.map(([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`).join("")}</div>`;
   const dz = `<div class="seg hb-g" role="radiogroup" aria-label="디자인"><b>디자인</b>${DESIGNS.map(([k,l])=>`<label title="${l}"><input type="radio" name="design" value="${k}" aria-label="${l}" ${S.design===k?"checked":""} data-pref="design"><span><i class="dsw ${k}"></i></span></label>`).join("")}</div>`;
   // 순서: 화면 구성(어른) → 디자인 → 글씨. 휴대폰에서는 🎨 단추를 눌러야 펼쳐져요
