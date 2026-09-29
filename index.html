@@ -1591,7 +1591,7 @@ function safeList(c,list){
    groups/{gid}/chats: {profileId, text, photo{url,path,thumb,thumbPath,w,h}, createdAt, deleted}
    사진은 일기 사진과 같은 곳(groups/{gid}/diaries/chat/…)에 올려서 저장소 규칙을 바꾸지 않아도 돼요 */
 function startChat(){
-  S.chatUnsub?.(); S.chats=[]; S.chatReady=false;
+  S.chatUnsub?.(); S.chats=[]; S.chatReady=false; S.chatJump=true;
   S.chatUnsub=B.watchChats(S.gid,list=>{ S.chats=list; S.chatReady=true; onChats(); });
 }
 const chatSeenKey = () => `iinote-chatseen-${S.gid}-${S.me?.id}`;
@@ -1616,7 +1616,8 @@ function onChats(){
   else chatDots();
 }
 function afterChatRender(){
-  const box=document.getElementById("chat-list"); if(box) box.scrollTop=box.scrollHeight;
+  // 채팅 탭을 처음 열 때만 맨 아래로 (사진 크게 보기를 열고 닫아도 보던 자리 그대로)
+  const box=document.getElementById("chat-list"); if(box && S.chatJump){ box.scrollTop=box.scrollHeight; S.chatJump=false; }
   markChatSeen(); cleanOldChats();
 }
 async function cleanOldChats(){
@@ -1661,7 +1662,7 @@ async function sendChat(file){
       data.photo={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w||0,h:big.h||0};
     }
     await B.add(S.gid,"chats",data);
-    if(ta){ ta.value=""; ta.style.height=""; } S.chatDraft="";
+    if(ta && ta.value.trim()===text){ ta.value=""; ta.style.height=""; S.chatDraft=""; }
   }catch(e){ console.error(e); toast(e.message?.includes("사진")?e.message:"보내지 못했어요. 다시 눌러 주세요"); }
   finally{ S.chatBusy=false; const b=document.getElementById("chat-send"); if(b){ b.disabled=false; b.textContent="보내기"; } document.getElementById("chat-text")?.focus(); }
 }
@@ -2886,6 +2887,7 @@ function viewPen(d){
   const call=label=>`<button class="btn btn-pen sm" data-act="pen-check" ${S.penBusy?"disabled":""}>${S.penBusy?"🖍 AI 선생님이 읽는 중…":label}</button>`;
   const rest=S.penFailed?`<p class="pen-warn">AI 빨간펜 선생님이 잠깐 쉬는 중이에요. 조금 있다가 다시 눌러 보세요. 제출은 지금도 할 수 있어요.</p>`:"";
   // 초6까지: 글자를 다 채우기 전에는 🔒 잠긴 빨간펜 단추, 다 채우면 열려요 (글자 수 막대는 일기 칸 바로 아래)
+  if(!p && kidUI() && d.talk?.diary) return `<section class="pen kw-pen" id="pen"><span class="kw-pen-t">🎙 이야기로 만든 일기는 엄마 · 아빠가 읽어 보고 바로 제출할 수 있어요.</span></section>`;
   if(!p && kidUI()) return `<section class="pen kw-pen" id="pen">${n<goal
       ? `<button class="kw-lock" type="button" disabled>🔒 AI 빨간펜 (${goal-n}자 더 쓰면 열려요)</button>`
       : `${call("🖍 AI 빨간펜 선생님 부르기")}<span class="kw-pen-t">틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요!</span>`}${rest}</section>`;
@@ -3208,7 +3210,7 @@ const acts = {
   "merge-dup": el => guard(()=>mergeSameName(el.dataset.v)),
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => guard(async()=>{ S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
-  tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
+  tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); if(el.dataset.v==="chat") S.chatJump=true; S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
     if((p.type==="child" && p.pin) || needParentPin(p)){ S.pinFor=p.id; render(); return; }
@@ -3541,7 +3543,7 @@ async function readOldDiaries(){
   }catch(e){ throw new Error(`예전 일기장을 읽지 못했어요 (${e.code||e.message})`); }
   finally{ AU.signOut(auth).catch(()=>{}); }
 }
-const OLD_MOOD = {"😆":"great","🥰":"great","😊":"good","😐":"calm","😢":"sad","😠":"sad","😴":"tired"};
+const OLD_MOOD = {"😆":"great","🥰":"love","😊":"good","😐":"calm","😢":"sad","😠":"angry","😴":"tired"};
 const msOf = (t,fb) => t?.toMillis ? t.toMillis() : typeof t==="number" ? t : fb;
 // 예전 일기장의 빨간펜(AI 맞춤법) 기록 → iinote의 aiResult 모양으로. 어떻게 고쳤는지(how)는 설명 칸에
 const OLD_HOW = {self:"스스로 찾아 고쳤어요", hint:"힌트를 보고 고쳤어요", ai:"AI 선생님이 고쳐 줬어요", other:"다른 말로 고쳐 썼어요"};
@@ -3718,7 +3720,7 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("change", e => {
   const t=e.target;
-  if(t.id==="chat-photo" && t.files?.[0]){ const file=t.files[0]; t.value=""; sendChat(file); return; }
+  if(t.id==="chat-photo" && t.files?.[0]){ const file=t.files[0]; t.value=""; if(S.chatBusy){ toast("보내는 중이에요. 끝나면 사진을 다시 골라 주세요"); return; } sendChat(file); return; }
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
@@ -3780,7 +3782,7 @@ const keepBox = () => DEMO ? "" : `<label class="keep-login"><input type="checkb
 B.onAuth(async u => {
   S.isOperator = await isOperatorUser(u);
   S.user=u;
-  if(!u){ ls.del("iinote-login"); useSavedKidLink(); S.phase="landing"; S.me=null; render(); return; }
+  if(!u){ S.chatUnsub?.(); S.chatUnsub=null; S.chats=[]; S.chatReady=false; ls.del("iinote-login"); useSavedKidLink(); S.phase="landing"; S.me=null; render(); return; }
   if(!u.isAnonymous && !(S.joinCode && S.kidId)) ls.del("iinote-kidlink");   // 어른이 구글 · 카카오로 들어오면 기억한 아이 링크는 지워요
   if(await autoLogoutCheck()) return;
   S.phase="loading"; render();
