@@ -91,6 +91,20 @@ function isIinoteAdmin() {
   return request.auth != null && request.auth.token.email == "${ADMIN_EMAIL}"
     && request.auth.token.email_verified == true;
 }
+// 날짜별 접속 현황: 누구나 숫자만 1씩 더하고, 읽기는 운영자만
+function statStep(k) {
+  return request.resource.data.get(k, 0) == resource.data.get(k, 0)
+    || request.resource.data.get(k, 0) == resource.data.get(k, 0) + 1;
+}
+match /stats/{day} {
+  allow read: if isIinoteAdmin();
+  allow create: if day.matches('^20[0-9]{2}-[0-9]{2}-[0-9]{2}$')
+    && request.resource.data.keys().hasOnly(['views', 'visitors', 'members'])
+    && request.resource.data.get('views', 0) <= 1 && request.resource.data.get('visitors', 0) <= 1
+    && request.resource.data.get('members', 0) <= 1;
+  allow update: if request.resource.data.keys().hasOnly(['views', 'visitors', 'members'])
+    && statStep('views') && statStep('visitors') && statStep('members');
+}
 match /users/{uid} { allow list: if isIinoteAdmin(); }
 match /groups/{gid} {
   allow read: if isIinoteAdmin();
@@ -114,6 +128,8 @@ async function load(){
   catch(e){ return showRuleHelp(e); }
   let users="-"; try{ users=await count(F.collection(db,"users")); }catch(e){}
   let usage=null; try{ usage=await (await fetch(USAGE_API,{cache:"no-store"})).json(); }catch(e){}
+  // 날짜별 접속 현황 (최근 30일): 규칙이 아직 없으면 null
+  let stats=null; try{ stats=(await F.getDocs(F.query(F.collection(db,"stats"),F.where(F.documentId(),">=",d30)))).docs.map(d=>({day:d.id,...d.data()})); }catch(e){ console.warn(e); }
   const idxErrs=new Set();
   const fams=await Promise.all(groups.map(async g=>{
     const dcol=F.collection(db,"groups",g.id,"diaries");
@@ -131,9 +147,23 @@ async function load(){
     }));
     return {...g,members,total,today:today_,w,m};
   }));
-  render(fams,users,[...idxErrs],usage);
+  render(fams,users,[...idxErrs],usage,stats);
 }
 
+// 날짜별 대문 접속 현황 (최근 30일, 새 날짜가 위로)
+function visitCard(stats){
+  if(!stats) return `<div class="card"><h2>📈 대문 접속 현황</h2><p class="alert">날짜별 접속 현황을 보려면 Firestore 규칙에 <b>stats</b> 부분을 한 번 추가해 주세요 (아래 규칙 안내의 '날짜별 접속 현황' 줄).</p><pre>${esc(RULES.split("match /users")[0])}</pre></div>`;
+  const by=Object.fromEntries(stats.map(s=>[s.day,s])), days=[...Array(30)].map((_,i)=>daysAgo(i));
+  const v=d=>by[d]||{}, max=Math.max(1,...days.map(d=>v(d).visitors||0));
+  const sum=(n,k)=>days.slice(0,n).reduce((s,d)=>s+(v(d)[k]||0),0);
+  const wd=d=>"일월화수목금토"[new Date(d+"T00:00").getDay()];
+  const rows=days.map(d=>{ const x=v(d); return `<tr><td class="l"><b>${d.slice(5).replace("-","/")}</b> <span class="sub">(${wd(d)})</span></td>
+    <td class="l"><span class="bar" style="width:${Math.round((x.visitors||0)/max*120)}px"></span>${x.visitors||'<span class="z">0</span>'}</td><td>${x.members||'<span class="z">0</span>'}</td><td>${x.views||'<span class="z">0</span>'}</td></tr>`; }).join("");
+  return `<div class="card"><h2>📈 대문 접속 현황 · 최근 30일</h2>
+    <p class="sub" style="margin:0 0 10px">오늘 방문자 <b>${v(days[0]).visitors||0}</b> · 어제 <b>${v(days[1]).visitors||0}</b> · 최근 7일 <b>${sum(7,"visitors")}</b> · 30일 <b>${sum(30,"visitors")}</b></p>
+    <div class="scroll"><table><tr><th class="l">날짜</th><th class="l">방문자 (기기)</th><th>로그인해서 쓴 기기</th><th>페이지 열림</th></tr>${rows}</table></div>
+    <p class="note">방문자는 그날 처음 들어온 기기 수예요 (같은 기기는 하루 한 번만 세요). 페이지 열림은 새로고침을 포함한 횟수예요. 누가 들어왔는지는 남기지 않고 날짜별 숫자만 세요.</p></div>`;
+}
 // AI 사용 횟수와 예상 금액 (이번 달 + 지난 두 달)
 function aiCard(usage){
   const months=(usage?.months||[]);
@@ -150,7 +180,7 @@ function aiCard(usage){
     <p class="note">모델 ${esc(usage.model||"")} · 100만 토큰당 입력 $${PRICE.input} · 출력 $${PRICE.output}, 1달러 ≈ ${KRW.toLocaleString()}원으로 어림한 금액이에요. 정확한 청구액은 Anthropic 콘솔(Billing)에서 확인하세요. 횟수는 공부방 · 예전 일기장 사용도 함께 세요 (아이 이름은 보이지 않아요).</p></div>`;
 }
 
-function render(fams,users,idx,usage){
+function render(fams,users,idx,usage,stats){
   const sum=k=>fams.reduce((s,f)=>s+f[k],0), ms=fams.flatMap(f=>f.members);
   const kids=ms.filter(p=>p.type==="child"), maxW=Math.max(1,...fams.map(f=>f.w));
   const active=fams.filter(f=>f.w>0).length;
@@ -166,6 +196,7 @@ function render(fams,users,idx,usage){
   $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="sub">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
       <button class="pill" data-act="reload">🔄 새로고침</button><button class="pill" data-act="logout">로그아웃</button></header>
     <div class="tiles">
+      ${stats?`<div class="tile"><b>${(stats.find(x=>x.day===dayStr(new Date()))||{}).visitors||0}</b><span>오늘 방문자</span></div>`:""}
       <div class="tile"><b>${fams.length}</b><span>가족</span></div>
       <div class="tile"><b>${active}</b><span>이번 주 쓴 가족</span></div>
       <div class="tile"><b>${users}</b><span>가입한 계정 (구글 · 카카오)</span></div>
@@ -177,6 +208,7 @@ function render(fams,users,idx,usage){
       ${(()=>{ const m=usage?.months?.[0]; if(!m) return ""; const n=AI_KINDS.reduce((s,[k])=>s+(m[k]||0),0);
         return `<div class="tile"><b>${n}</b><span>이번 달 AI 사용 횟수</span></div><div class="tile"><b>${won(usd(m)+(m.transcribe||0)*STT_USD)}</b><span>이번 달 AI 예상 금액</span></div>`; })()}
     </div>
+    ${visitCard(stats)}
     ${aiCard(usage)}
     <div class="card"><h2>가족별</h2><div class="scroll"><table>
       <tr><th class="l">가족 (누르면 사람별)</th><th>만든 날</th><th>보호자 · 아이</th><th>오늘</th><th class="l">최근 7일</th><th>30일</th><th>전체</th></tr>${rows||'<tr><td colspan="7" class="z">아직 가족이 없어요</td></tr>'}
