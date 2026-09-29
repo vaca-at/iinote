@@ -144,6 +144,7 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .land-cta .share-row{margin:0}
 .dup-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 16px;padding:12px 16px;border-radius:14px;border:1.5px solid var(--butter);background:var(--butter-soft);font-size:14px}
 .dup-bar span{flex:1;min-width:14em}
+.kid-first{margin:12px 0 0;padding:12px 14px;border-radius:14px;border:1.5px solid var(--butter);background:var(--butter-soft);font-size:14px;line-height:1.6}
 .keep-login{display:flex;align-items:flex-start;gap:8px;margin:12px 0 0;font-weight:650;font-size:14px;cursor:pointer}
 .keep-login input{width:18px;height:18px;margin:1px 0 0;flex:none;accent-color:var(--ink)}
 .keep-login small{display:block;font-weight:500;color:var(--ink3);font-size:12.5px;margin-top:2px}
@@ -1803,12 +1804,15 @@ async function enterGroup(gid){
   if(!S.group){ S.phase="onboard"; render(); return; }
   await reloadAll();
   startChat();
+  // 공부방 '일기' 단추(?write&kid=아이번호): 이미 가족으로 들어와 있는 기기면 그 아이로 바로 (비밀번호가 있으면 먼저 물어요)
+  let askPin=null;
+  if(S.kidId && !S.joinCode){ const k=S.profiles.find(x=>x.id===S.kidId && x.type==="child"); if(k){ ls.set("iinote-pid-"+gid,k.id); if(k.pin) askPin=k.id; } S.kidId=""; }
   const saved = ls.get("iinote-pid-"+gid,"");
   let p = prof(saved);
   // 기억해 둔 프로필이 합치기로 없어졌으면, 내 로그인이 쓰는 프로필로
   if(saved && !p){ const m=S.profiles.filter(x=>x.type==="parent" && isMine(x)); if(m.length===1){ p=m[0]; ls.set("iinote-pid-"+gid,p.id); } }
   if(p && canUse(p) && !(p.type==="child" && p.pin)){ S.me=p; S.phase="app"; }
-  else S.phase="picker";
+  else { S.phase="picker"; if(askPin) S.pinFor=askPin; }
   render();
 }
 
@@ -1915,6 +1919,7 @@ function viewLanding(){
         <li><span class="dot" style="background:var(--ink)"></span>사진 추가, 장소와 태그 추가하여 하루를 더욱 풍성하게</li>
       </ul>
       <div class="land-cta"><button class="btn btn-primary" data-act="signin">구글 계정으로 시작하기</button><button class="btn btn-kakao" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button></div>
+      ${S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:""}
       ${keepBox()}
       <p class="demo-note">구글과 카카오는 따로 가입돼요. 둘 다 쓰고 싶으면 처음 방법으로 로그인한 뒤 '우리 가족 설정 → 계정'에서 연결해 주세요.</p>
       ${kakaoBtn()}
