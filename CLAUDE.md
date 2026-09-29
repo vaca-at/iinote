@@ -33,6 +33,9 @@
 - 이름이 같은 어른 프로필 합치기: dupBanner(부모 화면 위 노란 띠) → mergeSameName: 일기 많은 쪽을 남기고 다른 쪽 uid 를 uids 에 넣은 뒤 mergeProfiles 로 기록 옮김 (다른 로그인 확인 없이)
 - 목소리 · 소리 칸: 아이는 7세 이하만 (allow("audio")), 어른은 그대로. 비밀번호 칸은 모두 .pin-in 으로 ●●●●
 - 초6까지 아이 일기 쓰기 화면(kidUI): 공부방 일기장처럼 머리(○○의 일기장 · 🔥 연속) · 8시 알림 · 오늘/어제 · 💡 오늘의 질문(KID_QS, 고르면 diaries.prompt) · 공책 줄(빨간 여백선) · ✏️ 글자 수 막대(kwProgress/syncLen) · 🔒 빨간펜(글자 다 채우면 열림) · 💾 다 썼어요!
+- 💬 가족 채팅 (2026-09-29): 탭 "가족 채팅"(chat). groups/{gid}/chats {profileId,text,photo,createdAt,deleted}, onSnapshot 으로 최근 150개(CHAT_LIMIT) 실시간. 사진은 어른만, 일기 사진처럼 줄여서 groups/{gid}/diaries/chat/ 에 올림(저장소 규칙 그대로). 90일(CHAT_KEEP_DAYS) 지난 것은 어른이 채팅 열 때 정리. 새 메시지는 탭에 빨간 숫자(ls iinote-chatseen-…). 새 메시지가 와도 다른 화면은 다시 그리지 않음(쓰던 일기 보호). 엔터 = 보내기(한글 조합 중 제외)
+- 테스트 팁: Edge 헤드리스 --virtual-time-budget 에서는 홈 · 채팅 화면의 createImageBitmap 이 멈춤(가상 시간 탓). 사진은 --remote-debugging-port 로 실제 시간 실행 뒤 Runtime.evaluate 로 확인
+- 검색 등록: naver…html · google…html 확인 파일, robots.txt(다음 확인 코드 포함) · sitemap.xml
 - 백업: 우리 가족 설정(부모만) → 일기 · 댓글 CSV (엑셀용 BOM, =+-@ 로 시작하는 칸은 ' 붙임)
 - 자동 로그아웃: 첫 화면 · 계정에 '이 기기에서 로그인 유지'(iinote-keep). 로그인은 늘 local 저장(새 탭 · 공부방 ?write 링크에서도 유지). 켜면 30일(KEEP_DAYS) 뒤, 끄면 30분(IDLE_MIN) 안 쓰면 autoLogoutCheck 가 로그아웃 (iinote-login · iinote-active 시각으로 판단). 일기 쓰는 중엔 기다림. 익명(아이 휴대폰 연결) 계정은 제외
 - 위쪽 머리: 맨 위 홈 단추(.home-btn) · 휴대폰은 1줄(홈 · 제목 · 🎨) + 2줄(나 · 즐겨찾기 · 로그아웃), 🎨 누르면 화면 구성 → 디자인 → 글씨

@@ -647,6 +647,37 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 
 /* ============ 일기 쓰기 ============ */
 .write{max-width:780px}
+/* 💬 가족 채팅 */
+.chat{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.chat-list{display:flex;flex-direction:column;gap:10px;height:min(60vh,620px);min-height:320px;overflow-y:auto;padding:14px;border-radius:18px;border:1.5px solid var(--line);background:var(--paper);overscroll-behavior:contain}
+.chat-day{text-align:center;margin:6px 0}
+.chat-day span{display:inline-block;padding:3px 12px;border-radius:999px;background:var(--surface2);color:var(--ink3);font-size:12px;font-weight:650}
+.cm{display:flex;align-items:flex-start;gap:8px;max-width:88%}
+.cm.me{align-self:flex-end;flex-direction:row-reverse}
+.cm-b{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cm.me .cm-b{align-items:flex-end}
+.cm-n{font-size:12.5px;color:var(--ink2)}
+.cm-row{display:flex;align-items:flex-end;gap:6px}
+.cm.me .cm-row{flex-direction:row-reverse}
+.cm-bub{padding:9px 13px;border-radius:4px 16px 16px 16px;background:var(--surface);border:1.5px solid var(--line);border-left:4px solid var(--pc);min-width:0}
+.cm.me .cm-bub{border-radius:16px 4px 16px 16px;background:var(--butter-soft);border-color:transparent}
+.cm-bub p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+.cm-bub em{color:var(--ink3);font-size:13px}
+.cm-ph{display:block;padding:0;border:0;background:none;cursor:zoom-in;margin:0 0 4px}
+.cm-ph img{display:block;max-width:min(240px,60vw);max-height:260px;border-radius:12px;object-fit:cover}
+.cm-t{flex:none;display:flex;flex-direction:column;align-items:flex-end;font-size:11px;color:var(--ink3);white-space:nowrap}
+.cm.me .cm-t{align-items:flex-start}
+.cm-del{padding:0;border:0;background:none;color:var(--ink3);font-size:11px;text-decoration:underline;cursor:pointer}
+.chat-in{display:flex;align-items:flex-end;gap:8px}
+.chat-in textarea{flex:1;min-height:46px;max-height:140px;resize:none;padding:11px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);font:inherit;line-height:1.5}
+.chat-ph{position:relative;display:grid;place-items:center;flex:none;width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);cursor:pointer}
+.chat-ph input{position:absolute;opacity:0;width:1px;height:1px}
+.chat-ph:focus-within{outline:3px solid var(--focus)}
+.chat-send{min-height:46px}
+.cdot{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:4px;padding:0 5px;border-radius:999px;background:var(--coral);color:#fff;font-size:11px;font-style:normal;font-weight:800}
+.nav-item{position:relative}
+.nav-item .cdot{position:absolute;top:2px;right:calc(50% - 22px);margin:0}
+@media (max-width:759px){ .chat-list{height:calc(100vh - 330px);padding:10px} .cm{max-width:94%} }
 /* ✏️ 초6까지 아이의 일기 쓰기 (공부방 일기장처럼) */
 .kw{padding:18px 20px 22px;border-radius:24px;background:var(--surface);border:2px solid var(--butter-soft);box-shadow:0 12px 30px -24px rgba(31,42,68,.35)}
 .kw .sub-top{margin-bottom:8px}
@@ -1081,6 +1112,8 @@ async function isOperatorUser(u){
 // 빨간펜(AI 맞춤법 · 칭찬 · 응원) 클라우드플레어 워커: 공부방 빨간펜과 같은 워커 (API 키는 워커에만 보관)
 const SPELL_API = "https://family-spell.bellachord.workers.dev";
 // 🎙 이야기로 일기 쓰기: 5~7세 아이가 엄마 · 아빠와 이야기(3분 이내)를 녹음 → 워커 /transcribe 로 글자 → mode "talk" 로 아이 말투 일기
+// 💬 가족 채팅: 최근 150개만 실시간으로 받고, 90일 지난 메시지 · 사진은 어른이 채팅을 열 때 정리해요
+const CHAT_LIMIT = 150, CHAT_KEEP_DAYS = 90;
 const TALK_MAX_MAKE = 3;   // 일기 하나에 AI 일기 만들기는 세 번까지
 const wait = ms => new Promise(r=>setTimeout(r,ms));
 // 컴퓨터에서 접속하는 쉬운 주소 (화면 곳곳에 안내돼요)
@@ -1232,6 +1265,8 @@ function makeDemo(){
   const user = { uid:"demo-user", displayName:"체험 부모" };
   let signed = ls.get("iinote-demo-signed","0")==="1", cb = null;
   const sub = (gid,c) => { db.sub[gid] = db.sub[gid] || {}; return db.sub[gid][c] = db.sub[gid][c] || {}; };
+  let chatCb = null;   // 체험 모드 채팅: 바뀌면 화면에 다시 알려요
+  const chatPing = gid => setTimeout(()=>chatCb?.(Object.entries(sub(gid,"chats")).map(([id,v])=>({id,...v})).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).slice(-CHAT_LIMIT)),0);
   const api = {
     demo:true,
     onAuth(f){ cb=f; setTimeout(()=>f(signed?user:null),0); },
@@ -1256,9 +1291,11 @@ function makeDemo(){
       const g=db.groups[gid]; if(!g.memberUids.includes(u.uid)){ g.memberUids.push(u.uid); if(role) sub(gid,"profiles")[rid()]={name:myName,...role,uid:u.uid,color:COLORS[g.memberUids.length%COLORS.length],createdAt:Date.now()}; }
       await api.addUserGroup(u.uid,gid); return gid; },
     async list(gid,c){ return Object.entries(sub(gid,c)).map(([id,v])=>({id,...v})); },
-    async add(gid,c,data){ const id=rid(); sub(gid,c)[id]={...data}; save(); return id; },
-    async update(gid,c,id,data){ Object.assign(sub(gid,c)[id],data); save(); },
-    async remove(gid,c,id){ delete sub(gid,c)[id]; save(); },
+    async add(gid,c,data){ const id=rid(); sub(gid,c)[id]={...data}; save(); if(c==="chats") chatPing(gid); return id; },
+    async update(gid,c,id,data){ Object.assign(sub(gid,c)[id],data); save(); if(c==="chats") chatPing(gid); },
+    async remove(gid,c,id){ delete sub(gid,c)[id]; save(); if(c==="chats") chatPing(gid); },
+    watchChats(gid,cb){ chatCb=cb; chatPing(gid); return ()=>{ if(chatCb===cb) chatCb=null; }; },
+    async oldChats(gid,before){ return Object.entries(sub(gid,"chats")).map(([id,v])=>({id,...v})).filter(m=>(m.createdAt||0)<before); },
     async uploadMedia(path,blob){ return { url: await blobToDataURL(blob), path }; },
     async deleteMedia(path){},
     async leaveGroup(gid,uid){ const g=db.groups[gid]; if(g){ g.memberUids=g.memberUids.filter(x=>x!==uid); save(); } },
@@ -1345,6 +1382,10 @@ async function makeFirebase(){
       return gid;
     },
     async list(gid,c){ const s=await F.getDocs(col(gid,c)); return s.docs.map(d=>({id:d.id,...d.data()})); },
+    // 가족 채팅: 최근 CHAT_LIMIT 개를 실시간으로 (새 메시지가 오면 cb 가 다시 불려요)
+    watchChats(gid,cb){ return F.onSnapshot(F.query(col(gid,"chats"),F.orderBy("createdAt","desc"),F.limit(CHAT_LIMIT)),
+      s=>cb(s.docs.map(d=>({id:d.id,...d.data()})).reverse()), e=>console.warn("채팅을 불러오지 못했어요",e)); },
+    async oldChats(gid,before){ const s=await F.getDocs(F.query(col(gid,"chats"),F.where("createdAt","<",before),F.limit(50))); return s.docs.map(d=>({id:d.id,...d.data()})); },
     async add(gid,c,data){ const r=await F.addDoc(col(gid,c),data); return r.id; },
     async update(gid,c,id,data){ await F.updateDoc(F.doc(db,"groups",gid,c,id),data); },
     async remove(gid,c,id){ await F.deleteDoc(F.doc(db,"groups",gid,c,id)); },
@@ -1546,10 +1587,90 @@ function safeList(c,list){
   return list;
 }
 
+/* ---------- 💬 가족 채팅 ----------
+   groups/{gid}/chats: {profileId, text, photo{url,path,thumb,thumbPath,w,h}, createdAt, deleted}
+   사진은 일기 사진과 같은 곳(groups/{gid}/diaries/chat/…)에 올려서 저장소 규칙을 바꾸지 않아도 돼요 */
+function startChat(){
+  S.chatUnsub?.(); S.chats=[]; S.chatReady=false;
+  S.chatUnsub=B.watchChats(S.gid,list=>{ S.chats=list; S.chatReady=true; onChats(); });
+}
+const chatSeenKey = () => `iinote-chatseen-${S.gid}-${S.me?.id}`;
+function chatUnread(){
+  if(!S.me || !S.chatReady) return 0;
+  const k=chatSeenKey(), last=S.chats.at(-1)?.createdAt||0;
+  if(ls.get(k,null)===null){ ls.set(k,String(last)); return 0; }   // 처음에는 지난 이야기를 '새 메시지'로 세지 않아요
+  const seen=Number(ls.get(k,"0"));
+  return S.chats.filter(m=>m.profileId!==S.me.id && !m.deleted && (m.createdAt||0)>seen).length;
+}
+function markChatSeen(){ const last=S.chats.at(-1)?.createdAt||0; if(S.me && last>Number(ls.get(chatSeenKey(),"0"))) ls.set(chatSeenKey(),String(last)); chatDots(); }
+function chatDots(){
+  const n = S.tab==="chat" && !S.sub ? 0 : chatUnread();
+  document.querySelectorAll('[data-act="tab"][data-v="chat"]').forEach(b=>{ let d=b.querySelector(".cdot");
+    if(n){ if(!d){ d=document.createElement("i"); d.className="cdot"; b.appendChild(d); } d.textContent=n>9?"9+":n; } else d?.remove(); });
+}
+// 새 메시지가 오면: 채팅 화면이면 목록만 바꾸고(쓰던 글 그대로), 다른 화면이면 탭에 빨간 숫자만
+function onChats(){
+  if(S.phase!=="app" || !S.me) return;
+  const box=document.getElementById("chat-list");
+  if(box){ const bottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML=chatItems(); if(bottom) box.scrollTop=box.scrollHeight; markChatSeen(); }
+  else chatDots();
+}
+function afterChatRender(){
+  const box=document.getElementById("chat-list"); if(box) box.scrollTop=box.scrollHeight;
+  markChatSeen(); cleanOldChats();
+}
+async function cleanOldChats(){
+  if(!isParent() || S.chatCleaned===S.gid) return; S.chatCleaned=S.gid;
+  try{ for(const m of await B.oldChats(S.gid,Date.now()-CHAT_KEEP_DAYS*864e5)){
+    if(m.photo?.path) await B.deleteMedia(m.photo.path); if(m.photo?.thumbPath) await B.deleteMedia(m.photo.thumbPath);
+    await B.remove(S.gid,"chats",m.id); } }catch(e){ console.warn(e); }
+}
+function viewChat(){
+  return `<div class="chat">
+    <div class="page-h"><h1>💬 가족 채팅</h1><p class="muted" style="margin:4px 0 0">우리 가족만 보는 채팅방이에요. ${CHAT_KEEP_DAYS}일이 지난 이야기는 저절로 정리돼요.</p></div>
+    <div class="chat-list" id="chat-list" aria-live="polite">${chatItems()}</div>
+    <form class="chat-in" data-form="chat">
+      ${allow("photos")?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" id="chat-photo" accept="image/*"></label>`:""}
+      <label class="sr" for="chat-text">메시지</label><textarea id="chat-text" name="text" rows="1" maxlength="1000" placeholder="가족에게 한마디" enterkeyhint="send">${esc(S.chatDraft||"")}</textarea>
+      <button class="btn btn-primary chat-send" id="chat-send">보내기</button>
+    </form></div>`;
+}
+function chatItems(){
+  if(!S.chatReady) return `<p class="empty">불러오는 중…</p>`;
+  if(!S.chats.length) return `<p class="empty">아직 이야기가 없어요. 첫 인사를 남겨 보세요 👋</p>`;
+  let out="", day="";
+  for(const m of S.chats){
+    const t=new Date(m.createdAt||0), ds=ymd(t), p=prof(m.profileId), mine=m.profileId===S.me.id, del=!m.deleted && (mine||isParent());
+    if(ds!==day){ day=ds; out+=`<div class="chat-day"><span>${fmtLong(ds)}</span></div>`; }
+    out+=`<div class="cm ${mine?"me":""}">${mine?"":av(p,32)}<div class="cm-b">${mine?"":`<b class="cm-n">${esc(p?.name||"알 수 없음")}</b>`}
+      <div class="cm-row"><div class="cm-bub" style="--pc:${p?.color||"#1F2A44"}">${m.deleted?`<em>지운 메시지예요</em>`
+        :`${m.photo?`<button type="button" class="cm-ph" data-act="chat-ph" data-id="${esc(m.id)}" aria-label="사진 크게 보기"><img src="${esc(m.photo.thumb||m.photo.url)}" alt="" loading="lazy"></button>`:""}${m.text?`<p>${esc(m.text)}</p>`:""}`}</div>
+      <span class="cm-t">${pad(t.getHours())}:${pad(t.getMinutes())}${del?`<button type="button" class="cm-del" data-act="chat-del" data-id="${esc(m.id)}" aria-label="메시지 지우기">지우기</button>`:""}</span></div></div></div>`;
+  }
+  return out;
+}
+async function sendChat(file){
+  const ta=document.getElementById("chat-text"), text=String(ta?.value||"").trim();
+  if((!text && !file) || S.chatBusy) return;
+  const btn=document.getElementById("chat-send"); S.chatBusy=true; if(btn){ btn.disabled=true; btn.textContent="보내는 중…"; }
+  try{
+    const data={profileId:S.me.id,text:text.slice(0,1000),createdAt:Date.now()};
+    if(file){
+      const {big,thumb}=await makePhotoPair(file), id=rid(), base=`groups/${S.gid}/diaries/chat`;
+      const r=await B.uploadMedia(`${base}/${id}.jpg`,big.blob), th=thumb?.blob?await B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob):null;
+      data.photo={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w||0,h:big.h||0};
+    }
+    await B.add(S.gid,"chats",data);
+    if(ta){ ta.value=""; ta.style.height=""; } S.chatDraft="";
+  }catch(e){ console.error(e); toast(e.message?.includes("사진")?e.message:"보내지 못했어요. 다시 눌러 주세요"); }
+  finally{ S.chatBusy=false; const b=document.getElementById("chat-send"); if(b){ b.disabled=false; b.textContent="보내기"; } document.getElementById("chat-text")?.focus(); }
+}
+
 async function enterGroup(gid){
   S.gid=gid; S.group=await B.getGroup(gid);
   if(!S.group){ S.phase="onboard"; render(); return; }
   await reloadAll();
+  startChat();
   const saved = ls.get("iinote-pid-"+gid,"");
   let p = prof(saved);
   // 기억해 둔 프로필이 합치기로 없어졌으면, 내 로그인이 쓰는 프로필로
@@ -1739,7 +1860,7 @@ function viewPicker(){
 }
 
 // 폴더 탭 색: [바탕색, 선 색]
-const TAB_TONE = {mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
+const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
 // 일기 글씨 4가지
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
@@ -1781,7 +1902,7 @@ function kidBar(){
 function viewShell(){
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
-  const tabs=[["home","홈","home"],["mine","내 일기","pen"]];
+  const tabs=[["home","홈","home"],["mine","내 일기","pen"],["chat","가족 채팅","talk"]];
   if(isParent()) tabs.push(["kids","아이들 현황","spark"]);
   tabs.push(["day","하루 펼쳐보기","cal"],["shelf","책장","book"]);
   if(isParent()) tabs.push(["report","AI 리포트","chart"]);
@@ -1818,7 +1939,7 @@ function viewMain(){
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
   if(!S.tab || S.tab==="home") return viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
-  return ({home:viewHome,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
+  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -3048,6 +3169,7 @@ function render(){
     if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; history.replaceState(null,"",location.pathname); }
     $app.innerHTML=viewShell();
     if(S.sub?.type==="write") penHL();
+    if(S.tab==="chat" && !S.sub) afterChatRender(); else chatDots();
   }
   document.body.style.overflow = S.lb ? "hidden" : "";
 }
@@ -3085,7 +3207,7 @@ const acts = {
   "merge-login": el => guard(()=>mergeOtherLogin(el.dataset.v,null)),
   "merge-dup": el => guard(()=>mergeSameName(el.dataset.v)),
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
-  signout: () => guard(async()=>{ ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
+  signout: () => guard(async()=>{ S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
   tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
@@ -3209,6 +3331,10 @@ const acts = {
   "talk-make": el => talkMake(el.dataset.v==="text"),
   "rec-stop": () => { if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); },
   "audio-del": () => { const a=S.draft.audio; if(a?.path) S.draft.removed.push(a.path); S.draft.audio=null; render(); },
+  "chat-ph": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m?.photo) return; S.lb={photos:[m.photo],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
+  "chat-del": el => guard(async()=>{ const m=S.chats.find(x=>x.id===el.dataset.id); if(!m || !confirm("이 메시지를 지울까요?")) return;
+    if(m.photo?.path) await B.deleteMedia(m.photo.path); if(m.photo?.thumbPath) await B.deleteMedia(m.photo.thumbPath);
+    await B.update(S.gid,"chats",m.id,{deleted:true,text:"",photo:null}); }),
   "lb-open": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return; S.lb={photos:d.photos,i:+el.dataset.i}; render(); document.querySelector(".lb-x")?.focus(); },
   "lb-close": () => { S.lb=null; render(); },
   "lb-prev": () => lbMove(-1),
@@ -3296,6 +3422,10 @@ async function wipeProfiles(gid,pids,all){
   await rm("links",links.filter(l=>has(l.createdBy)));
   await rm("quizWords",quizWords.filter(w=>has(w.profileId)));
   await rm("aiReports",aiReports.filter(r=>has(r.profileId)));
+  // 가족 채팅: 그 사람이 보낸 메시지와 사진
+  try{ const chats=(await B.list(gid,"chats")).filter(m=>has(m.profileId));
+    for(const m of chats){ if(m.photo?.path) await B.deleteMedia(m.photo.path); if(m.photo?.thumbPath) await B.deleteMedia(m.photo.thumbPath); }
+    await rm("chats",chats); }catch(e){ console.warn(e); }
   await rm("profiles",profiles.filter(p=>has(p.id)));
 }
 /* ---------- 구글 · 카카오 로그인 하나로 합치기 ----------
@@ -3349,6 +3479,7 @@ async function mergeProfiles(from,to){
   for(const l of S.links.filter(x=>x.createdBy===from)) await B.update(gid,"links",l.id,{createdBy:to});
   for(const w of S.quizWords.filter(x=>x.profileId===from)) await B.update(gid,"quizWords",w.id,{profileId:to});
   try{ for(const r of (await B.list(gid,"aiReports")).filter(x=>x.profileId===from)) await B.update(gid,"aiReports",r.id,{profileId:to}); }catch(e){}
+  try{ for(const m of (await B.list(gid,"chats")).filter(x=>x.profileId===from)) await B.update(gid,"chats",m.id,{profileId:to}); }catch(e){}
   await B.remove(gid,"profiles",from);
 }
 // 가족에 처음 들어올 때: 전에 다른 로그인으로 들어온 적 있으면 그 프로필로 바로 들어가요 (초대 코드 · 새 프로필 없이)
@@ -3532,6 +3663,7 @@ async function penCheck(){
 /* 폼 제출 */
 const forms = {
   pdf: (fd, f) => makePdf(f),
+  chat: () => sendChat(null),
   // 아이 일기 최소 글자 수 (비우면 학년 기본값)
   "kid-goal": fd => guard(async()=>{
     for(const p of S.profiles.filter(x=>x.type==="child")){
@@ -3573,6 +3705,7 @@ const KID_MAX_BURST = 10, KID_TYPE_MSG = "아이 일기는 직접 손으로 써�
 const kidField = t => S.me?.type==="child" && S.draft && (t.id==="w-text"||t.id==="w-title");
 ["paste","drop"].forEach(ev=>document.addEventListener(ev, e => { if(kidField(e.target)){ e.preventDefault(); toast(KID_TYPE_MSG); } }));
 document.addEventListener("input", e => {
+  if(e.target.id==="chat-text"){ S.chatDraft=e.target.value; e.target.style.height="auto"; e.target.style.height=Math.min(140,e.target.scrollHeight)+"px"; return; }
   if(e.target.id==="q"){ S.search=e.target.value; const w=document.getElementById("feed-wrap"); if(w) w.innerHTML=viewFeed(); return; }
   if(!S.draft) return;
   // 아이 일기는 직접 손으로 써요: 말로 쓰기처럼 한꺼번에 긴 글이 들어오면 되돌려요
@@ -3585,6 +3718,7 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("change", e => {
   const t=e.target;
+  if(t.id==="chat-photo" && t.files?.[0]){ const file=t.files[0]; t.value=""; sendChat(file); return; }
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
@@ -3600,6 +3734,8 @@ document.addEventListener("change", e => {
 });
 
 document.addEventListener("keydown", e => {
+  // 채팅: 엔터로 보내기, Shift+엔터는 줄바꿈 (한글 조합 중에는 기다려요)
+  if(e.target.id==="chat-text" && e.key==="Enter" && !e.shiftKey && !e.isComposing && e.keyCode!==229){ e.preventDefault(); sendChat(null); return; }
   if(S.lb){ if(e.key==="Escape") { S.lb=null; render(); } else if(e.key==="ArrowLeft") lbMove(-1); else if(e.key==="ArrowRight") lbMove(1); return; }
   const id=e.target.id;
   if(id==="w-tag" && !e.isComposing){
