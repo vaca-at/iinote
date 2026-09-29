@@ -681,6 +681,31 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .nav-item{position:relative}
 .nav-item .cdot{position:absolute;top:2px;right:calc(50% - 22px);margin:0}
 @media (max-width:759px){ .chat-list{height:calc(100vh - 330px);padding:10px} .cm{max-width:94%} }
+.chat-ta-l{flex:1;display:flex;min-width:0}
+.chat-ta-l textarea{flex:1}
+/* 컴퓨터(넓은 화면): 종이 판 오른쪽 바깥의 좁은 채팅 기둥. 좁은 화면은 '가족 채팅' 탭으로 */
+.chat-side{display:none}
+@media (min-width:1100px){
+  .body-row{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+  .body-row.side-closed{grid-template-columns:minmax(0,1fr) 46px}
+  .ftab[data-v="chat"]{display:none}
+  .chat-side{position:sticky;top:12px;display:flex;flex-direction:column;gap:8px;height:calc(100vh - 24px);max-height:900px;padding:12px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line);box-shadow:0 10px 30px rgba(31,42,68,.08)}
+  .chat-side-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .chat-side-h b{font-size:15px}
+  .chat-side .chat-list{flex:1;height:auto;min-height:0;padding:8px;gap:8px;border-radius:14px}
+  .chat-side .cm{max-width:100%;gap:6px}
+  .chat-side .cm .av{width:26px!important;height:26px!important;font-size:12px!important}
+  .chat-side .cm-bub{padding:7px 10px;font-size:14px}
+  .chat-side .cm-ph img{max-width:170px;max-height:180px}
+  .chat-side .chat-in{gap:6px}
+  .chat-side .chat-in textarea{min-height:40px;padding:9px 11px;border-radius:12px;font-size:14px}
+  .chat-side .chat-ph{width:40px;height:40px}
+  .chat-side .chat-send{min-height:40px;padding:0 12px;font-size:14px}
+  .chat-side.closed{padding:0;background:none;border:0;box-shadow:none;height:auto}
+  .chat-side-open{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;width:46px;padding:14px 0;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-size:20px;cursor:pointer}
+  .chat-side-open span{writing-mode:vertical-rl;font-size:14px;font-weight:750;letter-spacing:2px}
+  .chat-side-open .cdot{position:absolute;top:-6px;right:-6px;margin:0}
+}
 /* ✏️ 초6까지 아이의 일기 쓰기 (공부방 일기장처럼) */
 .kw{padding:18px 20px 22px;border-radius:24px;background:var(--surface);border:2px solid var(--butter-soft);box-shadow:0 12px 30px -24px rgba(31,42,68,.35)}
 .kw .sub-top{margin-bottom:8px}
@@ -1610,23 +1635,40 @@ function chatUnread(){
   return S.chats.filter(m=>m.profileId!==S.me.id && !m.deleted && (m.createdAt||0)>seen).length;
 }
 function markChatSeen(){ const last=S.chats.at(-1)?.createdAt||0; if(S.me && last>Number(ls.get(chatSeenKey(),"0"))) ls.set(chatSeenKey(),String(last)); chatDots(); }
+// 채팅 목록은 두 곳에 있어요: 컴퓨터는 종이 판 오른쪽 채팅 기둥, 휴대폰은 '가족 채팅' 탭. 지금 눈에 보이는 것만 써요
+const chatBoxes = () => [...document.querySelectorAll(".chat-list")].filter(b=>b.offsetParent!==null);
 function chatDots(){
-  const n = S.tab==="chat" && !S.sub ? 0 : chatUnread();
-  document.querySelectorAll('[data-act="tab"][data-v="chat"]').forEach(b=>{ let d=b.querySelector(".cdot");
+  const n = chatBoxes().length ? 0 : chatUnread();
+  document.querySelectorAll('[data-act="tab"][data-v="chat"],[data-act="chat-side"]').forEach(b=>{ let d=b.querySelector(".cdot");
     if(n){ if(!d){ d=document.createElement("i"); d.className="cdot"; b.appendChild(d); } d.textContent=n>9?"9+":n; } else d?.remove(); });
 }
-// 새 메시지가 오면: 채팅 화면이면 목록만 바꾸고(쓰던 글 그대로), 다른 화면이면 탭에 빨간 숫자만
+// 새 메시지가 오면: 채팅이 보이면 목록만 바꾸고(쓰던 글 그대로), 안 보이면 탭 · 채팅 단추에 빨간 숫자만
 function onChats(){
   if(S.phase!=="app" || !S.me) return;
-  const box=document.getElementById("chat-list");
-  if(box){ const bottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML=chatItems(); if(bottom) box.scrollTop=box.scrollHeight; markChatSeen(); }
-  else chatDots();
+  document.querySelectorAll(".chat-list").forEach(box=>{ const bottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML=chatItems(); if(bottom) box.scrollTop=box.scrollHeight; });
+  if(chatBoxes().length) markChatSeen(); else chatDots();
 }
 function afterChatRender(){
-  // 채팅 탭을 처음 열 때만 맨 아래로 (사진 크게 보기를 열고 닫아도 보던 자리 그대로)
-  const box=document.getElementById("chat-list"); if(box && S.chatJump){ box.scrollTop=box.scrollHeight; S.chatJump=false; }
+  // 채팅을 처음 열 때만 맨 아래로 (사진 크게 보기를 열고 닫아도 보던 자리 그대로)
+  const boxes=chatBoxes(); if(!boxes.length){ chatDots(); return; }
+  if(S.chatJump){ boxes.forEach(b=>b.scrollTop=b.scrollHeight); S.chatJump=false; }
   markChatSeen(); cleanOldChats();
 }
+// 컴퓨터 화면: 종이 판 오른쪽 바깥의 좁은 채팅 기둥 (접으면 세로 단추만)
+const chatSideOpen = () => ls.get("iinote-chat-side","open")!=="closed";
+function viewChatSide(){
+  if(S.tab==="chat" && !S.sub) return "";   // 채팅 탭을 보고 있으면 기둥은 안 그려요 (같은 채팅이 두 번 안 보이게)
+  if(!chatSideOpen()) return `<aside class="chat-side closed" aria-label="가족 채팅"><button class="chat-side-open" data-act="chat-side" aria-label="가족 채팅 펼치기">💬<span>가족 채팅</span></button></aside>`;
+  return `<aside class="chat-side" aria-label="가족 채팅">
+    <div class="chat-side-h"><b>💬 가족 채팅</b><button class="link-btn" data-act="chat-side" aria-label="가족 채팅 접기">접기 ▸</button></div>
+    <div class="chat-list" aria-live="polite">${chatItems()}</div>
+    ${chatForm()}</aside>`;
+}
+const chatForm = () => `<form class="chat-in" data-form="chat">
+      ${allow("photos")?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" class="chat-photo" accept="image/*"></label>`:""}
+      <label class="chat-ta-l"><span class="sr">메시지</span><textarea class="chat-ta" name="text" rows="1" maxlength="1000" placeholder="가족에게 한마디" enterkeyhint="send">${esc(S.chatDraft||"")}</textarea></label>
+      <button class="btn btn-primary chat-send" ${S.chatBusy?"disabled":""}>${S.chatBusy?"보내는 중…":"보내기"}</button>
+    </form>`;
 async function cleanOldChats(){
   if(!isParent() || S.chatCleaned===S.gid) return; S.chatCleaned=S.gid;
   try{ for(const m of await B.oldChats(S.gid,Date.now()-CHAT_KEEP_DAYS*864e5)){
@@ -1636,12 +1678,8 @@ async function cleanOldChats(){
 function viewChat(){
   return `<div class="chat">
     <div class="page-h"><h1>💬 가족 채팅</h1><p class="muted" style="margin:4px 0 0">우리 가족만 보는 채팅방이에요. ${CHAT_KEEP_DAYS}일이 지난 이야기는 저절로 정리돼요.</p></div>
-    <div class="chat-list" id="chat-list" aria-live="polite">${chatItems()}</div>
-    <form class="chat-in" data-form="chat">
-      ${allow("photos")?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" id="chat-photo" accept="image/*"></label>`:""}
-      <label class="sr" for="chat-text">메시지</label><textarea id="chat-text" name="text" rows="1" maxlength="1000" placeholder="가족에게 한마디" enterkeyhint="send">${esc(S.chatDraft||"")}</textarea>
-      <button class="btn btn-primary chat-send" id="chat-send">보내기</button>
-    </form></div>`;
+    <div class="chat-list" aria-live="polite">${chatItems()}</div>
+    ${chatForm()}</div>`;
 }
 function chatItems(){
   if(!S.chatReady) return `<p class="empty">불러오는 중…</p>`;
@@ -1657,10 +1695,11 @@ function chatItems(){
   }
   return out;
 }
-async function sendChat(file){
-  const ta=document.getElementById("chat-text"), text=String(ta?.value||"").trim();
+// ta = 보낸 곳의 글 칸 (채팅 기둥 또는 채팅 탭)
+async function sendChat(file, ta){
+  const text=String(ta?.value||"").trim();
   if((!text && !file) || S.chatBusy) return;
-  const btn=document.getElementById("chat-send"); S.chatBusy=true; if(btn){ btn.disabled=true; btn.textContent="보내는 중…"; }
+  const btn=ta?.form?.querySelector(".chat-send"); S.chatBusy=true; if(btn){ btn.disabled=true; btn.textContent="보내는 중…"; }
   try{
     const data={profileId:S.me.id,text:text.slice(0,1000),createdAt:Date.now()};
     if(file){
@@ -1671,7 +1710,7 @@ async function sendChat(file){
     await B.add(S.gid,"chats",data);
     if(ta && ta.value.trim()===text){ ta.value=""; ta.style.height=""; S.chatDraft=""; }
   }catch(e){ console.error(e); toast(e.message?.includes("사진")?e.message:"보내지 못했어요. 다시 눌러 주세요"); }
-  finally{ S.chatBusy=false; const b=document.getElementById("chat-send"); if(b){ b.disabled=false; b.textContent="보내기"; } document.getElementById("chat-text")?.focus(); }
+  finally{ S.chatBusy=false; document.querySelectorAll(".chat-send").forEach(b=>{ b.disabled=false; b.textContent="보내기"; }); if(ta?.isConnected) ta.focus(); }
 }
 
 async function enterGroup(gid){
@@ -1931,7 +1970,7 @@ function viewShell(){
       ${kidBar()}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
-      <main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${dupBanner()}${viewMain()}</main>
+      <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
     </div>
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`).join("")}</div>
@@ -3178,7 +3217,7 @@ function render(){
     if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; history.replaceState(null,"",location.pathname); }
     $app.innerHTML=viewShell();
     if(S.sub?.type==="write") penHL();
-    if(S.tab==="chat" && !S.sub) afterChatRender(); else chatDots();
+    afterChatRender();
   }
   document.body.style.overflow = S.lb ? "hidden" : "";
 }
@@ -3340,6 +3379,7 @@ const acts = {
   "talk-make": el => talkMake(el.dataset.v==="text"),
   "rec-stop": () => { if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); },
   "audio-del": () => { const a=S.draft.audio; if(a?.path) S.draft.removed.push(a.path); S.draft.audio=null; render(); },
+  "chat-side": () => { const open=!chatSideOpen(); ls.set("iinote-chat-side",open?"open":"closed"); if(open) S.chatJump=true; render(); },
   "chat-ph": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m?.photo) return; S.lb={photos:[m.photo],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
   "chat-del": el => guard(async()=>{ const m=S.chats.find(x=>x.id===el.dataset.id); if(!m || !confirm("이 메시지를 지울까요?")) return;
     if(m.photo?.path) await B.deleteMedia(m.photo.path); if(m.photo?.thumbPath) await B.deleteMedia(m.photo.thumbPath);
@@ -3672,7 +3712,7 @@ async function penCheck(){
 /* 폼 제출 */
 const forms = {
   pdf: (fd, f) => makePdf(f),
-  chat: () => sendChat(null),
+  chat: (fd, f) => sendChat(null, f.querySelector(".chat-ta")),
   // 아이 일기 최소 글자 수 (비우면 학년 기본값)
   "kid-goal": fd => guard(async()=>{
     for(const p of S.profiles.filter(x=>x.type==="child")){
@@ -3714,7 +3754,7 @@ const KID_MAX_BURST = 10, KID_TYPE_MSG = "아이 일기는 직접 손으로 써�
 const kidField = t => S.me?.type==="child" && S.draft && (t.id==="w-text"||t.id==="w-title");
 ["paste","drop"].forEach(ev=>document.addEventListener(ev, e => { if(kidField(e.target)){ e.preventDefault(); toast(KID_TYPE_MSG); } }));
 document.addEventListener("input", e => {
-  if(e.target.id==="chat-text"){ S.chatDraft=e.target.value; e.target.style.height="auto"; e.target.style.height=Math.min(140,e.target.scrollHeight)+"px"; return; }
+  if(e.target.classList?.contains("chat-ta")){ S.chatDraft=e.target.value; e.target.style.height="auto"; e.target.style.height=Math.min(140,e.target.scrollHeight)+"px"; return; }
   if(e.target.id==="q"){ S.search=e.target.value; const w=document.getElementById("feed-wrap"); if(w) w.innerHTML=viewFeed(); return; }
   if(!S.draft) return;
   // 아이 일기는 직접 손으로 써요: 말로 쓰기처럼 한꺼번에 긴 글이 들어오면 되돌려요
@@ -3727,7 +3767,7 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("change", e => {
   const t=e.target;
-  if(t.id==="chat-photo" && t.files?.[0]){ const file=t.files[0]; t.value=""; if(S.chatBusy){ toast("보내는 중이에요. 끝나면 사진을 다시 골라 주세요"); return; } sendChat(file); return; }
+  if(t.classList?.contains("chat-photo") && t.files?.[0]){ const file=t.files[0], ta=t.closest("form")?.querySelector(".chat-ta"); t.value=""; if(S.chatBusy){ toast("보내는 중이에요. 끝나면 사진을 다시 골라 주세요"); return; } sendChat(file, ta); return; }
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
@@ -3744,7 +3784,7 @@ document.addEventListener("change", e => {
 
 document.addEventListener("keydown", e => {
   // 채팅: 엔터로 보내기, Shift+엔터는 줄바꿈 (한글 조합 중에는 기다려요)
-  if(e.target.id==="chat-text" && e.key==="Enter" && !e.shiftKey && !e.isComposing && e.keyCode!==229){ e.preventDefault(); sendChat(null); return; }
+  if(e.target.classList?.contains("chat-ta") && e.key==="Enter" && !e.shiftKey && !e.isComposing && e.keyCode!==229){ e.preventDefault(); sendChat(null, e.target); return; }
   if(S.lb){ if(e.key==="Escape") { S.lb=null; render(); } else if(e.key==="ArrowLeft") lbMove(-1); else if(e.key==="ArrowRight") lbMove(1); return; }
   const id=e.target.id;
   if(id==="w-tag" && !e.isComposing){
