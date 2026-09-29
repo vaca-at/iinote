@@ -687,6 +687,16 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .nav-item{position:relative}
 .nav-item .cdot{position:absolute;top:2px;right:calc(50% - 22px);margin:0}
 @media (max-width:759px){ .chat-list{height:calc(100vh - 330px);padding:10px} .cm{max-width:94%} }
+.cm-rxs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:2px}
+.cm.me .cm-rxs{justify-content:flex-end}
+.rx{display:inline-flex;align-items:center;gap:3px;min-height:26px;padding:0 8px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-size:13px;cursor:pointer}
+.rx b{font-size:11.5px;color:var(--ink2)}
+.rx.on{border-color:var(--coral);background:var(--coral-soft)}
+.rx-add{min-height:26px;padding:0 7px;border-radius:999px;border:1.5px dashed var(--line);background:none;color:var(--ink3);font-size:12px;cursor:pointer;opacity:.7}
+.cm:hover .rx-add,.rx-add[aria-expanded="true"]{opacity:1}
+.rx-pick{display:inline-flex;gap:2px;padding:2px 4px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line);box-shadow:0 4px 12px rgba(31,42,68,.12)}
+.rx-e{width:30px;height:30px;border:0;border-radius:50%;background:none;font-size:18px;cursor:pointer}
+.rx-e:hover{background:var(--butter-soft)}
 .chat-ta-l{flex:1;display:flex;min-width:0}
 .chat-ta-l textarea{flex:1}
 /* 컴퓨터(넓은 화면): 종이 판 오른쪽 바깥의 좁은 채팅 기둥. 좁은 화면은 '가족 채팅' 탭으로 */
@@ -1663,6 +1673,17 @@ function afterChatRender(){
   if(S.chatJump){ boxes.forEach(b=>b.scrollTop=b.scrollHeight); S.chatJump=false; }
   markChatSeen(); cleanOldChats();
 }
+// 채팅 이모지 반응: 한 사람당 하나 (같은 걸 다시 누르면 빠져요). chats.reactions = {프로필id: 이모지}
+const REACTS = ["❤️","👍","😂","👏","🥰","😮"];
+function chatReacts(m){
+  const rx=m.reactions||{}, cnt={};
+  Object.entries(rx).forEach(([pid,e])=>{ (cnt[e]=cnt[e]||[]).push(prof(pid)?.name||""); });
+  const chips=Object.entries(cnt).map(([e,names])=>`<button type="button" class="rx ${rx[S.me.id]===e?"on":""}" data-act="chat-react" data-id="${esc(m.id)}" data-v="${e}" title="${esc(names.filter(Boolean).join(", "))}">${e}<b>${names.length}</b></button>`).join("");
+  const pick=S.rxFor===m.id?`<span class="rx-pick" role="group" aria-label="반응 고르기">${REACTS.map(e=>`<button type="button" class="rx-e" data-act="chat-react" data-id="${esc(m.id)}" data-v="${e}" aria-label="${e} 반응">${e}</button>`).join("")}</span>`:"";
+  return `<div class="cm-rxs">${chips}<button type="button" class="rx-add" data-act="chat-rx-open" data-id="${esc(m.id)}" aria-label="반응 달기" aria-expanded="${S.rxFor===m.id}">☺+</button>${pick}</div>`;
+}
+// 채팅 목록만 다시 그리기 (보던 자리 그대로, 쓰던 글 그대로)
+function refreshChatLists(){ document.querySelectorAll(".chat-list").forEach(b=>{ const st=b.scrollTop; b.innerHTML=chatItems(); b.scrollTop=st; }); }
 // 컴퓨터 화면: 종이 판 오른쪽 바깥의 좁은 채팅 기둥 (접으면 세로 단추만)
 const chatSideOpen = () => ls.get("iinote-chat-side","open")!=="closed";
 function viewChatSide(){
@@ -1700,7 +1721,7 @@ function chatItems(){
     out+=`<div class="cm ${mine?"me":""}">${mine?"":av(p,32)}<div class="cm-b">${mine?"":`<b class="cm-n">${esc(p?.name||"알 수 없음")}</b>`}
       <div class="cm-row"><div class="cm-bub" style="--pc:${p?.color||"#1F2A44"}">${m.deleted?`<em>지운 메시지예요</em>`
         :`${m.photo?`<button type="button" class="cm-ph" data-act="chat-ph" data-id="${esc(m.id)}" aria-label="사진 크게 보기"><img src="${esc(m.photo.thumb||m.photo.url)}" alt="" loading="lazy"></button>`:""}${m.text?`<p>${esc(m.text)}</p>`:""}`}</div>
-      <span class="cm-t">${pad(t.getHours())}:${pad(t.getMinutes())}${del?`<button type="button" class="cm-del" data-act="chat-del" data-id="${esc(m.id)}" aria-label="메시지 지우기">지우기</button>`:""}</span></div></div></div>`;
+      <span class="cm-t">${pad(t.getHours())}:${pad(t.getMinutes())}${del?`<button type="button" class="cm-del" data-act="chat-del" data-id="${esc(m.id)}" aria-label="메시지 지우기">지우기</button>`:""}</span></div>${m.deleted?"":chatReacts(m)}</div></div>`;
   }
   return out;
 }
@@ -3390,6 +3411,11 @@ const acts = {
   "talk-make": el => talkMake(el.dataset.v==="text"),
   "rec-stop": () => { if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); },
   "audio-del": () => { const a=S.draft.audio; if(a?.path) S.draft.removed.push(a.path); S.draft.audio=null; render(); },
+  "chat-rx-open": el => { S.rxFor = S.rxFor===el.dataset.id ? null : el.dataset.id; refreshChatLists(); },
+  "chat-react": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m) return;
+    const rx={...(m.reactions||{})}; if(rx[S.me.id]===el.dataset.v) delete rx[S.me.id]; else rx[S.me.id]=el.dataset.v;
+    m.reactions=rx; S.rxFor=null; refreshChatLists();   // 먼저 화면에 보여 주고 저장해요
+    B.update(S.gid,"chats",m.id,{reactions:rx}).catch(()=>toast("반응을 저장하지 못했어요")); },
   "chat-side": () => { const open=!chatSideOpen(); ls.set("iinote-chat-side",open?"open":"closed"); if(open) S.chatJump=true; render(); },
   "chat-ph": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m?.photo) return; S.lb={photos:[m.photo],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
   "chat-del": el => guard(async()=>{ const m=S.chats.find(x=>x.id===el.dataset.id); if(!m || !confirm("이 메시지를 지울까요?")) return;
