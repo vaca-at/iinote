@@ -235,6 +235,10 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .nav-items{display:flex;justify-content:space-around}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;padding:6px 4px;border-radius:12px;color:var(--ink3);font-size:12px;font-weight:650;min-height:52px}
 .nav-item .ic{width:24px;height:24px}
+.nav-item{min-width:0}
+.nav-item .ns{display:none}
+/* 휴대폰 아래 메뉴: 짧은 이름으로 한 줄에 (가족 채팅 → 채팅, 우리 가족 설정 → 설정 …) */
+@media (max-width:640px){ .nav-item .nl{display:none} .nav-item .ns{display:inline;white-space:nowrap} .nav-item{padding:6px 0;font-size:11.5px} }
 .nav-item.on{color:var(--ink)}
 .nav-item.on .ic{color:var(--coral)}
 .top{position:sticky;top:0;z-index:15;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
@@ -355,7 +359,7 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 @media (max-width:640px){ .st-list{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .st-row{display:flex;flex-wrap:wrap;row-gap:6px;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--paper)}
 .st-name{white-space:nowrap;font-weight:700}
-.st-name{font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-name{font-weight:650;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}   /* auto: 이름이 먼저 자리를 잡고, 모자라면 '썼어요'가 아랫줄로 (짧은 이름이 '지..'로 잘리지 않게) */
 .week{border-top:1px dashed var(--line);padding-top:14px;overflow-x:auto}
 .wk-row{display:grid;grid-template-columns:4.5em repeat(7,minmax(28px,1fr));align-items:center;gap:4px;min-height:32px}
 .wk-head{font-size:12px;color:var(--ink3);text-align:center}
@@ -679,6 +683,16 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .cm.me .cm-t{align-items:flex-start}
 .cm-del{padding:0;border:0;background:none;color:var(--ink3);font-size:11px;text-decoration:underline;cursor:pointer}
 .chat-in{display:flex;align-items:flex-end;gap:8px}
+/* 답장 */
+.cm-rep{text-decoration:none;font-weight:700;color:var(--ink2);margin:1px 0}
+.cm-q{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;margin:0 0 6px;padding:5px 9px;border:0;border-left:3px solid var(--qc);border-radius:6px;background:rgba(127,127,127,.1);color:var(--ink2);font-size:12.5px;text-align:left;cursor:pointer;max-width:260px}
+.cm-q b{font-size:12px;color:var(--ink)}
+.cm-q span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.chat-rp{display:flex;align-items:center;gap:8px;margin:0 0 6px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--sage-soft);font-size:13px;color:var(--ink2)}
+.chat-rp span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-rp b{color:var(--ink)}
+.cm.flash .cm-bub{animation:cmFlash 1.4s ease}
+@keyframes cmFlash{0%,60%{box-shadow:0 0 0 3px var(--coral)}100%{box-shadow:0 0 0 0 transparent}}
 .chat-in textarea{flex:1;min-height:46px;max-height:140px;resize:none;padding:11px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);font:inherit;line-height:1.5}
 .chat-ph{position:relative;display:grid;place-items:center;flex:none;width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);cursor:pointer}
 .chat-ph input{position:absolute;opacity:0;width:1px;height:1px}
@@ -782,7 +796,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .kw-done{min-height:50px;padding:0 24px;border-radius:14px;border:0;background:var(--sage);color:#fff;font-weight:800;font-size:17px;box-shadow:0 6px 0 -2px color-mix(in srgb,var(--sage) 60%,#000)}
 .kw-done:hover{filter:brightness(1.05)}
 .kw-qshow{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:var(--butter-soft);font-weight:650;font-size:14px}
-@media (max-width:759px){ .kw{padding:14px 12px 18px;border-radius:18px} .kw .w-text,.kw .w-hl{padding-left:44px} .kw .w-text{background-image:linear-gradient(to right,transparent 32px,var(--coral) 32px,var(--coral) 33.5px,transparent 33.5px),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))} .kw-msg{flex-basis:100%;order:3} }
+@media (max-width:759px){ .kw{padding:14px 12px 18px;border-radius:18px} .kw .w-text,.kw .w-hl{padding-left:44px} .kw .w-text{background-image:linear-gradient(to right,transparent 32px,var(--coral) 32px,var(--coral) 33.5px,transparent 33.5px),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))} .kw-prog{flex-wrap:wrap} .kw-msg{flex:1 1 100%;min-width:0;order:3} }
 /* 날씨 · 기분 고르기: 이름 + 그림 7개, 고른 것 이름은 오른쪽에 */
 .wm{display:grid;gap:8px;margin:16px 0}
 .wm-row{display:flex;align-items:center;gap:10px;margin:0;padding:0;border:0;min-width:0}
@@ -854,6 +868,16 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .pen mark{color:inherit;border-radius:4px;padding:0 3px}
 .pen mark.pen-x{background:rgba(255,214,51,.6)}
 .pen mark.pen-ok{background:rgba(80,200,120,.35)}
+.pen-ask{display:flex;align-items:center;gap:12px;background:var(--sage-soft);border-radius:14px;padding:12px 14px;margin:0 0 14px}
+.pen-ask p{margin:0;flex:1;min-width:0;color:var(--ink)}
+.pen-ask small{color:var(--ink2)}
+.pen-ask-i{font-size:22px}
+.pen-how{margin:0;padding-left:1.2em;display:grid;gap:6px;font-size:14px;color:var(--ink2)}
+.pen-how b{color:var(--ink)}
+.pen-pick{border:1px solid var(--line);border-radius:12px;padding:8px 12px 10px;margin:0;display:flex;flex-wrap:wrap;gap:6px 18px}
+.pen-pick legend{padding:0 4px;font-weight:700}
+.pen-pick label{display:flex;align-items:center;gap:6px;cursor:pointer;flex:1 1 150px;white-space:nowrap}
+.pen-pick input{width:auto;min-height:0;height:auto;margin:0;padding:0;flex:none;accent-color:var(--coral)}
 .pen-list{margin:12px 0 0;padding-left:1.4em;display:grid;gap:10px}
 .pen-list li.done{opacity:.85}
 .pen-chip{display:inline-block;font-size:12px;border-radius:99px;padding:0 8px;margin-right:6px;background:var(--coral-soft);color:var(--coral-ink);font-weight:700}
@@ -1519,8 +1543,22 @@ const PEN_GOAL_DEFAULT = {"-2":10,"-1":20,0:30,1:40,2:60,3:80,4:100,5:150,6:150,
 const penGoalDefault = p => (hasGrade(p?.grade) && PEN_GOAL_DEFAULT[Number(p.grade)]) || 60;
 const penGoalOf = p => Number(p?.diaryGoal) || penGoalDefault(p);
 const penAuto = g => (hasGrade(g)?Number(g):2) <= 2;   // 7세 이하 · 초1 · 초2는 다홍펜이 바로 고쳐 줘요
+// 7세 이하 · 초1 · 초2 아이는 보호자가 '우리 가족'에서 골라요 (profiles.penAuto: true 바로 고쳐 줘요 · false 스스로 고쳐요). 고르기 전에는 바로 고쳐 줘요
+const penYoung = p => p?.type==="child" && (hasGrade(p.grade)?Number(p.grade):2) <= 2;
+const penAutoOf = p => p?.type!=="child" ? penAuto(p?.grade) : penYoung(p) ? (typeof p.penAuto==="boolean" ? p.penAuto : true) : false;
+const penUnset = () => isParent() ? sortedProfiles().filter(p=>penYoung(p) && typeof p.penAuto!=="boolean") : [];
+// 마침표만 붙이는 고침은 줄 전체 대신 끝 몇 글자만 보여 줘요 (띄어쓰기 없이 길게 쓴 줄이 통째로 그어지지 않게)
+function penTrim(er,text){
+  const add=er.right.slice(er.wrong.length);
+  const cs=[...er.wrong];   // 이모지가 반으로 잘리지 않게 글자 단위로
+  if(!er.right.startsWith(er.wrong) || !/^[.?!]{1,2}$/.test(add) || cs.length<=5) return er;
+  const i=penAt(er,text); if(i<0) return er;
+  const end=i+er.wrong.length;
+  for(let n=4;n<cs.length;n++){ const s=cs.slice(-n).join(""); if(text.indexOf(s)===end-s.length && text.lastIndexOf(s)===end-s.length) return {...er, wrong:s, right:s+add}; }
+  return er;
+}
 const countChars = s => String(s||"").replace(/\s/g,"").length;
-const PEN_ENDS = /[.?!…~。)"'”’\]]$|\p{Extended_Pictographic}$/u;
+const PEN_ENDS = /[.?!…~。)"'”’\]]$|\p{Extended_Pictographic}[️‍]*$/u;   // ❤️ 처럼 뒤에 모양 글자(FE0F)가 붙은 이모지도 문장 끝으로 봐요
 const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"AI 다홍펜 선생님이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
 const PRAISE_SELF = ["👍 스스로 찾아서 고쳤어요! 정말 대단해요!","🦸 혼자 고치다니, 맞춤법 영웅이에요!","🧠 똑똑해요! AI 선생님 도움 없이 고쳤어요!"];
 // 틀린 말이 글 어디에 있는지 (고친 말 안에 틀린 말이 들어 있는 경우는 건너뛰어요)
@@ -1548,7 +1586,7 @@ function penPeriod(text,known){
 // 쉼표 · 마침표 · 물음표 · 느낌표 바로 뒤에 글자가 붙어 있으면 한 칸 띄어요 (1,000 · 3.5 는 그대로)
 function penSpace(text,known){
   const out=[];
-  for(const m of text.matchAll(/[,.!?](?=[^\s.,!?)"'”’~…])/g)){
+  for(const m of text.matchAll(/[,.!?](?=[^\s.,!?)"'”’~…\p{Extended_Pictographic}‍️])/gu)){   // 이모지(끝.💛)는 붙여 써도 괜찮아요
     const i=m.index, c=m[0], prev=text[i-1]||"", rest=text.slice(i+1);
     if(c==="," && /\d/.test(prev) && /^\d{3}(?!\d)/.test(rest)) continue;
     if(c==="." && /\d/.test(prev) && /^\d/.test(rest)) continue;
@@ -1738,6 +1776,7 @@ function chatReacts(m){
   const pick=S.rxFor===m.id?`<span class="rx-pick" role="group" aria-label="반응 고르기">${REACTS.map(e=>`<button type="button" class="rx-e" data-act="chat-react" data-id="${esc(m.id)}" data-v="${e}" aria-label="${e} 반응">${e}</button>`).join("")}</span>`:"";
   return `<div class="cm-rxs">${chips}<button type="button" class="rx-add" data-act="chat-rx-open" data-id="${esc(m.id)}" aria-label="반응 달기" aria-expanded="${S.rxFor===m.id}">☺+</button>${pick}</div>`;
 }
+function drawReplyBars(){ document.querySelectorAll(".chat-rp").forEach(x=>x.remove()); document.querySelectorAll("form.chat-in").forEach(f=>f.insertAdjacentHTML("beforebegin",chatReplyBar())); }
 // 채팅 목록만 다시 그리기 (보던 자리 그대로, 쓰던 글 그대로)
 function refreshChatLists(){ document.querySelectorAll(".chat-list").forEach(b=>{ const st=b.scrollTop; b.innerHTML=chatItems(); b.scrollTop=st; }); }
 // 컴퓨터 화면: 종이 판 오른쪽 바깥의 좁은 채팅 기둥 (접으면 세로 단추만)
@@ -1750,7 +1789,17 @@ function viewChatSide(){
     <div class="chat-list" aria-live="polite">${chatItems()}</div>
     ${chatForm()}</aside>`;
 }
-const chatForm = () => `<form class="chat-in" data-form="chat">
+// 답장: 메시지의 '답장'을 누르면 글 칸 위에 누구에게 답하는지 띠가 떠요. 보낸 답장에는 원래 메시지를 조금 보여 줘요 (chats.replyTo = {id, profileId, text, photo})
+const chatSnip = m => m.deleted ? "지운 메시지예요" : (m.text ? m.text.replace(/\s+/g," ").slice(0,60) : m.photo ? "📷 사진" : "");
+function chatQuote(r){
+  if(!r) return "";
+  const p=prof(r.profileId), orig=S.chats.find(x=>x.id===r.id);
+  const txt=orig ? chatSnip(orig) : (r.text || (r.photo?"📷 사진":""));
+  return `<button type="button" class="cm-q" data-act="chat-jump" data-id="${esc(r.id)}" style="--qc:${p?.color||"#767E91"}"><b>${esc(p?.name||"알 수 없음")}</b><span>${esc(txt)}</span></button>`;
+}
+const chatReplyBar = () => { const r=S.chatReply; if(!r) return ""; const p=prof(r.profileId);
+  return `<div class="chat-rp" role="status"><span>↩ <b>${esc(p?.name||"")}</b>에게 답장 · ${esc(r.text||(r.photo?"📷 사진":""))}</span><button type="button" class="icon-btn" data-act="chat-reply-x" aria-label="답장 그만두기">✕</button></div>`; };
+const chatForm = () => `${chatReplyBar()}<form class="chat-in" data-form="chat">
       ${allow("photos")?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" class="chat-photo" accept="image/*"></label>`:""}
       <label class="chat-ta-l"><span class="sr">메시지</span><textarea class="chat-ta" name="text" rows="1" maxlength="1000" placeholder="가족에게 한마디" enterkeyhint="send">${esc(S.chatDraft||"")}</textarea></label>
       <button class="btn btn-primary chat-send" ${S.chatBusy?"disabled":""}>${S.chatBusy?"보내는 중…":"보내기"}</button>
@@ -1774,10 +1823,10 @@ function chatItems(){
   for(const m of S.chats){
     const t=new Date(m.createdAt||0), ds=ymd(t), p=prof(m.profileId), mine=m.profileId===S.me.id, del=!m.deleted && (mine||isParent());
     if(ds!==day){ day=ds; out+=`<div class="chat-day"><span>${fmtLong(ds)}</span></div>`; }
-    out+=`<div class="cm ${mine?"me":""}">${mine?"":av(p,32)}<div class="cm-b">${mine?"":`<b class="cm-n">${esc(p?.name||"알 수 없음")}</b>`}
+    out+=`<div class="cm ${mine?"me":""}" id="cm-${esc(m.id)}">${mine?"":av(p,32)}<div class="cm-b">${mine?"":`<b class="cm-n">${esc(p?.name||"알 수 없음")}</b>`}
       <div class="cm-row"><div class="cm-bub" style="--pc:${p?.color||"#1F2A44"}">${m.deleted?`<em>지운 메시지예요</em>`
-        :`${m.photo?`<button type="button" class="cm-ph" data-act="chat-ph" data-id="${esc(m.id)}" aria-label="사진 크게 보기"><img src="${esc(m.photo.thumb||m.photo.url)}" alt="" loading="lazy"></button>`:""}${m.text?`<p>${esc(m.text)}</p>`:""}`}</div>
-      <span class="cm-t">${pad(t.getHours())}:${pad(t.getMinutes())}${del?`<button type="button" class="cm-del" data-act="chat-del" data-id="${esc(m.id)}" aria-label="메시지 지우기">지우기</button>`:""}</span></div>${m.deleted?"":chatReacts(m)}</div></div>`;
+        :`${chatQuote(m.replyTo)}${m.photo?`<button type="button" class="cm-ph" data-act="chat-ph" data-id="${esc(m.id)}" aria-label="사진 크게 보기"><img src="${esc(m.photo.thumb||m.photo.url)}" alt="" loading="lazy"></button>`:""}${m.text?`<p>${esc(m.text)}</p>`:""}`}</div>
+      <span class="cm-t">${pad(t.getHours())}:${pad(t.getMinutes())}${m.deleted?"":`<button type="button" class="cm-del cm-rep" data-act="chat-reply" data-id="${esc(m.id)}" aria-label="이 메시지에 답장">답장</button>`}${del?`<button type="button" class="cm-del" data-act="chat-del" data-id="${esc(m.id)}" aria-label="메시지 지우기">지우기</button>`:""}</span></div>${m.deleted?"":chatReacts(m)}</div></div>`;
   }
   return out;
 }
@@ -1787,7 +1836,8 @@ async function sendChat(file, ta){
   if((!text && !file) || S.chatBusy) return;
   const btn=ta?.form?.querySelector(".chat-send"); S.chatBusy=true; if(btn){ btn.disabled=true; btn.textContent="보내는 중…"; }
   try{
-    const data={profileId:S.me.id,text:text.slice(0,1000),createdAt:Date.now()};
+    const data={profileId:S.me.id,text:text.slice(0,1000),createdAt:Date.now()}, rp=S.chatReply;
+    if(rp) data.replyTo={id:rp.id,profileId:rp.profileId,text:rp.text||"",photo:!!rp.photo};
     if(file){
       const {big,thumb}=await makePhotoPair(file), id=rid(), base=`groups/${S.gid}/diaries/chat`;
       const r=await B.uploadMedia(`${base}/${id}.jpg`,big.blob), th=thumb?.blob?await B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob):null;
@@ -1795,6 +1845,7 @@ async function sendChat(file, ta){
     }
     await B.add(S.gid,"chats",data);
     if(ta && ta.value.trim()===text){ ta.value=""; ta.style.height=""; S.chatDraft=""; }
+    if(rp && S.chatReply===rp){ S.chatReply=null; document.querySelectorAll(".chat-rp").forEach(x=>x.remove()); }
   }catch(e){ console.error(e); toast(e.message?.includes("사진")?e.message:"보내지 못했어요. 다시 눌러 주세요"); }
   finally{ S.chatBusy=false; document.querySelectorAll(".chat-send").forEach(b=>{ b.disabled=false; b.textContent="보내기"; }); if(ta?.isConnected) ta.focus(); }
 }
@@ -2037,6 +2088,7 @@ function kidBar(){
   if(!pp) return "";
   return `<div class="kid-bar kid-now"><b>${esc(S.me.name)}${hasBatchim(S.me.name)?"이가":"가"} 쓰는 중</b><button class="kq back" data-act="back-parent">${av(pp,26)}<span>${esc(pp.name)}${ro(pp.name)} 돌아가기</span></button></div>`;
 }
+const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", report:"리포트", quiz:"퀴즈", family:"설정"};   // 휴대폰 아래 메뉴 이름
 function viewShell(){
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
@@ -2065,7 +2117,7 @@ function viewShell(){
       <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
     </div>
     <nav class="nav" aria-label="메뉴">
-      <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`).join("")}</div>
+      <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}</div>
     </nav>
     ${S.lb?viewLightbox():""}
   </div>`;
@@ -2077,7 +2129,7 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  if(!S.tab || S.tab==="home") return penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
@@ -2088,6 +2140,11 @@ const homeStyle = () => isParent() && HOME_STYLES.some(([k])=>k===S.me.homeStyle
 const homeCta = mine => mine && mine.status==="submitted"
   ? `<button class="btn btn-ghost" data-act="open-diary" data-id="${mine.id}">${ic("book")}오늘 내 일기 보기</button>`
   : `<button class="btn btn-primary" data-act="write">${ic("pen")}${mine?"오늘 일기 이어 쓰기":"오늘 일기 쓰기"}</button>`;
+// 보호자 홈: 7세 이하 · 초1 · 초2 아이의 다홍펜 고치는 방법을 아직 안 골랐으면 알려 줘요
+function penAskBanner(){
+  const ks=penUnset(); if(!ks.length) return "";
+  return `<div class="pen-ask" role="note"><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b>의 AI 다홍펜, 어떻게 고칠까요?<br><small>지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요.</small></p><button class="btn btn-primary sm" data-act="pen-set">고르기</button></div>`;
+}
 function viewHome(){
   const st=homeStyle();
   if(st==="calendar") return viewHomeCalendar();
@@ -3268,6 +3325,18 @@ function viewFamily(){
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
         <ul class="mem-list">${ps.map(p=>`<li class="mem">${av(p)}<span>${esc(p.name)}</span><small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`https://${SITE_ADDRESS}/?k=${g.inviteCode}-${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>`).join("")}</ul>
         ${isParent()&&ps.some(p=>p.type==="child"&&!p.uid)?`<p class="muted" style="margin:0 0 8px;font-size:13px">초대 문자를 복사해 아이 휴대폰에 문자로 보내면, 구글 계정 없이 크롬에서 바로 일기를 써요. 이 링크가 있으면 누구나 가족 일기장에 들어올 수 있으니 아이에게만 보내고, 걱정되면 비밀번호를 걸어 주세요.</p>`:""}
+        ${isParent()&&ps.some(penYoung)?`<details class="add" id="pen-mode" ${S.penOpen||penUnset().length?"open":""}><summary>${ic("pen")}AI 다홍펜 고치는 방법 <small class="muted">(7세 이하 · 초1 · 초2)</small></summary>
+          <form class="form-grid" data-form="kid-pen">
+            <p class="muted span2" style="margin:0;font-size:13px">어린 아이는 틀린 곳이 많으면 금방 지칠 수 있어요. 아이에게 맞는 방법을 골라 주세요. 언제든 바꿀 수 있고, 초3부터는 늘 스스로 고쳐요.</p>
+            <ul class="pen-how span2">
+              <li><b>🤖 바로 고쳐 줘요</b> · 다홍펜이 틀린 곳을 바로 고쳐서 초록 형광펜으로 보여 줘요. 아이는 바뀐 곳을 소리 내어 읽어 봐요. 쓰는 재미를 먼저 붙일 때 좋아요.</li>
+              <li><b>✏️ 스스로 고쳐요</b> · 틀린 곳을 노란 형광펜으로 칠하고 힌트를 줘요. 아이가 직접 고치거나 ‘정답 보기’를 눌러요. 다 고쳐야 제출할 수 있어요.</li>
+            </ul>
+            ${ps.filter(penYoung).map(p=>{ const on=penAutoOf(p); return `<fieldset class="span2 pen-pick"><legend>${esc(p.name)} <small class="muted">${esc(gradeName(p.grade)||"어린이")}${typeof p.penAuto!=="boolean"?" · 아직 안 골랐어요":""}</small></legend>
+              <label><input type="radio" name="${esc(p.id)}" value="auto" ${on?"checked":""}> 🤖 바로 고쳐 줘요</label>
+              <label><input type="radio" name="${esc(p.id)}" value="self" ${on?"":"checked"}> ✏️ 스스로 고쳐요</label></fieldset>`; }).join("")}
+            <button class="btn btn-primary span2">저장</button>
+          </form></details>`:""}
         ${isParent()&&ps.some(p=>p.type==="child")?`<details class="add"><summary>${ic("pen")}아이 일기 최소 글자 수</summary>
           <form class="form-grid" data-form="kid-goal">
             <p class="muted span2" style="margin:0;font-size:13px">이만큼 써야 AI 다홍펜 선생님을 부르고 제출할 수 있어요. 비워 두면 학년 기본값을 써요 (5세 10 · 6세 20 · 7세 30 · 초1 40 · 초2 60 · 초3 100 · 초4 150 · 초5 200 · 초6 250 · 중학생 300 · 고등학생 400자, 띄어쓰기 빼고).</p>
@@ -3377,6 +3446,7 @@ const acts = {
   "merge-dup": el => guard(()=>mergeSameName(el.dataset.v)),
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => guard(async()=>{ S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
+  "pen-set": () => { go(()=>{ S.tab="family"; S.sub=null; S.draft=null; S.penOpen=true; }); setTimeout(()=>document.getElementById("pen-mode")?.scrollIntoView({behavior:"smooth",block:"center"}),80); },
   tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); if(el.dataset.v==="chat") S.chatJump=true; S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
@@ -3508,6 +3578,15 @@ const acts = {
     S.newsOpen=true; render(); }),
   "news-go": el => go(()=>{ S.newsOpen=false; S.sub={type:"diary",id:el.dataset.id}; }),
   "chat-rx-open": el => { S.rxFor = S.rxFor===el.dataset.id ? null : el.dataset.id; refreshChatLists(); },
+  // 답장: 쓰던 글은 그대로 두고 띠만 다시 그려요
+  "chat-reply": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m) return;
+    S.chatReply={id:m.id, profileId:m.profileId, text:chatSnip(m), photo:!!m.photo}; drawReplyBars();
+    const ta=[...document.querySelectorAll(".chat-ta")].find(x=>x.offsetParent) || document.querySelector(".chat-ta"); ta?.focus(); },
+  "chat-reply-x": () => { S.chatReply=null; drawReplyBars(); },
+  // 답장 속 원래 메시지를 누르면 거기로 가서 잠깐 반짝여요
+  "chat-jump": el => { const box=el.closest(".chat-list"), t=box?.querySelector(`#cm-${CSS.escape(el.dataset.id)}`);
+    if(!t){ toast("원래 메시지가 너무 오래돼서 여기에 없어요"); return; }
+    t.scrollIntoView({behavior:"smooth",block:"center"}); t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash"); },
   "chat-react": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m) return;
     const rx={...(m.reactions||{})}; if(rx[S.me.id]===el.dataset.v) delete rx[S.me.id]; else rx[S.me.id]=el.dataset.v;
     m.reactions=rx; S.rxFor=null; refreshChatLists();   // 먼저 화면에 보여 주고 저장해요
@@ -3819,14 +3898,15 @@ async function penCheck(){
   try{
     const data=await callPen(d.text), prev=d.pen, text=d.text;
     let errors=(data.errors||[]).filter(e=>e && e.wrong && e.right && e.wrong!==e.right)
-      .map(e=>({wrong:String(e.wrong),right:String(e.right),kind:String(e.kind||""),hint:String(e.hint||""),why:String(e.why||"")}));
-    const found=errors.slice();   // 받아쓰기 퀴즈에 넣을 것 (다홍펜이 찾은 낱말만)
+      .map(e=>({wrong:String(e.wrong),right:String(e.right),kind:String(e.kind||""),hint:String(e.hint||""),why:String(e.why||"").replace(/([.!?])\s*[、，,]\s*/g,"$1 ").trim()}));
+    const found=errors.filter(e=>!/^[.?!]{1,2}$/.test(e.right.slice(e.wrong.length)) || !e.right.startsWith(e.wrong));   // 받아쓰기 퀴즈에 넣을 것 (마침표만 붙인 것은 빼고)
     errors.push(...penSpace(text,errors)); errors.push(...penPeriod(text,errors));
+    errors=errors.map(er=>penTrim(er,text));
     // 앞 검사에서 고친 기록은 그대로 남겨요 (같은 것은 한 번만)
     const kept=(prev?.errors||[]).filter(er=>penAt(er,text)<0 || er.kept), seen=new Set(errors.map(e=>e.wrong+"→"+e.right));
     errors=[...kept.filter(e=>!seen.has(e.wrong+"→"+e.right)), ...errors];
     errors.forEach(er=>{ er._left=penLeft(er,text); });
-    d.pen={praise:data.praise||"", cheer:data.cheer||"", errors, checks:(prev?.checks||0)+1, original:prev?.original||text, auto:penAuto(g)};
+    d.pen={praise:data.praise||"", cheer:data.cheer||"", errors, checks:(prev?.checks||0)+1, original:prev?.original||text, auto:penAutoOf(S.me)};
     if(d.pen.auto){ for(const er of errors) if(penAt(er,d.text)>=0){ penApplyOne(er); er.auto=true; er._left=false; } }
     // 검사 결과를 일기에 바로 붙여 둬요 (나갔다 와도 그대로)
     const base={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",prompt:d.prompt||"",title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now(),aiChecked:true,aiResult:penResult(d)};
@@ -3856,6 +3936,14 @@ const forms = {
       if((p.diaryGoal||null)!==goal) await B.update(S.gid,"profiles",p.id,{diaryGoal:goal});
     }
     await reload("profiles"); S.me=prof(S.me.id)||S.me; render(); toast("최소 글자 수를 저장했어요");
+  }),
+  // 7세 이하 · 초1 · 초2: 다홍펜이 바로 고쳐 줄지 · 스스로 고칠지
+  "kid-pen": fd => guard(async()=>{
+    for(const p of S.profiles.filter(penYoung)){
+      const v = fd[p.id]==="self" ? false : fd[p.id]==="auto" ? true : null;
+      if(v!==null && p.penAuto!==v) await B.update(S.gid,"profiles",p.id,{penAuto:v});
+    }
+    S.penOpen=false; await reload("profiles"); S.me=prof(S.me.id)||S.me; render(); toast("다홍펜 고치는 방법을 저장했어요");
   }),
   "old-import": fd => guard(()=>importOld(fd)),
   "create-group": fd => guard(async()=>{ const gid=await B.createGroup(fd.name.trim(),S.user,fd.me.trim()); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid); toast("가족을 만들었어요. 초대 코드는 '우리 가족'에 있어요"); }),

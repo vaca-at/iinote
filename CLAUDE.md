@@ -35,11 +35,14 @@
 - 목소리 · 소리 칸: 아이는 7세 이하만 (allow("audio")), 어른은 그대로. 비밀번호 칸은 모두 .pin-in 으로 ●●●●
 - 초6까지 아이 일기 쓰기 화면(kidUI): 공부방 일기장처럼 머리(○○의 일기장 · 🔥 연속) · 8시 알림 · 오늘/어제 · 💡 오늘의 질문(KID_QS, 고르면 diaries.prompt) · 공책 줄(빨간 여백선) · ✏️ 글자 수 막대(kwProgress/syncLen) · 🔒 다홍펜(글자 다 채우면 열림) · 💾 다 썼어요!
 - 💬 가족 채팅 (2026-09-29): 넓은 화면(1100px~)은 종이 판 오른쪽 바깥의 좁은 채팅 기둥(viewChatSide, 300px, 접기 · 펼치기 ls iinote-chat-side), 좁은 화면은 탭 "가족 채팅"(chat). 채팅 목록은 .chat-list 클래스로 두 곳, 보이는 것만 씀(chatBoxes). groups/{gid}/chats {profileId,text,photo,createdAt,deleted}, onSnapshot 으로 최근 150개(CHAT_LIMIT) 실시간. 사진은 어른만, 일기 사진처럼 줄여서 groups/{gid}/diaries/chat/ 에 올림(저장소 규칙 그대로). 90일(CHAT_KEEP_DAYS) 지난 것은 어른이 채팅 열 때 정리. 새 메시지는 탭에 빨간 숫자(ls iinote-chatseen-…). 새 메시지가 와도 다른 화면은 다시 그리지 않음(쓰던 일기 보호). 엔터 = 보내기(한글 조합 중 제외)
+- ✍️ 다홍펜 고치는 방법 (2026-09-29): 7세 이하 · 초1 · 초2(penYoung) 아이마다 보호자가 우리 가족 → 'AI 다홍펜 고치는 방법'에서 고름 → profiles.penAuto (true 바로 고쳐 줌 · false 스스로, 없으면 바로 고쳐 줌 = 예전과 같음). 안 고른 아이가 있으면 보호자 홈 맨 위에 안내 띠(penAskBanner → pen-set). 초3부터는 늘 스스로. 마침표만 붙이는 고침은 끝 네 글자만 보여 줌(penTrim), 이모지 뒤 붙여쓰기는 띄어쓰기 오류로 안 잡음. 7세(age7)는 family-spell 워커 LEVELS.age7 지시문을 고쳐서(2026-09-29, 39efb10) 소리 나는 대로 · 붙여 쓴 말도 하려던 말을 찾아 덩어리째 고침(최대 6개)
 - 테스트 팁: Edge 헤드리스 --virtual-time-budget 에서는 홈 · 채팅 화면의 createImageBitmap 이 멈춤(가상 시간 탓). 사진은 --remote-debugging-port 로 실제 시간 실행 뒤 Runtime.evaluate 로 확인
 - 검색 등록: naver…html · google…html 확인 파일, robots.txt(다음 확인 코드 포함) · sitemap.xml
 - 🔔 새 소식(newsItems): 내 일기의 댓글 · 내 댓글의 답글 · 하트(hearts 값 = 누른 시각) · 도장(stampAt), 어른은 아이가 쓴 일기. 최근 2주, 안 본 것 수는 ls iinote-news-{gid}-{pid}. 따로 저장하는 컬렉션 없음
 - 🏅 스티커판(STICKERS 14개, stickerStats): 아이의 내 일기 탭 위 + 아이들 현황 카드. 제출하면 새 스티커 토스트. 계산만 하고 저장 안 함
 - 채팅 반응: chats.reactions = {프로필id: 이모지} (REACTS 6개, 한 사람당 하나)
+- 채팅 답장 (2026-09-29): 메시지 시간 아래 '답장' → S.chatReply, 글 칸 위 띠(chatReplyBar · drawReplyBars, 쓰던 글 유지) → chats.replyTo = {id, profileId, text(앞 60자), photo}. 말풍선 안 인용(chatQuote)을 누르면 원래 메시지로 스크롤 + 반짝(chat-jump, #cm-{id})
+- 휴대폰 점검 (2026-09-29): 아래 메뉴는 640px 이하에서 짧은 이름(NAV_SHORT: 채팅 · 현황 · 하루 · 리포트 · 퀴즈 · 설정), .st-name flex:1 1 auto(짧은 이름 '지..' 잘림 고침), 아이 쓰기 화면 .kw-prog 줄바꿈(가로 넘침 고침). 체험 모드로 390 · 360px 전 화면 가로 넘침 없음 확인
 - PWA: manifest.json + icon-192/512.png (서비스 워커는 없음, 캐시 문제 피하려고)
 - 예전 주소 jsun.site/iinote 는 iinote.co.kr 로 넘기는 안내 페이지만 (쿼리 그대로). 더는 거기에 올리지 않음
 - 레이아웃(첫 화면 모양) 고르기는 홈에서만
