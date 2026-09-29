@@ -44,6 +44,8 @@
 - 채팅 답장 (2026-09-29): 메시지 시간 아래 '답장' → S.chatReply, 글 칸 위 띠(chatReplyBar · drawReplyBars, 쓰던 글 유지) → chats.replyTo = {id, profileId, text(앞 60자), photo}. 말풍선 안 인용(chatQuote)을 누르면 원래 메시지로 스크롤 + 반짝(chat-jump, #cm-{id})
 - 휴대폰 점검 (2026-09-29): 아래 메뉴는 640px 이하에서 짧은 이름(NAV_SHORT: 채팅 · 현황 · 하루 · 리포트 · 퀴즈 · 설정), .st-name flex:1 1 auto(짧은 이름 '지..' 잘림 고침), 아이 쓰기 화면 .kw-prog 줄바꿈(가로 넘침 고침). 체험 모드로 390 · 360px 전 화면 가로 넘침 없음 확인
 - PWA: manifest.json + icon-192/512.png (서비스 워커는 없음, 캐시 문제 피하려고)
+- 다홍펜 꼭 고칠 낱말 (2026-09-30): 워커 src/index.js 의 MUST_FIX = [[틀린 말, 바른 말, 힌트, 설명]] (첫 줄 홈럭볼 → 홈런볼). 지시문에 목록으로 들어가고, AI 가 빠뜨리면 워커가 직접 errors 에 넣음. 보호자가 새 기준을 말하면 여기에 한 줄 더하고 deploy. (Git Bash curl 은 한글이 깨지니 시험은 node fetch 로)
+- 🌸 따뜻한 일기장 디자인 (2026-09-30, data-design="warm"): 가족일기장(jsun.site/diary) 크레파스 테마처럼 분홍 책상 · 파스텔 인덱스 탭(아래로 살짝 내려앉음) · 색 띠 카드. 하루 펼쳐보기(dayCard)는 모든 디자인에서 도장을 본문 위 동그란 도장(.day-stamp), 아이 일기 다홍펜 고친 곳 · 칭찬 · 처음 쓴 글, 댓글 · 답글 모두 + 바로 한마디(form data-diary) · 하트 · 도장
 - 운영 현황판 (2026-09-30): 글씨 윤탱체, 접속 현황 최근 7일 + 펼쳐 보기, 13주 접속 잔디, 로그인 계정 나눠 보기(users.kind = google · kakao · both · kid, 앱이 가족에 들어간 계정에만 markKind 로 적음)
 - 예전 가족일기장 jsun.site/diary 에서 iinote 같이 보기 (2026-09-30, 저장소 jsun): 두 번째 파이어베이스 앱 "iinote" 에 bellachord 구글로 로그인('🌐 iinote 일기 같이 보기') → 도윤 · 도진 프로필이 있는 가족의 제출한 일기 · 댓글 · 하트 · 도장을 읽기만 해서 S.entries 에 합침(같은 날 같은 사람이면 예전 일기장 것이 먼저, importKey old: 는 뺌). 쓰기 · 도장 · 댓글은 iinote 에서
 - 예전 주소 jsun.site/iinote 는 iinote.co.kr 로 넘기는 안내 페이지만 (쿼리 그대로). 더는 거기에 올리지 않음
