@@ -445,13 +445,39 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .day-nav h1{font-family:var(--diary);font-size:clamp(24px,3.4vw,32px);margin:0}
 .day-nav .flip .ic{transform:scaleX(-1)}
 .day-cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));align-items:start}
-.day-col{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--pc);border-radius:18px;padding:14px 16px;box-shadow:0 1px 2px rgba(31,42,68,.04),0 8px 20px rgba(31,42,68,.06)}
+.day-col{position:relative;background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--pc);border-radius:18px;padding:14px 16px;box-shadow:0 1px 2px rgba(31,42,68,.04),0 8px 20px rgba(31,42,68,.06)}
+/* 칭찬 도장: 본문 위 오른쪽에 동그랗게 쾅 (가족일기장처럼) */
+.day-stamp{position:absolute;right:14px;top:50px;z-index:1;transform:rotate(-12deg);width:78px;height:78px;border-radius:50%;border:3px double var(--coral);color:var(--coral-ink);background:color-mix(in srgb,var(--surface) 72%,transparent);display:grid;place-items:center;text-align:center;font-family:var(--diary);font-weight:700;font-size:14px;line-height:1.1;padding:6px;pointer-events:none}
+.day-q{margin:0 0 6px;font-size:13.5px;color:var(--ink3)}
+.has-stamp .day-q,.has-stamp .day-text{padding-right:4px}
+.fx-ok{background:color-mix(in srgb,var(--sage) 26%,transparent);border-radius:4px;padding:0 2px}
+.fx-bad{color:var(--coral-ink);text-decoration:underline wavy var(--coral);text-underline-offset:4px}
+.day-pen{margin-top:10px;display:grid;gap:4px;font-size:13.5px;color:var(--ink2)}
+.day-pen p{margin:0}
+.day-pen-h small{color:var(--ink3)}
+.day-fix{margin:0;padding-left:1.2em;font-family:var(--diary);font-size:calc(var(--diary-size) * .78);line-height:1.7}
+.day-fix s{color:var(--coral-ink)}
+.day-fix small{font-family:var(--sans);font-size:11.5px;color:var(--ink3)}
+.day-praise{line-height:1.6}
+.day-praise b{color:var(--coral-ink)}
+.day-orig{border:1.5px dashed var(--line);border-radius:10px;padding:4px 10px}
+.day-orig summary{cursor:pointer;color:var(--ink3)}
+.day-orig div{white-space:pre-wrap;font-family:var(--diary);font-size:calc(var(--diary-size) * .85);margin-top:4px}
+.day-stamps{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.day-stamps .stamp-btn{font-size:12.5px;padding:2px 10px}
+.day-hearts{display:flex;align-items:center;gap:6px}
+.day-heart{border:0;background:none;font-size:19px;padding:0;line-height:1}
+.day-cmts li.re{padding-left:calc(var(--d) * 14px)}
+.day-cform{display:flex;gap:6px;margin-top:8px}
+.day-cform input{flex:1;min-width:0;border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:4px 2px;font-family:var(--diary);font-size:calc(var(--diary-size) * .8);color:var(--ink)}
+.day-cform input:focus{outline:0;border-bottom-color:var(--pc)}
 .day-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .day-h b{color:var(--pc);font-size:16px}
 .day-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:break-word;background-image:repeating-linear-gradient(transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))}
 .day-ph{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 .day-ph img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}
 .day-hearts{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--coral-ink)}
+.day-col .link-btn{display:block;margin-top:6px}
 .day-cmts{list-style:none;margin:10px 0 6px;padding:10px 0 0;border-top:1.5px dashed var(--line);display:grid;gap:6px;font-family:var(--diary);font-size:calc(var(--diary-size) * .8)}
 .day-col .link-btn{font-size:13px}
 .cm-when{font-family:var(--sans);font-size:11.5px;color:var(--ink3);white-space:nowrap}
@@ -1186,6 +1212,37 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 :root[data-design="wongoji"] .sheet .pill.none{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
 :root[data-design="wongoji"] .sheet::before{width:1px;box-shadow:4px 0 0 var(--margin)}
 .dsw.wongoji{border-color:#1E1E24;background:linear-gradient(#F4CFCA 1px,transparent 1px) 0 0/6px 6px,linear-gradient(90deg,#F4CFCA 1px,transparent 1px) 0 0/6px 6px,#FFFFFF;box-shadow:inset 3px 0 0 #D7263D}
+/* 따뜻한 일기장 (jsun.site/diary 가족일기장 '크레파스'처럼): 분홍 책상 + 둥근 종이 + 파스텔 인덱스 탭 + 색 띠 카드 */
+[data-design="warm"]:not([data-theme="dark"]){
+  --paper:#FBE3EC; --grid:transparent; --surface:#FFF9FB; --surface2:#FDEEF3;
+  --ink:#5A2E45; --ink2:#744860; --ink3:#86596F;
+  --line:#F2CADA; --rule:#F5D5E1; --margin:#F2B5C8;
+  --coral:#E4507F; --coral-ink:#B3315D; --coral-soft:#FCE0EA;
+  --butter:#F6C945; --butter-soft:#FDF1CC;
+  --sage:#4FA88A; --sage-soft:#DDF2EA;
+  --sky:#8EB6EC; --sky-soft:#E3EEFB; --lilac:#B9A2E8; --lilac-soft:#EFE8FB;
+  --focus:#F6C945; --r-lg:16px; --r-md:12px; --r-sm:10px;
+}
+[data-design="warm"][data-theme="dark"]{--margin:#7A4A5E}
+:root[data-design="warm"]:not([data-theme="dark"]) body{background-image:none}
+:root[data-design="warm"] :is(.mast-t,.page-h h1,.block-h h2,.day-nav h1){font-family:var(--diary);letter-spacing:0}
+:root[data-design="warm"] .block{border:2px solid var(--line);border-radius:14px;box-shadow:0 2px 0 var(--line)}
+:root[data-design="warm"] .btn{border-radius:12px}
+:root[data-design="warm"] .btn-primary{background:var(--ink);color:var(--surface)}
+:root[data-design="warm"] .day-col{border:0;border-top:8px solid var(--pc);border-radius:14px;box-shadow:0 2px 0 var(--line),0 6px 18px rgba(90,46,69,.06)}
+:root[data-design="warm"] .day-text{background-image:none}
+:root[data-design="warm"] :is(.fav,.me-chip){border-width:1.5px;background:var(--surface)}
+@media (min-width:760px){
+  :root[data-design="warm"] .ftabs{gap:5px;padding-left:24px}
+  :root[data-design="warm"] .ftab{border-radius:12px 12px 0 0;background:color-mix(in srgb,var(--tl) 45%,var(--surface));color:var(--ink);opacity:1;transform:translateY(4px);transition:transform .15s}
+  :root[data-design="warm"] .ftab .ic{color:var(--ink)}
+  :root[data-design="warm"] .ftab:hover{transform:translateY(1px)}
+  :root[data-design="warm"] .ftab.on{background:var(--tl);transform:none;box-shadow:none}
+  :root[data-design="warm"] .sheet{border-radius:6px 16px 16px 16px;border-top:6px solid var(--tl);box-shadow:0 3px 0 var(--line),0 10px 30px rgba(90,46,69,.08);padding-left:40px}
+  :root[data-design="warm"] .sheet::before{display:none}
+  :root[data-design="warm"] .sheet .block{background:var(--surface)}
+}
+.dsw.warm{border-color:#F2CADA;background:linear-gradient(#E4507F 0 0) top/100% 5px no-repeat,radial-gradient(circle at 70% 65%,#F6C945 0 3px,transparent 3.5px),#FDEEF3}
 /* ═════════ 손글씨 글씨: 화면 전체를 손글씨로 (눈누 무료 폰트 3가지 · 모두 웹 임베딩 허용 확인 2026-09-28) ═════════
    거의 전부 = 온글잎 윤탱체 (사용자 요청), 큰 화면 제목만 = 오뮤 다예쁨체 (기호는 Pretendard 로). 카페24 아네모네 에어는 불러 두기만 (지금은 안 씀) */
 @font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
@@ -1768,7 +1825,7 @@ const S = {
 if(S.joinCode && S.kidId) ls.set("iinote-kidlink",JSON.stringify({join:S.joinCode,kid:S.kidId,n:S.kidName}));
 function useSavedKidLink(){ try{ const k=JSON.parse(ls.get("iinote-kidlink","null")); if(k?.join && k?.kid && !S.joinCode){ S.joinCode=k.join; S.kidId=k.kid; S.kidName=k.n||""; } }catch(e){} }
 if(!["batang","pen","gothic","dodum"].includes(S.dfont)) S.dfont="batang";
-if(!["note","clean","bright","wongoji"].includes(S.design)) S.design="note";
+if(!["note","warm","clean","bright","wongoji"].includes(S.design)) S.design="note";
 function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
   document.querySelector('meta[name="theme-color"]').content = S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7"})[S.design] || "#FBF6EE"; }
 applyPrefs();
@@ -2158,7 +2215,7 @@ const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-
 // 일기 글씨 4가지
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
-const DESIGNS = [["note","노트"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
+const DESIGNS = [["note","노트"],["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
 // 레이아웃(첫 화면 모양)은 홈 화면에서만 보여요 (다른 탭에서는 바뀌는 게 없고, 누르면 홈으로 가 버려서)
 function prefBar(){
@@ -2864,16 +2921,48 @@ function viewDayOpen(){
   const list=sortedProfiles().map(p=>({p, x:S.diaries.find(y=>y.profileId===p.id && y.date===d && (y.status==="submitted" || y.profileId===S.me.id))})).filter(o=>o.x);
   const nav=`<div class="day-nav"><button class="icon-btn" data-act="day-move" data-v="-1" aria-label="전날">${ic("back")}</button><h1>${fmtLong(d)}</h1><button class="icon-btn flip" data-act="day-move" data-v="1" aria-label="다음 날" ${d>=t?"disabled":""}>${ic("back")}</button>${d!==t?`<button class="btn btn-ghost sm" data-act="day-move" data-v="0">오늘</button>`:""}</div>`;
   if(!list.length) return nav+`<p class="empty">${d===t?"오늘은 아직 아무도 일기를 쓰지 않았어요.":"이날은 가족이 쓴 일기가 없어요."}</p>`;
-  return nav+`<div class="day-cols">${list.map(({p,x})=>{ const c=p.color||"#1F2A44", m=MOODS.find(k=>k[0]===x.mood), hs=heartsOf(x).map(id=>prof(id)?.name).filter(Boolean);
-    const cs=S.comments.filter(k=>k.diaryId===x.id && !k.deleted).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
-    return `<article class="day-col" style="--pc:${c}">
-      <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${moodChip(x.mood,x.weather)}${x.status!=="submitted"?'<span class="pill draft">쓰는 중</span>':""}${x.stamp?`<span class="stamp-mini">${esc(x.stamp)}</span>`:""}</div>
-      <div class="day-text">${esc(x.text||"")}</div>
+  return nav+`<div class="day-cols">${list.map(({p,x})=>dayCard(p,x)).join("")}</div>`;
+}
+// 하루 펼쳐보기 카드 (가족일기장처럼): 도장은 본문 위에 쾅, 아이 일기는 다홍펜 고친 곳 · 칭찬, 댓글 · 답글 다 보이고 바로 쓰기
+const DAY_HOW = {self:"👍 스스로", hint:"💡 힌트 보고", ai:"🖍 AI가 고쳐 줌", other:"✏️ 다른 말로", kept:"🙆 이대로 둠", left:"⏳ 아직"};
+// 본문에서 찾은 낱말에 표시 (겹치지 않게 앞에서부터)
+function markWords(text, words, cls){
+  const spans=[];
+  words.filter(Boolean).forEach(w=>{ let i=text.indexOf(w);
+    while(i>=0 && spans.some(s=>i<s.e && i+w.length>s.i)) i=text.indexOf(w,i+1);
+    if(i>=0) spans.push({i,e:i+w.length}); });
+  spans.sort((a,b)=>a.i-b.i);
+  let h="", pos=0; spans.forEach(s=>{ h+=esc(text.slice(pos,s.i))+`<span class="${cls}">${esc(text.slice(s.i,s.e))}</span>`; pos=s.e; });
+  return h+esc(text.slice(pos));
+}
+function dayCard(p,x){
+  const c=p.color||"#1F2A44", mine=x.profileId===S.me.id, hsIds=heartsOf(x), hs=hsIds.map(id=>prof(id)?.name).filter(Boolean), on=hsIds.includes(S.me.id);
+  const cs=S.comments.filter(k=>k.diaryId===x.id), sub=x.status==="submitted";
+  const r=p.type==="child" && x.aiResult && (mine||isParent()) ? x.aiResult : null;
+  const fx=(r?.corrections||[]).filter(k=>k.wrong&&k.right), done=fx.filter(k=>!["kept","left"].includes(k.how));
+  const cnt=h=>fx.filter(k=>k.how===h).length;
+  const pen=r?`<div class="day-pen">
+      <p class="day-pen-h">✏️ ${countChars(x.text)}자 · 🖍 ${fx.length?`고친 곳 ${done.length}군데${Object.keys(DAY_HOW).some(cnt)?` <small>(${Object.keys(DAY_HOW).filter(cnt).map(h=>`${DAY_HOW[h].split(" ").slice(1).join(" ")} ${cnt(h)}`).join(" · ")})</small>`:""}`:"틀린 곳 없이 잘 썼어요"}</p>
+      ${fx.length?`<ul class="day-fix">${fx.map(k=>`<li><s>${esc(k.wrong)}</s> → <span class="fx-ok">${esc(k.right)}</span> <small>${DAY_HOW[k.how]||""}</small></li>`).join("")}</ul>`:""}
+      ${r.praise||r.feedback?`<p class="day-praise">👏 <b>AI 다홍펜</b> ${esc(r.praise||"")} ${esc(r.feedback||"")}</p>`:""}
+      ${r.original && r.original!==x.text?`<details class="day-orig"><summary>✍️ 처음 쓴 글 (다홍펜 전) 보기</summary><div>${markWords(r.original,fx.map(k=>k.wrong),"fx-bad")}</div></details>`:""}
+    </div>`:"";
+  const canStamp=sub && isParent() && !mine && p.type==="child";
+  const thread=(pid,depth)=>cs.filter(k=>(k.parentId||null)===pid).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).map(k=>{ const q=prof(k.profileId);
+    return `<li class="${depth?"re":""}" style="--d:${Math.min(depth,3)}">${depth?"↪ ":""}<b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${k.deleted?'<span class="muted">(지운 댓글이에요)</span>':esc(k.text)} <small class="cm-when">${cmtTime(k.createdAt)}${k.edited?" · 고침":""}</small></li>${thread(k.id,depth+1)}`; }).join("");
+  return `<article class="day-col${x.stamp?" has-stamp":""}" style="--pc:${c}">
+      <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${moodChip(x.mood,x.weather)}${!sub?'<span class="pill draft">쓰는 중</span>':""}</div>
+      ${x.stamp?`<div class="day-stamp" role="img" aria-label="칭찬 도장: ${esc(x.stamp)}">${esc(x.stamp)}</div>`:""}
+      ${x.prompt?`<p class="day-q">💡 ${esc(x.prompt)}</p>`:""}
+      <div class="day-text">${r?markWords(x.text||"",done.map(k=>k.right),"fx-ok"):esc(x.text||"")}</div>
       ${(x.photos||[]).length?`<div class="day-ph">${x.photos.slice(0,4).map(ph=>`<img src="${esc(ph.thumb||ph.url)}" alt="" loading="lazy">`).join("")}</div>`:""}
-      ${hs.length?`<p class="day-hearts">❤️ ${hs.map(esc).join(" · ")}</p>`:""}
-      ${cs.length?`<ul class="day-cmts">${cs.map(k=>{ const q=prof(k.profileId); return `<li><b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${esc(k.text)} <small class="cm-when">${cmtTime(k.createdAt)}</small></li>`; }).join("")}</ul>`:""}
-      <button class="link-btn" data-act="open-diary" data-id="${x.id}">💬 자세히 보기 · 댓글 쓰기</button>
-    </article>`; }).join("")}</div>`;
+      ${pen}
+      ${canStamp?`<div class="day-stamps" role="group" aria-label="칭찬 도장 찍기">${STAMPS.map(s=>`<button class="stamp-btn ${x.stamp===s?"on":""}" data-act="stamp" data-id="${x.id}" data-v="${esc(s)}" aria-pressed="${x.stamp===s}">${esc(s)}</button>`).join("")}</div>`:""}
+      ${sub?`<div class="day-hearts"><button class="day-heart" data-act="heart" data-id="${x.id}" aria-pressed="${on}" aria-label="하트">${on?"❤️":"🤍"}</button>${hs.length?`<span>${hs.map(esc).join(" · ")}</span>`:""}</div>`:""}
+      ${cs.length?`<ul class="day-cmts">${thread(null,0)}</ul>`:""}
+      ${sub?`<form class="day-cform" data-form="comment" data-parent="" data-diary="${x.id}"><label class="sr" for="dc-${x.id}">한마디</label><input id="dc-${x.id}" name="text" maxlength="500" required autocomplete="off" spellcheck="false" placeholder="${esc(p.name)}에게 한마디"><button class="btn btn-ghost sm">남기기</button></form>`:""}
+      <button class="link-btn" data-act="open-diary" data-id="${x.id}">자세히 보기 · 답글 쓰기 →</button>
+    </article>`;
 }
 /* ---------- 주간 · 월간 리포트 (부모만) ----------
    아이마다: 일기 쓴 날 · 글자 수 · 목표 달성 · 다홍펜 고친 곳 · 글자 수 막대 · 자주 틀린 맞춤법 · AI 선생님 총평
@@ -4069,7 +4158,7 @@ const forms = {
   link: fd => guard(async()=>{ let u=fd.url.trim(); if(!/^https?:\/\//i.test(u)) u="https://"+u; try{ new URL(u); }catch(e){ toast("주소를 다시 확인해 주세요"); return; }
     await B.add(S.gid,"links",{title:fd.title.trim(),url:u,createdBy:S.me.id,createdAt:Date.now()}); await reload("links"); render(); toast("즐겨찾기를 추가했어요"); }),
   comment: (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
-    await B.add(S.gid,"comments",{diaryId:S.sub.id,parentId:f.dataset.parent||null,profileId:S.me.id,text,createdAt:Date.now()});
+    await B.add(S.gid,"comments",{diaryId:f.dataset.diary||S.sub.id,parentId:f.dataset.parent||null,profileId:S.me.id,text,createdAt:Date.now()});
     S.replyTo=null; await reload("comments"); render(); toast(f.dataset.parent?"답글을 달았어요":"댓글을 달았어요"); }),
   "edit-comment": (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
     await B.update(S.gid,"comments",f.dataset.id,{text,edited:true,updatedAt:Date.now()}); S.editing=null; await reload("comments"); render(); toast("댓글을 수정했어요"); }),
