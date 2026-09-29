@@ -9,42 +9,73 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 /* 운영자 현황판: 가족 · 구성원 · 일기 수만 세요. 일기 내용은 한 글자도 받아 오지 않아요 (파이어베이스 '개수 세기'만 사용) */
-:root{--bg:#FBF6EE;--paper:#FFFDF9;--soft:#F6EFE3;--ink:#1F2A44;--sub:#767E91;--line:#E7DDCD;--accent:#EF6F53;--accent-ink:#B8452D;--ok:#3F7F70;--ok-soft:#DFEEE9;--warn:#B8452D}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--accent:#F07C62;--accent-ink:#F59C86;--ok:#8CC2B4;--ok-soft:#1E3430;--warn:#F59C86}}
-:root[data-theme="dark"]{--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--accent:#F07C62;--accent-ink:#F59C86;--ok:#8CC2B4;--ok-soft:#1E3430;--warn:#F59C86}
+/* 글씨: 온글잎 윤탱체 (사용자 요청), 없는 기호는 Pretendard 로 */
+@font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
+:root{--bg:#FBF6EE;--paper:#FFFDF9;--soft:#F6EFE3;--ink:#1F2A44;--sub:#767E91;--line:#E7DDCD;--grid:rgba(31,42,68,.045);--accent:#EF6F53;--accent-ink:#B8452D;--accent-soft:#FCE6DF;--ok:#3F7F70;--ok-soft:#DFEEE9;--butter:#F4BE45;--butter-soft:#FCF0CF;--sky:#6F9BD8;--sky-soft:#E3ECF8;--warn:#B8452D;--sun:#C9503A;--sat:#4A74B5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--grid:rgba(242,237,227,.035);--accent:#F07C62;--accent-ink:#F59C86;--accent-soft:#3A2A2A;--ok:#8CC2B4;--ok-soft:#1E3430;--butter:#E8B84A;--butter-soft:#352F20;--sky:#8FB3E6;--sky-soft:#1F2C44;--warn:#F59C86;--sun:#F59C86;--sat:#8FB3E6}}
+:root[data-theme="dark"]{--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--grid:rgba(242,237,227,.035);--accent:#F07C62;--accent-ink:#F59C86;--accent-soft:#3A2A2A;--ok:#8CC2B4;--ok-soft:#1E3430;--butter:#E8B84A;--butter-soft:#352F20;--sky:#8FB3E6;--sky-soft:#1F2C44;--warn:#F59C86;--sun:#F59C86;--sat:#8FB3E6}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;line-height:1.6;font-size:15px;word-break:keep-all}
-.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 48px}
-header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px}
-h1{font-size:22px;margin:0;flex:1;min-width:12em}
-h2{font-size:17px;margin:0 0 10px}
-.sub{color:var(--sub);font-size:13px}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font-family:'OwnglyphYuntaeng',"Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;line-height:1.55;font-size:18px;word-break:keep-all}
+.wrap{max-width:1040px;margin:0 auto;padding:22px 16px 56px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-bottom:18px}
+h1{font-size:30px;margin:0;flex:1;min-width:10em;font-weight:400;letter-spacing:-.01em}
+h2{font-size:23px;margin:0 0 12px;font-weight:400;display:flex;align-items:center;gap:8px}
+b,strong,th{font-weight:400}
+.sub{color:var(--sub);font-size:17px}
+.when{color:var(--sub);font-size:16px;background:var(--paper);border:1.5px dashed var(--line);border-radius:999px;padding:4px 12px}
 button{font:inherit;color:inherit;cursor:pointer}
-.btn{border:0;border-radius:999px;padding:10px 20px;background:var(--ink);color:var(--paper);font-weight:700}
-.pill{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
-.card{background:var(--paper);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:14px}
+.btn{border:0;border-radius:999px;padding:10px 20px;background:var(--ink);color:var(--paper);font-size:19px}
+.pill{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 14px;font-size:17px;transition:background .15s,border-color .15s}
+.pill:hover{background:var(--soft);border-color:var(--sub)}
+.card{background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:16px;box-shadow:0 2px 0 var(--line)}
 .login{max-width:420px;margin:12vh auto 0;text-align:center}
 .login .btn{width:100%;margin-top:14px}
-.alert{color:var(--warn);font-size:14px;margin:10px 0 0}
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
-.tile{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
-.tile b{display:block;font-size:26px;line-height:1.2}
-.tile span{color:var(--sub);font-size:13px}
+.alert{color:var(--warn);font-size:16px;margin:10px 0 0}
+/* 숫자 칸: 무리마다 위쪽 색 띠 (방문 = 하늘, 가족 · 사람 = 초록, 일기 = 코랄, AI = 버터) */
+.group-h{font-size:18px;color:var(--sub);margin:4px 2px 8px;display:flex;align-items:center;gap:8px}
+.group-h::after{content:"";flex:1;height:1.5px;background:var(--line)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.tile{position:relative;background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:14px 14px 12px;overflow:hidden}
+.tile::before{content:"";position:absolute;inset:0 0 auto;height:5px;background:var(--c,var(--line))}
+.tile b{display:block;font-size:36px;line-height:1.1;color:var(--ink)}
+.tile span{color:var(--sub);font-size:17px}
+.tile i{font-style:normal;position:absolute;right:12px;top:12px;font-size:18px;opacity:.85}
+.t-visit{--c:var(--sky)}.t-fam{--c:var(--ok)}.t-diary{--c:var(--accent)}.t-ai{--c:var(--butter)}
 .scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{border-bottom:1.5px solid var(--line);padding:8px 10px;text-align:center;white-space:nowrap}
-th{color:var(--sub);font-weight:600;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:19px}
+th,td{border-bottom:1.5px dashed var(--line);padding:7px 10px;text-align:center;white-space:nowrap}
+th{color:var(--sub);font-size:17px;border-bottom:1.5px solid var(--line)}
 td.l,th.l{text-align:left}
 tr.fam{cursor:pointer}
 tr.fam:hover td{background:var(--soft)}
-tr.mem td{background:var(--soft);font-size:13px}
+tr.mem td{background:var(--soft);font-size:16px}
 tr.mem td.l{padding-left:26px}
-.z{color:var(--sub)}
-.good{color:var(--ok);font-weight:700}
-.bar{display:inline-block;height:8px;border-radius:99px;background:var(--ok);vertical-align:middle;margin-right:6px;min-width:2px}
-.note{font-size:13px;color:var(--sub);margin:8px 0 0}
-pre{background:var(--soft);border-radius:12px;padding:12px;overflow-x:auto;font-size:12.5px;line-height:1.5;white-space:pre}
+.z{color:var(--sub);opacity:.7}
+.good{color:var(--ok)}
+.bar{display:inline-block;height:9px;border-radius:99px;background:var(--ok);vertical-align:middle;margin-right:6px;min-width:2px}
+.note{font-size:16px;color:var(--sub);margin:10px 0 0}
+pre{background:var(--soft);border-radius:12px;padding:12px;overflow-x:auto;font-family:Consolas,"D2Coding",monospace;font-size:12.5px;line-height:1.5;white-space:pre}
 a{color:var(--accent-ink)}
+/* 대문 접속 현황 */
+.vsum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 14px}
+.vsum div{background:var(--soft);border-radius:14px;padding:8px 12px}
+.vsum b{display:block;font-size:26px;line-height:1.1}
+.vsum span{font-size:17px;color:var(--sub)}
+.vsum .hot{background:var(--sky-soft)}
+.visit td.num{font-variant-numeric:tabular-nums;width:18%}
+.visit .track{display:flex;align-items:center;gap:8px}
+.visit .track s{flex:1;max-width:260px;height:10px;border-radius:99px;background:var(--soft);text-decoration:none;overflow:hidden}
+.visit .track s i{display:block;height:100%;border-radius:99px;background:var(--sky)}
+.visit .track em{font-style:normal;min-width:2ch}
+.visit tr.today td{background:var(--sky-soft)}
+.visit tr.today td:first-child{border-radius:10px 0 0 10px}
+.visit tr.today td:last-child{border-radius:0 10px 10px 0}
+.visit tr.empty td{color:var(--sub)}
+.visit .d-sun{color:var(--sun)}.visit .d-sat{color:var(--sat)}
+.visit .tag-today{font-size:13px;background:var(--sky);color:var(--paper);border-radius:99px;padding:0 7px;margin-left:4px;vertical-align:2px}
+.more{display:block;width:100%;margin-top:10px;border:1.5px dashed var(--line);background:transparent;border-radius:12px;padding:7px;font-size:17px;color:var(--sub)}
+.more:hover{background:var(--soft);color:var(--ink)}
+@media (max-width:560px){.vsum{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:25px}.visit .track s{max-width:110px}}
 </style>
 </head>
 <body>
@@ -156,12 +187,17 @@ function visitCard(stats){
   const by=Object.fromEntries(stats.map(s=>[s.day,s])), days=[...Array(30)].map((_,i)=>daysAgo(i));
   const v=d=>by[d]||{}, max=Math.max(1,...days.map(d=>v(d).visitors||0));
   const sum=(n,k)=>days.slice(0,n).reduce((s,d)=>s+(v(d)[k]||0),0);
-  const wd=d=>"일월화수목금토"[new Date(d+"T00:00").getDay()];
-  const rows=days.map(d=>{ const x=v(d); return `<tr><td class="l"><b>${d.slice(5).replace("-","/")}</b> <span class="sub">(${wd(d)})</span></td>
-    <td class="l"><span class="bar" style="width:${Math.round((x.visitors||0)/max*120)}px"></span>${x.visitors||'<span class="z">0</span>'}</td><td>${x.members||'<span class="z">0</span>'}</td><td>${x.views||'<span class="z">0</span>'}</td></tr>`; }).join("");
-  return `<div class="card"><h2>📈 대문 접속 현황 · 최근 30일</h2>
-    <p class="sub" style="margin:0 0 10px">오늘 방문자 <b>${v(days[0]).visitors||0}</b> · 어제 <b>${v(days[1]).visitors||0}</b> · 최근 7일 <b>${sum(7,"visitors")}</b> · 30일 <b>${sum(30,"visitors")}</b></p>
-    <div class="scroll"><table><tr><th class="l">날짜</th><th class="l">방문자 (기기)</th><th>로그인해서 쓴 기기</th><th>페이지 열림</th></tr>${rows}</table></div>
+  const wd=d=>new Date(d+"T00:00").getDay();
+  const n0=n=>n||'<span class="z">0</span>';
+  const row=(d,i)=>{ const x=v(d), w=wd(d), n=x.visitors||0;
+    return `<tr class="${i===0?"today":""}${!n&&!x.views?" empty":""}"><td class="l"><span class="${w===0?"d-sun":w===6?"d-sat":""}">${d.slice(5).replace("-","/")} (${"일월화수목금토"[w]})</span>${i===0?'<span class="tag-today">오늘</span>':""}</td>
+    <td class="l"><span class="track"><s><i style="width:${Math.round(n/max*100)}%"></i></s><em>${n0(n)}</em></span></td><td class="num">${n0(x.members)}</td><td class="num">${n0(x.views)}</td></tr>`; };
+  // 최근 7일만 보이고, 나머지 23일은 '펼쳐 보기'로 (같은 표 안이라 칸이 어긋나지 않아요)
+  return `<div class="card visit"><h2>📈 대문 접속 현황</h2>
+    <div class="vsum"><div class="hot"><b>${v(days[0]).visitors||0}</b><span>오늘 방문자</span></div><div><b>${v(days[1]).visitors||0}</b><span>어제</span></div><div><b>${sum(7,"visitors")}</b><span>최근 7일</span></div><div><b>${sum(30,"visitors")}</b><span>최근 30일</span></div></div>
+    <div class="scroll"><table><thead><tr><th class="l">날짜</th><th class="l">방문자 (기기)</th><th>로그인해서 쓴 기기</th><th>페이지 열림</th></tr></thead>
+      <tbody>${days.slice(0,7).map(row).join("")}</tbody><tbody id="visit-more" hidden>${days.slice(7).map((d,i)=>row(d,i+7)).join("")}</tbody></table></div>
+    <button class="more" data-act="visit-more">▾ 이전 23일 펼쳐 보기</button>
     <p class="note">방문자는 그날 처음 들어온 기기 수예요 (같은 기기는 하루 한 번만 세요). 페이지 열림은 새로고침을 포함한 횟수예요. 누가 들어왔는지는 남기지 않고 날짜별 숫자만 세요.</p></div>`;
 }
 // AI 사용 횟수와 예상 금액 (이번 달 + 지난 두 달)
@@ -193,24 +229,29 @@ function render(fams,users,idx,usage,stats){
     ${f.members.map(p=>`<tr class="mem" data-g="${i}" hidden><td class="l">${p.type==="child"?`아이 <span class="sub">${gradeName(p.grade)}${p.linked?" · 자기 기기":""}</span>`:"보호자"}</td>
       <td></td><td></td><td></td><td>${p.week==null?'<span class="z">?</span>':p.week?`<span class="good">${p.week}</span>`:'<span class="z">0</span>'}</td>
       <td class="sub">${p.pen!=null?`다홍펜 ${p.pen}`:""}</td><td>${p.sub}${p.all>p.sub?` <span class="sub">(+쓰는 중 ${p.all-p.sub})</span>`:""}</td></tr>`).join("")}`).join("");
-  $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="sub">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
+  const tile=(cls,icon,n,label)=>`<div class="tile ${cls}"><i>${icon}</i><b>${n}</b><span>${label}</span></div>`;
+  const m0=usage?.months?.[0];
+  $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="when">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
       <button class="pill" data-act="reload">🔄 새로고침</button><button class="pill" data-act="logout">로그아웃</button></header>
+    <div class="group-h">👨‍👩‍👧 사람 · 가족</div>
     <div class="tiles">
-      ${stats?`<div class="tile"><b>${(stats.find(x=>x.day===dayStr(new Date()))||{}).visitors||0}</b><span>오늘 방문자</span></div>`:""}
-      <div class="tile"><b>${fams.length}</b><span>가족</span></div>
-      <div class="tile"><b>${active}</b><span>이번 주 쓴 가족</span></div>
-      <div class="tile"><b>${users}</b><span>가입한 계정 (구글 · 카카오)</span></div>
-      <div class="tile"><b>${ms.length-kids.length} · ${kids.length}</b><span>보호자 · 아이 프로필</span></div>
-      <div class="tile"><b>${sum("today")}</b><span>오늘 일기</span></div>
-      <div class="tile"><b>${sum("w")}</b><span>최근 7일 일기</span></div>
-      <div class="tile"><b>${sum("m")}</b><span>최근 30일 일기</span></div>
-      <div class="tile"><b>${kids.reduce((s,p)=>s+(p.pen||0),0)}</b><span>다홍펜 받은 아이 일기</span></div>
-      ${(()=>{ const m=usage?.months?.[0]; if(!m) return ""; const n=AI_KINDS.reduce((s,[k])=>s+(m[k]||0),0);
-        return `<div class="tile"><b>${n}</b><span>이번 달 AI 사용 횟수</span></div><div class="tile"><b>${won(usd(m)+(m.transcribe||0)*STT_USD)}</b><span>이번 달 AI 예상 금액</span></div>`; })()}
+      ${stats?tile("t-visit","🚪",(stats.find(x=>x.day===dayStr(new Date()))||{}).visitors||0,"오늘 방문자"):""}
+      ${tile("t-fam","🏠",fams.length,"가족")}
+      ${tile("t-fam","✍️",active,"이번 주 쓴 가족")}
+      ${tile("t-fam","🔑",users,"가입한 계정 (구글 · 카카오)")}
+      ${tile("t-fam","🧑‍🧒",`${ms.length-kids.length} · ${kids.length}`,"보호자 · 아이 프로필")}
+    </div>
+    <div class="group-h">📒 일기 · AI</div>
+    <div class="tiles">
+      ${tile("t-diary","📝",sum("today"),"오늘 일기")}
+      ${tile("t-diary","🗓",sum("w"),"최근 7일 일기")}
+      ${tile("t-diary","📚",sum("m"),"최근 30일 일기")}
+      ${tile("t-diary","👩‍🏫",kids.reduce((s,p)=>s+(p.pen||0),0),"다홍펜 받은 아이 일기")}
+      ${m0?tile("t-ai","🤖",AI_KINDS.reduce((s,[k])=>s+(m0[k]||0),0),"이번 달 AI 사용 횟수")+tile("t-ai","💰",won(usd(m0)+(m0.transcribe||0)*STT_USD),"이번 달 AI 예상 금액"):""}
     </div>
     ${visitCard(stats)}
     ${aiCard(usage)}
-    <div class="card"><h2>가족별</h2><div class="scroll"><table>
+    <div class="card"><h2>🏡 가족별</h2><div class="scroll"><table>
       <tr><th class="l">가족 (누르면 사람별)</th><th>만든 날</th><th>보호자 · 아이</th><th>오늘</th><th class="l">최근 7일</th><th>30일</th><th>전체</th></tr>${rows||'<tr><td colspan="7" class="z">아직 가족이 없어요</td></tr>'}
     </table></div>
     <p class="note">일기 수는 쓰는 중(임시 저장)을 포함해요. 사람별 ‘전체’는 제출한 일기 수예요. 이 화면은 이름과 일기 내용을 보여 주지 않고 숫자만 세요.</p>
@@ -233,6 +274,7 @@ document.addEventListener("click", async e => {
     try{ await AU.signInWithPopup(auth,p); }catch(err){ if(err.code!=="auth/popup-closed-by-user" && err.code!=="auth/cancelled-popup-request") $app.innerHTML=loginHTML(errText(err)); } }
   if(act==="logout"){ await AU.signOut(auth); }
   if(act==="reload") load();
+  if(act==="visit-more"){ const t=document.getElementById("visit-more"); t.hidden=!t.hidden; b.textContent=t.hidden?"▾ 이전 23일 펼쳐 보기":"▴ 접기 (최근 7일만)"; }
   if(act==="toggle") document.querySelectorAll(`tr.mem[data-g="${b.dataset.v}"]`).forEach(r=>r.hidden=!r.hidden);
 });
 let msg="";
