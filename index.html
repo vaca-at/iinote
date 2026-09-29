@@ -687,6 +687,18 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .nav-item{position:relative}
 .nav-item .cdot{position:absolute;top:2px;right:calc(50% - 22px);margin:0}
 @media (max-width:759px){ .chat-list{height:calc(100vh - 330px);padding:10px} .cm{max-width:94%} }
+.bell{position:relative;flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font-size:18px;cursor:pointer}
+.bell.on{border-color:var(--ink)}
+.bell .cdot{position:absolute;top:-5px;right:-6px;margin:0}
+.news-panel{margin:10px 0 0;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);box-shadow:0 10px 26px rgba(31,42,68,.1);max-width:560px}
+.news-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.news-panel ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.news-panel li button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:0;border-radius:10px;background:none;text-align:left;cursor:pointer;font:inherit}
+.news-panel li button:hover{background:var(--paper)}
+.news-panel li.new button{background:var(--butter-soft)}
+.news-panel .ni{font-size:18px}
+.news-panel .nt{flex:1;min-width:0;font-size:14px}
+.news-panel small{color:var(--ink3);font-size:12px;white-space:nowrap}
 .cm-rxs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:2px}
 .cm.me .cm-rxs{justify-content:flex-end}
 .rx{display:inline-flex;align-items:center;gap:3px;min-height:26px;padding:0 8px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-size:13px;cursor:pointer}
@@ -1673,6 +1685,34 @@ function afterChatRender(){
   if(S.chatJump){ boxes.forEach(b=>b.scrollTop=b.scrollHeight); S.chatJump=false; }
   markChatSeen(); cleanOldChats();
 }
+/* ---------- 🔔 새 소식 ----------
+   내 일기에 달린 댓글 · 내 댓글에 달린 답글 · 하트 · 칭찬 도장, (어른) 아이가 쓴 일기. 따로 저장하지 않고 있는 기록에서 모아요 */
+const newsSeenKey = () => `iinote-news-${S.gid}-${S.me?.id}`;
+function newsItems(){
+  if(!S.me) return [];
+  const me=S.me.id, dmap=Object.fromEntries(S.diaries.map(d=>[d.id,d])), myC=new Set(S.comments.filter(c=>c.profileId===me).map(c=>c.id));
+  const nm=id=>prof(id)?.name||"가족", since=Date.now()-14*864e5, out=[];
+  const short=t=>{ t=String(t||"").replace(/\s+/g," ").trim(); return t.length>24?t.slice(0,24)+"…":t; };
+  for(const c of S.comments){ if(c.deleted || c.profileId===me || (c.createdAt||0)<since) continue; const d=dmap[c.diaryId]; if(!d) continue;
+    if(c.parentId && myC.has(c.parentId)) out.push({at:c.createdAt, ic:"↩️", text:`${nm(c.profileId)}의 답글: “${short(c.text)}”`, id:d.id});
+    else if(d.profileId===me) out.push({at:c.createdAt, ic:"💬", text:`${nm(c.profileId)}의 댓글: “${short(c.text)}”`, id:d.id}); }
+  for(const d of S.diaries){
+    if(d.profileId===me){
+      for(const [pid,v] of Object.entries(d.hearts||{})) if(pid!==me && typeof v==="number" && v>=since) out.push({at:v, ic:"❤️", text:`${nm(pid)}이(가) ${fmtShort(d.date)} 일기에 하트를 눌렀어요`, id:d.id});
+      if(d.stamp && d.stampAt>=since && d.stampBy!==me) out.push({at:d.stampAt, ic:"🏅", text:`'${d.stamp}' 도장을 받았어요 (${fmtShort(d.date)} 일기)`, id:d.id});
+    } else if(isParent() && prof(d.profileId)?.type==="child" && d.status==="submitted" && (d.createdAt||0)>=since)
+      out.push({at:d.createdAt, ic:"📒", text:`${nm(d.profileId)}이(가) ${fmtShort(d.date)} 일기를 썼어요`, id:d.id});
+  }
+  return out.sort((a,b)=>b.at-a.at).slice(0,30);
+}
+function newsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return newsItems().filter(x=>x.at>seen).length; }
+const newsBell = () => { const n=newsUnread(); return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">🔔${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
+function viewNews(){
+  const seen=Number(ls.get(newsSeenKey(),"0")), items=newsItems();
+  return `<div class="news-panel" role="region" aria-label="새 소식"><div class="news-h"><b>🔔 새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>
+    ${items.length?`<ul>${items.map(x=>`<li class="${x.at>S.newsSeenBefore?"new":""}"><button data-act="news-go" data-id="${esc(x.id)}"><span class="ni">${x.ic}</span><span class="nt">${esc(x.text)}</span><small>${relTime(x.at)}</small></button></li>`).join("")}</ul>`
+      :`<p class="muted" style="margin:6px 0 0;font-size:14px">최근 2주 동안 새 소식이 없어요.</p>`}</div>`;
+}
 // 채팅 이모지 반응: 한 사람당 하나 (같은 걸 다시 누르면 빠져요). chats.reactions = {프로필id: 이모지}
 const REACTS = ["❤️","👍","😂","👏","🥰","😮"];
 function chatReacts(m){
@@ -1994,12 +2034,13 @@ function viewShell(){
         <h1 class="mast-h"><button class="mast-l" data-act="tab" data-v="home" title="홈으로">${logo(44)}<span class="mast-t">${esc(S.group.name)} 일기장</span></button></h1>
       </header>
       <div class="mast-sub">
-        <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>
+        <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>${newsBell()}
         ${favRow()}
         ${isParent()?`<button class="link-btn out" data-act="signout" aria-label="로그아웃">${ic("out")}<span>로그아웃</span></button>`:""}
       </div>
       ${kidBar()}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
+      ${S.newsOpen?viewNews():""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
       <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
     </div>
@@ -3322,11 +3363,12 @@ const acts = {
   pdf: () => go(()=>{ S.sub={type:"pdf"}; }),
   "pdf-range": el => pdfRange(el.dataset.v),
   heart: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
-    const hearts={...(d.hearts||{})}; if(hearts[S.me.id]) delete hearts[S.me.id]; else hearts[S.me.id]=true;
+    const hearts={...(d.hearts||{})}; if(hearts[S.me.id]) delete hearts[S.me.id]; else hearts[S.me.id]=Date.now();   // 누른 때(새 소식에 쓰여요)
     await B.update(S.gid,"diaries",d.id,{hearts}); d.hearts=hearts; render(); }),
   stamp: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d || !isParent()) return;
     const v=d.stamp===el.dataset.v ? null : el.dataset.v;
-    await B.update(S.gid,"diaries",d.id,{stamp:v,stampBy:v?S.me.id:null}); d.stamp=v; render(); if(v) toast(`'${v}' 도장을 찍었어요`); }),
+    const at=v?Date.now():null;
+    await B.update(S.gid,"diaries",d.id,{stamp:v,stampBy:v?S.me.id:null,stampAt:at}); d.stamp=v; d.stampBy=v?S.me.id:null; d.stampAt=at; render(); if(v) toast(`'${v}' 도장을 찍었어요`); }),
   "pen-check": () => penCheck(),
   "pen-reveal": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ er.shown=true; refreshPen(); } },
   "pen-apply": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ penApplyOne(er); penSyncText(); refreshPen(); } },
@@ -3411,6 +3453,12 @@ const acts = {
   "talk-make": el => talkMake(el.dataset.v==="text"),
   "rec-stop": () => { if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); },
   "audio-del": () => { const a=S.draft.audio; if(a?.path) S.draft.removed.push(a.path); S.draft.audio=null; render(); },
+  "news-open": () => guard(async()=>{
+    if(S.newsOpen){ S.newsOpen=false; render(); return; }
+    await Promise.all([reload("comments"),reload("diaries")]);   // 열 때 새로 불러와요
+    S.newsSeenBefore=Number(ls.get(newsSeenKey(),"0")); ls.set(newsSeenKey(),String(Date.now()));
+    S.newsOpen=true; render(); }),
+  "news-go": el => go(()=>{ S.newsOpen=false; S.sub={type:"diary",id:el.dataset.id}; }),
   "chat-rx-open": el => { S.rxFor = S.rxFor===el.dataset.id ? null : el.dataset.id; refreshChatLists(); },
   "chat-react": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m) return;
     const rx={...(m.reactions||{})}; if(rx[S.me.id]===el.dataset.v) delete rx[S.me.id]; else rx[S.me.id]=el.dataset.v;
