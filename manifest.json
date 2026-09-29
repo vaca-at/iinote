@@ -1,0 +1,16 @@
+{
+  "name": "아이아이노트 - 가족이 함께 쓰는 일기장",
+  "short_name": "아이아이노트",
+  "description": "온 가족이 함께 쓰고 서로 읽어 주는 일기장. 아이 일기는 AI 다홍펜 선생님이 맞춤법을 봐 줘요.",
+  "lang": "ko",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FBF6EE",
+  "theme_color": "#FBF6EE",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
