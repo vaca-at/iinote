@@ -1430,6 +1430,9 @@ async function makeFirebase(){
   const db = F.getFirestore(app);
   const storage = ST.getStorage(app);
   const col = (gid,c) => F.collection(db,"groups",gid,c);
+  // 로그인 종류 (운영 현황판에서 계정 수를 나눠 세는 데만 써요): google · kakao · both(둘 다 연결) · kid(아이 기기 익명)
+  const kindOf = () => { const u=auth.currentUser; if(!u) return ""; if(u.isAnonymous) return "kid";
+    const p=u.providerData.map(x=>x.providerId), g=p.includes("google.com"), k=p.includes("oidc.kakao"); return g&&k?"both":k?"kakao":g?"google":"other"; };
   const api = {
     demo:false,
     onAuth(f){ AU.onAuthStateChanged(auth,f); },
@@ -1468,8 +1471,10 @@ async function makeFirebase(){
     async signOut(){ await AU.signOut(auth); },
     async getIdToken(){ return auth.currentUser ? auth.currentUser.getIdToken() : ""; },
     async getUser(uid){ const s=await F.getDoc(F.doc(db,"users",uid)); return s.exists()?s.data():null; },
-    async addUserGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{groupIds:F.arrayUnion(gid),lastGroupId:gid},{merge:true}); },
+    async addUserGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{groupIds:F.arrayUnion(gid),lastGroupId:gid,kind:kindOf()},{merge:true}); },
     async setLastGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{lastGroupId:gid},{merge:true}); },
+    // 예전 계정 · 나중에 카카오를 연결한 계정도 들어올 때 종류를 맞춰 둬요 (가족에 들어간 계정만)
+    async markKind(uid,ud){ const k=kindOf(); if(k && ud?.groupIds && ud.kind!==k) await F.setDoc(F.doc(db,"users",uid),{kind:k},{merge:true}); },
     async getGroup(gid){ const s=await F.getDoc(F.doc(db,"groups",gid)); return s.exists()?{id:gid,...s.data()}:null; },
     async updateGroup(gid,data){ await F.updateDoc(F.doc(db,"groups",gid),data); },
     async createGroup(name,u,myName){
@@ -4089,6 +4094,7 @@ B.onAuth(async u => {
   S.phase="loading"; render();
   try{
     S.userDoc = (await B.getUser(u.uid)) || {};
+    B.markKind?.(u.uid,S.userDoc).catch(()=>{});
     if(S.joinCode && S.kidId){ // 아이 휴대폰 연결 링크: 가족에 들어가서 그 아이 프로필로 바로 열기
       const gid=await B.joinGroup(S.joinCode,u,"",null), kid=S.kidId;
       S.joinCode=""; S.kidId=""; history.replaceState(null,"",location.pathname);
