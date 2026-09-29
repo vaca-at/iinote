@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBF6EE">
 <title>아이아이노트 - 가족이 함께 쓰는 일기장</title>
-<meta name="description" content="매일 일기 습관부터 AI 다홍펜 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
+<meta name="description" content="매일 일기 습관부터 AI 다홍펜 선생님과 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="아이아이노트">
 <meta property="og:title" content="아이아이노트 - 온 가족이 함께 쓰는 일기장">
-<meta property="og:description" content="매일 일기 습관부터 AI 다홍펜 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
+<meta property="og:description" content="매일 일기 습관부터 AI 다홍펜 선생님과 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
 <meta property="og:image" content="https://iinote.co.kr/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -1477,7 +1477,7 @@ const penGoalOf = p => Number(p?.diaryGoal) || penGoalDefault(p);
 const penAuto = g => (hasGrade(g)?Number(g):2) <= 2;   // 7세 이하 · 초1 · 초2는 다홍펜이 바로 고쳐 줘요
 const countChars = s => String(s||"").replace(/\s/g,"").length;
 const PEN_ENDS = /[.?!…~。)"'”’\]]$|\p{Extended_Pictographic}$/u;
-const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"AI 다홍펜이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
+const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"AI 다홍펜 선생님이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
 const PRAISE_SELF = ["👍 스스로 찾아서 고쳤어요! 정말 대단해요!","🦸 혼자 고치다니, 맞춤법 영웅이에요!","🧠 똑똑해요! AI 선생님 도움 없이 고쳤어요!"];
 // 틀린 말이 글 어디에 있는지 (고친 말 안에 틀린 말이 들어 있는 경우는 건너뛰어요)
 function penAt(er,text){
@@ -2639,7 +2639,7 @@ function viewReport(){
       <div class="rep-stats">
         <div><span>📔 일기 쓴 날</span><b>${s.n}일</b><small>${s.passed}일 중 · 목표 달성 ${s.met}일</small></div>
         <div><span>✏️ 평균 · 최고 글자</span><b>${s.avg}자 · ${s.max}자</b><small>목표 ${s.goal}자</small></div>
-        <div><span>👩‍🏫 AI 다홍펜</span><b>고친 곳 ${s.fixes}개</b><small>스스로 ${s.self}개${s.left?` · 남은 곳 ${s.left}개`:""}</small></div>
+        <div><span>👩‍🏫 AI 다홍펜 선생님</span><b>고친 곳 ${s.fixes}개</b><small>스스로 ${s.self}개${s.left?` · 남은 곳 ${s.left}개`:""}</small></div>
       </div>
       <div class="rep-two">
         <div class="rep-box"><h3>📊 ${per.mode==="week"?"날마다":"주별 평균"} 글자 수</h3>
@@ -2938,7 +2938,7 @@ function viewPen(d){
   // 초6까지: 글자를 다 채우기 전에는 🔒 잠긴 다홍펜 단추, 다 채우면 열려요 (글자 수 막대는 일기 칸 바로 아래)
   if(!p && kidUI() && d.talk?.diary) return `<section class="pen kw-pen" id="pen"><span class="kw-pen-t">🎙 이야기로 만든 일기는 엄마 · 아빠가 읽어 보고 바로 제출할 수 있어요.</span></section>`;
   if(!p && kidUI()) return `<section class="pen kw-pen" id="pen">${n<goal
-      ? `<button class="kw-lock" type="button" disabled>🔒 AI 다홍펜 (${goal-n}자 더 쓰면 열려요)</button>`
+      ? `<button class="kw-lock" type="button" disabled>🔒 AI 다홍펜 선생님 (${goal-n}자 더 쓰면 만날 수 있어요)</button>`
       : `${call("🖍 AI 다홍펜 선생님 부르기")}<span class="kw-pen-t">틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요!</span>`}${rest}</section>`;
   if(!p) return `<section class="pen" id="pen"><div class="pen-h"><h3>🖍 AI 다홍펜 선생님</h3>${call("🖍 다홍펜 검사")}</div>
     <p>${n>=goal?"다 썼으면 AI 다홍펜 선생님을 불러 보세요. 틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요.":`${goal}자를 다 쓰면 AI 다홍펜 선생님을 부를 수 있어요.`}</p>
@@ -3090,7 +3090,7 @@ function backup(kind){
       rows.push([d?.date||"",prof(d?.profileId)?.name||"",prof(c.profileId)?.name||"",c.parentId?"답글":"",c.deleted?"":c.text,fmtTime(c.createdAt),c.edited?"고침":"",c.deleted?"지움":""]); });
     downloadCSV(`아이아이노트_${fam}_댓글_${day}.csv`,rows); toast(`댓글 ${rows.length-1}개를 저장했어요`); return;
   }
-  const rows=[["날짜","쓴 사람","구분","상태","날씨","기분","일기","태그","장소","사진 수","사진 주소","소리 주소","AI 다홍펜 칭찬","AI 다홍펜 응원","고친 곳","이야기 일기 대화","도장","하트","댓글 수","처음 쓴 때","마지막으로 고친 때"]];
+  const rows=[["날짜","쓴 사람","구분","상태","날씨","기분","일기","태그","장소","사진 수","사진 주소","소리 주소","AI 다홍펜 선생님 칭찬","AI 다홍펜 선생님 응원","고친 곳","이야기 일기 대화","도장","하트","댓글 수","처음 쓴 때","마지막으로 고친 때"]];
   const cmt={}; S.comments.forEach(c=>{ if(!c.deleted) cmt[c.diaryId]=(cmt[c.diaryId]||0)+1; });
   [...S.diaries].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).forEach(d=>{ const p=prof(d.profileId), r=d.aiResult;
     rows.push([d.date, p?.name||"", whoKind(p), d.status==="submitted"?(p?.type==="child"?"제출":"올림"):"쓰는 중",
