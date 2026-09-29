@@ -999,6 +999,24 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .thumb .icon-btn{position:absolute;top:4px;right:4px;width:28px;height:28px;background:rgba(20,26,40,.62);color:#fff}
 .thumb .fav-btn{position:absolute;left:4px;top:4px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(20,26,40,.62);color:#fff;font-size:16px;line-height:28px;padding:0;cursor:pointer}
 .thumb .fav-btn.on{background:var(--butter);color:var(--ink)}
+.thumb .crop-btn{position:absolute;right:4px;bottom:4px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(20,26,40,.62);color:#fff;font-size:15px;line-height:30px;padding:0;cursor:pointer}
+/* ✂️ 사진 자르기 화면 */
+.crop{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;background:#111621;color:#fff}
+.crop-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px}
+.crop-top .btn-ghost{color:#fff;border-color:rgba(255,255,255,.35);background:none}
+.crop-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.crop-pic{position:relative;overflow:hidden;touch-action:none}
+.crop-pic canvas{display:block}
+.crop-box{position:absolute;box-shadow:0 0 0 9999px rgba(0,0,0,.55);outline:2px solid #fff;cursor:move;touch-action:none;background-image:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35)),linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35)),linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,.35)),linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,.35));background-size:100% 1px,100% 1px,1px 100%,1px 100%;background-position:0 33.3%,0 66.6%,33.3% 0,66.6% 0;background-repeat:no-repeat}
+.crop-box i{position:absolute;width:26px;height:26px;border:4px solid #fff;touch-action:none}
+.crop-box i[data-h="nw"]{left:-4px;top:-4px;border-right:0;border-bottom:0;cursor:nwse-resize}
+.crop-box i[data-h="ne"]{right:-4px;top:-4px;border-left:0;border-bottom:0;cursor:nesw-resize}
+.crop-box i[data-h="sw"]{left:-4px;bottom:-4px;border-right:0;border-top:0;cursor:nesw-resize}
+.crop-box i[data-h="se"]{right:-4px;bottom:-4px;border-left:0;border-top:0;cursor:nwse-resize}
+.crop-box i::after{content:"";position:absolute;inset:-12px}   /* 손가락으로 잡기 쉽게 */
+.crop-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:10px 12px calc(12px + env(safe-area-inset-bottom,0px))}
+.crop-r{min-height:38px;padding:0 14px;border-radius:999px;border:1.5px solid rgba(255,255,255,.3);background:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.crop-r.on{background:#fff;color:#111621;border-color:#fff}
 .dcard-ph.two{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:220px}
 .dcard-ph.two img{min-width:0}
 .thumb-add{position:relative;display:grid;place-items:center;align-content:center;gap:4px;aspect-ratio:1;border-radius:12px;border:2px dashed var(--line);color:var(--ink3);font-size:13px;font-weight:650;cursor:pointer}
@@ -1301,6 +1319,70 @@ async function makePhotoPair(file){
   const big=await drawJpeg(img,...PHOTO_BIG), thumb=await drawJpeg(img,...PHOTO_THUMB);
   if(!big.blob) throw new Error("사진을 불러올 수 없어요");
   return {big, thumb};
+}
+/* ✂️ 사진 자르기 · 돌리기: 일기 쓰기 화면의 사진마다 (틀을 끌어 옮기고, 모서리로 크기, 비율 고르기, 90° 돌리기) */
+const CROP_RATIOS=[["자유",0],["1:1",1],["4:3",4/3],["3:4",3/4],["16:9",16/9]];
+function rotatedCanvas(img,rot){
+  const c=document.createElement("canvas"), q=rot%180!==0;
+  c.width=q?img.height:img.width; c.height=q?img.width:img.height;
+  const g=c.getContext("2d"); g.translate(c.width/2,c.height/2); g.rotate(rot*Math.PI/180); g.drawImage(img,-img.width/2,-img.height/2);
+  return c;
+}
+async function cropOut(img,r){
+  const src=rotatedCanvas(img,r.rot), c=document.createElement("canvas");
+  c.width=Math.max(1,Math.round(r.w)); c.height=Math.max(1,Math.round(r.h));
+  c.getContext("2d").drawImage(src,r.x,r.y,r.w,r.h,0,0,c.width,c.height);
+  return {big:await drawJpeg(c,...PHOTO_BIG), thumb:await drawJpeg(c,...PHOTO_THUMB)};
+}
+// 자르기 화면: 끝나면 {x,y,w,h,rot}(돌린 사진의 픽셀 기준), 취소하면 null
+function cropUI(img){
+  return new Promise(done=>{
+    const wrap=document.createElement("div"); wrap.className="crop"; wrap.setAttribute("role","dialog"); wrap.setAttribute("aria-modal","true"); wrap.setAttribute("aria-label","사진 자르기");
+    wrap.innerHTML=`<div class="crop-top"><button type="button" class="btn btn-ghost sm" data-c="cancel">취소</button><b>✂️ 사진 자르기</b><button type="button" class="btn btn-primary sm" data-c="ok">완료</button></div>
+      <div class="crop-stage"><div class="crop-pic"><canvas></canvas><div class="crop-box" aria-label="자를 부분 (끌어서 옮겨요)"><i data-h="nw"></i><i data-h="ne"></i><i data-h="sw"></i><i data-h="se"></i></div></div></div>
+      <div class="crop-bar">${CROP_RATIOS.map(([l,v],i)=>`<button type="button" class="crop-r ${i?"":"on"}" data-c="ratio" data-v="${v}">${l}</button>`).join("")}<button type="button" class="crop-r" data-c="rot" aria-label="오른쪽으로 90도 돌리기">↻ 돌리기</button></div>`;
+    document.body.appendChild(wrap); document.body.style.overflow="hidden";
+    const cv=wrap.querySelector("canvas"), pic=wrap.querySelector(".crop-pic"), box=wrap.querySelector(".crop-box"), stage=wrap.querySelector(".crop-stage");
+    let rot=0, src, sc=1, W=0, H=0, ratio=0, b={x:0,y:0,w:0,h:0};
+    const drawBox=()=>{ Object.assign(box.style,{left:b.x+"px",top:b.y+"px",width:b.w+"px",height:b.h+"px"}); };
+    const fitRatio=()=>{ if(!ratio){ drawBox(); return; } let w=b.w, h=w/ratio; if(h>H){ h=H; w=h*ratio; } if(w>W){ w=W; h=w/ratio; }
+      const cx=b.x+b.w/2, cy=b.y+b.h/2; b={w,h,x:Math.min(Math.max(0,cx-w/2),W-w),y:Math.min(Math.max(0,cy-h/2),H-h)}; drawBox(); };
+    const layout=()=>{ src=rotatedCanvas(img,rot);
+      const r=stage.getBoundingClientRect(), mw=r.width-24, mh=r.height-24; sc=Math.min(mw/src.width, mh/src.height, 1);
+      W=Math.round(src.width*sc); H=Math.round(src.height*sc); cv.width=W; cv.height=H; cv.getContext("2d").drawImage(src,0,0,W,H);
+      pic.style.width=W+"px"; pic.style.height=H+"px"; b={x:0,y:0,w:W,h:H}; fitRatio(); };
+    let drag=null;
+    box.addEventListener("pointerdown",e=>{ e.preventDefault(); box.setPointerCapture(e.pointerId); drag={h:e.target.dataset.h||"", sx:e.clientX, sy:e.clientY, b0:{...b}}; });
+    box.addEventListener("pointermove",e=>{ if(!drag) return; const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy, o=drag.b0, MIN=40;
+      if(!drag.h){ b.x=Math.min(Math.max(0,o.x+dx),W-o.w); b.y=Math.min(Math.max(0,o.y+dy),H-o.h); }
+      else { const L=drag.h.includes("w"), T=drag.h.includes("n");
+        let x1=o.x, y1=o.y, x2=o.x+o.w, y2=o.y+o.h;
+        if(L) x1=Math.min(Math.max(0,o.x+dx),x2-MIN); else x2=Math.max(Math.min(W,x2+dx),x1+MIN);
+        if(T) y1=Math.min(Math.max(0,o.y+dy),y2-MIN); else y2=Math.max(Math.min(H,y2+dy),y1+MIN);
+        if(ratio){ let w=x2-x1, h=w/ratio; if(T){ y1=y2-h; if(y1<0){ y1=0; h=y2; w=h*ratio; if(L) x1=x2-w; else x2=x1+w; } } else { y2=y1+h; if(y2>H){ y2=H; h=H-y1; w=h*ratio; if(L) x1=x2-w; else x2=x1+w; } } }
+        b={x:x1,y:y1,w:x2-x1,h:y2-y1}; }
+      drawBox(); });
+    const end=()=>{ drag=null; }; box.addEventListener("pointerup",end); box.addEventListener("pointercancel",end);
+    const close=v=>{ wrap.remove(); document.body.style.overflow=""; removeEventListener("resize",layout); done(v); };
+    wrap.addEventListener("click",e=>{ const t=e.target.closest("[data-c]"); if(!t) return; const c=t.dataset.c;
+      if(c==="cancel") close(null);
+      else if(c==="ok") close({x:b.x/sc, y:b.y/sc, w:b.w/sc, h:b.h/sc, rot});
+      else if(c==="rot"){ rot=(rot+90)%360; layout(); }
+      else if(c==="ratio"){ ratio=Number(t.dataset.v); wrap.querySelectorAll('[data-c="ratio"]').forEach(x=>x.classList.toggle("on",x===t)); if(ratio){ b={x:0,y:0,w:W,h:H}; } fitRatio(); } });
+    wrap.addEventListener("keydown",e=>{ if(e.key==="Escape") close(null); });
+    addEventListener("resize",layout); requestAnimationFrame(layout); wrap.querySelector('[data-c="ok"]').focus();
+  });
+}
+async function cropPhoto(id){
+  const d=S.draft, p=d?.photos.find(x=>x.id===id); if(!p) return;
+  let img;
+  try{ img=await decodeImage(p.blob || await (await fetch(p.url,{mode:"cors"})).blob()); }
+  catch(e){ toast("이미 올린 사진은 여기서 자를 수 없어요. 사진을 빼고 다시 넣으면 자를 수 있어요"); return; }
+  const r=await cropUI(img); if(!r || S.draft!==d) return;
+  const {big,thumb}=await cropOut(img,r); if(!big.blob){ toast("사진을 자르지 못했어요"); return; }
+  if(p.path){ d.removed.push(p.path); if(p.thumbPath) d.removed.push(p.thumbPath); }
+  Object.assign(p,{id:rid(),blob:big.blob,tblob:thumb.blob,url:URL.createObjectURL(big.blob),thumb:URL.createObjectURL(thumb.blob),w:big.w,h:big.h,path:"",thumbPath:""});
+  render(); toast("✂️ 사진을 잘랐어요");
 }
 async function reverseGeocode(lat,lng){
   try{
@@ -3110,7 +3192,7 @@ function insertEmoji(e){
 function viewMedia(d){
   const secs=[];
   if(allow("photos")) secs.push(`<section class="media-sec" aria-label="사진"><div class="media-h">사진<span>${d.photos.length}/${MAX_PHOTOS}장</span></div>
-    <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.thumb||p.url)}" alt="${i+1}번째 사진">${d.photos.length>1?`<button type="button" class="fav-btn ${p.fav?"on":""}" data-act="photo-fav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${i+1}번째 사진 미리보기로 고르기" title="목록 미리보기에 보일 사진 (2장까지)">${p.fav?"★":"☆"}</button>`:""}<button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button></div>`).join("")}
+    <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.thumb||p.url)}" alt="${i+1}번째 사진">${d.photos.length>1?`<button type="button" class="fav-btn ${p.fav?"on":""}" data-act="photo-fav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${i+1}번째 사진 미리보기로 고르기" title="목록 미리보기에 보일 사진 (2장까지)">${p.fav?"★":"☆"}</button>`:""}<button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button><button type="button" class="crop-btn" data-act="photo-crop" data-id="${esc(p.id)}" aria-label="${i+1}번째 사진 자르기 · 돌리기" title="자르기 · 돌리기">✂️</button></div>`).join("")}
     ${d.photos.length<MAX_PHOTOS?`<label class="thumb-add">${ic("image")}<span>사진 추가</span><input type="file" id="w-photos" accept="image/*" multiple></label>`:""}</div>
     ${d.photos.length>1?`<p class="muted" style="margin:10px 0 0;font-size:13px">${d.photos.length}장은 일기장에 ${d.photos.length}분할로 보이고, 누르면 크게 볼 수 있어요.</p>`:""}</section>`);
   if(allow("location")){ const l=d.location;
@@ -3622,6 +3704,7 @@ const acts = {
     await B.update(S.gid,"chats",m.id,{deleted:true,text:"",photo:null}); }),
   "lb-open": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return; S.lb={photos:d.photos,i:+el.dataset.i}; render(); document.querySelector(".lb-x")?.focus(); },
   "lb-close": () => { S.lb=null; render(); },
+  "photo-crop": el => cropPhoto(el.dataset.id),
   "lb-prev": () => lbMove(-1),
   "lb-next": () => lbMove(1)
 };
