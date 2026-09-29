@@ -699,6 +699,21 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .news-panel .ni{font-size:18px}
 .news-panel .nt{flex:1;min-width:0;font-size:14px}
 .news-panel small{color:var(--ink3);font-size:12px;white-space:nowrap}
+/* 🏅 스티커판 */
+.stk{margin:0 0 18px;padding:14px 16px;border-radius:18px;border:2px solid var(--butter);background:var(--butter-soft)}
+.stk.small{margin:12px 0 0;padding:10px 12px;border-width:1.5px}
+.stk-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.stk-h span{font-size:13px;font-weight:700;color:var(--ink2)}
+.stk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.stk.small .stk-grid{grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px}
+.stk-i{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;background:var(--surface);border:1.5px dashed var(--line);text-align:center}
+.stk-i i{font-style:normal;font-size:30px;line-height:1;filter:grayscale(1);opacity:.3}
+.stk-i small{font-size:11.5px;color:var(--ink3);line-height:1.3}
+.stk-i.on{border-style:solid;border-color:var(--butter);box-shadow:0 3px 0 color-mix(in srgb,var(--butter) 60%,transparent)}
+.stk-i.on i{filter:none;opacity:1}
+.stk-i.on small{color:var(--ink);font-weight:700}
+.stk.small .stk-i{padding:4px 2px;border-radius:10px}
+.stk.small .stk-i i{font-size:20px}
 .cm-rxs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:2px}
 .cm.me .cm-rxs{justify-content:flex-end}
 .rx{display:inline-flex;align-items:center;gap:3px;min-height:26px;padding:0 8px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-size:13px;cursor:pointer}
@@ -2620,11 +2635,38 @@ function viewDiaryTab(){
   return nav+body;
 }
 // 📔 내 일기: 내가 쓴 일기만 (쓰는 중 포함)
+/* ---------- 🏅 칭찬 스티커판 (아이) ----------
+   따로 저장하지 않고 일기 기록으로 계산해요: 편수 · 가장 긴 연속 · 한 달 개근 · 다홍펜 만점 · 칭찬 도장 · 목표 2배 */
+const STICKERS = [
+  ["first","✏️","첫 일기",s=>s.total>=1], ["d10","📒","일기 10편",s=>s.total>=10], ["d30","📚","일기 30편",s=>s.total>=30],
+  ["d50","🏆","일기 50편",s=>s.total>=50], ["d100","💯","일기 100편",s=>s.total>=100],
+  ["s3","🔥","3일 연속",s=>s.best>=3], ["s7","⭐","7일 연속",s=>s.best>=7], ["s14","🌈","14일 연속",s=>s.best>=14], ["s30","👑","30일 연속",s=>s.best>=30],
+  ["month","🗓️","한 달 개근",s=>s.fullMonth], ["clean","🎯","맞춤법 만점",s=>s.clean>=1], ["clean5","🧠","만점 5번",s=>s.clean>=5],
+  ["stamp5","🏅","칭찬 도장 5개",s=>s.stamps>=5], ["long","📝","목표의 2배 쓰기",s=>s.long>=1]
+];
+function stickerStats(p){
+  const list=S.diaries.filter(d=>d.profileId===p.id && d.status==="submitted" && (d.text||"").trim()), goal=penGoalOf(p);
+  const days=[...new Set(list.map(d=>d.date))].sort();
+  let best=0, run=0, prev=null;
+  for(const d of days){ run = prev && addDays(prev,1)===d ? run+1 : 1; best=Math.max(best,run); prev=d; }
+  const byMonth={}; days.forEach(d=>{ const m=d.slice(0,7); byMonth[m]=(byMonth[m]||0)+1; });
+  const fullMonth=Object.entries(byMonth).some(([m,n])=>{ const [y,mm]=m.split("-").map(Number); return n>=new Date(y,mm,0).getDate(); });
+  return { total:list.length, best, fullMonth,
+    clean:list.filter(d=>d.aiResult && !(d.aiResult.corrections||[]).length).length,
+    stamps:list.filter(d=>d.stamp).length, long:list.filter(d=>countChars(d.text)>=goal*2).length };
+}
+const stickersOf = p => { const s=stickerStats(p); return STICKERS.filter(x=>x[3](s)).map(x=>x[0]); };
+function viewStickers(p, small){
+  const got=new Set(stickersOf(p));
+  return `<section class="stk ${small?"small":""}" aria-label="${esc(p.name)}의 스티커판"><div class="stk-h"><b>🏅 ${small?"스티커":`${esc(p.name)}의 스티커판`}</b><span>${got.size} / ${STICKERS.length}</span></div>
+    <div class="stk-grid">${STICKERS.map(([k,e,n])=>`<span class="stk-i ${got.has(k)?"on":""}" title="${n}${got.has(k)?" · 받았어요!":" · 아직이에요"}"><i>${e}</i>${small?"":`<small>${n}</small>`}</span>`).join("")}</div></section>`;
+}
 function viewMyDiary(){
   const list=S.diaries.filter(d=>d.profileId===S.me.id).sort((a,b)=>b.date.localeCompare(a.date));
   const month=todayStr().slice(0,7), n=list.filter(d=>d.status==="submitted" && d.date.startsWith(month)).length;
   return `<div class="page-h"><h1>내 일기</h1><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div>
     <p class="muted" style="margin:-6px 0 16px">이번 달 ${n}편 · 🔥 ${streakOf(S.me.id)}일 연속</p>
+    ${S.me.type==="child"?viewStickers(S.me):""}
     ${list.length?`<div class="feed">${list.map(dcard).join("")}</div>`:`<p class="empty">아직 쓴 일기가 없어요. 오늘 첫 일기를 써 보세요.</p>`}`;
 }
 // 👧 아이들 현황: 아이마다 오늘 · 이번 달 · 작은 달력
@@ -2645,6 +2687,7 @@ function viewKidsStatus(){
       <div class="kid-stats"><span>📔 <b>${mon.length}</b>편</span><span>🔥 <b>${streakOf(p.id)}</b>일 연속</span><span>✏️ 평균 <b>${avg}</b>자</span><span>🖍 고친 곳 <b>${fixes}</b></span></div>
       <div class="kid-cal">${cal}</div>
       <p class="muted" style="font-size:12px;margin:8px 0 0">색칠된 날 = 일기 쓴 날 · ⭐ = 칭찬 도장. 날짜를 누르면 그날 가족 일기를 펼쳐 봐요.</p>
+      ${viewStickers(p,true)}
     </section>`; }).join("")}</div>`;
 }
 // 📖 하루 펼쳐보기: 한 날짜의 가족 일기를 나란히
@@ -3752,10 +3795,13 @@ async function saveDiary(status){
   await uploadPending(d);
   Object.assign(data,{ photos:d.photos, audio:d.audio||null, location:d.location||null, talk:d.talk||null,
     tags:[...new Set([...d.tags,...extractTags(d.title+" "+d.text)])].slice(0,20) });
+  const before = child ? new Set(stickersOf(S.me)) : null;   // 새 스티커를 받았는지 보려고
   await B.update(S.gid,"diaries",d.id,data);
   d.status=status;
   await reload("diaries");
-  if(status==="submitted"){ toast(child?"제출했어요":"올렸어요"); S.sub={type:"diary",id:d.id}; S.draft=null; render(); window.scrollTo(0,0); }
+  if(status==="submitted"){ toast(child?"제출했어요":"올렸어요"); S.sub={type:"diary",id:d.id}; S.draft=null; render(); window.scrollTo(0,0);
+    const got = before ? STICKERS.filter(x=>!before.has(x[0]) && stickersOf(S.me).includes(x[0])) : [];
+    if(got.length) setTimeout(()=>toast(`🎉 새 스티커를 받았어요! ${got.map(x=>x[1]+" "+x[2]).join(" · ")}`),1300); }
   else { toast("임시 저장했어요"); render(); }
 }
 

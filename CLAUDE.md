@@ -37,6 +37,12 @@
 - 💬 가족 채팅 (2026-09-29): 넓은 화면(1100px~)은 종이 판 오른쪽 바깥의 좁은 채팅 기둥(viewChatSide, 300px, 접기 · 펼치기 ls iinote-chat-side), 좁은 화면은 탭 "가족 채팅"(chat). 채팅 목록은 .chat-list 클래스로 두 곳, 보이는 것만 씀(chatBoxes). groups/{gid}/chats {profileId,text,photo,createdAt,deleted}, onSnapshot 으로 최근 150개(CHAT_LIMIT) 실시간. 사진은 어른만, 일기 사진처럼 줄여서 groups/{gid}/diaries/chat/ 에 올림(저장소 규칙 그대로). 90일(CHAT_KEEP_DAYS) 지난 것은 어른이 채팅 열 때 정리. 새 메시지는 탭에 빨간 숫자(ls iinote-chatseen-…). 새 메시지가 와도 다른 화면은 다시 그리지 않음(쓰던 일기 보호). 엔터 = 보내기(한글 조합 중 제외)
 - 테스트 팁: Edge 헤드리스 --virtual-time-budget 에서는 홈 · 채팅 화면의 createImageBitmap 이 멈춤(가상 시간 탓). 사진은 --remote-debugging-port 로 실제 시간 실행 뒤 Runtime.evaluate 로 확인
 - 검색 등록: naver…html · google…html 확인 파일, robots.txt(다음 확인 코드 포함) · sitemap.xml
+- 🔔 새 소식(newsItems): 내 일기의 댓글 · 내 댓글의 답글 · 하트(hearts 값 = 누른 시각) · 도장(stampAt), 어른은 아이가 쓴 일기. 최근 2주, 안 본 것 수는 ls iinote-news-{gid}-{pid}. 따로 저장하는 컬렉션 없음
+- 🏅 스티커판(STICKERS 14개, stickerStats): 아이의 내 일기 탭 위 + 아이들 현황 카드. 제출하면 새 스티커 토스트. 계산만 하고 저장 안 함
+- 채팅 반응: chats.reactions = {프로필id: 이모지} (REACTS 6개, 한 사람당 하나)
+- PWA: manifest.json + icon-192/512.png (서비스 워커는 없음, 캐시 문제 피하려고)
+- 예전 주소 jsun.site/iinote 는 iinote.co.kr 로 넘기는 안내 페이지만 (쿼리 그대로). 더는 거기에 올리지 않음
+- 레이아웃(첫 화면 모양) 고르기는 홈에서만
 - 백업: 우리 가족 설정(부모만) → 일기 · 댓글 CSV (엑셀용 BOM, =+-@ 로 시작하는 칸은 ' 붙임)
 - 자동 로그아웃: 첫 화면 · 계정에 '이 기기에서 로그인 유지'(iinote-keep). 로그인은 늘 local 저장(새 탭 · 공부방 ?write 링크에서도 유지). 켜면 30일(KEEP_DAYS) 뒤, 끄면 30분(IDLE_MIN) 안 쓰면 autoLogoutCheck 가 로그아웃 (iinote-login · iinote-active 시각으로 판단). 일기 쓰는 중엔 기다림. 익명(아이 휴대폰 연결) 계정은 제외
 - 위쪽 머리: 맨 위 홈 단추(.home-btn) · 휴대폰은 1줄(홈 · 제목 · 🎨) + 2줄(나 · 즐겨찾기 · 로그아웃), 🎨 누르면 화면 구성 → 디자인 → 글씨
