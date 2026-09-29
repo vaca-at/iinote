@@ -75,7 +75,7 @@ const gradeName = g => { if(g===undefined || g===null || g==="") return ""; cons
 const fmtDate = ms => ms ? new Date(ms).toLocaleDateString("ko-KR",{year:"numeric",month:"short",day:"numeric"}) : "-";
 // 개수만 세요: 문서 내용은 받아 오지 않아요
 const count = async q => (await F.getCountFromServer(q)).data().count;
-// AI 사용량: 빨간펜 워커가 달마다 세어 둔 횟수 · 토큰 (GET /usage). 아이 이름은 보여 주지 않고 iinote / 공부방으로만 나눠요
+// AI 사용량: 다홍펜 워커가 달마다 세어 둔 횟수 · 토큰 (GET /usage). 아이 이름은 보여 주지 않고 iinote / 공부방으로만 나눠요
 const USAGE_API = "https://family-spell.bellachord.workers.dev/usage";
 // Claude Opus 5 요금 (100만 토큰당 달러): 입력 5 · 출력 25 · 캐시 읽기 0.5 · 캐시 쓰기 6.25. 환율은 대략으로
 const PRICE = { input:5, output:25, cacheRead:0.5, cacheWrite:6.25 }, KRW = 1400;
@@ -83,7 +83,7 @@ const PRICE = { input:5, output:25, cacheRead:0.5, cacheWrite:6.25 }, KRW = 1400
 const STT_USD = 0.0015;
 const usd = m => ((m.input||0)*PRICE.input + (m.output||0)*PRICE.output + (m.cacheRead||0)*PRICE.cacheRead + (m.cacheWrite||0)*PRICE.cacheWrite)/1e6;
 const won = d => Math.round(d*KRW).toLocaleString("ko-KR")+"원";
-const AI_KINDS = [["spell","빨간펜"],["similar","비슷한 낱말 퀴즈"],["report","AI 총평"],["transcribe","목소리 → 글"],["talk","이야기 일기"]];
+const AI_KINDS = [["spell","다홍펜"],["similar","비슷한 낱말 퀴즈"],["report","AI 총평"],["transcribe","목소리 → 글"],["talk","이야기 일기"]];
 
 // 관리자 계정이 숫자를 셀 수 있게 하는 파이어베이스 규칙 (콘솔 > Firestore > 규칙에 이미 있는 match 들 옆에 추가)
 const RULES = `// 아이아이노트 운영 현황판 (bellachord 계정만 · 숫자 세기용)
@@ -162,7 +162,7 @@ function render(fams,users,idx,usage){
       <td>${f.today||'<span class="z">0</span>'}</td><td class="l"><span class="bar" style="width:${Math.round(f.w/maxW*60)}px"></span>${f.w}</td><td>${f.m}</td><td>${f.total}</td></tr>
     ${f.members.map(p=>`<tr class="mem" data-g="${i}" hidden><td class="l">${p.type==="child"?`아이 <span class="sub">${gradeName(p.grade)}${p.linked?" · 자기 기기":""}</span>`:"보호자"}</td>
       <td></td><td></td><td></td><td>${p.week==null?'<span class="z">?</span>':p.week?`<span class="good">${p.week}</span>`:'<span class="z">0</span>'}</td>
-      <td class="sub">${p.pen!=null?`빨간펜 ${p.pen}`:""}</td><td>${p.sub}${p.all>p.sub?` <span class="sub">(+쓰는 중 ${p.all-p.sub})</span>`:""}</td></tr>`).join("")}`).join("");
+      <td class="sub">${p.pen!=null?`다홍펜 ${p.pen}`:""}</td><td>${p.sub}${p.all>p.sub?` <span class="sub">(+쓰는 중 ${p.all-p.sub})</span>`:""}</td></tr>`).join("")}`).join("");
   $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="sub">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
       <button class="pill" data-act="reload">🔄 새로고침</button><button class="pill" data-act="logout">로그아웃</button></header>
     <div class="tiles">
@@ -173,7 +173,7 @@ function render(fams,users,idx,usage){
       <div class="tile"><b>${sum("today")}</b><span>오늘 일기</span></div>
       <div class="tile"><b>${sum("w")}</b><span>최근 7일 일기</span></div>
       <div class="tile"><b>${sum("m")}</b><span>최근 30일 일기</span></div>
-      <div class="tile"><b>${kids.reduce((s,p)=>s+(p.pen||0),0)}</b><span>빨간펜 받은 아이 일기</span></div>
+      <div class="tile"><b>${kids.reduce((s,p)=>s+(p.pen||0),0)}</b><span>다홍펜 받은 아이 일기</span></div>
       ${(()=>{ const m=usage?.months?.[0]; if(!m) return ""; const n=AI_KINDS.reduce((s,[k])=>s+(m[k]||0),0);
         return `<div class="tile"><b>${n}</b><span>이번 달 AI 사용 횟수</span></div><div class="tile"><b>${won(usd(m)+(m.transcribe||0)*STT_USD)}</b><span>이번 달 AI 예상 금액</span></div>`; })()}
     </div>
