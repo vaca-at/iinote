@@ -683,14 +683,25 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .cm.me .cm-t{align-items:flex-start}
 .cm-del{padding:0;border:0;background:none;color:var(--ink3);font-size:11px;text-decoration:underline;cursor:pointer}
 .chat-in{display:flex;align-items:flex-end;gap:8px}
-/* 답장 */
-.cm-rep{text-decoration:none;font-weight:700;color:var(--ink2);margin:1px 0}
-.cm-q{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;margin:0 0 6px;padding:5px 9px;border:0;border-left:3px solid var(--qc);border-radius:6px;background:rgba(127,127,127,.1);color:var(--ink2);font-size:12.5px;text-align:left;cursor:pointer;max-width:260px}
-.cm-q b{font-size:12px;color:var(--ink)}
-.cm-q span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-.chat-rp{display:flex;align-items:center;gap:8px;margin:0 0 6px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--sage-soft);font-size:13px;color:var(--ink2)}
-.chat-rp span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chat-rp b{color:var(--ink)}
+/* 답장 · 말풍선 메뉴 (간단하게: 평소엔 시간만, 누르면 메뉴 한 줄) */
+.cm-bub[data-act]{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cm-bub.sel{box-shadow:0 0 0 2px var(--line)}
+.cm-menu{display:inline-flex;align-items:center;gap:0;margin-top:4px;padding:3px 4px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:0 4px 14px rgba(31,42,68,.10);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.cm-menu::-webkit-scrollbar{display:none}
+.cm-mi{flex:none;border:0;background:none;padding:4px 6px;border-radius:999px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;white-space:nowrap}
+.cm-mi.del{color:var(--ink3);font-weight:600}
+.cm-mi:hover,.rx-e.on{background:var(--butter-soft)}
+.cm-sep{flex:none;width:1px;height:16px;background:var(--line);margin:0 2px}
+.cm-menu .rx-e{flex:none;width:26px;height:28px;padding:0;font-size:16px}
+.cm.me .cm-b:has(.cm-menu){max-width:100%}
+.cm-q{display:block;width:100%;max-width:240px;margin:0 0 4px;padding:0 0 0 8px;border:0;border-left:2px solid var(--qc);background:none;color:var(--ink3);font-size:12.5px;line-height:1.4;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cm-q b{color:var(--ink2);font-weight:700}
+.chat-rp{display:flex;align-items:center;gap:8px;margin:0 0 6px;padding:2px 2px 2px 10px;border-left:2px solid var(--qc);font-size:13px;color:var(--ink2)}
+.chat-rp span{flex:1;min-width:0;display:flex;gap:8px;align-items:baseline;overflow:hidden;white-space:nowrap}
+.chat-rp b{color:var(--ink);flex:none}
+.chat-rp small{min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--ink3);font-size:12.5px}
+.chat-rp-x{flex:none;width:28px;height:28px;border:0;border-radius:50%;background:none;color:var(--ink3);font-size:14px;cursor:pointer}
+.chat-rp-x:hover{background:var(--line)}
 .cm.flash .cm-bub{animation:cmFlash 1.4s ease}
 @keyframes cmFlash{0%,60%{box-shadow:0 0 0 3px var(--coral)}100%{box-shadow:0 0 0 0 transparent}}
 .chat-in textarea{flex:1;min-height:46px;max-height:140px;resize:none;padding:11px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);font:inherit;line-height:1.5}
@@ -1773,8 +1784,16 @@ function chatReacts(m){
   const rx=m.reactions||{}, cnt={};
   Object.entries(rx).forEach(([pid,e])=>{ (cnt[e]=cnt[e]||[]).push(prof(pid)?.name||""); });
   const chips=Object.entries(cnt).map(([e,names])=>`<button type="button" class="rx ${rx[S.me.id]===e?"on":""}" data-act="chat-react" data-id="${esc(m.id)}" data-v="${e}" title="${esc(names.filter(Boolean).join(", "))}">${e}<b>${names.length}</b></button>`).join("");
-  const pick=S.rxFor===m.id?`<span class="rx-pick" role="group" aria-label="반응 고르기">${REACTS.map(e=>`<button type="button" class="rx-e" data-act="chat-react" data-id="${esc(m.id)}" data-v="${e}" aria-label="${e} 반응">${e}</button>`).join("")}</span>`:"";
-  return `<div class="cm-rxs">${chips}<button type="button" class="rx-add" data-act="chat-rx-open" data-id="${esc(m.id)}" aria-label="반응 달기" aria-expanded="${S.rxFor===m.id}">☺+</button>${pick}</div>`;
+  return chips ? `<div class="cm-rxs">${chips}</div>` : "";
+}
+// 말풍선을 누르면 뜨는 작은 메뉴: 답장 · 반응 · 지우기 (평소에는 시간만 보여서 깔끔하게)
+function chatMenu(m, canDel){
+  if(S.cmFor!==m.id) return "";
+  const mineRx=(m.reactions||{})[S.me.id];
+  return `<div class="cm-menu" role="group" aria-label="메시지 메뉴">
+    <button type="button" class="cm-mi" data-act="chat-reply" data-id="${esc(m.id)}">↩ 답장</button><span class="cm-sep" aria-hidden="true"></span>
+    ${REACTS.map(e=>`<button type="button" class="rx-e ${mineRx===e?"on":""}" data-act="chat-react" data-id="${esc(m.id)}" data-v="${e}" aria-label="${e} 반응">${e}</button>`).join("")}
+    ${canDel?`<span class="cm-sep" aria-hidden="true"></span><button type="button" class="cm-mi del" data-act="chat-del" data-id="${esc(m.id)}">지우기</button>`:""}</div>`;
 }
 function drawReplyBars(){ document.querySelectorAll(".chat-rp").forEach(x=>x.remove()); document.querySelectorAll("form.chat-in").forEach(f=>f.insertAdjacentHTML("beforebegin",chatReplyBar())); }
 // 채팅 목록만 다시 그리기 (보던 자리 그대로, 쓰던 글 그대로)
@@ -1795,10 +1814,10 @@ function chatQuote(r){
   if(!r) return "";
   const p=prof(r.profileId), orig=S.chats.find(x=>x.id===r.id);
   const txt=orig ? chatSnip(orig) : (r.text || (r.photo?"📷 사진":""));
-  return `<button type="button" class="cm-q" data-act="chat-jump" data-id="${esc(r.id)}" style="--qc:${p?.color||"#767E91"}"><b>${esc(p?.name||"알 수 없음")}</b><span>${esc(txt)}</span></button>`;
+  return `<button type="button" class="cm-q" data-act="chat-jump" data-id="${esc(r.id)}" style="--qc:${p?.color||"#767E91"}" aria-label="${esc(p?.name||"")}의 메시지로 가기"><b>${esc(p?.name||"알 수 없음")}</b> ${esc(txt)}</button>`;
 }
 const chatReplyBar = () => { const r=S.chatReply; if(!r) return ""; const p=prof(r.profileId);
-  return `<div class="chat-rp" role="status"><span>↩ <b>${esc(p?.name||"")}</b>에게 답장 · ${esc(r.text||(r.photo?"📷 사진":""))}</span><button type="button" class="icon-btn" data-act="chat-reply-x" aria-label="답장 그만두기">✕</button></div>`; };
+  return `<div class="chat-rp" role="status" style="--qc:${p?.color||"#767E91"}"><span><b>${esc(p?.name||"")}</b>에게 답장<small>${esc(r.text||(r.photo?"📷 사진":""))}</small></span><button type="button" class="chat-rp-x" data-act="chat-reply-x" aria-label="답장 그만두기">✕</button></div>`; };
 const chatForm = () => `${chatReplyBar()}<form class="chat-in" data-form="chat">
       ${allow("photos")?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" class="chat-photo" accept="image/*"></label>`:""}
       <label class="chat-ta-l"><span class="sr">메시지</span><textarea class="chat-ta" name="text" rows="1" maxlength="1000" placeholder="가족에게 한마디" enterkeyhint="send">${esc(S.chatDraft||"")}</textarea></label>
@@ -1824,9 +1843,9 @@ function chatItems(){
     const t=new Date(m.createdAt||0), ds=ymd(t), p=prof(m.profileId), mine=m.profileId===S.me.id, del=!m.deleted && (mine||isParent());
     if(ds!==day){ day=ds; out+=`<div class="chat-day"><span>${fmtLong(ds)}</span></div>`; }
     out+=`<div class="cm ${mine?"me":""}" id="cm-${esc(m.id)}">${mine?"":av(p,32)}<div class="cm-b">${mine?"":`<b class="cm-n">${esc(p?.name||"알 수 없음")}</b>`}
-      <div class="cm-row"><div class="cm-bub" style="--pc:${p?.color||"#1F2A44"}">${m.deleted?`<em>지운 메시지예요</em>`
+      <div class="cm-row"><div class="cm-bub ${S.cmFor===m.id?"sel":""}" style="--pc:${p?.color||"#1F2A44"}" ${m.deleted?"":`data-act="chat-menu" data-id="${esc(m.id)}" role="button" tabindex="0" aria-label="메시지 메뉴 열기 (답장 · 반응)"`}>${m.deleted?`<em>지운 메시지예요</em>`
         :`${chatQuote(m.replyTo)}${m.photo?`<button type="button" class="cm-ph" data-act="chat-ph" data-id="${esc(m.id)}" aria-label="사진 크게 보기"><img src="${esc(m.photo.thumb||m.photo.url)}" alt="" loading="lazy"></button>`:""}${m.text?`<p>${esc(m.text)}</p>`:""}`}</div>
-      <span class="cm-t">${pad(t.getHours())}:${pad(t.getMinutes())}${m.deleted?"":`<button type="button" class="cm-del cm-rep" data-act="chat-reply" data-id="${esc(m.id)}" aria-label="이 메시지에 답장">답장</button>`}${del?`<button type="button" class="cm-del" data-act="chat-del" data-id="${esc(m.id)}" aria-label="메시지 지우기">지우기</button>`:""}</span></div>${m.deleted?"":chatReacts(m)}</div></div>`;
+      <span class="cm-t">${pad(t.getHours())}:${pad(t.getMinutes())}</span></div>${m.deleted?"":chatMenu(m,del)+chatReacts(m)}</div></div>`;
   }
   return out;
 }
@@ -3577,10 +3596,10 @@ const acts = {
     S.newsSeenBefore=Number(ls.get(newsSeenKey(),"0")); ls.set(newsSeenKey(),String(Date.now()));
     S.newsOpen=true; render(); }),
   "news-go": el => go(()=>{ S.newsOpen=false; S.sub={type:"diary",id:el.dataset.id}; }),
-  "chat-rx-open": el => { S.rxFor = S.rxFor===el.dataset.id ? null : el.dataset.id; refreshChatLists(); },
+  "chat-menu": el => { S.cmFor = S.cmFor===el.dataset.id ? null : el.dataset.id; refreshChatLists(); },
   // 답장: 쓰던 글은 그대로 두고 띠만 다시 그려요
   "chat-reply": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m) return;
-    S.chatReply={id:m.id, profileId:m.profileId, text:chatSnip(m), photo:!!m.photo}; drawReplyBars();
+    S.chatReply={id:m.id, profileId:m.profileId, text:chatSnip(m), photo:!!m.photo}; S.cmFor=null; refreshChatLists(); drawReplyBars();
     const ta=[...document.querySelectorAll(".chat-ta")].find(x=>x.offsetParent) || document.querySelector(".chat-ta"); ta?.focus(); },
   "chat-reply-x": () => { S.chatReply=null; drawReplyBars(); },
   // 답장 속 원래 메시지를 누르면 거기로 가서 잠깐 반짝여요
@@ -3589,7 +3608,7 @@ const acts = {
     t.scrollIntoView({behavior:"smooth",block:"center"}); t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash"); },
   "chat-react": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m) return;
     const rx={...(m.reactions||{})}; if(rx[S.me.id]===el.dataset.v) delete rx[S.me.id]; else rx[S.me.id]=el.dataset.v;
-    m.reactions=rx; S.rxFor=null; refreshChatLists();   // 먼저 화면에 보여 주고 저장해요
+    m.reactions=rx; S.cmFor=null; refreshChatLists();   // 먼저 화면에 보여 주고 저장해요
     B.update(S.gid,"chats",m.id,{reactions:rx}).catch(()=>toast("반응을 저장하지 못했어요")); },
   "chat-side": () => { const open=!chatSideOpen(); ls.set("iinote-chat-side",open?"open":"closed"); if(open) S.chatJump=true; render(); },
   "chat-ph": el => { const m=S.chats.find(x=>x.id===el.dataset.id); if(!m?.photo) return; S.lb={photos:[m.photo],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
