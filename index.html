@@ -108,6 +108,10 @@ a{color:var(--coral-ink)}
 /* 입력 */
 input,textarea,select{width:100%;border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:11px 14px;font-size:16px}
 textarea{resize:vertical}
+/* 체크 상자 · 동그라미 선택은 원래 크기 그대로 (위 100% 너비가 걸리면 휴대폰에서 상자가 늘어나 옆 글자와 겹쳐요) */
+input:is([type="checkbox"],[type="radio"]){width:auto;padding:0;border-radius:0;flex:none}
+.kw-q input[type="checkbox"]{width:22px;height:22px;margin:0;accent-color:var(--coral)}
+.kw-q label{font-size:14px}
 label{display:block;font-size:14px;font-weight:600;color:var(--ink2)}
 label>input,label>select{margin-top:6px}
 fieldset{border:0;margin:0;padding:0}
