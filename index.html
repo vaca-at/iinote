@@ -1308,7 +1308,8 @@ const SITE_ADDRESS = "iinote.co.kr";
 const KAKAO_JS_KEY = "af2b2ce946d6ce93d51a11914063e4fd";
 const SHARE_URL = "https://iinote.co.kr";
 // 기능별 사용 대상: "parent" = 어른만, "all" = 모두
-const FEATURES = { photos:"parent", location:"parent", audio:"all", tags:"all" };
+// 사진: 일기에는 아이도 넣을 수 있어요(5~7세는 보호자가 넣어 줘도 돼요, 2026-09-30). 가족 채팅 사진은 어른만
+const FEATURES = { photos:"all", location:"parent", audio:"all", tags:"all" };
 // 사진 · 소리는 파이어베이스 Storage에 저장돼요. (Storage는 Blaze 요금제에서 켤 수 있어요)
 // MEDIA_READY: Storage 를 켜고 storage.rules 를 적용하면 true 로 바꾸기. false 면 사진 · 소리 올리기 칸을 숨기고 "곧 열려요" 안내만 보여요 (체험 모드는 늘 보임)
 const MEDIA_READY = true;
@@ -1967,7 +1968,7 @@ function chatQuote(r){
 const chatReplyBar = () => { const r=S.chatReply; if(!r) return ""; const p=prof(r.profileId);
   return `<div class="chat-rp" role="status" style="--qc:${p?.color||"#767E91"}"><span><b>${esc(p?.name||"")}</b>에게 답장<small>${esc(r.text||(r.photo?"📷 사진":""))}</small></span><button type="button" class="chat-rp-x" data-act="chat-reply-x" aria-label="답장 그만두기">✕</button></div>`; };
 const chatForm = () => `${chatReplyBar()}<form class="chat-in" data-form="chat">
-      ${allow("photos")?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" class="chat-photo" accept="image/*"></label>`:""}
+      ${allow("photos") && S.me?.type==="parent"?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" class="chat-photo" accept="image/*"></label>`:""}
       <label class="chat-ta-l"><span class="sr">메시지</span><textarea class="chat-ta" name="text" rows="1" maxlength="1000" placeholder="가족에게 한마디" enterkeyhint="send">${esc(S.chatDraft||"")}</textarea></label>
       <button class="btn btn-primary chat-send" ${S.chatBusy?"disabled":""}>${S.chatBusy?"보내는 중…":"보내기"}</button>
     </form>`;
