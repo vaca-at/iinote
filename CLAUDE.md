@@ -52,6 +52,7 @@
 - 예전 가족일기장 jsun.site/diary 에서 iinote 같이 보기 (2026-09-30, 저장소 jsun): 두 번째 파이어베이스 앱 "iinote" 에 bellachord 구글로 로그인('🌐 iinote 일기 같이 보기') → 도윤 · 도진 프로필이 있는 가족의 제출한 일기 · 댓글 · 하트 · 도장을 읽기만 해서 S.entries 에 합침(같은 날 같은 사람이면 예전 일기장 것이 먼저, importKey old: 는 뺌). 쓰기 · 도장 · 댓글은 iinote 에서
 - 예전 주소 jsun.site/iinote 는 iinote.co.kr 로 넘기는 안내 페이지만 (쿼리 그대로). 더는 거기에 올리지 않음
 - 레이아웃(첫 화면 모양) 고르기는 홈에서만
+- 일정 순서 (2026-10-03): 시간과 상관없이 먼저 넣은 일정이 위(bySch: schedules.order ?? createdAt). 하루 목록 아래 '↕ 순서 · 고치기'(S.schEdit=날짜) → ▲▼(sch-move, 이웃과 order 맞바꿈, 가족 누구나) · ✏️ 고치기(sch-edit 폼, 쓴 사람 · 부모) · ✕ 지우기. 공통 그리기 schList(달력 카드 · 다가오는 일정)
 - 일기장 이름 바꾸기 (2026-10-03): 우리 가족 설정 > 초대 카드 아래(부모만, data-form="group-name") → groups/{gid}.name (최대 20자, 위쪽 '○○ 일기장'에 보임)
 - 백업: 우리 가족 설정(부모만) → 일기 · 댓글 CSV (엑셀용 BOM, =+-@ 로 시작하는 칸은 ' 붙임)
 - 자동 로그아웃: 첫 화면 · 계정에 '이 기기에서 로그인 유지'(iinote-keep). 로그인은 늘 local 저장(새 탭 · 공부방 ?write 링크에서도 유지). 켜면 30일(KEEP_DAYS) 뒤, 끄면 30분(IDLE_MIN) 안 쓰면 autoLogoutCheck 가 로그아웃 (iinote-login · iinote-active 시각으로 판단). 일기 쓰는 중엔 기다림. 익명(아이 휴대폰 연결) 계정은 제외

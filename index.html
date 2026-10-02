@@ -634,6 +634,13 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .sc-item{display:flex;align-items:center;gap:10px;padding:10px 6px 10px 12px;border-radius:12px;background:var(--paper)}
 .sc-time{font-size:13px;color:var(--ink3);min-width:4.6em;font-variant-numeric:tabular-nums}
 .sc-title{flex:1;font-weight:600;min-width:0}
+.sc-move{display:flex;gap:2px;flex:none}
+.sc-move .icon-btn{font-size:13px}
+.sc-move .icon-btn:disabled{opacity:.3}
+.sc-editing{padding:6px}
+.sc-editing .sch-line{margin:0;flex:1}
+.sc-tools{display:flex;justify-content:flex-end;margin-top:4px}
+@media (max-width:640px){ .sc-list:has(.sc-move) .sc-item{flex-wrap:wrap;row-gap:4px} .sc-list:has(.sc-move) .sc-title{flex-basis:calc(100% - 6em)} .sc-move{margin-left:auto} }
 details.add{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
 details.add summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:650;color:var(--ink2);list-style:none;min-height:40px}
 details.add summary::-webkit-details-marker{display:none}
@@ -2384,6 +2391,9 @@ const HOLIDAYS = {
   "2027-10-09":"한글날","2027-10-11":"대체공휴일","2027-12-25":"성탄절","2027-12-27":"대체공휴일"
 };
 const mySchedules = () => S.schedules.filter(s=>s.scope==="family" || s.profileId===S.me.id);
+// 일정 순서: 먼저 넣은 일정이 위 (createdAt). '순서 · 고치기'에서 ▲▼로 옮기면 schedules.order 에 적어요
+const schOrder = s => s.order ?? s.createdAt ?? 0;
+const bySch = (a,b) => schOrder(a)-schOrder(b);
 const submittedOn = (pid,date) => findDiary(pid,date)?.status==="submitted";
 // 홈 날짜 넘기기: ◀ ▶ 로 어제 · 그저께도 보고 (오늘 뒤로는 못 가요), '오늘' 단추로 돌아와요
 const homeDay = () => { const t=todayStr(); return S.homeDay && S.homeDay<t ? S.homeDay : t; };
@@ -2408,7 +2418,7 @@ function viewHomeCalendar(){
       ${open?(d.status==="submitted"?`<button class="btn btn-ghost sm" data-act="open-diary" data-id="${d.id}">읽기</button>`:`<button class="btn btn-ghost sm" data-act="write" data-date="${hd}">이어 쓰기</button>`):""}</div></div>`; }).join("");
   const legend = ps.map(p=>`<span><i style="background:${p.color||"var(--ink)"}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("");
   const sch = mySchedules();
-  const cells = dates.map(d=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], list=sch.filter(s=>s.date===d).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+  const cells = dates.map(d=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], list=sch.filter(s=>s.date===d).sort(bySch);
     const who=ps.filter(p=>submittedOn(p.id,d));
     const cls=["cal-cell", d===t?"today":"", d===(S.calDay||t)?"sel":"", d>t?"future":"", (dow===0||hol)?"red":dow===6?"blue":""].join(" ");
     return `<button class="${cls}" data-act="cal-day" data-v="${d}" aria-label="${fmtLong(d)}${hol?" "+hol:""}, 일정 ${list.length}개, ${who.length}명 씀">
@@ -2523,13 +2533,24 @@ function parseSchedule(s){
     if(h<24 && mi<60) return {time:`${pad(h)}:${pad(mi)}`, title:m[5].trim()}; }
   return {time:"", title:s};
 }
+// 하루 일정 목록 (list 는 bySch 로 정렬된 것). 아래 '순서 · 고치기'를 누르면 그날(S.schEdit) 일정마다 ▲▼ · 고치기 · 지우기
+function schList(d,list){
+  const edit=S.schEdit===d;
+  const item=(s,i)=>{ const own=s.profileId===S.me.id || isParent();
+    if(edit && own && S.schEditId===s.id) return `<li class="sc-item sc-editing"><form class="sch-line" data-form="sch-edit" data-id="${s.id}">
+      <label class="sr" for="sce-${s.id}">일정 고치기</label><input id="sce-${s.id}" name="title" required maxlength="40" value="${esc((s.time?s.time+" ":"")+s.title)}" autocomplete="off">
+      <div class="seg sch-scope" role="radiogroup" aria-label="누가 볼 일정인가요"><label><input type="radio" name="scope" value="family" ${s.scope==="family"?"checked":""}><span>가족</span></label><label><input type="radio" name="scope" value="personal" ${s.scope==="family"?"":"checked"}><span>나만</span></label></div>
+      <button class="btn btn-primary sm">저장</button><button type="button" class="btn btn-ghost sm" data-act="sch-edit" data-id="">취소</button></form></li>`;
+    return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span><span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${edit?`<span class="sc-move"><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="-1" ${i?"":"disabled"} aria-label="${esc(s.title)} 위로">▲</button><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="1" ${i<list.length-1?"":"disabled"} aria-label="${esc(s.title)} 아래로">▼</button></span>${own?`<button class="icon-btn" data-act="sch-edit" data-id="${s.id}" aria-label="${esc(s.title)} 일정 고치기">${ic("pen")}</button>`:""}`:""}${own?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; };
+  return `<ul class="sc-list">${list.map(item).join("")}</ul>
+    <div class="sc-tools"><button class="link-btn" data-act="sch-edit-mode" data-v="${d}" aria-expanded="${edit}">${edit?"✓ 다 했어요":"↕ 순서 · 고치기"}</button></div>`;
+}
 // 달력 카드 안의 일정: 고른 날(안 고르면 오늘)의 일정 목록 + 일정 추가 (달력과 한 세트)
 function viewCalSchedule(d){
-  const sch=mySchedules().filter(s=>s.date===d).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+  const sch=mySchedules().filter(s=>s.date===d).sort(bySch);
   return `<div class="cal-sch">
     <h3 class="cd-h">${fmtShort(d)} 일정</h3>
-    ${sch.length?`<ul class="sc-list">${sch.map(s=>{ const del=s.profileId===S.me.id || isParent();
-      return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span><span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${del?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; }).join("")}</ul>`:`<p class="muted" style="margin:0">이날 일정이 없어요.</p>`}
+    ${sch.length?schList(d,sch):`<p class="muted" style="margin:0">이날 일정이 없어요.</p>`}
     <form class="sch-line" data-form="schedule">
       <input type="hidden" name="date" value="${d}">
       <label class="sr" for="sch-${d}">일정</label><input id="sch-${d}" name="title" required maxlength="40" placeholder="예: 14시 태권도" autocomplete="off">
@@ -2542,7 +2563,7 @@ function viewCalDay(d){
   const t=todayStr(), hol=HOLIDAYS[d], mine=findDiary(S.me.id,d);
   const list=S.diaries.filter(x=>x.date===d && (x.status==="submitted" || x.profileId===S.me.id))
     .sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
-  const sch=mySchedules().filter(s=>s.date===d).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+  const sch=mySchedules().filter(s=>s.date===d).sort(bySch);
   const write = d>t ? "" : mine?.status==="submitted" ? "" : `<button class="btn btn-primary sm" data-act="write" data-date="${d}">${ic("pen")}${mine?"이어 쓰기":"이날 일기 쓰기"}</button>`;
   return `<section class="block" id="cal-day" aria-labelledby="h-cd"><div class="block-h"><h2 id="h-cd">${fmtLong(d)}${hol?` <span class="tag family">${hol}</span>`:""}</h2>
       <div class="row">${write}${S.calDay?`<button class="icon-btn" data-act="cal-day" data-v="${d}" aria-label="닫기">${ic("x")}</button>`:""}</div></div>
@@ -2553,11 +2574,9 @@ function viewCalDay(d){
 function viewSchedules(){
   const t=todayStr(), end=addDays(t,13);
   const list=S.schedules.filter(s=>s.date>=t && s.date<=end && (s.scope==="family" || s.profileId===S.me.id))
-    .sort((a,b)=>(a.date+(a.time||"00")).localeCompare(b.date+(b.time||"00")));
+    .sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:bySch(a,b));
   const days=[...new Set(list.map(s=>s.date))];
-  const body = days.length ? days.map(d=>`<div class="sc-day"><h3>${d===t?"오늘":d===addDays(t,1)?"내일":fmtShort(d)}</h3><ul class="sc-list">${list.filter(s=>s.date===d).map(s=>{
-      const del = s.profileId===S.me.id || isParent();
-      return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span><span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${del?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; }).join("")}</ul></div>`).join("")
+  const body = days.length ? days.map(d=>`<div class="sc-day"><h3>${d===t?"오늘":d===addDays(t,1)?"내일":fmtShort(d)}</h3>${schList(d,list.filter(s=>s.date===d))}</div>`).join("")
     : `<p class="empty">앞으로 2주 동안 잡힌 일정이 없어요. 가족 일정이나 나만 보는 일정을 추가해 보세요.</p>`;
   return `<section class="block" aria-labelledby="h-sc"><div class="block-h"><h2 id="h-sc">다가오는 일정</h2><span class="muted">2주</span></div>${body}
     <details class="add"><summary>${ic("plus")}일정 추가</summary>
@@ -3765,6 +3784,15 @@ const acts = {
   "prefs-open": () => { S.prefsOpen=!S.prefsOpen; render(); },
   backup: el => { if(!isParent()) return; try{ backup(el.dataset.v); }catch(e){ console.error(e); toast("파일을 만들지 못했어요. 다시 눌러 주세요"); } },
   grow: el => { S.growId=el.dataset.v; render(); },
+  // 일정 순서 · 고치기: 그날 목록을 고치는 모드로 (다시 누르면 끝)
+  "sch-edit-mode": el => { const d=el.dataset.v; S.schEdit = S.schEdit===d ? null : d; S.schEditId=null; render(); },
+  "sch-edit": el => { S.schEditId=el.dataset.id||null; render(); document.getElementById("sce-"+S.schEditId)?.focus(); },
+  // ▲▼: 바로 위 · 아래 일정과 순서 값을 바꿔요 (같은 값이면 1 차이 나게)
+  "sch-move": el => guard(async()=>{ const s=S.schedules.find(x=>x.id===el.dataset.id); if(!s) return;
+    const list=mySchedules().filter(x=>x.date===s.date).sort(bySch), i=list.indexOf(s), o=list[i+Number(el.dataset.v)]; if(!o) return;
+    let a=schOrder(s), b=schOrder(o); if(a===b){ if(+el.dataset.v<0) a=b-1; else a=b+1; } else [a,b]=[b,a];
+    await B.update(S.gid,"schedules",s.id,{order:a}); if(schOrder(o)!==b) await B.update(S.gid,"schedules",o.id,{order:b});
+    await reload("schedules"); render(); }),
   "del-schedule": el => guard(async()=>{ await B.remove(S.gid,"schedules",el.dataset.id); await reload("schedules"); render(); toast("일정을 지웠어요"); }),
   "del-link": el => guard(async()=>{ if(!confirm("이 즐겨찾기를 지울까요?")) return; await B.remove(S.gid,"links",el.dataset.id); await reload("links"); render(); toast("즐겨찾기를 지웠어요"); }),
   copy: async el => { try{ await navigator.clipboard.writeText(el.dataset.v); toast("복사했어요"); }catch(e){ prompt("아래 내용을 복사해 주세요", el.dataset.v); } },
@@ -4209,6 +4237,9 @@ const forms = {
     // 저장이 조금 걸릴 때도 바로 알 수 있게: 단추를 잠그고 "저장 중…" → "저장되었어요!"
     const btn=f?.querySelector("button"); if(btn){ btn.disabled=true; btn.dataset.label=btn.innerHTML; btn.textContent="저장 중…"; } toast("💾 일정을 저장하는 중…");
     await B.add(S.gid,"schedules",{date:fd.date,time:p.time,title:p.title,scope:fd.scope||"family",profileId:S.me.id,createdAt:Date.now()}); await reload("schedules"); render(); toast(`✅ 저장되었어요! ${p.time?p.time+" ":""}${p.title}`); }).finally(()=>{ const b=f?.querySelector("button"); if(b?.dataset.label){ b.disabled=false; b.innerHTML=b.dataset.label; } }),
+  "sch-edit": (fd,f) => guard(async()=>{ const s=S.schedules.find(x=>x.id===f.dataset.id); if(!s) return;
+    const p=parseSchedule(fd.title); if(!p.title){ toast("할 일을 적어 주세요"); return; }
+    await B.update(S.gid,"schedules",s.id,{time:p.time,title:p.title,scope:fd.scope||s.scope}); S.schEditId=null; await reload("schedules"); render(); toast("일정을 고쳤어요"); }),
   link: fd => guard(async()=>{ let u=fd.url.trim(); if(!/^https?:\/\//i.test(u)) u="https://"+u; try{ new URL(u); }catch(e){ toast("주소를 다시 확인해 주세요"); return; }
     await B.add(S.gid,"links",{title:fd.title.trim(),url:u,createdBy:S.me.id,createdAt:Date.now()}); await reload("links"); render(); toast("즐겨찾기를 추가했어요"); }),
   comment: (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
