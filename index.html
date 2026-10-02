@@ -3545,6 +3545,12 @@ function viewFamily(){
         <p style="margin:0 0 10px;color:var(--ink2)">가족에게 이 초대 코드를 알려 주세요. 앱이나 주소로 들어와 구글 계정으로 시작한 뒤 코드를 넣으면 돼요.</p>
         <div class="row" style="justify-content:space-between"><span class="code">${esc(g.inviteCode)}</span><button class="btn btn-ghost sm" data-act="copy" data-v="${esc(g.inviteCode)}">${ic("copy")}코드 복사</button></div>
         <div class="row" style="margin-top:12px"><button class="btn btn-ghost sm" data-act="copy" data-v="${esc(link)}">${ic("link")}초대 링크 복사</button></div>
+        ${isParent()?`<details class="add" style="margin-top:14px"><summary>${ic("pen")}일기장 이름 바꾸기</summary>
+          <form class="form-grid" data-form="group-name">
+            <label class="span2">가족 이름<input name="name" required maxlength="20" value="${esc(g.name)}" placeholder="예: 우리집, 햇살네"></label>
+            <p class="muted span2" style="margin:0;font-size:13px">화면 맨 위에 '○○ 일기장'으로 보여요. 가족 모두에게 같이 바뀌어요.</p>
+            <button class="btn btn-primary span2">저장</button>
+          </form></details>`:""}
       </section>
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
         <ul class="mem-list">${ps.map(p=>`<li class="mem">${av(p)}<span>${esc(p.name)}</span><small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`https://${SITE_ADDRESS}/?k=${g.inviteCode}-${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="link-btn" data-act="kid-pin-open" data-id="${p.id}" aria-expanded="${S.pinEdit===p.id}">🔑 비밀번호</button><button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>
@@ -4174,6 +4180,13 @@ const forms = {
       if(v!==null && p.penAuto!==v) await B.update(S.gid,"profiles",p.id,{penAuto:v});
     }
     S.penOpen=false; await reload("profiles"); S.me=prof(S.me.id)||S.me; render(); toast("다홍펜 고치는 방법을 저장했어요");
+  }),
+  // 가족 일기장 이름 바꾸기 (부모만, 가족 모두에게 같이 바뀜)
+  "group-name": fd => guard(async()=>{
+    const name=String(fd.name||"").trim().slice(0,20);
+    if(!name){ toast("가족 이름을 적어 주세요"); return; }
+    if(name===S.group.name) return;
+    await B.updateGroup(S.gid,{name}); S.group.name=name; render(); toast("일기장 이름을 바꿨어요");
   }),
   "old-import": fd => guard(()=>importOld(fd)),
   "create-group": fd => guard(async()=>{ const gid=await B.createGroup(fd.name.trim(),S.user,fd.me.trim()); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid); toast("가족을 만들었어요. 초대 코드는 '우리 가족'에 있어요"); }),
