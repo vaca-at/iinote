@@ -363,7 +363,15 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .today-date{font-family:var(--diary);font-size:clamp(32px,5vw,46px);line-height:1.15;margin:4px 0 0;letter-spacing:-1px}
 .home-grid{display:grid;gap:20px}
 .col{display:grid;gap:20px;align-content:start}
-@media (min-width:1100px){.home-grid{grid-template-columns:1.35fr 1fr;align-items:stretch} .home-grid>.col:first-child{align-content:stretch} .home-grid>.col:first-child>.block{height:100%}}
+@media (min-width:1100px){.home-grid{grid-template-columns:1.35fr 1fr;align-items:stretch} .home-grid>.col:first-child{align-content:stretch} .home-grid>.col:first-child>.block{height:100%}
+  /* 일기장형 첫 화면: '다가오는 일정'은 왼쪽 '오늘의 일기'와 같은 높이, 많으면 칸 안에서 스크롤 (어디서든 카드는 그 아래) */
+  .home-grid:has(.sc-block){grid-template-rows:auto auto;row-gap:20px}
+  .home-grid:has(.sc-block)>.col{display:contents}
+  .home-grid:has(.sc-block)>.col:first-child>.block{grid-column:1;grid-row:1;height:auto}
+  .home-grid .sc-block{grid-column:2;grid-row:1;contain:size;min-height:320px;display:flex;flex-direction:column}
+  .home-grid .sc-block>.block-h,.home-grid .sc-block>details{flex:none}
+  .home-grid .sc-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;margin-right:-8px;padding-right:8px}
+  .home-grid .any-mini{grid-column:2;grid-row:2}}
 .block{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:20px}
 .block-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
 .block-h h2{font-size:18px;margin:0;letter-spacing:-.3px}
@@ -2578,7 +2586,7 @@ function viewSchedules(){
   const days=[...new Set(list.map(s=>s.date))];
   const body = days.length ? days.map(d=>`<div class="sc-day"><h3>${d===t?"오늘":d===addDays(t,1)?"내일":fmtShort(d)}</h3>${schList(d,list.filter(s=>s.date===d))}</div>`).join("")
     : `<p class="empty">앞으로 2주 동안 잡힌 일정이 없어요. 가족 일정이나 나만 보는 일정을 추가해 보세요.</p>`;
-  return `<section class="block" aria-labelledby="h-sc"><div class="block-h"><h2 id="h-sc">다가오는 일정</h2><span class="muted">2주</span></div>${body}
+  return `<section class="block sc-block" aria-labelledby="h-sc"><div class="block-h"><h2 id="h-sc">다가오는 일정</h2><span class="muted">2주</span></div><div class="sc-scroll">${body}</div>
     <details class="add"><summary>${ic("plus")}일정 추가</summary>
       <form class="form-grid" data-form="schedule">
         <label>날짜<input type="date" name="date" value="${t}" required></label>
@@ -3656,7 +3664,9 @@ function render(){
   else {
     // 공부방 일기 단추 등에서 ?write 로 들어오면: 프로필이 정해진 뒤 바로 오늘 일기 쓰는 칸으로
     if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; history.replaceState(null,"",location.pathname); }
+    const scTop=$app.querySelector(".sc-scroll")?.scrollTop;   // 다가오는 일정 칸 안 스크롤 위치는 다시 그려도 그대로
     $app.innerHTML=viewShell();
+    if(scTop){ const sc=$app.querySelector(".sc-scroll"); if(sc) sc.scrollTop=scTop; }
     if(S.sub?.type==="write") penHL();
     afterChatRender();
   }
