@@ -1361,20 +1361,29 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .al-up{margin:0 0 20px;display:flex;flex-direction:column;gap:10px}
 .al-up h2{margin:0;font-size:17px}
 .al-note{margin:0;font-size:13px}
-.al-prev{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
-.al-pv{position:relative;display:flex;flex-direction:column;gap:4px;min-width:0}
-.al-pv img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:var(--line)}
-.al-pv img.bad{visibility:hidden}
-.al-pv input{font-size:12px;padding:4px;min-height:32px;min-width:0}
+.al-rows{display:flex;flex-direction:column;gap:10px}
+.al-row{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:10px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface)}
+.al-rimg{position:relative}
+.al-rimg img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:var(--line);display:block}
+.al-rimg img.bad{visibility:hidden}
+.al-rf{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;min-width:0}
+.al-rf label{display:block;font-size:13px;font-weight:650;min-width:0}
+.al-rf label small{margin-left:4px;font-weight:500}
+.al-rf input,.al-rf textarea{display:block;width:100%;margin-top:4px;font-size:14px;min-width:0}
+.al-rf textarea{resize:vertical;min-height:52px}
+.al-rf .al-wide{grid-column:1/-1}
+.al-amsg{color:var(--sage);font-weight:600}
+.al-same{display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:640px){ .al-row{grid-template-columns:84px 1fr;gap:8px;padding:8px} .al-rf{grid-template-columns:1fr} }
 .al-x{position:absolute;top:4px;right:4px;width:26px;height:26px;padding:0;border-radius:50%;border:0;background:var(--ink);color:var(--surface);opacity:.8;font-size:12px}
 .al-f{border:0;padding:0;margin:0;font-weight:650}
 .al-f legend{padding:0;margin-bottom:6px}
 .al-ppl,.al-places{display:flex;flex-wrap:wrap;gap:6px}
-.al-edit-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.al-edit-top img{width:96px;height:96px;object-fit:cover;border-radius:10px}
-.al-edit-top label{display:flex;flex-direction:column;gap:4px;font-weight:650}
 .al-empty{text-align:center;padding:30px 12px}
 .lb .lb-cap{max-width:calc(100vw - 24px)}
+.lb.has-memo{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+.lb.has-memo img{max-height:calc(100dvh - 230px)}
+.lb .lb-memo{position:absolute;left:50%;bottom:calc(68px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) rotate(-1.5deg);width:max-content;max-width:min(520px,calc(100vw - 48px));margin:0;padding:10px 18px 11px;border-radius:18px 18px 18px 6px;background:var(--butter-soft);color:var(--ink);border:2px dashed var(--butter);font-family:var(--diary);font-size:17px;line-height:1.5;text-align:center;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;box-shadow:0 8px 22px rgba(0,0,0,.35)}
 .lb .lb-cap span{overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){ .al-grid{grid-template-columns:repeat(3,1fr);gap:4px} .al-cell{border-radius:6px} }
 </style>
@@ -1720,10 +1729,10 @@ function seedDemo(){
   // 예시 사진첩: 지난해 여름 제주 · 운동회 · 공원 · 김치찌개
   const alb=(k,date,people,place,by,i)=>({url:DEMO_IMG[k].url,path:"",thumb:"",thumbPath:"",w:DEMO_IMG[k].w,h:DEMO_IMG[k].h,date,people,place,by,createdAt:now-i*1000});
   s.album = {
-    a1:alb("park",addDays(t,-1),["mom","dad","k1","k2"],"동네 공원","dad",1),
-    a2:alb("kimchi",addDays(t,-2),["dad"],"우리 집","dad",2),
-    a3:alb("track",addDays(t,-9),["k1"],"하랑이 학교","mom",3),
-    a4:alb("sea",`${Number(t.slice(0,4))-1}-08-03`,["mom","dad","k1","k2"],"제주 곽지 해변","mom",4)
+    a1:{...alb("park",addDays(t,-1),["mom","dad","k1","k2"],"동네 공원","dad",1),area:"서울 송파구",memo:"이안이 낙엽 왕관 쓴 날 👑🍂"},
+    a2:{...alb("kimchi",addDays(t,-2),["dad"],"우리 집","dad",2),area:"서울 송파구",memo:"아빠표 김치찌개, 하랑이가 두 그릇 먹었어요"},
+    a3:{...alb("track",addDays(t,-9),["k1"],"하랑이 학교","mom",3),area:"서울 송파구",memo:"운동회 이어달리기 연습! 하랑이 화이팅 🏃"},
+    a4:{...alb("sea",`${Number(t.slice(0,4))-1}-08-03`,["mom","dad","k1","k2"],"곽지해수욕장","mom",4),area:"제주 제주시",memo:"처음 본 제주 바다 🌊 이안이가 파도 소리가 좋대요"}
   };
   s.links = {
     l2:{title:"EBS 초등",url:"https://primary.ebs.co.kr",createdBy:"mom",createdAt:2},
@@ -1741,7 +1750,7 @@ function seedDemo(){
 }
 
 function makeDemo(){
-  const KEY="iinote-demo-v7";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
+  const KEY="iinote-demo-v8";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
   let db = null; try { db = JSON.parse(ls.get(KEY,"null")); } catch(e) {}
   if(!db) db = seedDemo();
   const save = () => ls.set(KEY, JSON.stringify(db));
@@ -2320,9 +2329,10 @@ const photoGrid = (photos,did) => { const L=LAYOUT[Math.min(photos.length,9)];
 // #태그를 단추로: 원래 글에서 태그를 찾고 나머지는 esc() (먼저 esc 하면 ' → &#39; 의 #39 가 태그로 잡힘)
 const tagify = t => { const s=String(t||""); let o="",p=0; for(const m of s.matchAll(TAG_RE)){ o+=esc(s.slice(p,m.index))+`<button class="tag-inline" data-act="tag" data-v="${esc(m[1])}">#${esc(m[1])}</button>`; p=m.index+m[0].length; } return o+esc(s.slice(p)); };
 function viewLightbox(){
-  const l=S.lb, p=l.photos[l.i], many=l.photos.length>1;
-  return `<div class="lb" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
+  const l=S.lb, p=l.photos[l.i], many=l.photos.length>1, memo=l.caps?.[l.i]?.m||"";
+  return `<div class="lb ${memo?"has-memo":""}" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
     <img src="${esc(p.url)}" alt="${l.i+1}번째 사진" data-act="noop">
+    ${memo?`<p class="lb-memo" data-act="noop"><span aria-hidden="true">💌</span> ${esc(memo)}</p>`:""}
     ${(c=>c?`<div class="lb-cap" data-act="noop"><span>${esc(c.t)}</span>${c.id?`<button class="btn btn-ghost sm" data-act="lb-diary" data-id="${esc(c.id)}">일기 보기</button>`:""}${c.al && alById(c.al) && albumCanEdit(alById(c.al))?`<button class="btn btn-ghost sm" data-act="al-edit" data-id="${esc(c.al)}">✏️ 고치기</button>`:""}</div>`:"")(l.caps?.[l.i])}
     ${many?`<span class="lb-c">${l.i+1} / ${l.photos.length}</span><button class="lb-p" data-act="lb-prev" aria-label="이전 사진">${ic("left")}</button><button class="lb-n" data-act="lb-next" aria-label="다음 사진">${ic("right")}</button>`:""}
     <button class="lb-x" data-act="lb-close" aria-label="닫기">${ic("x")}</button></div>`;
@@ -2927,37 +2937,75 @@ function albumGroups(){
   } else if(S.albumBy==="place"){
     for(const pl of albumPlaces()) out.push({h:`📍 ${esc(pl)}`,l:L.filter(a=>(a.place||"").trim()===pl)});
     const none=L.filter(a=>!(a.place||"").trim()); if(none.length) out.push({h:"장소를 안 쓴 사진",l:none});
+  } else if(S.albumBy==="area"){
+    const n={}; L.forEach(a=>{ const v=(a.area||"").trim(); if(v) n[v]=(n[v]||0)+1; });
+    for(const v of Object.keys(n).sort((a,b)=>n[b]-n[a])) out.push({h:`🏘 ${esc(v)}`,l:L.filter(a=>(a.area||"").trim()===v)});
+    const none=L.filter(a=>!(a.area||"").trim()); if(none.length) out.push({h:"동네를 모르는 사진",l:none});
   } else {
     const yOf=a=>(a.date||"").slice(0,4)||"?";
     for(const y of [...new Set(L.map(yOf))]) out.push({h:y==="?"?"날짜 모름":`📅 ${y}년`,l:L.filter(a=>yOf(a)===y)});
   }
   return out;
 }
-// 사람 고르기 · 장소 쓰기 (올리기 · 고치기 같이 씀)
-function albumTagForm(st){
-  const places=albumPlaces().slice(0,12);
-  return `<fieldset class="al-f"><legend>누가 나왔나요? <small class="muted">여러 명 고를 수 있어요</small></legend><div class="al-ppl">${sortedProfiles().map(p=>`<button type="button" class="chip ${st.people.includes(p.id)?"on":""}" data-act="al-person" data-v="${p.id}" aria-pressed="${st.people.includes(p.id)}">${av(p,26)}${esc(p.name)}</button>`).join("")}</div></fieldset>
-    <label class="al-f" for="al-place">어디에서 찍었나요?</label><input id="al-place" name="place" maxlength="30" value="${esc(st.place)}" placeholder="예) 동네 공원, 할머니 댁" autocomplete="off">
-    ${places.length?`<div class="al-places" role="group" aria-label="전에 쓴 장소">${places.map(pl=>`<button type="button" class="htag" data-act="al-place" data-v="${esc(pl)}">📍 ${esc(pl)}</button>`).join("")}</div>`:""}`;
+// 누가 나왔나요? (올리기는 모든 사진에 같이, 고치기는 그 사진만)
+const albumPeople = (st,all) => `<fieldset class="al-f"><legend>🙂 누가 나왔나요? <small class="muted">${all?"고른 사람은 이번 사진 모두에 들어가요 (나중에 한 장씩 고칠 수 있어요)":"여러 명 고를 수 있어요"}</small></legend><div class="al-ppl">${sortedProfiles().map(p=>`<button type="button" class="chip ${st.people.includes(p.id)?"on":""}" data-act="al-person" data-v="${p.id}" aria-pressed="${st.people.includes(p.id)}">${av(p,26)}${esc(p.name)}</button>`).join("")}</div></fieldset>`;
+// 사진 한 장의 칸: 찍은 날 · 장소 · 동네(장소를 쓰면 자동으로 찾음) · 메모
+const albumRow = (st,key,pic) => `<div class="al-row" data-alrow="${esc(key)}">${pic}<div class="al-rf">
+    <label>📅 찍은 날<input type="date" data-alf="date" value="${esc(st.date||"")}" max="${todayStr()}"></label>
+    <label>📍 장소<input data-alf="place" list="al-pl" maxlength="30" value="${esc(st.place||"")}" placeholder="예) 서울아산병원, 할머니 댁" autocomplete="off"></label>
+    <label>🏘 동네 <small class="al-amsg">${esc(st.areaMsg||"")}</small><input data-alf="area" maxlength="30" value="${esc(st.area||"")}" placeholder="장소를 쓰면 찾아 줘요 (예: 서울 송파구)" autocomplete="off"></label>
+    <label class="al-wide">💌 메모 <small class="muted">비워 둬도 돼요</small><textarea data-alf="memo" maxlength="100" rows="2" placeholder="예) 도윤이가 태어난 날 · 엄마 손가락을 꼭 잡았어요">${esc(st.memo||"")}</textarea></label>
+  </div></div>`;
+const alState = key => key==="e" ? S.alEdit : S.alUp?.items.find(x=>x.k===key);
+/* 🏘 동네 찾기: 장소 이름 → OpenStreetMap(Nominatim)에서 '서울 송파구'처럼. 1초에 한 번씩만 물어봐요 (무료 이용 규칙) */
+const SIDO_SHORT = {"서울특별시":"서울","부산광역시":"부산","대구광역시":"대구","인천광역시":"인천","광주광역시":"광주","대전광역시":"대전","울산광역시":"울산","세종특별자치시":"세종","경기도":"경기","강원도":"강원","강원특별자치도":"강원","충청북도":"충북","충청남도":"충남","전라북도":"전북","전북특별자치도":"전북","전라남도":"전남","경상북도":"경북","경상남도":"경남","제주특별자치도":"제주"};
+function areaOf(a){
+  const sido=a.province||a.city||a.state||"", si=a.province?(a.city||a.county||a.town||""):"", gu=a.borough||(!a.province?(a.county||""):"");
+  return [SIDO_SHORT[sido]||sido, si, gu].filter(Boolean).filter((x,i,arr)=>arr.indexOf(x)===i).join(" ").slice(0,30);
+}
+const areaCache = {}; let areaQ = Promise.resolve();
+function findArea(st,key){
+  const place=(st.place||"").trim();
+  if(!place || st.areaManual) return;
+  const known=S.album.find(a=>(a.place||"").trim()===place && a.area)?.area || areaCache[place];
+  if(known!==undefined){ if(known){ st.area=known; st.areaMsg="찾았어요"; } else st.areaMsg="못 찾았어요 · 직접 써 주세요"; drawArea(st,key); return; }
+  st.areaMsg="찾는 중…"; drawArea(st,key);
+  areaQ=areaQ.then(async()=>{
+    if((st.place||"").trim()!==place) return;
+    let area="";
+    try{ const r=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=kr&accept-language=ko&addressdetails=1&limit=1&q="+encodeURIComponent(place));
+      const j=await r.json(); if(j[0]?.address) area=areaOf(j[0].address); areaCache[place]=area; }catch(e){}
+    if((st.place||"").trim()===place && !st.areaManual){ if(area) st.area=area; st.areaMsg=area?"자동으로 찾았어요 · 틀리면 고쳐 주세요":"못 찾았어요 · 직접 써 주세요"; drawArea(st,key); }
+    await new Promise(r=>setTimeout(r,1100));
+  });
+}
+function drawArea(st,key){
+  const box=document.querySelector(`[data-alrow="${CSS.escape(key)}"]`); if(!box) return;
+  const i=box.querySelector('[data-alf="area"]'); if(i && document.activeElement!==i) i.value=st.area||"";
+  const m=box.querySelector(".al-amsg"); if(m) m.textContent=st.areaMsg||"";
 }
 function viewAlbum(){
-  const head=`<div class="page-h"><h1>📸 사진첩</h1><label class="btn btn-primary al-pick">${ic("image")}사진 올리기<input type="file" id="al-files" accept="image/*" multiple class="sr"></label></div>`;
+  const pick=(cls,label)=>`<label class="btn ${cls} al-pick">${label}<input type="file" class="al-files sr" accept="image/*" multiple></label>`;
+  const head=`<div class="page-h"><h1>📸 사진첩</h1>${pick("btn-primary",ic("image")+"사진 올리기")}</div>`;
   if(!S.albumReady){
     if(!S.albumLoading){ S.albumLoading=true; loadAlbum().then(()=>{ S.albumLoading=false; if(S.tab==="album" && !S.sub) render(); }); }
     return head+`<p class="empty">사진첩을 펼치는 중이에요…</p>`;
   }
   const up=S.alUp, ed=S.alEdit, ea=ed&&alById(ed.id);
+  const dl=`<datalist id="al-pl">${albumPlaces().map(pl=>`<option value="${esc(pl)}"></option>`).join("")}</datalist>`;
   const upForm = up ? `<form class="card al-up" data-form="al-up"><h2>사진 ${up.items.length}장 올리기</h2>
-      <div class="al-prev">${up.items.map((it,i)=>`<div class="al-pv"><img src="${it.src}" alt="" onerror="this.classList.add('bad')"><input type="date" data-al-date="${i}" value="${it.date}" max="${todayStr()}" aria-label="${i+1}번째 사진 찍은 날"><button type="button" class="al-x" data-act="al-drop" data-i="${i}" aria-label="${i+1}번째 사진 빼기">✕</button></div>`).join("")}</div>
-      <p class="muted al-note">날짜는 사진에 적힌 찍은 날이에요. 다르면 고쳐 주세요.</p>
-      ${albumTagForm(up)}
-      <div class="row"><button class="btn btn-primary al-go">올리기</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button></div></form>` : "";
+      <p class="muted al-note">사진마다 찍은 날 · 장소 · 메모를 따로 쓸 수 있어요. 찍은 날은 사진에 적힌 날짜예요.</p>
+      ${albumPeople(up,true)}
+      ${up.items.length>1?`<div class="al-same"><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="place">📍 첫 사진 장소를 모두에</button><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="date">📅 첫 사진 날짜를 모두에</button></div>`:""}
+      <div class="al-rows">${up.items.map((it,i)=>albumRow(it,it.k,`<div class="al-rimg"><img src="${it.src}" alt="${i+1}번째 사진" onerror="this.classList.add('bad')"><button type="button" class="al-x" data-act="al-drop" data-k="${it.k}" aria-label="${i+1}번째 사진 빼기">✕</button></div>`)).join("")}</div>
+      ${up.items.length<ALBUM_MAX_PICK?pick("btn-ghost sm","＋ 사진 더 고르기"):""}
+      <div class="row"><button class="btn btn-primary al-go">올리기</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button></div>${dl}</form>` : "";
   const edForm = ea ? `<form class="card al-up" data-form="al-save"><h2>사진 정보 고치기</h2>
-      <div class="al-edit-top"><img src="${esc(ea.thumb||ea.url)}" alt=""><label>찍은 날<input type="date" id="al-edate" name="date" value="${esc(ed.date)}" max="${todayStr()}"></label></div>
-      ${albumTagForm(ed)}
-      <div class="row"><button class="btn btn-primary">저장</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button><button type="button" class="btn btn-ghost danger" data-act="al-del">🗑 사진 지우기</button></div></form>` : "";
-  if(!S.album.length) return head+upForm+`<div class="empty al-empty"><p>📷 아직 사진이 없어요.</p><p class="muted">우리 가족 사진을 올려 보세요. 찍은 날짜로 연도가 저절로 나뉘고, 누가 나왔는지 · 어디인지 적어 두면 사람별 · 장소별로도 모아 볼 수 있어요.</p></div>`;
-  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["place","📍 장소별"]];
+      ${albumPeople(ed,false)}
+      ${albumRow(ed,"e",`<div class="al-rimg"><img src="${esc(ea.thumb||ea.url)}" alt=""></div>`)}
+      <div class="row"><button class="btn btn-primary">저장</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button><button type="button" class="btn btn-ghost danger" data-act="al-del">🗑 사진 지우기</button></div>${dl}</form>` : "";
+  if(!S.album.length) return head+upForm+`<div class="empty al-empty"><p>📷 아직 사진이 없어요.</p><p class="muted">우리 가족 사진을 올려 보세요. 찍은 날짜로 연도가 저절로 나뉘고, 누가 나왔는지 · 어디인지 적어 두면 사람별 · 장소별 · 동네별로도 모아 볼 수 있어요.</p></div>`;
+  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["place","📍 장소별"],["area","🏘 동네별"]];
   if(!BY.some(([k])=>k===S.albumBy)) S.albumBy="year";
   const groups=albumGroups();
   return head+upForm+edForm+`<p class="muted al-intro">우리 가족만 보는 사진첩이에요 · 사진 ${S.album.length}장</p>
@@ -2967,15 +3015,16 @@ function viewAlbum(){
 async function albumPick(files){
   files=files.filter(f=>/^image\//.test(f.type) || /\.(heic|heif)$/i.test(f.name));
   if(!files.length) return;
-  if(files.length>ALBUM_MAX_PICK){ toast(`한 번에 ${ALBUM_MAX_PICK}장까지 올릴 수 있어요`); files=files.slice(0,ALBUM_MAX_PICK); }
-  const items=await Promise.all(files.map(async f=>({file:f, src:URL.createObjectURL(f), date:await photoDate(f)})));
+  const room=ALBUM_MAX_PICK-(S.alUp?.items.length||0);
+  if(files.length>room){ toast(`한 번에 ${ALBUM_MAX_PICK}장까지 올릴 수 있어요`); files=files.slice(0,Math.max(0,room)); }
+  const items=await Promise.all(files.map(async f=>({k:rid(), file:f, src:URL.createObjectURL(f), date:await photoDate(f), place:"", area:"", memo:""})));
   const prev=S.alUp; S.alEdit=null;
-  S.alUp={items:[...(prev?.items||[]),...items].slice(0,ALBUM_MAX_PICK), people:prev?.people||[], place:prev?.place||""};
-  render(); document.querySelector(".al-up")?.scrollIntoView({block:"start"});
+  S.alUp={items:[...(prev?.items||[]),...items], people:prev?.people||[]};
+  render(); if(!prev) document.querySelector(".al-up")?.scrollIntoView({block:"start"});
 }
 async function albumUpload(){
   const up=S.alUp; if(!up?.items.length || S.alBusy) return;
-  const place=String(document.getElementById("al-place")?.value ?? up.place).trim().slice(0,30), people=up.people.filter(id=>prof(id));
+  const people=up.people.filter(id=>prof(id));
   const btn=document.querySelector(".al-go"); let ok=0, fail=0; S.alBusy=true;
   try{
     for(const [i,it] of up.items.entries()){
@@ -2985,7 +3034,7 @@ async function albumUpload(){
         if(!big.blob) throw new Error("사진을 불러올 수 없어요");
         const id=rid(), base=`groups/${S.gid}/album`;
         const r=await B.uploadMedia(`${base}/${id}.jpg`,big.blob,"album"), th=thumb.blob?await B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob,"album"):null;
-        const data={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w,h:big.h,date:/^\d{4}-\d{2}-\d{2}$/.test(it.date)?it.date:todayStr(),people,place,by:S.me.id,createdAt:Date.now()};
+        const data={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w,h:big.h,date:/^\d{4}-\d{2}-\d{2}$/.test(it.date)?it.date:todayStr(),people,...albumInfo(it),by:S.me.id,createdAt:Date.now()};
         const nid=await B.add(S.gid,"album",data); S.album.push({id:nid,...data}); ok++;
       }catch(e){ console.error(e); fail++; }
     }
@@ -2994,6 +3043,7 @@ async function albumUpload(){
   toast(fail ? `${ok}장 올렸어요. ${fail}장은 올리지 못했어요 (아이폰 HEIC 사진이면 '높은 호환성'으로 찍은 사진을 골라 주세요)` : `사진 ${ok}장을 사진첩에 넣었어요`);
   render();
 }
+const albumInfo = st => ({place:String(st.place||"").trim().slice(0,30), area:String(st.area||"").trim().slice(0,30), memo:String(st.memo||"").trim().slice(0,100)});
 async function albumRemove(gid,a){
   if(a.path) await B.deleteMedia(a.path,"album"); if(a.thumbPath) await B.deleteMedia(a.thumbPath,"album");
   await B.remove(gid,"album",a.id);
@@ -4209,7 +4259,7 @@ const acts = {
   "quiz-exit": () => go(()=>{ S.sub=null; S.quiz=null; S.tab="quiz"; }),
   "new-group": () => go(()=>{ S.phase="onboard"; }),
   "cancel-onboard": () => go(()=>{ S.phase = S.me ? "app" : "picker"; }),
-  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v7"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
+  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v8"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
   "tour-logout": () => guard(async()=>{ S.tourAsk=false; S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); try{ await B.signOut(); }catch(e){} acts.tour(); }),
   "tour-no": () => { S.tourAsk=false; try{ history.replaceState({iinote:1},"","/"); }catch(e){} render(); },
   "tour-exit": () => { try{ sessionStorage.removeItem("iinote-tour"); }catch(e){} location.href="/"; },
@@ -4270,12 +4320,13 @@ const acts = {
   "photo-crop": el => cropPhoto(el.dataset.id),
   // 📸 사진첩
   "al-by": el => { S.albumBy=el.dataset.v; ls.set("iinote-album-by",el.dataset.v); render(); },
-  "al-open": el => { const g=albumGroups()[+el.dataset.g]; if(!g) return; S.lb={photos:g.l.map(a=>({url:a.url})),caps:g.l.map(a=>({t:albumCap(a),al:a.id})),i:+el.dataset.i||0}; render(); document.querySelector(".lb-x")?.focus(); },
+  "al-open": el => { const g=albumGroups()[+el.dataset.g]; if(!g) return; S.lb={photos:g.l.map(a=>({url:a.url})),caps:g.l.map(a=>({t:albumCap(a),al:a.id,m:a.memo||""})),i:+el.dataset.i||0}; render(); document.querySelector(".lb-x")?.focus(); },
   "al-person": el => { const st=S.alEdit||S.alUp; if(!st) return; const v=el.dataset.v; st.people=st.people.includes(v)?st.people.filter(x=>x!==v):[...st.people,v]; render(); },
-  "al-place": el => { const st=S.alEdit||S.alUp; if(!st) return; st.place=el.dataset.v; const i=document.getElementById("al-place"); if(i) i.value=st.place; },
-  "al-drop": el => { const up=S.alUp; if(!up || S.alBusy) return; const [it]=up.items.splice(+el.dataset.i,1); if(it) URL.revokeObjectURL(it.src); if(!up.items.length) S.alUp=null; render(); },
+  "al-same": el => { const up=S.alUp; if(!up?.items.length) return; const f=up.items[0];
+    up.items.forEach(it=>{ if(el.dataset.v==="date") it.date=f.date; else { it.place=f.place; it.area=f.area; it.areaMsg=f.areaMsg; it.areaManual=f.areaManual; } }); render(); toast(el.dataset.v==="date"?"모든 사진의 날짜를 맞췄어요":"모든 사진의 장소를 맞췄어요"); },
+  "al-drop": el => { const up=S.alUp; if(!up || S.alBusy) return; const it=up.items.find(x=>x.k===el.dataset.k); if(!it) return; up.items=up.items.filter(x=>x!==it); URL.revokeObjectURL(it.src); if(!up.items.length) S.alUp=null; render(); },
   "al-cancel": () => { if(S.alBusy) return; S.alUp?.items.forEach(it=>URL.revokeObjectURL(it.src)); S.alUp=null; S.alEdit=null; render(); },
-  "al-edit": el => { const a=alById(el.dataset.id); if(!albumCanEdit(a)) return; S.lb=null; S.alUp=null; S.alEdit={id:a.id,people:[...(a.people||[])],place:a.place||"",date:a.date||""}; render(); window.scrollTo(0,0); },
+  "al-edit": el => { const a=alById(el.dataset.id); if(!albumCanEdit(a)) return; S.lb=null; S.alUp=null; S.alEdit={id:a.id,people:[...(a.people||[])],place:a.place||"",area:a.area||"",areaManual:false,memo:a.memo||"",date:a.date||""}; render(); window.scrollTo(0,0); },
   "al-del": () => guard(async()=>{ const a=alById(S.alEdit?.id); if(!albumCanEdit(a)) return; if(!confirm("이 사진을 사진첩에서 지울까요? 되돌릴 수 없어요.")) return;
     await albumRemove(S.gid,a); S.album=S.album.filter(x=>x.id!==a.id); S.alEdit=null; toast("사진을 지웠어요"); render(); }),
   "lb-prev": () => lbMove(-1),
@@ -4613,7 +4664,7 @@ async function penCheck(){
 const forms = {
   "al-up": () => albumUpload(),
   "al-save": fd => guard(async()=>{ const ed=S.alEdit, a=alById(ed?.id); if(!albumCanEdit(a)) return;
-    const data={people:ed.people.filter(id=>prof(id)), place:String(fd.place||"").trim().slice(0,30), date:/^\d{4}-\d{2}-\d{2}$/.test(fd.date||"")?fd.date:a.date};
+    const data={people:ed.people.filter(id=>prof(id)), ...albumInfo(ed), date:/^\d{4}-\d{2}-\d{2}$/.test(ed.date||"")?ed.date:a.date};
     await B.update(S.gid,"album",a.id,data); Object.assign(a,data); S.alEdit=null; toast("저장했어요"); render(); }),
   pdf: (fd, f) => makePdf(f),
   chat: (fd, f) => sendChat(null, f.querySelector(".chat-ta")),
@@ -4684,7 +4735,8 @@ const kidField = t => S.me?.type==="child" && S.draft && (t.id==="w-text"||t.id=
 ["paste","drop"].forEach(ev=>document.addEventListener(ev, e => { if(kidField(e.target)){ e.preventDefault(); toast(KID_TYPE_MSG); } }));
 document.addEventListener("input", e => {
   if(e.target.classList?.contains("chat-ta")){ S.chatDraft=e.target.value; e.target.style.height="auto"; e.target.style.height=Math.min(140,e.target.scrollHeight)+"px"; return; }
-  if(e.target.id==="al-place"){ const st=S.alEdit||S.alUp; if(st) st.place=e.target.value; return; }
+  if(e.target.dataset?.alf){ const key=e.target.closest("[data-alrow]")?.dataset.alrow, st=alState(key), f=e.target.dataset.alf; if(!st) return;
+    st[f]=e.target.value; if(f==="area"){ st.areaManual=!!e.target.value.trim(); st.areaMsg=""; } if(f==="place" && st.areaManual && !st.area?.trim()) st.areaManual=false; return; }
   if(e.target.id==="q"){ S.search=e.target.value; const w=document.getElementById("feed-wrap"); if(w) w.innerHTML=viewFeed(); return; }
   if(!S.draft) return;
   // 아이 일기는 직접 손으로 써요: 말로 쓰기처럼 한꺼번에 긴 글이 들어오면 되돌려요
@@ -4698,9 +4750,8 @@ document.addEventListener("input", e => {
 document.addEventListener("change", e => {
   const t=e.target;
   if(t.classList?.contains("chat-photo") && t.files?.[0]){ const file=t.files[0], ta=t.closest("form")?.querySelector(".chat-ta"); t.value=""; if(S.chatBusy){ toast("보내는 중이에요. 끝나면 사진을 다시 골라 주세요"); return; } sendChat(file, ta); return; }
-  if(t.id==="al-files" && t.files?.length){ const fs=[...t.files]; t.value=""; albumPick(fs); return; }
-  if(t.dataset.alDate!=null && S.alUp){ const it=S.alUp.items[+t.dataset.alDate]; if(it) it.date=t.value; return; }
-  if(t.id==="al-edate" && S.alEdit){ S.alEdit.date=t.value; return; }
+  if(t.classList?.contains("al-files") && t.files?.length){ const fs=[...t.files]; t.value=""; albumPick(fs); return; }
+  if(t.dataset?.alf==="place"){ const key=t.closest("[data-alrow]")?.dataset.alrow, st=alState(key); if(st){ st.place=t.value; findArea(st,key); } return; }
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
