@@ -1368,6 +1368,11 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .al-by .chip{padding:0 14px}
 .al-sec{margin:0 0 24px}
 .al-h{display:flex;align-items:center;gap:8px;font-size:17px;margin:0 0 10px}
+.al-avs{display:inline-flex}
+.al-avs>*{margin-right:-6px;box-shadow:0 0 0 2px var(--surface);border-radius:50%}
+.al-avs>*:last-child{margin-right:4px}
+.al-n{font-style:normal;font-size:12px;font-weight:700;color:var(--coral-ink);background:var(--coral-soft);padding:1px 8px;border-radius:999px}
+.al-n:empty{display:none}
 .al-h small{color:var(--ink3);font-weight:600;font-size:13px}
 .al-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
 .al-cell{aspect-ratio:1;padding:0;border:0;border-radius:10px;overflow:hidden;background:var(--line);cursor:zoom-in;min-width:0}
@@ -2982,6 +2987,16 @@ function albumGroups(){
   } else if(S.albumBy==="place"){
     for(const pl of albumPlaces()) out.push({h:`📍 ${esc(pl)}`,l:L.filter(a=>(a.place||"").trim()===pl)});
     const none=L.filter(a=>!(a.place||"").trim()); if(none.length) out.push({h:"장소를 안 쓴 사진",l:none});
+  } else if(S.albumBy==="with"){
+    // 👨‍👩‍👧 함께 찍은: 사진에 고른 사람들의 조합으로 저절로 묶어요 (집마다 다르게 · 사람 많은 묶음부터)
+    const order=sortedProfiles().map(p=>p.id), all=order.length, g={};
+    L.forEach(a=>{ const ids=order.filter(id=>(a.people||[]).includes(id)); if(ids.length) (g[ids.join(",")]=g[ids.join(",")]||[]).push(a); });
+    Object.entries(g).sort((x,y)=>y[0].split(",").length-x[0].split(",").length || y[1].length-x[1].length).forEach(([k,l])=>{
+      const ps=k.split(",").map(prof), n=ps.length;
+      const name = n===all && all>1 ? "온 가족" : n===1 ? `${esc(ps[0].name)} 혼자` : ps.map(p=>esc(p.name)).join(" · ");
+      out.push({h:`<span class="al-avs">${ps.map(p=>av(p,24)).join("")}</span>${name} <em class="al-n">${n===all&&all>1?"모두":n===1?"":n===2?"둘이":n===3?"셋이":n===4?"넷이":n+"명"}</em>`,l});
+    });
+    const none=L.filter(a=>!(a.people||[]).some(id=>prof(id))); if(none.length) out.push({h:"누가 나왔는지 안 고른 사진",l:none});
   } else if(S.albumBy==="area"){
     const n={}; L.forEach(a=>{ const v=(a.area||"").trim(); if(v) n[v]=(n[v]||0)+1; });
     for(const v of Object.keys(n).sort((a,b)=>n[b]-n[a])) out.push({h:`🏘 ${esc(v)}`,l:L.filter(a=>(a.area||"").trim()===v)});
@@ -3051,7 +3066,7 @@ function viewAlbum(){
       ${albumRow(ed,"e",`<div class="al-rimg"><img src="${esc(ea.thumb||ea.url)}" alt=""></div>`)}
       <div class="row"><button class="btn btn-primary">저장</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button><button type="button" class="btn btn-ghost danger" data-act="al-del">🗑 사진 지우기</button></div>${dl}</form>` : "";
   if(!S.album.length) return head+upForm+`<div class="empty al-empty"><p>📷 아직 사진이 없어요.</p><p class="muted">우리 가족 사진을 올려 보세요. 찍은 날짜로 연도가 저절로 나뉘고, 누가 나왔는지 · 어디인지 적어 두면 사람별 · 장소별 · 동네별로도 모아 볼 수 있어요.</p></div>`;
-  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["place","📍 장소별"],["area","🏘 동네별"]];
+  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["with","👨‍👩‍👧 함께 찍은"],["place","📍 장소별"],["area","🏘 동네별"]];
   if(!BY.some(([k])=>k===S.albumBy)) S.albumBy="year";
   const groups=albumGroups();
   return head+upForm+edForm+`<p class="muted al-intro">우리 가족만 보는 사진첩이에요 · 사진 ${S.album.length}장</p>
