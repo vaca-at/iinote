@@ -1991,7 +1991,7 @@ function chatQuote(r){
   if(!r) return "";
   const p=prof(r.profileId), orig=S.chats.find(x=>x.id===r.id);
   const txt=orig ? chatSnip(orig) : (r.text || (r.photo?"📷 사진":""));
-  return `<button type="button" class="cm-q" data-act="chat-jump" data-id="${esc(r.id)}" style="--qc:${p?.color||"#767E91"}" aria-label="${esc(p?.name||"")}의 메시지로 가기"><b>${esc(p?.name||"알 수 없음")}</b> ${esc(txt)}</button>`;
+  return `<button type="button" class="cm-q" data-act="chat-jump" data-id="${esc(r.id)}" style="--qc:${p?.color||"#767E91"}" aria-label="${esc(kidN(p))}의 메시지로 가기"><b>${esc(p?.name||"알 수 없음")}</b> ${esc(txt)}</button>`;
 }
 const chatReplyBar = () => { const r=S.chatReply; if(!r) return ""; const p=prof(r.profileId);
   return `<div class="chat-rp" role="status" style="--qc:${p?.color||"#767E91"}"><span><b>${esc(p?.name||"")}</b>에게 답장<small>${esc(r.text||(r.photo?"📷 사진":""))}</small></span><button type="button" class="chat-rp-x" data-act="chat-reply-x" aria-label="답장 그만두기">✕</button></div>`; };
@@ -2237,7 +2237,7 @@ function viewPicker(){
     <p class="muted">${esc(S.group?.name||"")} 가족</p>
     <div class="pick-grid">${ps.map(p=>{ const ok=canUse(p);
       return `<button class="pick" data-act="pick" data-id="${p.id}" ${ok?"":"disabled"}>${av(p,88)}<strong>${esc(p.name)}</strong><small>${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:ok?(p.pin&&S.me?.type==="child"?"🔒 나":"나"):"본인 계정으로 접속"}</small></button>`; }).join("")}</div>
-    ${pinP?`<form class="pin-box stack" data-form="pin" data-id="${pinP.id}"><label>${esc(pinP.name)}의 비밀번호 네 자리<input name="pin" class="pin-in" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" required autofocus></label><button class="btn btn-primary wide">들어가기</button>
+    ${pinP?`<form class="pin-box stack" data-form="pin" data-id="${pinP.id}"><label>${esc(kidN(pinP))}의 비밀번호 네 자리<input name="pin" class="pin-in" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" required autofocus></label><button class="btn btn-primary wide">들어가기</button>
       ${pinP.type==="parent"?`<button type="button" class="link-btn" data-act="pin-reauth" data-id="${pinP.id}" style="justify-self:center">비밀번호를 잊었어요 · 로그인으로 확인하기</button>`:""}</form>`:""}
     <p><button class="link-btn" data-act="signout">${ic("out")}로그아웃</button></p>
   </div></main>`;
@@ -2271,13 +2271,15 @@ function favRow(){
 }
 // 부모 폰으로 아이가 쓸 때: 부모 화면에는 '아이가 쓰기' 단추, 아이로 쓰는 중에는 '부모로 돌아가기'
 // 받침에 따라 "로" · "으로" (ㄹ 받침은 "로")
+// 아이 이름 부르기: 받침이 있으면 '이'를 붙여요 (도진 → 도진이의 · 지아 → 지아의). 어른 이름은 그대로
+const kidN = p => { const n=String(p?.name||""); if(p?.type!=="child") return n; const c=n.slice(-1).charCodeAt(0)-0xAC00; return c>=0&&c<11172&&c%28 ? n+"이" : n; };
 const ro = w => { const c=String(w||"").slice(-1).charCodeAt(0)-0xAC00; const j=c>=0&&c<11172?c%28:0; return j&&j!==8?"으로":"로"; };
 // 아이 프로필로 쓰던 기기에서 부모 프로필로 넘어갈 때만 부모 비밀번호를 물어요 (처음 로그인해 들어올 때는 안 물어요)
 // 아이 비밀번호 바꾸기: 부모는 가족 구성원에서 아이마다 (지금 비밀번호 없이), 아이는 계정에서 스스로 (지금 비밀번호를 먼저 확인)
 function pinForm(kind,p,self){
   const f=(id,lab,ph)=>`<label>${lab}<input id="${id}-${p.id}" name="${id}" class="pin-in" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="${ph}" required></label>`;
   return `<form class="pin-edit" data-form="${kind}" data-id="${p.id}">
-    <p class="muted">${self?`🔑 내 비밀번호 ${p.pin?"바꾸기":"정하기"} · 형제자매나 친구가 알게 됐으면 바로 바꿔요. 새 비밀번호는 나만 알고 있어요.`:`🔑 ${esc(p.name)}의 비밀번호 ${p.pin?"바꾸기 · 지금 비밀번호를 몰라도 새로 정할 수 있어요.":`정하기 · 정하면 ${esc(p.name)} 프로필로 들어갈 때 물어요.`}`}</p>
+    <p class="muted">${self?`🔑 내 비밀번호 ${p.pin?"바꾸기":"정하기"} · 형제자매나 친구가 알게 됐으면 바로 바꿔요. 새 비밀번호는 나만 알고 있어요.`:`🔑 ${esc(kidN(p))}의 비밀번호 ${p.pin?"바꾸기 · 지금 비밀번호를 몰라도 새로 정할 수 있어요.":`정하기 · 정하면 ${esc(p.name)} 프로필로 들어갈 때 물어요.`}`}</p>
     <div class="pin-row">${self&&p.pin?f("cur","지금 비밀번호","●●●●"):""}${f("next","새 비밀번호","숫자 네 자리")}${f("again","한 번 더","같은 숫자")}</div>
     <div class="row"><button class="btn btn-primary sm">${p.pin?"바꾸기":"정하기"}</button>${!self&&p.pin?`<button type="button" class="btn btn-ghost sm" data-act="kid-pin-clear" data-id="${p.id}">비밀번호 없애기</button>`:""}${!self?`<button type="button" class="btn btn-ghost sm" data-act="kid-pin-open" data-id="${p.id}">닫기</button>`:""}</div></form>`;
 }
@@ -2941,7 +2943,7 @@ function stickerStats(p){
 const stickersOf = p => { const s=stickerStats(p); return STICKERS.filter(x=>x[3](s)).map(x=>x[0]); };
 function viewStickers(p, small){
   const got=new Set(stickersOf(p));
-  return `<section class="stk ${small?"small":""}" aria-label="${esc(p.name)}의 스티커판"><div class="stk-h"><b>🏅 ${small?"스티커":`${esc(p.name)}의 스티커판`}</b><span>${got.size} / ${STICKERS.length}</span></div>
+  return `<section class="stk ${small?"small":""}" aria-label="${esc(kidN(p))}의 스티커판"><div class="stk-h"><b>🏅 ${small?"스티커":`${esc(p.name)}의 스티커판`}</b><span>${got.size} / ${STICKERS.length}</span></div>
     <div class="stk-grid">${STICKERS.map(([k,e,n])=>`<span class="stk-i ${got.has(k)?"on":""}" title="${n}${got.has(k)?" · 받았어요!":" · 아직이에요"}"><i>${e}</i>${small?"":`<small>${n}</small>`}</span>`).join("")}</div></section>`;
 }
 function viewMyDiary(){
@@ -3133,7 +3135,7 @@ function viewDiaryDetail(){
     ${viewReact(d,mine)}
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
-      ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(p?.name||"")}의 하루에 답해 주세요.</p>`}
+      ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
       <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
     </section></article>`;
 }
@@ -3195,7 +3197,7 @@ function syncLen(){
 function kwHead(d){
   const t=todayStr(), y=addDays(t,-1), st=kwStreak(), sub=d.status==="submitted";
   return `<div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${sub?"제출한 일기를 고치고 있어요":d.status==="draft"?"임시 저장된 일기예요":""}</span></div>
-    <header class="kw-head">${av(S.me,48)}<div class="kw-hl"><h2>${esc(S.me.name)}의 일기장</h2><small>${gradeName(S.me.grade)?gradeName(S.me.grade)+" · ":""}${fmtLong(d.date)}</small></div><span class="kw-streak">🔥 ${st?`${st}일째 쓰는 중!`:"오늘부터 시작!"}</span></header>
+    <header class="kw-head">${av(S.me,48)}<div class="kw-hl"><h2>${esc(kidN(S.me))}의 일기장</h2><small>${gradeName(S.me.grade)?gradeName(S.me.grade)+" · ":""}${fmtLong(d.date)}</small></div><span class="kw-streak">🔥 ${st?`${st}일째 쓰는 중!`:"오늘부터 시작!"}</span></header>
     ${d.date===t&&!sub?`<div class="kw-due">📓 오늘 일기는 저녁 8시 전에 써요!</div>`:""}
     <div class="kw-day"><button class="kw-dchip ${d.date===t?"on":""}" data-act="w-day" data-v="${t}">오늘</button><button class="kw-dchip ${d.date===y?"on":""}" data-act="w-day" data-v="${y}">어제</button><b>${fmtLong(d.date)}</b></div>`;
 }
@@ -3720,8 +3722,8 @@ const acts = {
     try{ await B.reauth(); }catch(e){ if(/popup-closed|cancelled-popup/.test(e.code||"")) return; throw new Error("로그인 확인이 안 됐어요. 다시 해 주세요"); }
     enterAs(p); toast(`${p.name}${ro(p.name)} 돌아왔어요`); }),
   "kid-pin-open": el => { S.pinEdit=S.pinEdit===el.dataset.id?null:el.dataset.id; render(); if(S.pinEdit) document.getElementById("next-"+S.pinEdit)?.focus(); },
-  "kid-pin-clear": el => guard(async()=>{ const p=prof(el.dataset.id); if(!p || !isParent()) return; if(!confirm(`${p.name}의 비밀번호를 없앨까요? 누구나 ${p.name} 프로필로 들어갈 수 있게 돼요.`)) return;
-    await savePin(p,""); S.pinEdit=null; render(); toast(`${p.name}의 비밀번호를 없앴어요`); }),
+  "kid-pin-clear": el => guard(async()=>{ const p=prof(el.dataset.id); if(!p || !isParent()) return; if(!confirm(`${kidN(p)}의 비밀번호를 없앨까요? 누구나 ${p.name} 프로필로 들어갈 수 있게 돼요.`)) return;
+    await savePin(p,""); S.pinEdit=null; render(); toast(`${kidN(p)}의 비밀번호를 없앴어요`); }),
   "parent-pin-clear": () =>guard(async()=>{ if(!confirm("부모 비밀번호를 없앨까요?")) return; await B.update(S.gid,"profiles",S.me.id,{pin:""}); S.me.pin=""; const p=prof(S.me.id); if(p) p.pin=""; render(); toast("부모 비밀번호를 없앴어요"); }),
   "switch-profile": () => go(()=>{ S.phase="picker"; S.pinFor=null; S.afterPin=null; S.sub=null; }),
   // 부모 화면의 '아이가 쓰기': 그 아이로 바꾸고 바로 오늘 일기 쓰기 (비밀번호가 있으면 먼저 물어요)
@@ -3773,7 +3775,7 @@ const acts = {
       if(S.comments.some(x=>x.parentId===c.id)) await B.update(S.gid,"comments",c.id,{text:"",deleted:true}); else await B.remove(S.gid,"comments",c.id);
       await reload("comments"); render(); toast("댓글을 지웠어요"); }); },
   "del-child": el => { const p=prof(el.dataset.id); if(!p) return;
-    if(!confirm(`${p.name} 프로필을 지울까요?\n${p.name}의 일기, 사진 · 소리, 댓글, 받아쓰기 기록이 모두 지워지고 되돌릴 수 없어요.`)) return;
+    if(!confirm(`${p.name} 프로필을 지울까요?\n${kidN(p)}의 일기, 사진 · 소리, 댓글, 받아쓰기 기록이 모두 지워지고 되돌릴 수 없어요.`)) return;
     guard(async()=>{ await wipeProfiles(S.gid,[p.id],false); await reloadAll(); render(); toast(`${p.name} 프로필과 기록을 지웠어요`); }); },
   "delete-account": () => deleteMyAccount(),
   "ai-report": () => { const id=S.sub?.type==="diary"?S.sub.id:S.draft?.id, d=S.diaries.find(x=>x.id===id), r=d?.aiResult||S.draft?.aiResult;
@@ -3931,7 +3933,7 @@ async function uploadPending(d){
   for(const path of d.removed) await B.deleteMedia(path);
   d.removed=[];
 }
-function openKidWrite(){ S.tab="home"; loadDraft(todayStr()); S.sub={type:"write"}; render(); window.scrollTo(0,0); toast(`${S.me.name}의 일기를 써요`); }
+function openKidWrite(){ S.tab="home"; loadDraft(todayStr()); S.sub={type:"write"}; render(); window.scrollTo(0,0); toast(`${kidN(S.me)}의 일기를 써요`); }
 function enterAs(p){
   S.me=p; S.pinFor=null; S.phase="app"; S.sub=null; S.filter="all";
   if((S.tab==="quiz" && p.type!=="child") || (["kids","report"].includes(S.tab) && p.type==="child")) S.tab="home";
@@ -4239,7 +4241,7 @@ const forms = {
     render(); toast("부모 비밀번호를 정했어요. 아이가 쓴 뒤 돌아올 때 물어볼게요"); }),
   "kid-pin": (fd,f) => guard(async()=>{ const p=prof(f.dataset.id); if(!p || !isParent()) return;
     const v=pinCheck(fd,f); if(!v) return;
-    await savePin(p,v); S.pinEdit=null; render(); toast(`${p.name}의 비밀번호를 바꿨어요. ${p.name}에게만 알려 주세요`); }),
+    await savePin(p,v); S.pinEdit=null; render(); toast(`${kidN(p)}의 비밀번호를 바꿨어요. ${p.name}에게만 알려 주세요`); }),
   "my-pin": (fd,f) => guard(async()=>{ const p=S.me; if(!p || p.type!=="child") return;
     if(p.pin && String(fd.cur||"")!==String(p.pin)){ toast("지금 비밀번호가 달라요. 잊었으면 엄마 · 아빠에게 바꿔 달라고 해요"); f.cur.value=""; f.cur.focus(); return; }
     const v=pinCheck(fd,f); if(!v) return;
