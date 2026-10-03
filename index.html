@@ -1572,6 +1572,10 @@ const mapLink = l => l.lat!=null ? `https://map.kakao.com/link/map/${encodeURICo
 function demoPhoto(bg, draw){ return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="${bg}"/>${draw}</svg>`); }
 // 체험용 김치찌개 사진: Wikimedia Commons "Kimchi jjigae - Kogi, Brighton 2023-11-15" (Andy Li, CC0 퍼블릭 도메인) → img/kimchi-jjigae.jpg
 const DEMO_KIMCHI = "img/kimchi-jjigae.jpg";
+// 그 밖의 체험용 사진 (Wikimedia Commons, 저작권 걱정 없는 것만): 들판의 나 홀로 나무 "Lone Tree (15421563365)" USFWS 퍼블릭 도메인 ·
+// 계주 출발선 "Relay runner (Unsplash)" Braden Collum CC0 · 바다 "Gwakji Beach in Jeju Island, 2022" Jeong seolah CC0
+const DEMO_IMG = { kimchi:{url:DEMO_KIMCHI,w:960,h:720}, tree:{url:"img/lone-tree.jpg",w:960,h:640}, relay:{url:"img/relay.jpg",w:960,h:640}, sea:{url:"img/jeju-sea.jpg",w:960,h:720} };
+const demoPh = (...ks) => ks.map((k,i)=>({id:"ph_"+k+i,url:DEMO_IMG[k].url,path:"",w:DEMO_IMG[k].w,h:DEMO_IMG[k].h}));
 const DEMO_PHOTOS = [
   demoPhoto("#BFD9EA",'<rect y="330" width="800" height="270" fill="#7FB069"/><ellipse cx="400" cy="470" rx="330" ry="100" fill="none" stroke="#E08A5E" stroke-width="46"/><ellipse cx="400" cy="470" rx="330" ry="100" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="18 14"/><circle cx="650" cy="120" r="54" fill="#F4BE45"/>'),
   demoPhoto("#F9D9A8",'<circle cx="400" cy="330" r="120" fill="#EF6F53"/><path d="M0 420 Q200 330 400 420 T800 400 V600 H0z" fill="#6E9F74"/><path d="M0 480 Q260 420 520 490 T800 470 V600 H0z" fill="#3F7F70"/>'),
@@ -1590,15 +1594,42 @@ function seedDemo(){
     k1:{name:"하랑",type:"child",grade:4,color:"#3F7F70",pin:"",createdAt:3},
     k2:{name:"이안",type:"child",grade:2,color:"#F4BE45",pin:"1234",createdAt:4}
   };
+  // 예시 일기: 그제 · 어제 · 오늘(3일) 가족 네 명이 모두 쓰고, 그 전 2주는 아이들이 거의 날마다 써서 글이 점점 길어져요
+  const ai = (praise,feedback,cs=[]) => ({praise,feedback,corrections:cs.map(([wrong,right,explain,how])=>({wrong,right,explain,context:"",how:how||"self"}))});
+  const D = (profileId,date,mood,weather,text,more={}) => ({profileId,date,mood,weather,title:"",text,status:"submitted",tags:(text.match(/#([^\s#]+)/g)||[]).map(x=>x.slice(1)),photos:[],createdAt:now-(Date.parse(t)-Date.parse(date))-6*H,updatedAt:now-(Date.parse(t)-Date.parse(date))-6*H,...more});
   s.diaries = {
-    d1:{profileId:"k1",date:y,mood:"great",title:"운동회 연습",text:"오늘 운동회 연습을 했다. 이어달리기에서 2등을 해서 기분이 좋았다.\n다음 주 진짜 운동회에서는 꼭 1등을 할 거다!",status:"submitted",tags:["운동회"],aiChecked:true,
-      aiResult:{praise:"달리기할 때의 설렘이 문장마다 느껴져요!",feedback:"틀린 낱말 1개를 찾았어요. 고쳐 쓴 것도 정말 잘했어요.",corrections:[{wrong:"할꺼다",right:"할 거다",explain:"'할 거다'는 띄어 쓰고 '거'로 써요.",context:"꼭 1등을 ____!"}]},createdAt:now-26*H,updatedAt:now-25*H},
-    d2:{profileId:"mom",date:y,mood:"good",title:"달리기 선수가 된 하랑이",text:"저녁을 먹으며 하랑이가 운동회 연습 이야기를 한참 했다. 2등을 했다는데 표정은 1등이었다.\n나도 어릴 때 이어달리기를 제일 좋아했던 기억이 났다.",status:"submitted",createdAt:now-22*H,updatedAt:now-22*H,
-      photos:DEMO_PHOTOS.slice(0,4).map((u,i)=>({id:"p"+i,url:u,path:"",w:800,h:600})),location:{name:"학교 운동장"},tags:["운동회","가족"]},
-    d3:{profileId:"k2",date:y2,mood:"good",title:"공원 산책",text:"아빠랑 공원에 갔다. 강아지를 만났는데 정말 귀여웠다.\n나도 강아지를 키우고 싶다.",status:"submitted",aiChecked:true,
-      aiResult:{praise:"강아지를 만난 기쁜 마음이 잘 담겼어요!",feedback:"틀린 낱말 1개를 찾았어요.",corrections:[{wrong:"됬다",right:"됐다",explain:"'되었다'를 줄이면 '됐다'예요.",context:"강아지랑 친구가 ____."}]},createdAt:now-50*H,updatedAt:now-49*H},
-    d4:{profileId:"dad",date:t,mood:"tired",title:"오늘 저녁은 김치찌개",text:"퇴근하고 가족이랑 김치찌개를 끓여 먹었다. 이안이가 두부를 제일 많이 먹었다. #저녁메뉴 #김치찌개 #우리가족사랑해",status:"submitted",tags:["저녁메뉴","김치찌개","우리가족사랑해"],photos:[{id:"p9",url:DEMO_KIMCHI,path:"",w:960,h:720}],createdAt:now-2*H,updatedAt:now-2*H}
+    // 그제
+    d3:D("k2",y2,"good","sunny","아빠랑 올림픽공원에 갔다. 넓은 들판에 나무가 혼자 서 있었다. 나무가 외로워 보여서 내가 안아 주었다. 강아지도 만났는데 정말 귀여웠다. 나도 강아지를 키우고 싶다.",{photos:demoPh("tree"),location:{name:"올림픽공원"},aiChecked:true,aiResult:ai("나무를 안아 준 따뜻한 마음이 정말 예뻐요!","틀린 낱말 1개를 찾았어요. 스스로 고친 것도 대단해요.",[["됬다","됐다","\'되었다\'를 줄이면 \'됐다\'예요."]])}),
+    e1:D("k1",y2,"great","sunny","오늘 운동회 계주 연습을 했다. 바통을 넘겨받을 때 손이 미끄러질까 봐 조마조마했다. 선생님이 손을 뒤로 쭉 뻗으라고 알려 주셨다. 다섯 번 연습하니까 이제 하나도 안 떨어뜨린다. 진짜 운동회 날이 기다려진다.",{aiChecked:true,aiResult:ai("바통을 넘겨받는 순간의 조마조마한 마음이 생생해요!","틀린 곳 없이 잘 썼어요.")}),
+    e2:D("mom",y2,"love","partly","주말에 다녀온 제주 바다 사진을 이제야 정리했다. 곽지 해변 물빛이 하늘보다 더 파랬다. 하랑이와 이안이는 모래성을 쌓다가 파도에 무너지면 깔깔 웃었다. 이 웃음소리를 오래 기억하고 싶다. #바다여행 #제주",{photos:demoPh("sea"),location:{name:"제주 곽지 해변"}}),
+    e3:D("dad",y2,"good","partly","퇴근길에 이안이가 전화로 오늘 본 나무 이야기를 해 줬다. 혼자 서 있어서 안아 줬다는 말에 하루 피로가 다 풀렸다. 주말엔 같이 그 나무 보러 가야겠다."),
+    // 어제
+    d1:D("k1",y,"great","sunny","오늘 운동회 연습을 했다. 이어달리기에서 2등을 해서 기분이 좋았다. 마지막 바퀴에서 한 명을 제쳤을 때 친구들이 내 이름을 크게 불러 줬다. 다음 주 진짜 운동회에서는 꼭 1등을 할 거다! #운동회",{photos:demoPh("relay"),aiChecked:true,aiResult:ai("달리기할 때의 설렘이 문장마다 느껴져요!","틀린 낱말 1개를 찾았어요. 고쳐 쓴 것도 정말 잘했어요.",[["할꺼다","할 거다","\'할 거다\'는 띄어 쓰고 \'거\'로 써요."]]),stamp:"최고예요",stampBy:"mom",stampAt:now-20*H,hearts:{mom:now-20*H,dad:now-18*H}}),
+    d2:D("mom",y,"good","sunny","저녁을 먹으며 하랑이가 운동회 연습 이야기를 한참 했다. 2등을 했다는데 표정은 1등이었다. 나도 어릴 때 이어달리기를 제일 좋아했던 기억이 났다. 운동회 날엔 김밥을 싸 가야지. #운동회 #가족",{location:{name:"학교 운동장"}}),
+    e4:D("dad",y,"tired","cloudy","회사 일이 많아 늦게 들어왔다. 아이들은 벌써 자고 있었는데 식탁 위에 \'아빠 힘내세요\' 쪽지가 있었다. 이안이 글씨가 삐뚤빼뚤해서 더 귀여웠다."),
+    e5:D("k2",y,"love","cloudy","아빠가 늦게 와서 쪽지를 써 놓았다. 아빠 힘내세요 라고 썼다. 아침에 아빠가 쪽지 고마워 하고 꼭 안아 주었다. 기분이 좋았다.",{aiChecked:true,aiResult:ai("아빠를 생각하는 마음이 쪽지에 가득 담겼어요!","틀린 곳 없이 잘 썼어요."),stamp:"참 잘했어요",stampBy:"dad",stampAt:now-10*H}),
+    // 오늘
+    d4:D("dad",t,"tired","sunny","퇴근하고 가족이랑 김치찌개를 끓여 먹었다. 이안이가 두부를 제일 많이 먹었다. #저녁메뉴 #김치찌개 #우리가족사랑해",{photos:demoPh("kimchi")}),
+    e6:D("mom",t,"great","sunny","오늘은 하루 종일 아이들 웃음소리가 가득했다. 하랑이는 계주 연습 이야기를, 이안이는 학교에서 받은 칭찬 이야기를 쉬지 않고 했다. 이렇게 같이 일기를 쓰니 서로의 하루가 더 잘 보인다."),
+    e7:D("k1",t,"good","sunny","오늘 국어 시간에 일기 쓰기 칭찬을 받았다. 선생님이 내 일기는 장면이 눈에 그려진다고 하셨다. 집에서 매일 일기를 쓴 덕분인 것 같다. 앞으로는 내가 느낀 마음도 더 자세히 써 보고 싶다. 저녁에는 아빠가 끓여 준 김치찌개를 두 그릇이나 먹었다.",{aiChecked:true,aiResult:ai("\'장면이 눈에 그려진다\'는 칭찬을 받은 기쁨이 잘 전해져요!","틀린 곳 없이 잘 썼어요. 정말 많이 자랐어요.")}),
+    e8:D("k2",t,"great","sunny","오늘 받아쓰기에서 백 점을 받았다. 며칠 전에 틀린 며칠을 이번에는 맞혔다. 엄마가 꼭 안아 주셨다. 저녁에 김치찌개 두부를 제일 많이 먹었다.",{aiChecked:true,aiResult:ai("틀렸던 낱말을 다시 맞힌 것, 정말 대단해요!","틀린 곳 없이 잘 썼어요.")})
   };
+  // 그 전 2주: 아이들 일기 (날이 갈수록 글이 길어지는 모습)
+  const K1 = ["학교에서 줄넘기를 했다. 재미있었다.","오늘은 비가 왔다. 우산을 쓰고 학교에 갔다. 신발이 젖었다.","친구랑 도서관에 갔다. 공룡 책을 빌렸다. 티라노사우루스가 제일 멋있다.","수학 시험을 봤다. 어려운 문제가 하나 있었지만 끝까지 풀었다. 다 맞았으면 좋겠다.","할머니 댁에 갔다. 할머니가 해 주신 잡채가 정말 맛있었다. 할머니가 우리 하랑이 많이 컸네 하셔서 기분이 좋았다.","학교에서 과학 실험을 했다. 식초에 달걀을 넣었더니 껍데기가 녹았다. 신기해서 집에 와서 엄마한테 바로 이야기했다. 엄마도 처음 알았다고 하셨다.","동생이랑 레고로 성을 만들었다. 이안이가 탑을 자꾸 무너뜨려서 처음엔 화가 났다. 그런데 같이 다시 쌓으니까 더 높은 탑이 됐다. 다음엔 다리도 만들어 볼 거다.","오늘 체육 시간에 계주 선수로 뽑혔다. 우리 반에서 네 명만 뽑히는데 내가 들어가서 너무 기뻤다. 선생님이 바통을 잘 넘기는 연습을 하자고 하셨다. 집에 와서 엄마 아빠한테 자랑했더니 박수를 쳐 주셨다.","책을 읽다가 모르는 낱말이 나와서 사전을 찾아봤다. 어휘라는 말이 낱말이라는 뜻이었다. 일기에 새로 배운 낱말을 써 보면 좋겠다는 생각이 들었다. 오늘 배운 낱말은 어휘, 조마조마, 뿌듯하다이다. 다 쓰고 나니 뿌듯하다."];
+  const K2 = ["놀이터에 갔다. 재미있었다.","엄마랑 빵을 만들었다. 맛있었다.","학교에서 그림을 그렸다. 우리 가족을 그렸다.","형아랑 레고를 했다. 탑이 무너졌다. 다시 쌓았다.","받아쓰기를 했다. 두 개 틀렸다. 다음에는 다 맞을 거다.","비가 와서 장화를 신었다. 물웅덩이에서 첨벙첨벙 뛰었다. 엄마가 웃었다.","학교에서 달팽이를 봤다. 달팽이는 아주 천천히 갔다. 나는 달팽이 이름을 느림보라고 지었다."];
+  K1.forEach((txt,i)=>{ const dt=addDays(t,-(3+(K1.length-1-i)*1.6|0)); s.diaries["h1_"+i]=D("k1",dt,["good","great","calm","love"][i%4],["sunny","partly","rain","cloudy"][i%4],txt,{aiChecked:i>3,aiResult:i>3?ai("글이 점점 길고 자세해지고 있어요!","틀린 곳 없이 잘 썼어요."):null}); });
+  K2.forEach((txt,i)=>{ const dt=addDays(t,-(3+(K2.length-1-i)*2)); s.diaries["h2_"+i]=D("k2",dt,["good","great","love","calm"][i%4],["sunny","partly","cloudy","rain"][i%4],txt,{aiChecked:i>2,aiResult:i>2?ai("하루를 차근차근 잘 적었어요!","틀린 곳 없이 잘 썼어요."):null}); });
+  // AI 선생님 총평 (이번 주 · 이번 달, 리포트 탭에서 바로 보여요)
+  const td=toDate(t), mon=addDays(t,-((td.getDay()+6)%7)), wk="report_w"+mon.replace(/-/g,"_"), mk="report_m"+td.getFullYear()+"_"+pad(td.getMonth()+1);
+  const R = (summary,highlight,tip) => ({summary,highlight,tip,at:now-2*H});
+  Object.assign(s.profiles.k1, {
+    [wk]:R("하랑이는 이번 주에 하루도 빠짐없이 일기를 썼어요. 처음엔 두세 문장이던 글이 이제는 다섯 문장이 넘을 만큼 길어졌고, 계주 연습처럼 그날 마음이 크게 움직인 장면을 골라 쓰는 힘이 생겼어요. 틀린 맞춤법도 스스로 찾아 고치는 일이 늘었어요. 꾸준히 쓰는 습관이 단단하게 자리 잡고 있어요.","\'바통을 넘겨받을 때 손이 미끄러질까 봐 조마조마했다\'는 문장은 그 순간의 긴장이 눈앞에 보이듯 생생했어요.","다음에는 사건 뒤에 \'그래서 나는 어떤 마음이 들었는지\'를 한 문장 더 적어 보자고 이야기해 주세요. 느낌을 쓰는 연습이 글을 한층 깊게 만들어요."),
+    [mk]:R("이번 달 하랑이의 일기는 양도, 내용도 눈에 띄게 자랐어요. 평균 글자 수가 달 초보다 두 배 가까이 늘었고, 새로 배운 낱말을 일기에 써 보는 등 스스로 공부하는 모습도 보였어요. \'할꺼다\'처럼 소리 나는 대로 쓰던 실수는 거의 사라졌어요. 가족의 칭찬 도장과 댓글이 큰 힘이 된 한 달이었어요.","계주 선수로 뽑혀 가족에게 자랑한 날의 일기에 기쁨과 뿌듯함이 고스란히 담겼어요.","다음 달에는 일주일에 한 번, 책이나 영화를 보고 느낀 점을 일기로 써 보는 것을 추천해요.")
+  });
+  Object.assign(s.profiles.k2, {
+    [wk]:R("이안이는 이번 주에 매일 일기를 쓰며 하루를 차근차근 적는 힘이 자라고 있어요. 아빠에게 쓴 쪽지, 올림픽공원의 나무처럼 마음이 따뜻해지는 장면을 잘 골랐어요. 짧은 문장으로 시작했지만 이제 네 문장 넘게 이어서 쓸 수 있어요. 틀렸던 \'며칠\'을 받아쓰기에서 다시 맞힌 것도 큰 성장이에요.","\'나무가 외로워 보여서 내가 안아 주었다\'는 문장에 이안이의 따뜻한 마음이 그대로 담겼어요.","오늘 있었던 일 가운데 \'가장 기억에 남는 한 가지\'를 먼저 고르고 그 이야기를 길게 써 보도록 도와주세요."),
+    [mk]:R("이번 달 이안이는 일기를 쓰는 날이 꾸준히 늘었어요. 처음엔 \'재미있었다\'로 끝나던 글이 이제는 무엇을 했고 누구와 함께했는지까지 담겨요. 받아쓰기에서 틀린 낱말을 다시 공부해 맞히는 모습도 보였어요. 칭찬받은 경험이 쓰는 즐거움으로 이어지고 있어요.","받아쓰기 백 점을 받은 날의 일기에서 스스로 해낸 자랑스러움이 잘 느껴져요.","\'왜 그런 마음이 들었는지\'를 한 문장 덧붙이는 연습을 함께 해 보세요.")
+  });
   s.comments = {
     c1:{diaryId:"d1",parentId:null,profileId:"mom",text:"2등 정말 멋지다! 다음 주에도 엄마가 응원할게.",createdAt:now-20*H},
     c2:{diaryId:"d1",parentId:"c1",profileId:"k1",text:"고마워요 엄마! 꼭 보러 와요.",createdAt:now-19*H},
@@ -1617,7 +1648,7 @@ function seedDemo(){
   };
   s.quizWords = {
     q1:{profileId:"k2",wrong:"됬다",right:"됐다",explain:"'되었다'를 줄이면 '됐다'예요.",context:"강아지랑 친구가 ____.",wrongCount:2,correctStreak:0,createdAt:now},
-    q2:{profileId:"k2",wrong:"몇일",right:"며칠",explain:"날짜를 셀 때는 '며칠'로 써요.",context:"방학이 ____ 남았을까?",wrongCount:1,correctStreak:1,createdAt:now},
+    q2:{profileId:"k2",wrong:"몇일",right:"며칠",explain:"날짜를 셀 때는 '며칠'로 써요.",context:"방학이 ____ 남았을까?",wrongCount:1,correctStreak:3,createdAt:now},
     q3:{profileId:"k2",wrong:"할께",right:"할게",explain:"'-ㄹ게'는 '께'가 아니라 '게'로 써요.",context:"내가 먼저 ____.",wrongCount:1,correctStreak:0,createdAt:now},
     q4:{profileId:"k1",wrong:"할꺼다",right:"할 거다",explain:"'할 거다'는 띄어 쓰고 '거'로 써요.",context:"꼭 1등을 ____!",wrongCount:1,correctStreak:0,createdAt:now},
     q5:{profileId:"k1",wrong:"어떻해",right:"어떡해",explain:"'어떻게 해'를 줄이면 '어떡해'예요.",context:"숙제를 두고 왔는데 ____?",wrongCount:2,correctStreak:0,createdAt:now},
@@ -1627,7 +1658,7 @@ function seedDemo(){
 }
 
 function makeDemo(){
-  const KEY="iinote-demo-v3";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
+  const KEY="iinote-demo-v4";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
   let db = null; try { db = JSON.parse(ls.get(KEY,"null")); } catch(e) {}
   if(!db) db = seedDemo();
   const save = () => ls.set(KEY, JSON.stringify(db));
@@ -3988,7 +4019,7 @@ const acts = {
   "quiz-exit": () => go(()=>{ S.sub=null; S.quiz=null; S.tab="quiz"; }),
   "new-group": () => go(()=>{ S.phase="onboard"; }),
   "cancel-onboard": () => go(()=>{ S.phase = S.me ? "app" : "picker"; }),
-  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v3"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
+  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v4"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
   "tour-logout": () => guard(async()=>{ S.tourAsk=false; S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); try{ await B.signOut(); }catch(e){} acts.tour(); }),
   "tour-no": () => { S.tourAsk=false; try{ history.replaceState({iinote:1},"","/"); }catch(e){} render(); },
   "tour-exit": () => { try{ sessionStorage.removeItem("iinote-tour"); }catch(e){} location.href="/"; },
