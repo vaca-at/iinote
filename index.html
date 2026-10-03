@@ -1642,7 +1642,6 @@ function seedDemo(){
     s3:{date:addDays(t,1),time:"16:00",title:"학부모 상담",scope:"personal",profileId:"mom",createdAt:now}
   };
   s.links = {
-    l1:{title:"표준국어대사전",url:"https://stdict.korean.go.kr",createdBy:"mom",createdAt:1},
     l2:{title:"EBS 초등",url:"https://primary.ebs.co.kr",createdBy:"mom",createdAt:2},
     l3:{title:"날씨",url:"https://weather.naver.com",createdBy:"dad",createdAt:3}
   };
@@ -1658,7 +1657,7 @@ function seedDemo(){
 }
 
 function makeDemo(){
-  const KEY="iinote-demo-v4";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
+  const KEY="iinote-demo-v5";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
   let db = null; try { db = JSON.parse(ls.get(KEY,"null")); } catch(e) {}
   if(!db) db = seedDemo();
   const save = () => ls.set(KEY, JSON.stringify(db));
@@ -3859,15 +3858,17 @@ function applyUrl(){
 let routeFromPop=false;
 function syncUrl(){
   if(S.phase!=="app" || !S.me || S.joinCode || S.kidId) return;
-  if(!S.routed){ S.routed=true; if(location.pathname!=="/" || /[?&](d|date)=/.test(location.search)){ applyUrl(); return "again"; } }
-  const u=urlOf(); if(u===location.pathname+location.search) return;
+  if(!S.routed){ S.routed=true; if(location.pathname!=="/" && location.pathname!=="/demo" || /[?&](d|date)=/.test(location.search)){ applyUrl(); return "again"; } }
+  // 둘러보기 중에는 주소에 늘 ?demo 를 붙여요 (복사해서 보내도 둘러보기로 열리게)
+  let u=urlOf(); if(TOUR) u+=(u.includes("?")?"&":"?")+"demo";
+  if(u===location.pathname+location.search) return;
   try{ if(routeFromPop) history.replaceState({iinote:1},"",u); else history.pushState({iinote:1},"",u); }catch(e){}
 }
 // 쓰던 일기를 저장하지 않고 나가려 하면 한 번 물어봐요
 const draftDirty = () => { const d=S.draft; if(!d || S.sub?.type!=="write") return false; const o=d.id&&S.diaries.find(x=>x.id===d.id); return (d.text||"").trim()!==((o?.text)||"").trim(); };
 addEventListener("popstate",()=>{
   if(S.phase!=="app" || !S.me) return;
-  if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")){ try{ history.pushState({iinote:1},"",urlOf()); }catch(e){} return; }
+  if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")){ try{ history.pushState({iinote:1},"",urlOf()+(TOUR?(urlOf().includes("?")?"&":"?")+"demo":"")); }catch(e){} return; }
   if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop();
   applyUrl(); routeFromPop=true; render(); routeFromPop=false; window.scrollTo(0,0);
 });
@@ -4019,7 +4020,7 @@ const acts = {
   "quiz-exit": () => go(()=>{ S.sub=null; S.quiz=null; S.tab="quiz"; }),
   "new-group": () => go(()=>{ S.phase="onboard"; }),
   "cancel-onboard": () => go(()=>{ S.phase = S.me ? "app" : "picker"; }),
-  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v4"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
+  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v5"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
   "tour-logout": () => guard(async()=>{ S.tourAsk=false; S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); try{ await B.signOut(); }catch(e){} acts.tour(); }),
   "tour-no": () => { S.tourAsk=false; try{ history.replaceState({iinote:1},"","/"); }catch(e){} render(); },
   "tour-exit": () => { try{ sessionStorage.removeItem("iinote-tour"); }catch(e){} location.href="/"; },
