@@ -145,7 +145,23 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .land-feats{list-style:none;padding:0;margin:0 0 24px;display:grid;gap:8px}
 .land-feats li{display:flex;gap:10px;align-items:flex-start;color:var(--ink2)}
 .land-feats .dot{width:10px;height:10px;border-radius:50%;margin-top:8px;flex:none}
-.land-cta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.land-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:600px}
+.land-cta .btn{width:100%;min-height:64px;padding:10px 14px;font-size:16px;justify-content:center;border-radius:18px}
+.cta-t{display:flex;flex-direction:column;align-items:center;line-height:1.25;text-align:center}
+.cta-t small{font-size:12px;font-weight:600;opacity:.75;margin-top:2px}
+.a2hs-btn{border:2px solid var(--sage);background:var(--sage-soft);color:var(--ink);font-weight:800}
+.a2hs-btn:hover{filter:brightness(.97)}
+.demo-link{margin:10px 0 0;font-size:14px;color:var(--ink2);display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.demo-link a{font-weight:800;color:var(--coral-ink)}
+.demo-note.one{max-width:none}
+.a2hs-box ol{margin:4px 0 12px;padding-left:22px;line-height:1.8}
+.land-new{background:var(--surface);border:1.5px solid var(--line);border-radius:28px;padding:22px 24px}
+.land-new h2{font-size:19px;margin:0 0 12px;letter-spacing:-.3px}
+.land-new ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.land-new li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:14px;background:var(--surface2);min-width:0}
+.land-new b{font-size:14.5px}
+.land-new span{font-size:12.5px;color:var(--ink3);line-height:1.45}
+@media (max-width:380px){ .land-cta .btn{font-size:15px;padding:8px 8px} .land-new ul{grid-template-columns:1fr} }
 .land-cta .share-row{margin:0}
 .dup-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 16px;padding:12px 16px;border-radius:14px;border:1.5px solid var(--butter);background:var(--butter-soft);font-size:14px}
 .dup-bar span{flex:1;min-width:14em}
@@ -168,7 +184,6 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
   .anywhere{padding:22px}
   .devices{max-height:150px;margin:0 0 12px}
   .anywhere .addr-t strong{font-size:19px}
-  .land-cta{flex-wrap:nowrap}
   .land-cta .share-row{flex-wrap:nowrap}
 }
 @media (min-width:900px) and (max-height:840px){
@@ -1544,8 +1559,10 @@ function drawJpeg(img,max,q){
   return new Promise(r=>c.toBlob(b=>r({blob:b,w:c.width,h:c.height}),"image/jpeg",q));
 }
 async function compressImage(file, max, q){ return drawJpeg(await decodeImage(file), max, q); }
-// 사진 속 찍은 날(EXIF DateTimeOriginal)을 읽어요 (새 라이브러리 없이 JPEG 앞부분만). 없으면 파일 날짜 → 오늘
-async function photoDate(file){
+// 사진 속 찍은 날(EXIF DateTimeOriginal)과 위치(GPS)를 읽어요 (새 라이브러리 없이 JPEG 앞부분만). 날짜가 없으면 파일 날짜 → 오늘
+// 위치는 기기 안에서만 읽어 동네 이름을 찾는 데만 쓰고 저장하지 않아요. 아이폰 사파리는 사진을 고를 때 위치를 빼고 줄 때가 많아요
+async function photoMeta(file){
+  let info={};
   try{
     const b=new DataView(await file.slice(0,256*1024).arrayBuffer());
     if(b.getUint16(0)===0xFFD8){
@@ -1553,21 +1570,31 @@ async function photoDate(file){
       while(o+10<b.byteLength){
         const m=b.getUint16(o), len=b.getUint16(o+2);
         if((m&0xFF00)!==0xFF00) break;
-        if(m===0xFFE1 && b.getUint32(o+4)===0x45786966){ const d=exifDate(b,o+10); if(d) return d; break; }
+        if(m===0xFFE1 && b.getUint32(o+4)===0x45786966){ try{ info=exifInfo(b,o+10); }catch(e){} break; }
         o+=2+len;
       }
     }
   }catch(e){}
-  return file.lastModified ? ymd(new Date(file.lastModified)) : todayStr();
+  return {date: info.date || (file.lastModified ? ymd(new Date(file.lastModified)) : todayStr()), gps: info.gps||null};
 }
-function exifDate(b,t){
+const photoDate = async file => (await photoMeta(file)).date;
+function exifInfo(b,t){
   const le=b.getUint16(t)===0x4949, u16=o=>b.getUint16(t+o,le), u32=o=>b.getUint32(t+o,le);
-  const find=(ifd,tag)=>{ const n=u16(ifd); for(let i=0;i<n;i++){ const e=ifd+2+i*12; if(u16(e)===tag) return u32(e+8); } return 0; };
-  const ifd0=u32(4), sub=find(ifd0,0x8769), off=(sub&&find(sub,0x9003))||find(ifd0,0x0132);
-  if(!off) return "";
-  let s=""; for(let i=0;i<10;i++) s+=String.fromCharCode(b.getUint8(t+off+i));
-  const m=/^(\d{4}):(\d{2}):(\d{2})$/.exec(s);
-  return m && m[1]>"1900" && m[2]!=="00" ? `${m[1]}-${m[2]}-${m[3]}` : "";
+  const entry=(ifd,tag)=>{ const n=u16(ifd); for(let i=0;i<n;i++){ const e=ifd+2+i*12; if(u16(e)===tag) return e; } return 0; };
+  const val=(ifd,tag)=>{ const e=entry(ifd,tag); return e?u32(e+8):0; };
+  const ifd0=u32(4), out={};
+  const sub=val(ifd0,0x8769), off=(sub&&val(sub,0x9003))||val(ifd0,0x0132);
+  if(off){ let s=""; for(let i=0;i<10;i++) s+=String.fromCharCode(b.getUint8(t+off+i));
+    const m=/^(\d{4}):(\d{2}):(\d{2})$/.exec(s); if(m && m[1]>"1900" && m[2]!=="00") out.date=`${m[1]}-${m[2]}-${m[3]}`; }
+  const g=val(ifd0,0x8825);
+  if(g){
+    const ref=tag=>{ const e=entry(g,tag); return e?String.fromCharCode(b.getUint8(t+e+8)):""; };
+    const deg=tag=>{ const o=val(g,tag); if(!o) return NaN; const r=k=>u32(o+k*8)/(u32(o+k*8+4)||1); return r(0)+r(1)/60+r(2)/3600; };
+    let lat=deg(2), lon=deg(4);
+    if(ref(1)==="S") lat=-lat; if(ref(3)==="W") lon=-lon;
+    if(Number.isFinite(lat) && Number.isFinite(lon) && (lat||lon) && Math.abs(lat)<=90 && Math.abs(lon)<=180) out.gps={lat,lon};
+  }
+  return out;
 }
 // 일기 사진: 큰 사진(긴 변 1280px · 0.7, 약 200KB) + 미리보기(긴 변 400px · 0.6, 약 30KB)
 const PHOTO_BIG=[1280,.7], PHOTO_THUMB=[400,.6], ALBUM_BIG=[1600,.75];   // 사진첩은 조금 더 크게 (약 300KB)
@@ -2385,12 +2412,19 @@ function viewLanding(){
         <li><span class="dot" style="background:var(--ink)"></span>사진 추가, 장소와 태그 추가하여 하루를 더욱 풍성하게</li>
       </ul>
       ${INAPP?`<p class="inapp-note" role="alert">📱 지금은 <b>앱 안의 브라우저</b>로 열려 있어서 로그인이 안 될 수 있어요. ${INAPP==="ios"?"··· (또는 공유) 단추를 눌러 <b>'Safari로 열기'</b>를 골라 주세요.":"로그인 단추를 누르면 <b>크롬 · 기본 브라우저</b>로 열어 드려요."}</p>`:""}
-      <div class="land-cta"><button class="btn btn-primary" data-act="signin">구글 계정으로 시작하기</button><button class="btn btn-kakao" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button><button class="btn tour-btn" data-act="tour" title="예시 가족 일기장을 로그인 없이 마음껏 눌러 봐요">👀 로그인 없이 둘러보기</button></div>
+      <div class="land-cta">
+        <button class="btn btn-primary" data-act="signin"><span class="cta-t">구글 계정으로 시작하기<small>Google 로그인</small></span></button>
+        <button class="btn btn-kakao" data-act="signin-kakao">${ic("talk")}<span class="cta-t">카카오로 시작하기<small>카카오 로그인</small></span></button>
+        <button class="btn tour-btn" data-act="tour" title="예시 가족 일기장을 로그인 없이 마음껏 눌러 봐요"><span class="cta-t">👀 데모 버전 둘러보기<small>로그인 없이 예시 가족으로</small></span></button>
+        <button class="btn a2hs-btn" data-act="a2hs"><span class="cta-t">📲 홈 화면에 추가<small>앱처럼 아이콘으로 바로</small></span></button>
+      </div>
+      <p class="demo-link">👀 데모 버전 주소 <a href="/?demo">iinote.co.kr/?demo</a> <button class="link-btn" data-act="copy-demo">복사</button></p>
       ${S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:""}
       ${keepBox()}
-      <p class="demo-note">구글과 카카오는 따로 가입돼요. 둘 다 쓰고 싶으면 처음 방법으로 로그인한 뒤 '우리 가족 설정 → 계정'에서 연결해 주세요.</p>
+      <p class="demo-note one">구글 · 카카오는 따로 가입돼요. 둘 다 쓰려면 로그인 뒤 ‘우리 가족 설정 → 계정’에서 연결해 주세요.</p>
       ${kakaoBtn()}
       <p class="demo-note"><a href="terms.html">이용약관</a> · <a href="privacy.html">개인정보처리방침</a></p>
+      ${S.a2hs?a2hsBox():""}
       ${DEMO?`<p class="demo-note">지금은 체험 모드예요. 예시 가족으로 모든 기능을 눌러 볼 수 있고, 내용은 이 기기에만 저장돼요.</p>`:""}
     </section>
     <div class="land-side">
@@ -2411,6 +2445,17 @@ function viewLanding(){
       <p>휴대폰에서 쓰던 일기를 컴퓨터에서는 주소 하나로 그대로 열어요.</p>
       ${devicesArt()}
       ${addrBox()}
+    </section>
+    <section class="land-new" aria-labelledby="new-h">
+      <h2 id="new-h">✨ 이런 것도 할 수 있어요</h2>
+      <ul>
+        <li><b>📸 가족 사진첩</b><span>연도 · 사람 · 동네별로 모아 보고 사진마다 메모</span></li>
+        <li><b>💬 가족 채팅</b><span>우리 가족만의 대화방 · 답장 · 반응</span></li>
+        <li><b>🎙 이야기로 일기</b><span>5~7세는 엄마 · 아빠와 나눈 이야기가 일기로</span></li>
+        <li><b>📖 하루 펼쳐보기</b><span>같은 날 가족 일기를 나란히 · 칭찬 도장</span></li>
+        <li><b>📈 AI 리포트</b><span>주 · 달마다 글쓰기 성장 총평</span></li>
+        <li><b>📄 PDF 일기책</b><span>쪽 구성 10가지로 인쇄 · 보관</span></li>
+      </ul>
     </section>
     </div>
   </div></main>`;
@@ -2524,7 +2569,7 @@ function kidBar(){
 }
 const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", album:"사진", report:"리포트", quiz:"퀴즈", family:"설정"};   // 휴대폰 아래 메뉴 이름
 const tourAsk = () => `<div class="tour-ask" role="dialog" aria-modal="true" aria-labelledby="ta-h"><div class="tour-ask-box"><h2 id="ta-h">👀 둘러보기</h2><p>지금 <b>${esc(S.me?.name||"내")}</b> 계정으로 로그인되어 있어요.<br>로그아웃하고 예시 가족 둘러보기 화면으로 갈까요?</p><p class="muted">내 일기장의 기록은 그대로 있어요. 둘러보기를 마치고 다시 로그인하면 돼요.</p><div class="row"><button class="btn btn-primary" data-act="tour-logout">로그아웃하고 둘러보기</button><button class="btn btn-ghost" data-act="tour-no">아니요, 내 일기장으로</button></div></div></div>`;
-const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? `<div class="tour-bar" role="note">👀 <b>둘러보기 중</b><span>예시 가족 일기장이에요. 마음껏 눌러 보세요 (이 기기에만 저장돼요)</span><button class="btn btn-primary sm" data-act="tour-exit">진짜로 시작하기</button></div>` : "");
+const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? `<div class="tour-bar" role="note">👀 <b>데모 버전 둘러보기 중</b><span>예시 가족 일기장이에요. 마음껏 눌러 보세요 (이 기기에만 저장돼요)</span><button class="btn btn-primary sm" data-act="tour-exit">진짜로 시작하기</button></div>` : "");
 function viewShell(){
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
@@ -2967,6 +3012,7 @@ const areaCache = {}; let areaQ = Promise.resolve();
 function findArea(st,key){
   const place=(st.place||"").trim();
   if(!place || st.areaManual) return;
+  if(st.gps && st.area) return;   // 사진 속 위치로 찾은 동네가 더 정확해요
   const known=S.album.find(a=>(a.place||"").trim()===place && a.area)?.area || areaCache[place];
   if(known!==undefined){ if(known){ st.area=known; st.areaMsg="찾았어요"; } else st.areaMsg="못 찾았어요 · 직접 써 주세요"; drawArea(st,key); return; }
   st.areaMsg="찾는 중…"; drawArea(st,key);
@@ -3017,10 +3063,23 @@ async function albumPick(files){
   if(!files.length) return;
   const room=ALBUM_MAX_PICK-(S.alUp?.items.length||0);
   if(files.length>room){ toast(`한 번에 ${ALBUM_MAX_PICK}장까지 올릴 수 있어요`); files=files.slice(0,Math.max(0,room)); }
-  const items=await Promise.all(files.map(async f=>({k:rid(), file:f, src:URL.createObjectURL(f), date:await photoDate(f), place:"", area:"", memo:""})));
+  const items=await Promise.all(files.map(async f=>{ const m=await photoMeta(f); return {k:rid(), file:f, src:URL.createObjectURL(f), date:m.date, gps:m.gps, place:"", area:"", memo:""}; }));
   const prev=S.alUp; S.alEdit=null;
   S.alUp={items:[...(prev?.items||[]),...items], people:prev?.people||[]};
   render(); if(!prev) document.querySelector(".al-up")?.scrollIntoView({block:"start"});
+  items.filter(it=>it.gps).forEach(it=>gpsArea(it,it.k));   // 사진 속 위치가 있으면 동네를 찾아 둬요
+}
+// 사진 속 위치 → 동네 (OpenStreetMap). 좌표는 소수 셋째 자리(약 100m)로 줄여서 보내고, 저장하지 않아요
+function gpsArea(st,key){
+  st.areaMsg="사진 속 위치로 찾는 중…"; drawArea(st,key);
+  areaQ=areaQ.then(async()=>{
+    if(st.areaManual || st.area) return;
+    let area="";
+    try{ const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&accept-language=ko&addressdetails=1&lat=${st.gps.lat.toFixed(3)}&lon=${st.gps.lon.toFixed(3)}`);
+      const j=await r.json(); if(j?.address) area=areaOf(j.address); }catch(e){}
+    if(!st.areaManual && !st.area){ st.area=area; st.areaMsg=area?"📍 사진 속 위치로 찾았어요":""; drawArea(st,key); }
+    await new Promise(r=>setTimeout(r,1100));
+  });
 }
 async function albumUpload(){
   const up=S.alUp; if(!up?.items.length || S.alBusy) return;
@@ -4119,7 +4178,26 @@ function inappHelp(){
   if(INAPP==="android"){ location.href="intent://"+location.href.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;end"; return; }
   alert("이 앱 안의 화면에서는 로그인이 되지 않아요.\n\n오른쪽 위나 아래의 ··· (또는 공유) 단추를 누르고 'Safari로 열기'를 골라 주세요.\n\n또는 Safari 에서 iinote.co.kr 을 직접 열어 주세요.");
 }
+// 📲 홈 화면에 추가: 브라우저가 설치 창을 줄 수 있으면 바로, 아니면(아이폰 사파리 등) 방법 안내
+let installEvt=null;
+addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; });
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+function a2hsBox(){
+  const how = IS_IOS
+    ? `<ol><li><b>Safari</b>로 iinote.co.kr 을 열어요 (카카오톡 · 네이버 앱 안 화면이면 'Safari로 열기')</li><li>아래(또는 위)의 <b>공유 단추</b> <span aria-hidden="true">⬆️</span> 를 눌러요</li><li><b>‘홈 화면에 추가’</b>를 고르고 <b>‘추가’</b>를 누르면 끝!</li></ol>`
+    : /Android/i.test(navigator.userAgent)
+    ? `<ol><li><b>크롬</b>으로 iinote.co.kr 을 열어요</li><li>오른쪽 위 <b>⋮</b> 메뉴를 눌러요</li><li><b>‘홈 화면에 추가’</b> 또는 <b>‘앱 설치’</b>를 골라요</li></ol>`
+    : `<ol><li>크롬 · 엣지 주소창 오른쪽의 <b>설치 아이콘</b>을 누르거나</li><li>브라우저 메뉴(⋮ 또는 …)에서 <b>‘앱 설치’</b> · <b>‘이 사이트를 앱으로 설치’</b>를 골라요</li></ol>`;
+  return `<div class="tour-ask" role="dialog" aria-modal="true" aria-labelledby="ah-h" data-act="a2hs-close"><div class="tour-ask-box a2hs-box" data-act="noop"><h2 id="ah-h">📲 홈 화면에 추가하기</h2><p>홈 화면 아이콘을 누르면 앱처럼 바로 열려요.</p>${how}<div class="row"><button class="btn btn-primary" data-act="a2hs-close">알겠어요</button></div></div></div>`;
+}
 const acts = {
+  a2hs: async () => {
+    if(STANDALONE){ toast("이미 홈 화면 앱으로 열려 있어요"); return; }
+    if(installEvt){ const ev=installEvt; installEvt=null; ev.prompt(); const r=await ev.userChoice.catch(()=>null); if(r?.outcome==="accepted") toast("홈 화면에 추가했어요"); return; }
+    S.a2hs=true; render(); document.querySelector(".a2hs-box .btn")?.focus();
+  },
+  "a2hs-close": () => { S.a2hs=false; render(); },
+  "copy-demo": async () => { try{ await navigator.clipboard.writeText("https://iinote.co.kr/?demo"); toast("데모 버전 주소를 복사했어요"); }catch(e){ toast("iinote.co.kr/?demo"); } },
   signin: () => TOUR ? acts["tour-exit"]() : INAPP ? inappHelp() : guard(()=>B.signIn()),
   "signin-kid": () => guard(()=>B.signInKid()),
   "not-kid": () => { ls.del("iinote-kidlink"); S.joinCode=""; S.kidId=""; S.kidName=""; history.replaceState(null,"",location.pathname); render(); },
