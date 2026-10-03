@@ -1179,6 +1179,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .ai-sum.none{background:var(--surface2);color:var(--ink3)}
 .ai-sum .ic{width:14px;height:14px}
 .lb{position:fixed;inset:0;z-index:60;background:rgba(12,15,24,.94);display:grid;place-items:center;padding:64px 12px calc(64px + env(safe-area-inset-bottom))}
+.lb img[data-act="lb-tap"]{cursor:pointer}
 .lb img{max-width:100%;max-height:calc(100dvh - 128px);object-fit:contain;border-radius:6px}
 .lb button{position:absolute;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff}
 .lb .ic{width:24px;height:24px}
@@ -1394,6 +1395,37 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .al-rf .al-wide{grid-column:1/-1}
 .al-amsg{color:var(--sage);font-weight:600}
 .al-same{display:flex;gap:6px;flex-wrap:wrap}
+/* 올리기: 한 장씩 크게 */
+.al-car{display:flex;flex-direction:column;gap:10px}
+.al-car-nav{display:flex;align-items:center;justify-content:center;gap:14px}
+.al-car-nav b{min-width:60px;text-align:center;font-size:16px}
+.al-car .al-row{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start}
+.al-car .al-rimg img{aspect-ratio:auto;max-height:46vh;object-fit:contain;background:var(--surface2)}
+.al-car .al-rf{grid-template-columns:1fr}
+.al-swipe{touch-action:pan-y}
+.al-strip{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
+.al-th{flex:none;width:58px;height:58px;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:var(--line);position:relative;opacity:.7}
+.al-th img{width:100%;height:100%;object-fit:cover;display:block}
+.al-th.on{border-color:var(--coral);opacity:1}
+.al-th.done::after{content:"✓";position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:var(--sage);color:var(--surface);font-size:10px;font-weight:800;display:grid;place-items:center}
+@media (max-width:640px){ .al-car .al-row{grid-template-columns:1fr} .al-car .al-rimg img{max-height:40vh} }
+/* 크게 보기에서 고치기 */
+.lb-edit{position:fixed;z-index:61;left:0;right:0;bottom:0;max-height:min(56dvh,520px);overflow:auto;background:var(--surface);color:var(--ink);border-radius:20px 20px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.lb-edit-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.lb-edit-h span{font-size:12.5px;color:var(--ink3)}
+.lb-edit .al-row{grid-template-columns:1fr;padding:0;border:0;background:none}
+.lb-edit .row{display:flex;flex-wrap:wrap;gap:6px;position:sticky;bottom:calc(-14px - env(safe-area-inset-bottom,0px));margin:0 -16px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+.lb.editing{align-items:start;padding-bottom:calc(min(56dvh,520px) + 8px)}
+.lb.editing img{max-height:calc(100dvh - min(56dvh,520px) - 80px)}
+.lb.editing .lb-p,.lb.editing .lb-n{top:calc((100dvh - min(56dvh,520px)) / 2 + 20px)}
+@media (min-width:900px){
+  .lb-edit{left:auto;right:20px;top:72px;bottom:20px;width:380px;max-height:none;border-radius:20px}
+  .lb.editing{align-items:center;padding:64px 420px 64px 12px}
+  .lb.editing img{max-height:calc(100dvh - 128px)}
+  .lb.editing .lb-p,.lb.editing .lb-n{top:50%}
+  .lb.editing .lb-n{right:420px}
+  .lb.editing .lb-x{right:420px}
+}
 @media (max-width:640px){ .al-row{grid-template-columns:84px 1fr;gap:8px;padding:8px} .al-rf{grid-template-columns:1fr} }
 .al-x{position:absolute;top:4px;right:4px;width:26px;height:26px;padding:0;border-radius:50%;border:0;background:var(--ink);color:var(--surface);opacity:.8;font-size:12px}
 .al-f{border:0;padding:0;margin:0;font-weight:650}
@@ -2361,11 +2393,17 @@ const photoGrid = (photos,did) => { const L=LAYOUT[Math.min(photos.length,9)];
 // #태그를 단추로: 원래 글에서 태그를 찾고 나머지는 esc() (먼저 esc 하면 ' → &#39; 의 #39 가 태그로 잡힘)
 const tagify = t => { const s=String(t||""); let o="",p=0; for(const m of s.matchAll(TAG_RE)){ o+=esc(s.slice(p,m.index))+`<button class="tag-inline" data-act="tag" data-v="${esc(m[1])}">#${esc(m[1])}</button>`; p=m.index+m[0].length; } return o+esc(s.slice(p)); };
 function viewLightbox(){
-  const l=S.lb, p=l.photos[l.i], many=l.photos.length>1, memo=l.caps?.[l.i]?.m||"";
-  return `<div class="lb ${memo?"has-memo":""}" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
-    <img src="${esc(p.url)}" alt="${l.i+1}번째 사진" data-act="noop">
+  const l=S.lb, p=l.photos[l.i], many=l.photos.length>1, ed=S.alEdit?.inLb && S.alEdit.id===l.caps?.[l.i]?.al ? S.alEdit : null, memo=ed?"":l.caps?.[l.i]?.m||"";
+  const panel = ed ? `<form class="lb-edit" data-form="al-lbsave" aria-label="사진 정보 고치기">
+      <div class="lb-edit-h"><b>✏️ 사진 정보</b>${many?`<span>${l.i+1} / ${l.photos.length} · 넘기면 저절로 저장돼요</span>`:""}</div>
+      ${albumPeople(ed,false)}
+      ${albumRow(ed,"e","")}
+      <div class="row"><button class="btn btn-primary sm">저장</button><button type="button" class="btn btn-ghost sm" data-act="lb-edit-close">다 고쳤어요</button><button type="button" class="btn btn-ghost sm danger" data-act="al-del">🗑 지우기</button></div>
+      <datalist id="al-pl">${albumPlaces().map(pl=>`<option value="${esc(pl)}"></option>`).join("")}</datalist></form>` : "";
+  return panel+`<div class="lb ${memo?"has-memo":""} ${ed?"editing":""}" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
+    <img src="${esc(p.url)}" alt="${l.i+1}번째 사진" data-act="${many?"lb-tap":"noop"}" ${many?'title="왼쪽을 누르면 이전, 오른쪽을 누르면 다음 사진"':""}>
     ${memo?`<p class="lb-memo" data-act="noop"><span aria-hidden="true">💌</span> ${esc(memo)}</p>`:""}
-    ${(c=>c?`<div class="lb-cap" data-act="noop"><span>${esc(c.t)}</span>${c.id?`<button class="btn btn-ghost sm" data-act="lb-diary" data-id="${esc(c.id)}">일기 보기</button>`:""}${c.al && alById(c.al) && albumCanEdit(alById(c.al))?`<button class="btn btn-ghost sm" data-act="al-edit" data-id="${esc(c.al)}">✏️ 고치기</button>`:""}</div>`:"")(l.caps?.[l.i])}
+    ${ed?"":(c=>c?`<div class="lb-cap" data-act="noop"><span>${esc(c.t)}</span>${c.id?`<button class="btn btn-ghost sm" data-act="lb-diary" data-id="${esc(c.id)}">일기 보기</button>`:""}${c.al && alById(c.al) && albumCanEdit(alById(c.al))?`<button class="btn btn-ghost sm" data-act="al-edit" data-id="${esc(c.al)}">✏️ 고치기</button>`:""}</div>`:"")(l.caps?.[l.i])}
     ${many?`<span class="lb-c">${l.i+1} / ${l.photos.length}</span><button class="lb-p" data-act="lb-prev" aria-label="이전 사진">${ic("left")}</button><button class="lb-n" data-act="lb-next" aria-label="다음 사진">${ic("right")}</button>`:""}
     <button class="lb-x" data-act="lb-close" aria-label="닫기">${ic("x")}</button></div>`;
 }
@@ -3058,10 +3096,15 @@ function viewAlbum(){
       <p class="muted al-note">사진마다 찍은 날 · 장소 · 메모를 따로 쓸 수 있어요. 찍은 날은 사진에 적힌 날짜예요.</p>
       ${albumPeople(up,true)}
       ${up.items.length>1?`<div class="al-same"><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="place">📍 첫 사진 장소를 모두에</button><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="date">📅 첫 사진 날짜를 모두에</button></div>`:""}
-      <div class="al-rows">${up.items.map((it,i)=>albumRow(it,it.k,`<div class="al-rimg"><img src="${it.src}" alt="${i+1}번째 사진" onerror="this.classList.add('bad')"><button type="button" class="al-x" data-act="al-drop" data-k="${it.k}" aria-label="${i+1}번째 사진 빼기">✕</button></div>`)).join("")}</div>
+      ${(()=>{ const n=up.items.length, c=Math.min(Math.max(0,up.cur||0),n-1), it=up.items[c]; up.cur=c;
+        return `<div class="al-car">
+          ${n>1?`<div class="al-car-nav"><button type="button" class="btn btn-ghost sm" data-act="al-cur" data-v="-1" aria-label="이전 사진" ${c?"":"disabled"}>◀</button><b>${c+1} / ${n}</b><button type="button" class="btn btn-ghost sm" data-act="al-cur" data-v="1" aria-label="다음 사진" ${c<n-1?"":"disabled"}>▶</button></div>`:""}
+          ${albumRow(it,it.k,`<div class="al-rimg al-swipe"><img src="${it.src}" alt="${c+1}번째 사진" onerror="this.classList.add('bad')"><button type="button" class="al-x" data-act="al-drop" data-k="${it.k}" aria-label="${c+1}번째 사진 빼기">✕</button></div>`)}
+          ${n>1?`<div class="al-strip" role="group" aria-label="고른 사진">${up.items.map((x,i)=>`<button type="button" class="al-th ${i===c?"on":""} ${(x.place||x.memo||"").trim()?"done":""}" data-act="al-cur-go" data-i="${i}" aria-label="${i+1}번째 사진${i===c?" (지금)":""}"><img src="${x.src}" alt=""></button>`).join("")}</div>`:""}
+        </div>`; })()}
       ${up.items.length<ALBUM_MAX_PICK?pick("btn-ghost sm","＋ 사진 더 고르기"):""}
       <div class="row"><button class="btn btn-primary al-go">올리기</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button></div>${dl}</form>` : "";
-  const edForm = ea ? `<form class="card al-up" data-form="al-save"><h2>사진 정보 고치기</h2>
+  const edForm = ea && !S.lb && !ed.inLb ? `<form class="card al-up" data-form="al-save"><h2>사진 정보 고치기</h2>
       ${albumPeople(ed,false)}
       ${albumRow(ed,"e",`<div class="al-rimg"><img src="${esc(ea.thumb||ea.url)}" alt=""></div>`)}
       <div class="row"><button class="btn btn-primary">저장</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button><button type="button" class="btn btn-ghost danger" data-act="al-del">🗑 사진 지우기</button></div>${dl}</form>` : "";
@@ -3080,7 +3123,7 @@ async function albumPick(files){
   if(files.length>room){ toast(`한 번에 ${ALBUM_MAX_PICK}장까지 올릴 수 있어요`); files=files.slice(0,Math.max(0,room)); }
   const items=await Promise.all(files.map(async f=>{ const m=await photoMeta(f); return {k:rid(), file:f, src:URL.createObjectURL(f), date:m.date, gps:m.gps, place:"", area:"", memo:""}; }));
   const prev=S.alUp; S.alEdit=null;
-  S.alUp={items:[...(prev?.items||[]),...items], people:prev?.people||[]};
+  S.alUp={items:[...(prev?.items||[]),...items], people:prev?.people||[], cur:prev?prev.items.length:0};
   render(); if(!prev) document.querySelector(".al-up")?.scrollIntoView({block:"start"});
   items.filter(it=>it.gps).forEach(it=>gpsArea(it,it.k));   // 사진 속 위치가 있으면 동네를 찾아 둬요
 }
@@ -3116,6 +3159,16 @@ async function albumUpload(){
   up.items.forEach(it=>URL.revokeObjectURL(it.src)); S.alUp=null;
   toast(fail ? `${ok}장 올렸어요. ${fail}장은 올리지 못했어요 (아이폰 HEIC 사진이면 '높은 호환성'으로 찍은 사진을 골라 주세요)` : `사진 ${ok}장을 사진첩에 넣었어요`);
   render();
+}
+const albumEditState = (a,inLb) => ({id:a.id, people:[...(a.people||[])], place:a.place||"", area:a.area||"", areaManual:false, memo:a.memo||"", date:a.date||"", inLb});
+// 고친 것만 저장 (바뀐 게 없으면 그냥 넘어가요). 크게 보기 글자도 바로 바꿔요
+async function albumSaveEdit(){
+  const ed=S.alEdit, a=alById(ed?.id); if(!albumCanEdit(a)) return;
+  const data={people:ed.people.filter(id=>prof(id)), ...albumInfo(ed), date:/^\d{4}-\d{2}-\d{2}$/.test(ed.date||"")?ed.date:a.date};
+  if(Object.keys(data).every(k=>JSON.stringify(data[k])===JSON.stringify(k==="people"?(a.people||[]):(a[k]||"")))) return;
+  await B.update(S.gid,"album",a.id,data); Object.assign(a,data);
+  S.lb?.caps?.forEach((c,j)=>{ if(c.al===a.id) S.lb.caps[j]={t:albumCap(a),al:a.id,m:a.memo||""}; });
+  toast("저장했어요 ✓");
 }
 const albumInfo = st => ({place:String(st.place||"").trim().slice(0,30), area:String(st.area||"").trim().slice(0,30), memo:String(st.memo||"").trim().slice(0,100)});
 async function albumRemove(gid,a){
@@ -4406,7 +4459,9 @@ const acts = {
     if(m.photo?.path) await B.deleteMedia(m.photo.path); if(m.photo?.thumbPath) await B.deleteMedia(m.photo.thumbPath);
     await B.update(S.gid,"chats",m.id,{deleted:true,text:"",photo:null}); }),
   "lb-open": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return; S.lb={photos:d.photos,i:+el.dataset.i}; render(); document.querySelector(".lb-x")?.focus(); },
-  "lb-close": () => { S.lb=null; render(); },
+  // 사진의 왼쪽 반을 누르면 이전, 오른쪽 반을 누르면 다음 사진
+  "lb-tap": (el,e) => { const r=el.getBoundingClientRect(); lbMove(e.clientX < r.left+r.width/2 ? -1 : 1); },
+  "lb-close": () => { if(S.alEdit?.inLb){ guard(async()=>{ await albumSaveEdit(); S.alEdit=null; S.lb=null; render(); }); return; } S.lb=null; render(); },
   "lb-diary": el => go(()=>{ S.lb=null; S.sub={type:"diary",id:el.dataset.id}; }),
   // 4분할 앨범: 가족 사진을 갤러리로 (좌우로 넘기기)
   "album-lb": el => { const L=albumPhotos(); if(!L.length) return; S.lb={photos:L.map(x=>({url:x.full})),caps:L.map(x=>({t:`${x.p?.name||""} · ${fmtShort(x.d.date)}`,id:x.d.id})),i:Math.max(0,+el.dataset.i||0)}; render(); document.querySelector(".lb-x")?.focus(); },
@@ -4417,16 +4472,27 @@ const acts = {
   "al-person": el => { const st=S.alEdit||S.alUp; if(!st) return; const v=el.dataset.v; st.people=st.people.includes(v)?st.people.filter(x=>x!==v):[...st.people,v]; render(); },
   "al-same": el => { const up=S.alUp; if(!up?.items.length) return; const f=up.items[0];
     up.items.forEach(it=>{ if(el.dataset.v==="date") it.date=f.date; else { it.place=f.place; it.area=f.area; it.areaMsg=f.areaMsg; it.areaManual=f.areaManual; } }); render(); toast(el.dataset.v==="date"?"모든 사진의 날짜를 맞췄어요":"모든 사진의 장소를 맞췄어요"); },
-  "al-drop": el => { const up=S.alUp; if(!up || S.alBusy) return; const it=up.items.find(x=>x.k===el.dataset.k); if(!it) return; up.items=up.items.filter(x=>x!==it); URL.revokeObjectURL(it.src); if(!up.items.length) S.alUp=null; render(); },
+  "al-cur": el => { const up=S.alUp; if(!up) return; up.cur=Math.min(Math.max(0,(up.cur||0)+Number(el.dataset.v)),up.items.length-1); render(); },
+  "al-cur-go": el => { const up=S.alUp; if(!up) return; up.cur=+el.dataset.i||0; render(); },
+  "al-drop": el => { const up=S.alUp; if(!up || S.alBusy) return; const it=up.items.find(x=>x.k===el.dataset.k); if(!it) return; up.items=up.items.filter(x=>x!==it); URL.revokeObjectURL(it.src); up.cur=Math.min(up.cur||0,up.items.length-1); if(!up.items.length) S.alUp=null; render(); },
   "al-cancel": () => { if(S.alBusy) return; S.alUp?.items.forEach(it=>URL.revokeObjectURL(it.src)); S.alUp=null; S.alEdit=null; render(); },
-  "al-edit": el => { const a=alById(el.dataset.id); if(!albumCanEdit(a)) return; S.lb=null; S.alUp=null; S.alEdit={id:a.id,people:[...(a.people||[])],place:a.place||"",area:a.area||"",areaManual:false,memo:a.memo||"",date:a.date||""}; render(); window.scrollTo(0,0); },
+  "al-edit": el => { const a=alById(el.dataset.id); if(!albumCanEdit(a)) return; S.alUp=null; S.alEdit=albumEditState(a,!!S.lb); render(); if(!S.lb) window.scrollTo(0,0); },
+  "lb-edit-close": () => guard(async()=>{ await albumSaveEdit(); S.alEdit=null; render(); }),
   "al-del": () => guard(async()=>{ const a=alById(S.alEdit?.id); if(!albumCanEdit(a)) return; if(!confirm("이 사진을 사진첩에서 지울까요? 되돌릴 수 없어요.")) return;
-    await albumRemove(S.gid,a); S.album=S.album.filter(x=>x.id!==a.id); S.alEdit=null; toast("사진을 지웠어요"); render(); }),
+    await albumRemove(S.gid,a); S.album=S.album.filter(x=>x.id!==a.id); const inLb=S.alEdit?.inLb; S.alEdit=null;
+    // 크게 보기에서 지웠으면 그 사진만 빼고 다음 사진을 계속 고쳐요
+    const l=S.lb; if(inLb && l?.caps){ const j=l.caps.findIndex(c=>c.al===a.id); if(j>=0){ l.photos.splice(j,1); l.caps.splice(j,1); }
+      if(!l.photos.length) S.lb=null; else { l.i=Math.min(l.i,l.photos.length-1); const b=alById(l.caps[l.i]?.al); if(albumCanEdit(b)) S.alEdit=albumEditState(b,true); } }
+    toast("사진을 지웠어요"); render(); }),
   "lb-prev": () => lbMove(-1),
   "lb-next": () => lbMove(1)
 };
 
-function lbMove(n){ const l=S.lb; if(!l) return; l.i=(l.i+n+l.photos.length)%l.photos.length; render(); }
+function lbMove(n){ const l=S.lb; if(!l) return;
+  const go=()=>{ l.i=(l.i+n+l.photos.length)%l.photos.length;
+    if(S.alEdit?.inLb){ const a=alById(l.caps?.[l.i]?.al); S.alEdit=albumCanEdit(a)?albumEditState(a,true):null; }
+    render(); };
+  if(S.alEdit?.inLb) guard(async()=>{ await albumSaveEdit(); go(); }); else go(); }
 function addTag(v){ const t=cleanTag(v); if(t && !S.draft.tags.includes(t) && S.draft.tags.length<10) S.draft.tags.push(t); render(); document.getElementById("w-tag")?.focus(); }
 async function addPhotos(files){
   const d=S.draft, room=MAX_PHOTOS-d.photos.length;
@@ -4756,6 +4822,7 @@ async function penCheck(){
 /* 폼 제출 */
 const forms = {
   "al-up": () => albumUpload(),
+  "al-lbsave": () => guard(async()=>{ await albumSaveEdit(); render(); }),
   "al-save": fd => guard(async()=>{ const ed=S.alEdit, a=alById(ed?.id); if(!albumCanEdit(a)) return;
     const data={people:ed.people.filter(id=>prof(id)), ...albumInfo(ed), date:/^\d{4}-\d{2}-\d{2}$/.test(ed.date||"")?ed.date:a.date};
     await B.update(S.gid,"album",a.id,data); Object.assign(a,data); S.alEdit=null; toast("저장했어요"); render(); }),
@@ -4863,7 +4930,8 @@ document.addEventListener("keydown", e => {
   // 채팅: 엔터로 보내기, Shift+엔터는 줄바꿈 (한글 조합 중에는 기다려요)
   if(e.target.classList?.contains("chat-ta") && e.key==="Enter" && !e.shiftKey && !e.isComposing && e.keyCode!==229){ e.preventDefault(); sendChat(null, e.target); return; }
   if(S.newsOpen && e.key==="Escape"){ S.newsOpen=false; render(); document.querySelector(".bell")?.focus(); return; }
-  if(S.lb){ if(e.key==="Escape") { S.lb=null; render(); } else if(e.key==="ArrowLeft") lbMove(-1); else if(e.key==="ArrowRight") lbMove(1); return; }
+  if(S.lb && e.target.closest?.(".lb-edit")){ if(e.key==="Escape") acts["lb-edit-close"](); return; }   // 쓰는 중에는 화살표가 글자 사이를 움직여요
+  if(S.lb){ if(e.key==="Escape") { acts["lb-close"](); } else if(e.key==="ArrowLeft") lbMove(-1); else if(e.key==="ArrowRight") lbMove(1); return; }
   const id=e.target.id;
   if(id==="w-tag" && !e.isComposing){
     if(e.key==="Enter"||e.key===","||e.key===" "){ e.preventDefault(); addTag(e.target.value); }
@@ -4872,8 +4940,10 @@ document.addEventListener("keydown", e => {
   if(id==="w-loc" && e.key==="Enter" && !e.isComposing){ e.preventDefault(); acts["loc-set"](); }
 });
 let touchX=null;
-document.addEventListener("touchstart", e => { if(S.lb) touchX=e.touches[0].clientX; }, {passive:true});
-document.addEventListener("touchend", e => { if(S.lb && touchX!==null){ const dx=e.changedTouches[0].clientX-touchX; if(Math.abs(dx)>50) lbMove(dx<0?1:-1); } touchX=null; });
+// 옆으로 밀어 넘기기: 크게 보기 사진, 사진첩 올리기의 큰 사진 (고치는 칸 안에서는 넘기지 않아요)
+document.addEventListener("touchstart", e => { touchX = (S.lb && !e.target.closest(".lb-edit")) || e.target.closest(".al-swipe") ? e.touches[0].clientX : null; }, {passive:true});
+document.addEventListener("touchend", e => { if(touchX===null) return; const dx=e.changedTouches[0].clientX-touchX; touchX=null; if(Math.abs(dx)<=50) return;
+  if(S.lb) lbMove(dx<0?1:-1); else if(S.alUp && e.target.closest(".al-swipe")) acts["al-cur"]({dataset:{v:dx<0?1:-1}}); });
 
 /* =========================================================
    10. 시작
