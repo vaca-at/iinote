@@ -1570,6 +1570,8 @@ const mapLink = l => l.lat!=null ? `https://map.kakao.com/link/map/${encodeURICo
    3. 데이터 저장소 (체험 모드 / 파이어베이스 모드가 같은 모양)
    ========================================================= */
 function demoPhoto(bg, draw){ return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="${bg}"/>${draw}</svg>`); }
+// 체험용 김치찌개 사진: Wikimedia Commons "Kimchi jjigae - Kogi, Brighton 2023-11-15" (Andy Li, CC0 퍼블릭 도메인) → img/kimchi-jjigae.jpg
+const DEMO_KIMCHI = "img/kimchi-jjigae.jpg";
 const DEMO_PHOTOS = [
   demoPhoto("#BFD9EA",'<rect y="330" width="800" height="270" fill="#7FB069"/><ellipse cx="400" cy="470" rx="330" ry="100" fill="none" stroke="#E08A5E" stroke-width="46"/><ellipse cx="400" cy="470" rx="330" ry="100" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="18 14"/><circle cx="650" cy="120" r="54" fill="#F4BE45"/>'),
   demoPhoto("#F9D9A8",'<circle cx="400" cy="330" r="120" fill="#EF6F53"/><path d="M0 420 Q200 330 400 420 T800 400 V600 H0z" fill="#6E9F74"/><path d="M0 480 Q260 420 520 490 T800 470 V600 H0z" fill="#3F7F70"/>'),
@@ -1579,7 +1581,9 @@ const DEMO_PHOTOS = [
 ];
 function seedDemo(){
   const gid="g_demo", t=todayStr(), y=addDays(t,-1), y2=addDays(t,-2), now=Date.now(), H=3600000;
-  const s = { profiles:{}, diaries:{}, comments:{}, schedules:{}, links:{}, quizWords:{} };
+  const s = { profiles:{}, diaries:{}, comments:{}, schedules:{}, links:{}, quizWords:{},
+    // 체험용 가족 채팅 예시
+    chats:{ c1:{profileId:"mom",text:"하랑아 이안아 사랑해 💕",createdAt:now-50*60000,deleted:false}, c2:{profileId:"k1",text:"엄마 사랑해요",createdAt:now-42*60000,deleted:false,reactions:{mom:"❤️"}}, c3:{profileId:"k2",text:"엄마 고마워요",createdAt:now-35*60000,deleted:false,reactions:{mom:"🥰"}} } };
   s.profiles = {
     mom:{name:"엄마",type:"parent",uid:"demo-user",color:"#EF6F53",createdAt:1},
     dad:{name:"아빠",type:"parent",uid:"demo-dad",color:"#1F2A44",createdAt:2},
@@ -1593,12 +1597,12 @@ function seedDemo(){
       photos:DEMO_PHOTOS.slice(0,4).map((u,i)=>({id:"p"+i,url:u,path:"",w:800,h:600})),location:{name:"학교 운동장"},tags:["운동회","가족"]},
     d3:{profileId:"k2",date:y2,mood:"good",title:"공원 산책",text:"아빠랑 공원에 갔다. 강아지를 만났는데 정말 귀여웠다.\n나도 강아지를 키우고 싶다.",status:"submitted",aiChecked:true,
       aiResult:{praise:"강아지를 만난 기쁜 마음이 잘 담겼어요!",feedback:"틀린 낱말 1개를 찾았어요.",corrections:[{wrong:"됬다",right:"됐다",explain:"'되었다'를 줄이면 '됐다'예요.",context:"강아지랑 친구가 ____."}]},createdAt:now-50*H,updatedAt:now-49*H},
-    d4:{profileId:"dad",date:t,mood:"tired",title:"오늘 저녁은 김치찌개",text:"퇴근하고 가족이랑 김치찌개를 끓여 먹었다. 이안이가 두부를 제일 많이 먹었다. #저녁메뉴",status:"submitted",tags:["저녁메뉴"],photos:[{id:"p9",url:DEMO_PHOTOS[4],path:"",w:800,h:600}],createdAt:now-2*H,updatedAt:now-2*H}
+    d4:{profileId:"dad",date:t,mood:"tired",title:"오늘 저녁은 김치찌개",text:"퇴근하고 가족이랑 김치찌개를 끓여 먹었다. 이안이가 두부를 제일 많이 먹었다. #저녁메뉴 #김치찌개 #우리가족사랑해",status:"submitted",tags:["저녁메뉴","김치찌개","우리가족사랑해"],photos:[{id:"p9",url:DEMO_KIMCHI,path:"",w:960,h:720}],createdAt:now-2*H,updatedAt:now-2*H}
   };
   s.comments = {
     c1:{diaryId:"d1",parentId:null,profileId:"mom",text:"2등 정말 멋지다! 다음 주에도 엄마가 응원할게.",createdAt:now-20*H},
     c2:{diaryId:"d1",parentId:"c1",profileId:"k1",text:"고마워요 엄마! 꼭 보러 와요.",createdAt:now-19*H},
-    c3:{diaryId:"d1",parentId:null,profileId:"dad",text:"아빠도 운동회 날 휴가 냈어.",createdAt:now-18*H},
+    c3:{diaryId:"d1",parentId:null,profileId:"dad",text:"아빠도 운동회 날 휴가 냈어 🏃‍♂️🎉 우리 하랑이 최고 💖",createdAt:now-18*H},
     c4:{diaryId:"d3",parentId:null,profileId:"mom",text:"강아지 이름을 지어 본다면 뭐라고 할래?",createdAt:now-40*H}
   };
   s.schedules = {
@@ -1623,7 +1627,7 @@ function seedDemo(){
 }
 
 function makeDemo(){
-  const KEY="iinote-demo-v2";
+  const KEY="iinote-demo-v3";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
   let db = null; try { db = JSON.parse(ls.get(KEY,"null")); } catch(e) {}
   if(!db) db = seedDemo();
   const save = () => ls.set(KEY, JSON.stringify(db));
@@ -3984,7 +3988,7 @@ const acts = {
   "quiz-exit": () => go(()=>{ S.sub=null; S.quiz=null; S.tab="quiz"; }),
   "new-group": () => go(()=>{ S.phase="onboard"; }),
   "cancel-onboard": () => go(()=>{ S.phase = S.me ? "app" : "picker"; }),
-  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v2"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
+  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v3"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
   "tour-logout": () => guard(async()=>{ S.tourAsk=false; S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); try{ await B.signOut(); }catch(e){} acts.tour(); }),
   "tour-no": () => { S.tourAsk=false; try{ history.replaceState({iinote:1},"","/"); }catch(e){} render(); },
   "tour-exit": () => { try{ sessionStorage.removeItem("iinote-tour"); }catch(e){} location.href="/"; },
