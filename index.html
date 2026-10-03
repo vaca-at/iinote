@@ -48,7 +48,7 @@
   --diary:"Gowun Batang","AppleMyungjo","Batang",serif;
   --diary-size:19px; --diary-lh:36px;
 }
-[data-dfont="pen"]{ --diary:"OwnglyphYuntaeng","Nanum Pen Script","Gowun Batang",serif; --diary-size:22px; --diary-lh:38px; --hand-ui:"OwnglyphYuntaeng","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OmuDaye","OwnglyphYuntaeng","Pretendard Variable",sans-serif; }
+[data-dfont="pen"]{ --diary:"OwnglyphYuntaeng","Nanum Pen Script","Gowun Batang",serif; --diary-size:22px; --diary-lh:38px; --hand-ui:"OwnglyphYuntaeng","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OngleipUnz","OwnglyphYuntaeng","Pretendard Variable",sans-serif; }
 [data-dfont="gothic"]{ --diary:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; --diary-size:18px; --diary-lh:34px; }
 [data-dfont="dodum"]{ --diary:"Gowun Dodum","Pretendard Variable",sans-serif; --diary-size:18px; --diary-lh:35px; }
 [data-theme="dark"]{
@@ -1336,15 +1336,46 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 }
 .dsw.warm{border-color:#F2CADA;background:linear-gradient(#E4507F 0 0) top/100% 5px no-repeat,radial-gradient(circle at 70% 65%,#F6C945 0 3px,transparent 3.5px),#FDEEF3}
 /* ═════════ 손글씨 글씨: 화면 전체를 손글씨로 (눈누 무료 폰트 3가지 · 모두 웹 임베딩 허용 확인 2026-09-28) ═════════
-   거의 전부 = 온글잎 윤탱체 (사용자 요청), 큰 화면 제목만 = 오뮤 다예쁨체 (기호는 Pretendard 로). 카페24 아네모네 에어는 불러 두기만 (지금은 안 씀) */
+   거의 전부 = 온글잎 윤탱체 (사용자 요청), 큰 글자(제목) = 온글잎 언즈체 (2026-10-03 다예쁨체 → 언즈체, 기호는 Pretendard 로). 카페24 아네모네 에어는 불러 두기만 (지금은 안 씀) */
 @font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'OmuDaye';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');font-weight:normal;font-display:swap}
+@font-face{font-family:'OngleipUnz';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2406-1@1.0/Ownglyph_UNZ-Rg.woff2') format('woff2');font-weight:normal;font-display:swap}
 @font-face{font-family:'Cafe24AnemoneAir';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202@1.0/Cafe24Ohsquareair.woff') format('woff');font-weight:normal;font-display:swap;unicode-range:U+0020-007E,U+2018-201D,U+2026,U+3131-318E,U+AC00-D7A3}
 :root[data-dfont="pen"] body,:root[data-dfont="pen"] :is(button,input,select,textarea,label,small,p,li,span,a,td,th,summary,legend){font-family:var(--hand-ui)}
-:root[data-dfont="pen"] :is(.mast-t,.page-h h1,.land h1){font-family:var(--hand-head)}
-:root[data-dfont="pen"] :is(h2,h3,.block-h h2,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name){font-family:var(--hand-ui)}
+:root[data-dfont="pen"] :is(.mast-t,.page-h h1,.land h1,h2){font-family:var(--hand-head);font-weight:400}
+:root[data-dfont="pen"] :is(h3,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name){font-family:var(--hand-ui)}
 :root[data-dfont="pen"] :is(.w-text,.w-hl,.paper-lines,.today-date,.dcard-ex,.al.txt strong,.cmt-text,.fix-list,.ais-text,.ct-title,.qn-x){font-family:var(--diary)}
 :root[data-dfont="pen"] .hb-g span:not(.pen){font-family:var(--sans)}
+/* 📸 사진첩 */
+.al-pick{cursor:pointer}
+.al-intro{margin:-4px 0 12px}
+.al-by{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.al-by .chip{padding:0 14px}
+.al-sec{margin:0 0 24px}
+.al-h{display:flex;align-items:center;gap:8px;font-size:17px;margin:0 0 10px}
+.al-h small{color:var(--ink3);font-weight:600;font-size:13px}
+.al-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.al-cell{aspect-ratio:1;padding:0;border:0;border-radius:10px;overflow:hidden;background:var(--line);cursor:zoom-in;min-width:0}
+.al-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+.al-cell:hover img{transform:scale(1.04)}
+.al-up{margin:0 0 20px;display:flex;flex-direction:column;gap:10px}
+.al-up h2{margin:0;font-size:17px}
+.al-note{margin:0;font-size:13px}
+.al-prev{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.al-pv{position:relative;display:flex;flex-direction:column;gap:4px;min-width:0}
+.al-pv img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:var(--line)}
+.al-pv img.bad{visibility:hidden}
+.al-pv input{font-size:12px;padding:4px;min-height:32px;min-width:0}
+.al-x{position:absolute;top:4px;right:4px;width:26px;height:26px;padding:0;border-radius:50%;border:0;background:var(--ink);color:var(--surface);opacity:.8;font-size:12px}
+.al-f{border:0;padding:0;margin:0;font-weight:650}
+.al-f legend{padding:0;margin-bottom:6px}
+.al-ppl,.al-places{display:flex;flex-wrap:wrap;gap:6px}
+.al-edit-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.al-edit-top img{width:96px;height:96px;object-fit:cover;border-radius:10px}
+.al-edit-top label{display:flex;flex-direction:column;gap:4px;font-weight:650}
+.al-empty{text-align:center;padding:30px 12px}
+.lb .lb-cap{max-width:calc(100vw - 24px)}
+.lb .lb-cap span{overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){ .al-grid{grid-template-columns:repeat(3,1fr);gap:4px} .al-cell{border-radius:6px} }
 </style>
 </head>
 <body>
@@ -1418,11 +1449,13 @@ const FEATURES = { photos:"all", location:"parent", audio:"all", tags:"all" };
 // MEDIA_READY: Storage 를 켜고 storage.rules 를 적용하면 true 로 바꾸기. false 면 사진 · 소리 올리기 칸을 숨기고 "곧 열려요" 안내만 보여요 (체험 모드는 늘 보임)
 const MEDIA_READY = true;
 const MAX_PHOTOS = 9, MAX_AUDIO_SEC = 180, MAX_AUDIO_MB = 10;
+// 📸 가족 사진첩 사진은 따로 만든 미국 버킷에 (미국 us-central1 · us-east1 · us-west1 버킷은 5GB까지 무료). 규칙은 기본 버킷과 같아요 (가족 구성원만, 사진만 10MB까지)
+const ALBUM_BUCKET = "gs://iinote";
 
 // 👀 로그인 없이 둘러보기: 첫 화면 단추 또는 iinote.co.kr/?demo → 이 탭에서만 체험 모드 (예시 가족, 이 기기에만 저장)
 // 로그인된 채로 ?demo 로 오면 바로 들어가지 않고 '로그아웃하고 둘러볼까요?'를 먼저 물어요 (TOUR_ASK)
 let TOUR_ASK = false;
-const TOUR = (()=>{ try{ const q=new URLSearchParams(location.search), want=q.has("demo") || q.get("p")==="/demo";
+const TOUR = (()=>{ try{ const q=new URLSearchParams(location.search), want=q.has("demo") || /^\/demo\b|[?&]demo(=|&|$)/.test(q.get("p")||"");   // /shelf?demo 처럼 하위 주소로 바로 와도 (404.html 이 ?p= 로 넘겨 줌)
   if(want && sessionStorage.getItem("iinote-tour")!=="1" && localStorage.getItem("iinote-login")){ TOUR_ASK=true; return false; }
   if(want){ sessionStorage.setItem("iinote-tour","1"); localStorage.setItem("iinote-demo-signed","1"); if(!localStorage.getItem("iinote-pid-g_demo")) localStorage.setItem("iinote-pid-g_demo","mom"); } return sessionStorage.getItem("iinote-tour")==="1"; }catch(e){ return false; } })();
 const DEMO = TOUR || !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith("여기");
@@ -1484,8 +1517,33 @@ function drawJpeg(img,max,q){
   return new Promise(r=>c.toBlob(b=>r({blob:b,w:c.width,h:c.height}),"image/jpeg",q));
 }
 async function compressImage(file, max, q){ return drawJpeg(await decodeImage(file), max, q); }
+// 사진 속 찍은 날(EXIF DateTimeOriginal)을 읽어요 (새 라이브러리 없이 JPEG 앞부분만). 없으면 파일 날짜 → 오늘
+async function photoDate(file){
+  try{
+    const b=new DataView(await file.slice(0,256*1024).arrayBuffer());
+    if(b.getUint16(0)===0xFFD8){
+      let o=2;
+      while(o+10<b.byteLength){
+        const m=b.getUint16(o), len=b.getUint16(o+2);
+        if((m&0xFF00)!==0xFF00) break;
+        if(m===0xFFE1 && b.getUint32(o+4)===0x45786966){ const d=exifDate(b,o+10); if(d) return d; break; }
+        o+=2+len;
+      }
+    }
+  }catch(e){}
+  return file.lastModified ? ymd(new Date(file.lastModified)) : todayStr();
+}
+function exifDate(b,t){
+  const le=b.getUint16(t)===0x4949, u16=o=>b.getUint16(t+o,le), u32=o=>b.getUint32(t+o,le);
+  const find=(ifd,tag)=>{ const n=u16(ifd); for(let i=0;i<n;i++){ const e=ifd+2+i*12; if(u16(e)===tag) return u32(e+8); } return 0; };
+  const ifd0=u32(4), sub=find(ifd0,0x8769), off=(sub&&find(sub,0x9003))||find(ifd0,0x0132);
+  if(!off) return "";
+  let s=""; for(let i=0;i<10;i++) s+=String.fromCharCode(b.getUint8(t+off+i));
+  const m=/^(\d{4}):(\d{2}):(\d{2})$/.exec(s);
+  return m && m[1]>"1900" && m[2]!=="00" ? `${m[1]}-${m[2]}-${m[3]}` : "";
+}
 // 일기 사진: 큰 사진(긴 변 1280px · 0.7, 약 200KB) + 미리보기(긴 변 400px · 0.6, 약 30KB)
-const PHOTO_BIG=[1280,.7], PHOTO_THUMB=[400,.6];
+const PHOTO_BIG=[1280,.7], PHOTO_THUMB=[400,.6], ALBUM_BIG=[1600,.75];   // 사진첩은 조금 더 크게 (약 300KB)
 async function makePhotoPair(file){
   const img=await decodeImage(file);
   const big=await drawJpeg(img,...PHOTO_BIG), thumb=await drawJpeg(img,...PHOTO_THUMB);
@@ -1641,6 +1699,14 @@ function seedDemo(){
     s2:{date:addDays(t,5),time:"",title:"할머니 댁 방문",scope:"family",profileId:"dad",createdAt:now},
     s3:{date:addDays(t,1),time:"16:00",title:"학부모 상담",scope:"personal",profileId:"mom",createdAt:now}
   };
+  // 예시 사진첩: 지난해 여름 제주 · 운동회 · 공원 · 김치찌개
+  const alb=(k,date,people,place,by,i)=>({url:DEMO_IMG[k].url,path:"",thumb:"",thumbPath:"",w:DEMO_IMG[k].w,h:DEMO_IMG[k].h,date,people,place,by,createdAt:now-i*1000});
+  s.album = {
+    a1:alb("park",addDays(t,-1),["mom","dad","k1","k2"],"동네 공원","dad",1),
+    a2:alb("kimchi",addDays(t,-2),["dad"],"우리 집","dad",2),
+    a3:alb("track",addDays(t,-9),["k1"],"하랑이 학교","mom",3),
+    a4:alb("sea",`${Number(t.slice(0,4))-1}-08-03`,["mom","dad","k1","k2"],"제주 곽지 해변","mom",4)
+  };
   s.links = {
     l2:{title:"EBS 초등",url:"https://primary.ebs.co.kr",createdBy:"mom",createdAt:2},
     l3:{title:"날씨",url:"https://weather.naver.com",createdBy:"dad",createdAt:3}
@@ -1657,7 +1723,7 @@ function seedDemo(){
 }
 
 function makeDemo(){
-  const KEY="iinote-demo-v6";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
+  const KEY="iinote-demo-v7";   // 예시 내용이 바뀌면 숫자를 올려요 (예전 체험 내용 대신 새 예시로)
   let db = null; try { db = JSON.parse(ls.get(KEY,"null")); } catch(e) {}
   if(!db) db = seedDemo();
   const save = () => ls.set(KEY, JSON.stringify(db));
@@ -1716,7 +1782,8 @@ async function makeFirebase(){
   const app = A.initializeApp(FIREBASE_CONFIG);
   const auth = AU.getAuth(app);
   const db = F.getFirestore(app);
-  const storage = ST.getStorage(app);
+  const storage = ST.getStorage(app), albumStore = ST.getStorage(app, ALBUM_BUCKET);
+  const bucketOf = where => where==="album" ? albumStore : storage;
   const col = (gid,c) => F.collection(db,"groups",gid,c);
   // 로그인 종류 (운영 현황판에서 계정 수를 나눠 세는 데만 써요): google · kakao · both(둘 다 연결) · kid(아이 기기 익명)
   const kindOf = () => { const u=auth.currentUser; if(!u) return ""; if(u.isAnonymous) return "kid";
@@ -1796,8 +1863,8 @@ async function makeFirebase(){
     async add(gid,c,data){ const r=await F.addDoc(col(gid,c),data); return r.id; },
     async update(gid,c,id,data){ await F.updateDoc(F.doc(db,"groups",gid,c,id),data); },
     async remove(gid,c,id){ await F.deleteDoc(F.doc(db,"groups",gid,c,id)); },
-    async uploadMedia(path,blob){ const r=ST.ref(storage,path); await ST.uploadBytes(r,blob,{contentType:blob.type||"application/octet-stream",cacheControl:"public, max-age=31536000"}); /* 한 번 본 사진은 다시 받지 않게 */ return { url: await ST.getDownloadURL(r), path }; },
-    async deleteMedia(path){ try{ await ST.deleteObject(ST.ref(storage,path)); }catch(e){} },
+    async uploadMedia(path,blob,where){ const r=ST.ref(bucketOf(where),path); await ST.uploadBytes(r,blob,{contentType:blob.type||"application/octet-stream",cacheControl:"public, max-age=31536000"}); /* 한 번 본 사진은 다시 받지 않게 */ return { url: await ST.getDownloadURL(r), path }; },
+    async deleteMedia(path,where){ try{ await ST.deleteObject(ST.ref(bucketOf(where),path)); }catch(e){} },
     async leaveGroup(gid,uid){ await F.updateDoc(F.doc(db,"groups",gid),{memberUids:F.arrayRemove(uid)}); },
     async deleteUserDoc(uid){ await F.deleteDoc(F.doc(db,"users",uid)); },
     // 계정 삭제 전 본인 확인: 구글 계정은 로그인 창을 한 번 더 띄워요 (익명 계정은 필요 없음)
@@ -1963,20 +2030,20 @@ const B = DEMO ? makeDemo() : await makeFirebase();
 const QS = new URLSearchParams(location.search), KQ = (QS.get("k")||"").split("-");
 const S = {
   phase:"loading", user:null, userDoc:null, gid:null, group:null,
-  profiles:[], diaries:[], comments:[], schedules:[], links:[], quizWords:[],
+  profiles:[], diaries:[], comments:[], schedules:[], links:[], quizWords:[], album:[], albumReady:false, albumBy:ls.get("iinote-album-by","year"),
   me:null, tab:"home", sub:null, filter:"all", draft:null,
   replyTo:null, editing:null, quiz:null, pinFor:null, busy:false,
   search:"", tag:"", lb:null, rec:null, locEdit:false,
   joinCode:(QS.get("join")||KQ[0]||"").toUpperCase(),
   kidId:QS.get("kid")||KQ[1]||"", kidName:QS.get("n")||"",
   wantWrite:new URLSearchParams(location.search).has("write"), penBusy:false, penFailed:false,
-  theme:ls.get("iinote-theme","light"), dfont:ls.get("iinote-dfont","batang"), design:ls.get("iinote-design","note")
+  theme:ls.get("iinote-theme","light"), dfont:ls.get("iinote-dfont","pen"), design:ls.get("iinote-design","warm")
 };
 // 아이 링크로 들어온 기기는 링크를 기억해 둬요: 나중에 로그인이 풀려도 '시작하기' 화면으로 다시 들어오게
 if(S.joinCode && S.kidId) ls.set("iinote-kidlink",JSON.stringify({join:S.joinCode,kid:S.kidId,n:S.kidName}));
 function useSavedKidLink(){ try{ const k=JSON.parse(ls.get("iinote-kidlink","null")); if(k?.join && k?.kid && !S.joinCode){ S.joinCode=k.join; S.kidId=k.kid; S.kidName=k.n||""; } }catch(e){} }
 if(!["batang","pen","gothic","dodum"].includes(S.dfont)) S.dfont="batang";
-if(!["note","warm","clean","bright","wongoji"].includes(S.design)) S.design="note";
+if(!["warm","clean","bright","wongoji"].includes(S.design)) S.design="warm";   // 노트 디자인은 원고지와 겹쳐서 뺐어요 (2026-10-03)
 function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
   document.querySelector('meta[name="theme-color"]').content = S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7"})[S.design] || "#FBF6EE"; }
 applyPrefs();
@@ -2165,7 +2232,7 @@ async function sendChat(file, ta){
 }
 
 async function enterGroup(gid){
-  S.gid=gid; S.group=await B.getGroup(gid);
+  S.gid=gid; S.group=await B.getGroup(gid); S.album=[]; S.albumReady=false; S.alUp=null; S.alEdit=null;
   if(!S.group){ S.phase="onboard"; render(); return; }
   await reloadAll();
   startChat();
@@ -2235,7 +2302,7 @@ function viewLightbox(){
   const l=S.lb, p=l.photos[l.i], many=l.photos.length>1;
   return `<div class="lb" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
     <img src="${esc(p.url)}" alt="${l.i+1}번째 사진" data-act="noop">
-    ${l.caps?.[l.i]?`<div class="lb-cap" data-act="noop"><span>${esc(l.caps[l.i].t)}</span><button class="btn btn-ghost sm" data-act="lb-diary" data-id="${esc(l.caps[l.i].id)}">일기 보기</button></div>`:""}
+    ${(c=>c?`<div class="lb-cap" data-act="noop"><span>${esc(c.t)}</span>${c.id?`<button class="btn btn-ghost sm" data-act="lb-diary" data-id="${esc(c.id)}">일기 보기</button>`:""}${c.al && alById(c.al) && albumCanEdit(alById(c.al))?`<button class="btn btn-ghost sm" data-act="al-edit" data-id="${esc(c.al)}">✏️ 고치기</button>`:""}</div>`:"")(l.caps?.[l.i])}
     ${many?`<span class="lb-c">${l.i+1} / ${l.photos.length}</span><button class="lb-p" data-act="lb-prev" aria-label="이전 사진">${ic("left")}</button><button class="lb-n" data-act="lb-next" aria-label="다음 사진">${ic("right")}</button>`:""}
     <button class="lb-x" data-act="lb-close" aria-label="닫기">${ic("x")}</button></div>`;
 }
@@ -2365,11 +2432,11 @@ function viewPicker(){
 }
 
 // 폴더 탭 색: [바탕색, 선 색]
-const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
+const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],album:["var(--sage-soft)","var(--sage)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
 // 일기 글씨 4가지
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
-const DESIGNS = [["note","노트"],["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
+const DESIGNS = [["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
 // 레이아웃(첫 화면 모양)은 홈 화면에서만 보여요 (다른 탭에서는 바뀌는 게 없고, 누르면 홈으로 가 버려서)
 function prefBar(){
@@ -2423,7 +2490,7 @@ function kidBar(){
   if(!pp) return "";
   return `<div class="kid-bar kid-now"><b>${esc(S.me.name)}${hasBatchim(S.me.name)?"이가":"가"} 쓰는 중</b><button class="kq back" data-act="back-parent">${av(pp,26)}<span>${esc(pp.name)}${ro(pp.name)} 돌아가기</span></button></div>`;
 }
-const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", report:"리포트", quiz:"퀴즈", family:"설정"};   // 휴대폰 아래 메뉴 이름
+const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", album:"사진", report:"리포트", quiz:"퀴즈", family:"설정"};   // 휴대폰 아래 메뉴 이름
 const tourAsk = () => `<div class="tour-ask" role="dialog" aria-modal="true" aria-labelledby="ta-h"><div class="tour-ask-box"><h2 id="ta-h">👀 둘러보기</h2><p>지금 <b>${esc(S.me?.name||"내")}</b> 계정으로 로그인되어 있어요.<br>로그아웃하고 예시 가족 둘러보기 화면으로 갈까요?</p><p class="muted">내 일기장의 기록은 그대로 있어요. 둘러보기를 마치고 다시 로그인하면 돼요.</p><div class="row"><button class="btn btn-primary" data-act="tour-logout">로그아웃하고 둘러보기</button><button class="btn btn-ghost" data-act="tour-no">아니요, 내 일기장으로</button></div></div></div>`;
 const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? `<div class="tour-bar" role="note">👀 <b>둘러보기 중</b><span>예시 가족 일기장이에요. 마음껏 눌러 보세요 (이 기기에만 저장돼요)</span><button class="btn btn-primary sm" data-act="tour-exit">진짜로 시작하기</button></div>` : "");
 function viewShell(){
@@ -2431,7 +2498,7 @@ function viewShell(){
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
   const tabs=[["home","홈","home"],["mine","내 일기","pen"],["chat","가족 채팅","talk"]];
   if(isParent()) tabs.push(["kids","아이들 현황","spark"]);
-  tabs.push(["day","하루 펼쳐보기","cal"],["shelf","책장","book"]);
+  tabs.push(["day","하루 펼쳐보기","cal"],["shelf","책장","book"],["album","사진첩","image"]);
   if(isParent()) tabs.push(["report","AI 리포트","chart"]);
   if(S.me.type==="child") tabs.push(["quiz","받아쓰기 퀴즈","quiz"]);
   tabs.push(["family","우리 가족 설정","people"]);
@@ -2467,7 +2534,7 @@ function viewMain(){
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
   if(!S.tab || S.tab==="home") return penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
-  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
+  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -2815,6 +2882,99 @@ function viewDiaryList(){
     ${chips}
     ${tags.length?`<div class="tags-row" role="group" aria-label="태그로 모아 보기">${tags.map(([t,n])=>`<button class="htag ${S.tag===t?"on":""}" data-act="tag" data-v="${esc(t)}" aria-pressed="${S.tag===t}">#${esc(t)} <small>${n}</small></button>`).join("")}</div>`:""}
     <div id="feed-wrap">${viewFeed()}</div>`;
+}
+
+/* ---------- 📸 가족 사진첩 (2026-10-03) ----------
+   groups/{gid}/album/{id}: {url, path, thumb, thumbPath, w, h, date(찍은 날), people:[프로필id], place, by(올린 사람), createdAt}
+   사진 파일은 미국 무료 버킷(ALBUM_BUCKET)의 groups/{gid}/album/ 에. 일기 사진과는 따로 모아요.
+   연도는 사진 속 찍은 날로 저절로, 사람 · 장소는 올릴 때 골라요(전에 쓴 장소는 눌러서 다시). 가족 모두 보고 올려요. 고치기 · 지우기는 올린 사람 · 부모
+   사진첩 탭을 처음 열 때만 불러와요 (읽기 횟수를 아끼려고) */
+const ALBUM_MAX_PICK = 30;
+async function loadAlbum(){ try{ S.album=await B.list(S.gid,"album"); }catch(e){ console.warn("사진첩",e); S.album=[]; } S.albumReady=true; }
+const alById = id => S.album.find(a=>a.id===id);
+const albumCanEdit = a => !!a && (isParent() || a.by===S.me?.id);
+const albumSorted = () => [...S.album].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.createdAt||0)-(a.createdAt||0));
+function albumPlaces(){ const n={}; S.album.forEach(a=>{ const pl=(a.place||"").trim(); if(pl) n[pl]=(n[pl]||0)+1; }); return Object.entries(n).sort((a,b)=>b[1]-a[1]).map(x=>x[0]); }
+const albumCap = a => [a.date?`${a.date.slice(0,4)}년 ${fmtShort(a.date)}`:"", (a.people||[]).map(id=>prof(id)?.name).filter(Boolean).join(" · "), a.place||""].filter(Boolean).join(" · ");
+// 모아 보기: 연도별 · 사람별 · 장소별 → [{h:제목, l:사진들}]
+function albumGroups(){
+  const L=albumSorted(), out=[];
+  if(S.albumBy==="person"){
+    for(const p of sortedProfiles()){ const l=L.filter(a=>(a.people||[]).includes(p.id)); if(l.length) out.push({h:`${av(p,26)}${esc(p.name)}`,l}); }
+    const none=L.filter(a=>!(a.people||[]).some(id=>prof(id))); if(none.length) out.push({h:"누가 나왔는지 안 고른 사진",l:none});
+  } else if(S.albumBy==="place"){
+    for(const pl of albumPlaces()) out.push({h:`📍 ${esc(pl)}`,l:L.filter(a=>(a.place||"").trim()===pl)});
+    const none=L.filter(a=>!(a.place||"").trim()); if(none.length) out.push({h:"장소를 안 쓴 사진",l:none});
+  } else {
+    const yOf=a=>(a.date||"").slice(0,4)||"?";
+    for(const y of [...new Set(L.map(yOf))]) out.push({h:y==="?"?"날짜 모름":`📅 ${y}년`,l:L.filter(a=>yOf(a)===y)});
+  }
+  return out;
+}
+// 사람 고르기 · 장소 쓰기 (올리기 · 고치기 같이 씀)
+function albumTagForm(st){
+  const places=albumPlaces().slice(0,12);
+  return `<fieldset class="al-f"><legend>누가 나왔나요? <small class="muted">여러 명 고를 수 있어요</small></legend><div class="al-ppl">${sortedProfiles().map(p=>`<button type="button" class="chip ${st.people.includes(p.id)?"on":""}" data-act="al-person" data-v="${p.id}" aria-pressed="${st.people.includes(p.id)}">${av(p,26)}${esc(p.name)}</button>`).join("")}</div></fieldset>
+    <label class="al-f" for="al-place">어디에서 찍었나요?</label><input id="al-place" name="place" maxlength="30" value="${esc(st.place)}" placeholder="예) 동네 공원, 할머니 댁" autocomplete="off">
+    ${places.length?`<div class="al-places" role="group" aria-label="전에 쓴 장소">${places.map(pl=>`<button type="button" class="htag" data-act="al-place" data-v="${esc(pl)}">📍 ${esc(pl)}</button>`).join("")}</div>`:""}`;
+}
+function viewAlbum(){
+  const head=`<div class="page-h"><h1>📸 사진첩</h1><label class="btn btn-primary al-pick">${ic("image")}사진 올리기<input type="file" id="al-files" accept="image/*" multiple class="sr"></label></div>`;
+  if(!S.albumReady){
+    if(!S.albumLoading){ S.albumLoading=true; loadAlbum().then(()=>{ S.albumLoading=false; if(S.tab==="album" && !S.sub) render(); }); }
+    return head+`<p class="empty">사진첩을 펼치는 중이에요…</p>`;
+  }
+  const up=S.alUp, ed=S.alEdit, ea=ed&&alById(ed.id);
+  const upForm = up ? `<form class="card al-up" data-form="al-up"><h2>사진 ${up.items.length}장 올리기</h2>
+      <div class="al-prev">${up.items.map((it,i)=>`<div class="al-pv"><img src="${it.src}" alt="" onerror="this.classList.add('bad')"><input type="date" data-al-date="${i}" value="${it.date}" max="${todayStr()}" aria-label="${i+1}번째 사진 찍은 날"><button type="button" class="al-x" data-act="al-drop" data-i="${i}" aria-label="${i+1}번째 사진 빼기">✕</button></div>`).join("")}</div>
+      <p class="muted al-note">날짜는 사진에 적힌 찍은 날이에요. 다르면 고쳐 주세요.</p>
+      ${albumTagForm(up)}
+      <div class="row"><button class="btn btn-primary al-go">올리기</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button></div></form>` : "";
+  const edForm = ea ? `<form class="card al-up" data-form="al-save"><h2>사진 정보 고치기</h2>
+      <div class="al-edit-top"><img src="${esc(ea.thumb||ea.url)}" alt=""><label>찍은 날<input type="date" id="al-edate" name="date" value="${esc(ed.date)}" max="${todayStr()}"></label></div>
+      ${albumTagForm(ed)}
+      <div class="row"><button class="btn btn-primary">저장</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button><button type="button" class="btn btn-ghost danger" data-act="al-del">🗑 사진 지우기</button></div></form>` : "";
+  if(!S.album.length) return head+upForm+`<div class="empty al-empty"><p>📷 아직 사진이 없어요.</p><p class="muted">우리 가족 사진을 올려 보세요. 찍은 날짜로 연도가 저절로 나뉘고, 누가 나왔는지 · 어디인지 적어 두면 사람별 · 장소별로도 모아 볼 수 있어요.</p></div>`;
+  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["place","📍 장소별"]];
+  if(!BY.some(([k])=>k===S.albumBy)) S.albumBy="year";
+  const groups=albumGroups();
+  return head+upForm+edForm+`<p class="muted al-intro">우리 가족만 보는 사진첩이에요 · 사진 ${S.album.length}장</p>
+    <div class="al-by" role="group" aria-label="모아 보기">${BY.map(([k,l])=>`<button class="chip ${S.albumBy===k?"on":""}" data-act="al-by" data-v="${k}" aria-pressed="${S.albumBy===k}">${l}</button>`).join("")}</div>
+    ${groups.map((g,gi)=>`<section class="al-sec"><h2 class="al-h">${g.h} <small>${g.l.length}장</small></h2><div class="al-grid">${g.l.map((a,i)=>`<button class="al-cell" data-act="al-open" data-g="${gi}" data-i="${i}" aria-label="${esc(albumCap(a))} 크게 보기"><img src="${esc(a.thumb||a.url)}" alt="" loading="lazy"></button>`).join("")}</div></section>`).join("")}`;
+}
+async function albumPick(files){
+  files=files.filter(f=>/^image\//.test(f.type) || /\.(heic|heif)$/i.test(f.name));
+  if(!files.length) return;
+  if(files.length>ALBUM_MAX_PICK){ toast(`한 번에 ${ALBUM_MAX_PICK}장까지 올릴 수 있어요`); files=files.slice(0,ALBUM_MAX_PICK); }
+  const items=await Promise.all(files.map(async f=>({file:f, src:URL.createObjectURL(f), date:await photoDate(f)})));
+  const prev=S.alUp; S.alEdit=null;
+  S.alUp={items:[...(prev?.items||[]),...items].slice(0,ALBUM_MAX_PICK), people:prev?.people||[], place:prev?.place||""};
+  render(); document.querySelector(".al-up")?.scrollIntoView({block:"start"});
+}
+async function albumUpload(){
+  const up=S.alUp; if(!up?.items.length || S.alBusy) return;
+  const place=String(document.getElementById("al-place")?.value ?? up.place).trim().slice(0,30), people=up.people.filter(id=>prof(id));
+  const btn=document.querySelector(".al-go"); let ok=0, fail=0; S.alBusy=true;
+  try{
+    for(const [i,it] of up.items.entries()){
+      if(btn){ btn.disabled=true; btn.textContent=`올리는 중… ${i+1} / ${up.items.length}`; }
+      try{
+        const img=await decodeImage(it.file), big=await drawJpeg(img,...ALBUM_BIG), thumb=await drawJpeg(img,...PHOTO_THUMB);
+        if(!big.blob) throw new Error("사진을 불러올 수 없어요");
+        const id=rid(), base=`groups/${S.gid}/album`;
+        const r=await B.uploadMedia(`${base}/${id}.jpg`,big.blob,"album"), th=thumb.blob?await B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob,"album"):null;
+        const data={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w,h:big.h,date:/^\d{4}-\d{2}-\d{2}$/.test(it.date)?it.date:todayStr(),people,place,by:S.me.id,createdAt:Date.now()};
+        const nid=await B.add(S.gid,"album",data); S.album.push({id:nid,...data}); ok++;
+      }catch(e){ console.error(e); fail++; }
+    }
+  }finally{ S.alBusy=false; }
+  up.items.forEach(it=>URL.revokeObjectURL(it.src)); S.alUp=null;
+  toast(fail ? `${ok}장 올렸어요. ${fail}장은 올리지 못했어요 (아이폰 HEIC 사진이면 '높은 호환성'으로 찍은 사진을 골라 주세요)` : `사진 ${ok}장을 사진첩에 넣었어요`);
+  render();
+}
+async function albumRemove(gid,a){
+  if(a.path) await B.deleteMedia(a.path,"album"); if(a.thumbPath) await B.deleteMedia(a.thumbPath,"album");
+  await B.remove(gid,"album",a.id);
 }
 
 /* ---------- 일기 PDF로 저장 (A4 · 컬러 · 구성 10가지) ----------
@@ -3834,9 +3994,9 @@ function render(){
 }
 function go(fn){ fn(); render(); window.scrollTo(0,0); }
 /* ---------- 주소와 뒤로 가기 ----------
-   / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
+   / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /album 사진첩 · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
    화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
-const ROUTE_TABS = ["mine","chat","kids","day","shelf","report","quiz","family"];
+const ROUTE_TABS = ["mine","chat","kids","day","shelf","album","report","quiz","family"];
 function urlOf(){
   let u = ROUTE_TABS.includes(S.tab) ? "/"+S.tab : "/";
   if(S.sub?.type==="diary") return u+"?d="+encodeURIComponent(S.sub.id);
@@ -4020,7 +4180,7 @@ const acts = {
   "quiz-exit": () => go(()=>{ S.sub=null; S.quiz=null; S.tab="quiz"; }),
   "new-group": () => go(()=>{ S.phase="onboard"; }),
   "cancel-onboard": () => go(()=>{ S.phase = S.me ? "app" : "picker"; }),
-  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v6"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
+  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v7"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
   "tour-logout": () => guard(async()=>{ S.tourAsk=false; S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); try{ await B.signOut(); }catch(e){} acts.tour(); }),
   "tour-no": () => { S.tourAsk=false; try{ history.replaceState({iinote:1},"","/"); }catch(e){} render(); },
   "tour-exit": () => { try{ sessionStorage.removeItem("iinote-tour"); }catch(e){} location.href="/"; },
@@ -4079,6 +4239,16 @@ const acts = {
   // 4분할 앨범: 가족 사진을 갤러리로 (좌우로 넘기기)
   "album-lb": el => { const L=albumPhotos(); if(!L.length) return; S.lb={photos:L.map(x=>({url:x.full})),caps:L.map(x=>({t:`${x.p?.name||""} · ${fmtShort(x.d.date)}`,id:x.d.id})),i:Math.max(0,+el.dataset.i||0)}; render(); document.querySelector(".lb-x")?.focus(); },
   "photo-crop": el => cropPhoto(el.dataset.id),
+  // 📸 사진첩
+  "al-by": el => { S.albumBy=el.dataset.v; ls.set("iinote-album-by",el.dataset.v); render(); },
+  "al-open": el => { const g=albumGroups()[+el.dataset.g]; if(!g) return; S.lb={photos:g.l.map(a=>({url:a.url})),caps:g.l.map(a=>({t:albumCap(a),al:a.id})),i:+el.dataset.i||0}; render(); document.querySelector(".lb-x")?.focus(); },
+  "al-person": el => { const st=S.alEdit||S.alUp; if(!st) return; const v=el.dataset.v; st.people=st.people.includes(v)?st.people.filter(x=>x!==v):[...st.people,v]; render(); },
+  "al-place": el => { const st=S.alEdit||S.alUp; if(!st) return; st.place=el.dataset.v; const i=document.getElementById("al-place"); if(i) i.value=st.place; },
+  "al-drop": el => { const up=S.alUp; if(!up || S.alBusy) return; const [it]=up.items.splice(+el.dataset.i,1); if(it) URL.revokeObjectURL(it.src); if(!up.items.length) S.alUp=null; render(); },
+  "al-cancel": () => { if(S.alBusy) return; S.alUp?.items.forEach(it=>URL.revokeObjectURL(it.src)); S.alUp=null; S.alEdit=null; render(); },
+  "al-edit": el => { const a=alById(el.dataset.id); if(!albumCanEdit(a)) return; S.lb=null; S.alUp=null; S.alEdit={id:a.id,people:[...(a.people||[])],place:a.place||"",date:a.date||""}; render(); window.scrollTo(0,0); },
+  "al-del": () => guard(async()=>{ const a=alById(S.alEdit?.id); if(!albumCanEdit(a)) return; if(!confirm("이 사진을 사진첩에서 지울까요? 되돌릴 수 없어요.")) return;
+    await albumRemove(S.gid,a); S.album=S.album.filter(x=>x.id!==a.id); S.alEdit=null; toast("사진을 지웠어요"); render(); }),
   "lb-prev": () => lbMove(-1),
   "lb-next": () => lbMove(1)
 };
@@ -4168,6 +4338,8 @@ async function wipeProfiles(gid,pids,all){
   try{ const chats=(await B.list(gid,"chats")).filter(m=>has(m.profileId));
     for(const m of chats){ if(m.photo?.path) await B.deleteMedia(m.photo.path); if(m.photo?.thumbPath) await B.deleteMedia(m.photo.thumbPath); }
     await rm("chats",chats); }catch(e){ console.warn(e); }
+  // 사진첩: 그 사람이 올린 사진 (다른 사람이 올린 사진에서는 이름만 빠져요)
+  try{ for(const a of (await B.list(gid,"album")).filter(a=>has(a.by))) await albumRemove(gid,a); S.albumReady=false; }catch(e){ console.warn(e); }
   await rm("profiles",profiles.filter(p=>has(p.id)));
 }
 /* ---------- 구글 · 카카오 로그인 하나로 합치기 ----------
@@ -4222,6 +4394,8 @@ async function mergeProfiles(from,to){
   for(const w of S.quizWords.filter(x=>x.profileId===from)) await B.update(gid,"quizWords",w.id,{profileId:to});
   try{ for(const r of (await B.list(gid,"aiReports")).filter(x=>x.profileId===from)) await B.update(gid,"aiReports",r.id,{profileId:to}); }catch(e){}
   try{ for(const m of (await B.list(gid,"chats")).filter(x=>x.profileId===from)) await B.update(gid,"chats",m.id,{profileId:to}); }catch(e){}
+  try{ for(const a of (await B.list(gid,"album")).filter(x=>x.by===from || (x.people||[]).includes(from)))
+    await B.update(gid,"album",a.id,{by:a.by===from?to:a.by, people:[...new Set((a.people||[]).map(x=>x===from?to:x))]}); S.albumReady=false; }catch(e){}
   await B.remove(gid,"profiles",from);
 }
 // 가족에 처음 들어올 때: 전에 다른 로그인으로 들어온 적 있으면 그 프로필로 바로 들어가요 (초대 코드 · 새 프로필 없이)
@@ -4408,6 +4582,10 @@ async function penCheck(){
 
 /* 폼 제출 */
 const forms = {
+  "al-up": () => albumUpload(),
+  "al-save": fd => guard(async()=>{ const ed=S.alEdit, a=alById(ed?.id); if(!albumCanEdit(a)) return;
+    const data={people:ed.people.filter(id=>prof(id)), place:String(fd.place||"").trim().slice(0,30), date:/^\d{4}-\d{2}-\d{2}$/.test(fd.date||"")?fd.date:a.date};
+    await B.update(S.gid,"album",a.id,data); Object.assign(a,data); S.alEdit=null; toast("저장했어요"); render(); }),
   pdf: (fd, f) => makePdf(f),
   chat: (fd, f) => sendChat(null, f.querySelector(".chat-ta")),
   // 아이 일기 최소 글자 수 (비우면 학년 기본값)
@@ -4477,6 +4655,7 @@ const kidField = t => S.me?.type==="child" && S.draft && (t.id==="w-text"||t.id=
 ["paste","drop"].forEach(ev=>document.addEventListener(ev, e => { if(kidField(e.target)){ e.preventDefault(); toast(KID_TYPE_MSG); } }));
 document.addEventListener("input", e => {
   if(e.target.classList?.contains("chat-ta")){ S.chatDraft=e.target.value; e.target.style.height="auto"; e.target.style.height=Math.min(140,e.target.scrollHeight)+"px"; return; }
+  if(e.target.id==="al-place"){ const st=S.alEdit||S.alUp; if(st) st.place=e.target.value; return; }
   if(e.target.id==="q"){ S.search=e.target.value; const w=document.getElementById("feed-wrap"); if(w) w.innerHTML=viewFeed(); return; }
   if(!S.draft) return;
   // 아이 일기는 직접 손으로 써요: 말로 쓰기처럼 한꺼번에 긴 글이 들어오면 되돌려요
@@ -4490,6 +4669,9 @@ document.addEventListener("input", e => {
 document.addEventListener("change", e => {
   const t=e.target;
   if(t.classList?.contains("chat-photo") && t.files?.[0]){ const file=t.files[0], ta=t.closest("form")?.querySelector(".chat-ta"); t.value=""; if(S.chatBusy){ toast("보내는 중이에요. 끝나면 사진을 다시 골라 주세요"); return; } sendChat(file, ta); return; }
+  if(t.id==="al-files" && t.files?.length){ const fs=[...t.files]; t.value=""; albumPick(fs); return; }
+  if(t.dataset.alDate!=null && S.alUp){ const it=S.alUp.items[+t.dataset.alDate]; if(it) it.date=t.value; return; }
+  if(t.id==="al-edate" && S.alEdit){ S.alEdit.date=t.value; return; }
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
   if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }

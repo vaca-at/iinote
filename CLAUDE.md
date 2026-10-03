@@ -53,6 +53,7 @@
 - 예전 주소 jsun.site/iinote 는 iinote.co.kr 로 넘기는 안내 페이지만 (쿼리 그대로). 더는 거기에 올리지 않음
 - 주소 · 뒤로 가기 (2026-10-03): 탭마다 주소 / · /mine · /chat · /kids · /day(?date=) · /shelf · /report · /quiz · /family, 일기 읽기 ?d=id, 쓰기 /write, PDF /pdf. 화면이 바뀌면 syncUrl 이 pushState, popstate 에 applyUrl (쓰던 일기가 저장 전이면 물어봄). 깃허브 페이지는 없는 주소를 404.html 로 보여 주므로 404.html 이 /?p=원래주소 로 넘기고 앱이 첫 줄에서 replaceState 로 되돌림. 하위 주소가 한 단계라 icon.png 같은 상대 주소도 그대로 됨
 - 첫 화면 4분할 (2026-10-03): ① 달력 미니(quadCal) ② 일기 히스토리 ③ 성장 기록(아이마다 위아래 growBlock) ④ 앨범(albumPhotos, 사진 수에 맞춰 4×3 · 3×2 · 2×2로 칸을 꽉, 누르면 갤러리 album-lb). 앨범형: 왼쪽 ⭐ 베스트(글 가장 긴 3편) · 오른쪽 3×8 격자, 🔀 섞기(S.albumSeed). 책장 · 내 일기 카드는 feedHTML(넓으면 3 · 2 · 1 기둥, 높이 어림해 짧은 기둥에), 사진은 원래 비율(phRatio). 🔔 새 소식은 오른쪽 위 떠 있는 창(.news-panel fixed + .news-bg)
+- 📸 가족 사진첩 (2026-10-03, 탭 album · 주소 /album): groups/{gid}/album {url,path,thumb,thumbPath,w,h,date,people,place,by,createdAt}. 사진 파일은 무료 5GB 되는 미국 버킷 ALBUM_BUCKET="gs://iinote"(규칙 원본 _local/storage-album.rules, 사진만 10MB) 에 groups/{gid}/album/ 로 (B.uploadMedia(path,blob,"album")). 긴 변 1600px(ALBUM_BIG) + 미리보기 400px. 연도 = photoDate(EXIF DateTimeOriginal, 없으면 파일 날짜, 올릴 때 고칠 수 있음), 사람 = 올릴 때 가족 고르기, 장소 = 직접 쓰기 + 전에 쓴 장소 단추. 연도별 · 사람별 · 장소별(S.albumBy, ls iinote-album-by), 누르면 크게 보기(caps.al → ✏️ 고치기). 가족 모두 보고 올림, 고치기 · 지우기는 올린 사람 · 부모. 탭 처음 열 때만 불러옴(loadAlbum). 얼굴 인식 없음(무료 아님). 방침에 국외 이전(미국) 적음
 - 레이아웃(첫 화면 모양) 고르기는 홈에서만
 - 일정 순서 (2026-10-03): 시간과 상관없이 먼저 넣은 일정이 위(bySch: schedules.order ?? createdAt). 하루 목록 아래 '↕ 순서 · 고치기'(S.schEdit=날짜) → ▲▼(sch-move, 이웃과 order 맞바꿈, 가족 누구나) · ✏️ 고치기(sch-edit 폼, 쓴 사람 · 부모) · ✕ 지우기. 공통 그리기 schList(달력 카드 · 다가오는 일정)
 - 일기장 이름 바꾸기 (2026-10-03): 우리 가족 설정 > 초대 카드 아래(부모만, data-form="group-name") → groups/{gid}.name (최대 20자, 위쪽 '○○ 일기장'에 보임)
@@ -64,8 +65,9 @@
 - 카카오톡 공유: 카카오 JS SDK(t1.kakaocdn.net, 사용자가 요청해서 넣음) + KAKAO_JS_KEY(공개용 JavaScript 키) → Kakao.Share.sendScrap(SHARE_URL). 카드 내용은 OG 태그 (og.png 1200×630: 버터 판 2분할 · 왼쪽 제목 + 키워드 4개(매일 일기 습관 · AI 다홍펜 · 맞춤법 공부 · 성장 기록), 오른쪽 로고 + iinote.co.kr. 원본 _local/og/final.html + chips.css · url.css. 아이콘: 📒 매일 일기 습관 · 👩‍🏫 AI 다홍펜 · ✏️ 맞춤법 공부 · 🌱 성장 기록, 주소는 흰 알약 + 🌐 + iinote(코랄).co.kr). 바꾸면 카카오 공유 디버거(developers.kakao.com/tool/debugger/sharing)에서 캐시 초기화. 카카오 개발자 > 플랫폼 > Web에 https://iinote.co.kr, https://jsun.site 등록 필요
 - 아이 일기 규칙: 말로 쓰기(한 번에 10글자 이상 들어오면 되돌림) · 붙여넣기 · 끌어다 놓기 막음, 브라우저 맞춤법 밑줄 끔
 - 설정값: FEATURES(기능별 어른만/모두), MAX_PHOTOS=9, MAX_AUDIO_SEC=180, SPELL_API(다홍펜 워커 family-spell.bellachord.workers.dev, 키 없이 { text, level:"gradeN", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer }), GRADES(profiles.grade 숫자: -2~0 = 5~7세, 1~6 = 초1~6, 7~9 = 중1~3, 10~12 = 고1~3, gradeName · gradeLevel(워커에 age5~7 · grade1~6 · middle1~3 · high1~3)), PEN_GOAL_DEFAULT(5세 10 · 6세 20 · 7세 30 · 초1 40 · 초2 60 · 초3 80 · 초4 100 · 초5 150 · 초6 150 · 중 300 · 고 400 (2026-09-29 낮춤), 부모가 우리 가족 탭에서 아이마다 바꿈 → profiles.diaryGoal), SITE_ADDRESS
+- 디자인 4가지 (2026-10-03 노트 디자인 뺌, 원고지와 겹쳐서): warm(따뜻한 일기장, 기본) · clean · bright · wongoji. 기본 글씨는 손글씨(pen). 예전에 note 를 고른 기기는 warm 으로
 - 디자인: 색은 모두 :root CSS 변수. 아이보리 #FBF6EE, 네이비 #1F2A44, 코랄 #EF6F53, 버터 #F4BE45, 모눈 배경, 컴퓨터 화면의 노트 여백선
-- 글꼴: Pretendard(화면), 일기 글씨 4가지(바탕 · 손글씨 · 고딕 · 동글). 손글씨를 고르면 화면 전체가 손글씨: 메뉴 · 제목 = 오뮤 다예쁨체, 일기 본문 = 온글잎 윤탱체, 작은 글 · 단추 = 카페24 아네모네 에어 (눈누, 셋 다 웹 임베딩 허용 확인). 디자인 제목 글씨 G마켓 산스. 일기 제목 기능은 쓰지 않음(사용자 결정 2026-09-28, 화면에서 모두 뺌)
+- 글꼴: Pretendard(화면), 일기 글씨 4가지(바탕 · 손글씨 · 고딕 · 동글). 손글씨를 고르면 화면 전체가 손글씨: 제목 · 큰 글자(h1 · h2) = 온글잎 언즈체(2026-10-03 다예쁨체에서 바꿈), 일기 본문 = 온글잎 윤탱체, 작은 글 · 단추 = 카페24 아네모네 에어 (눈누, 셋 다 웹 임베딩 허용 확인). 디자인 제목 글씨 G마켓 산스. 일기 제목 기능은 쓰지 않음(사용자 결정 2026-09-28, 화면에서 모두 뺌)
 
 ## 다른 PC에서 이어서 작업하기
 - `git clone https://github.com/vaca-at/iinote.git` 로 받은 폴더를 VS Code로 열고 그 폴더에서 바로 작업 (저장소 루트 = 작업 폴더)
