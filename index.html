@@ -8,6 +8,7 @@
 <meta name="description" content="매일 일기 습관부터 AI 다홍펜 선생님과 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="아이아이노트">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"아이아이노트","alternateName":"iiNote","url":"https://iinote.co.kr/","applicationCategory":"EducationalApplication","operatingSystem":"Web, Android","inLanguage":"ko","description":"가족이 함께 쓰는 일기장. 아이 일기는 AI 다홍펜 선생님이 맞춤법과 띄어쓰기를 봐 주고 칭찬과 응원을 해 줘요. 받아쓰기 퀴즈, 칭찬 도장, 성장 기록, 사진 일기, 일기책 PDF.","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}</script>
 <meta property="og:title" content="아이아이노트 - 온 가족이 함께 쓰는 일기장">
 <meta property="og:description" content="매일 일기 습관부터 AI 다홍펜 선생님과 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
 <meta property="og:image" content="https://iinote.co.kr/og.png?v=20260929">
@@ -1174,6 +1175,19 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .lb-c{position:absolute;top:calc(22px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);color:#fff;font-weight:650}
 
 .loading{min-height:100dvh;display:grid;place-items:center;color:var(--ink3)}
+/* 앱이 뜨기 전 잠깐 보이는 소개 (검색 로봇 · 링크 미리보기도 이 글을 읽어요) */
+.seo-intro{max-width:640px;margin:0 auto;padding:12vh 20px 40px;text-align:center;color:var(--ink2)}
+.seo-intro img{border-radius:16px}
+.seo-intro h1{font-size:24px;margin:12px 0 8px;color:var(--ink)}
+.seo-lead{font-size:15px;margin:0 0 14px}
+.seo-feats{list-style:none;padding:0;margin:0 auto 12px;display:grid;gap:4px;font-size:13px;text-align:left;max-width:520px;color:var(--ink3)}
+.seo-feats b{color:var(--ink2)}
+.seo-note{font-size:13px;color:var(--ink3);margin:0}
+.seo-load{margin:18px 0 0;color:var(--ink3)}
+.tour-btn{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin-top:10px;min-height:56px;border:2px dashed var(--coral);color:var(--coral-ink);background:var(--coral-soft);font-weight:800}
+.tour-btn small{font-weight:600;font-size:12px;color:var(--ink2)}
+.tour-bar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 12px;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px;background:var(--butter-soft);border-bottom:1.5px solid var(--butter);font-size:14px;color:var(--ink)}
+.tour-bar span{color:var(--ink2)}
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:999px;font-weight:600;font-size:15px;transition:opacity .2s,transform .2s;z-index:50;max-width:calc(100vw - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media (min-width:960px){.toast{bottom:32px}}
@@ -1328,7 +1342,23 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 </style>
 </head>
 <body>
-<div id="app"><div class="loading">불러오는 중...</div></div>
+<div id="app"><main class="seo-intro">
+  <img src="icon.png" alt="아이아이노트 로고" width="64" height="64">
+  <h1>아이아이노트 · 가족이 함께 쓰는 일기장</h1>
+  <p class="seo-lead">엄마 · 아빠와 아이가 함께 쓰고 서로 읽어 주는 가족 공유 일기장이에요. 아이의 일기는 <strong>AI 다홍펜 선생님</strong>이 맞춤법과 띄어쓰기를 봐 주고 칭찬과 응원을 해 줘요.</p>
+  <ul class="seo-feats">
+    <li><b>AI 맞춤법 선생님</b> · 초등학생 아이 일기의 맞춤법 · 띄어쓰기를 고쳐 주고, 힌트를 보고 스스로 고치게 도와줘요.</li>
+    <li><b>받아쓰기 퀴즈</b> · 자주 틀린 낱말을 빈칸 · OX 퀴즈로 다시 공부해요.</li>
+    <li><b>매일 일기 습관</b> · 칭찬 도장 · 하트 · 스티커판 · 연속 기록으로 날마다 쓰는 재미를 붙여요.</li>
+    <li><b>가족 댓글 · 가족 채팅</b> · 서로의 일기에 댓글과 답글을 남기고 이야기를 나눠요.</li>
+    <li><b>성장 기록 · AI 리포트</b> · 글 길이 변화와 자주 틀린 맞춤법, 선생님 총평으로 커 가는 모습을 봐요.</li>
+    <li><b>사진 일기 · 일기책 PDF</b> · 사진을 넣어 하루를 남기고, 한 달 일기를 PDF 일기책으로 만들어요.</li>
+    <li><b>5~7세 이야기 일기</b> · 아이가 엄마 · 아빠와 나눈 이야기를 녹음하면 아이 말투의 일기로 만들어 줘요.</li>
+  </ul>
+  <p class="seo-note">광고 없음 · 아이는 계정 없이 · 휴대폰 · 아이패드 · 컴퓨터 어디서나 iinote.co.kr</p>
+  <p class="seo-load">불러오는 중...</p>
+  <noscript><p>아이아이노트는 자바스크립트를 켜야 쓸 수 있어요.</p></noscript>
+</main></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
@@ -1383,7 +1413,9 @@ const FEATURES = { photos:"all", location:"parent", audio:"all", tags:"all" };
 const MEDIA_READY = true;
 const MAX_PHOTOS = 9, MAX_AUDIO_SEC = 180, MAX_AUDIO_MB = 10;
 
-const DEMO = !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith("여기");
+// 👀 로그인 없이 둘러보기: 첫 화면 단추 또는 iinote.co.kr/?demo → 이 탭에서만 체험 모드 (예시 가족, 이 기기에만 저장)
+const TOUR = (()=>{ try{ const q=new URLSearchParams(location.search); if(q.has("demo") || q.get("p")==="/demo") sessionStorage.setItem("iinote-tour","1"); return sessionStorage.getItem("iinote-tour")==="1"; }catch(e){ return false; } })();
+const DEMO = TOUR || !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith("여기");
 
 /* =========================================================
    2. 작은 도구들
@@ -2211,6 +2243,7 @@ function viewLanding(){
         <li><span class="dot" style="background:var(--ink)"></span>사진 추가, 장소와 태그 추가하여 하루를 더욱 풍성하게</li>
       </ul>
       <div class="land-cta"><button class="btn btn-primary" data-act="signin">구글 계정으로 시작하기</button><button class="btn btn-kakao" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button></div>
+      ${TOUR?"":`<button class="btn btn-ghost tour-btn" data-act="tour">👀 로그인 없이 둘러보기 <small>예시 가족 일기장을 마음껏 눌러 봐요</small></button>`}
       ${S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:""}
       ${keepBox()}
       <p class="demo-note">구글과 카카오는 따로 가입돼요. 둘 다 쓰고 싶으면 처음 방법으로 로그인한 뒤 '우리 가족 설정 → 계정'에서 연결해 주세요.</p>
@@ -2348,6 +2381,7 @@ function kidBar(){
   return `<div class="kid-bar kid-now"><b>${esc(S.me.name)}${hasBatchim(S.me.name)?"이가":"가"} 쓰는 중</b><button class="kq back" data-act="back-parent">${av(pp,26)}<span>${esc(pp.name)}${ro(pp.name)} 돌아가기</span></button></div>`;
 }
 const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", report:"리포트", quiz:"퀴즈", family:"설정"};   // 휴대폰 아래 메뉴 이름
+const tourBar = () => TOUR ? `<div class="tour-bar" role="note">👀 <b>둘러보기 중</b><span>예시 가족 일기장이에요. 마음껏 눌러 보세요 (이 기기에만 저장돼요)</span><button class="btn btn-primary sm" data-act="tour-exit">진짜로 시작하기</button></div>` : "";
 function viewShell(){
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
@@ -2358,7 +2392,7 @@ function viewShell(){
   if(S.me.type==="child") tabs.push(["quiz","받아쓰기 퀴즈","quiz"]);
   tabs.push(["family","우리 가족 설정","people"]);
   const tone=TAB_TONE[S.tab]||TAB_TONE.home;
-  return `<div class="shell">
+  return `${tourBar()}<div class="shell">
     <div class="frame">
       <header class="mast">
         <button class="home-btn" data-act="tab" data-v="home" ${S.tab==="home"&&!S.sub?'aria-current="page"':""}>${ic("home")}<span>홈</span></button>
@@ -3938,6 +3972,8 @@ const acts = {
   "quiz-exit": () => go(()=>{ S.sub=null; S.quiz=null; S.tab="quiz"; }),
   "new-group": () => go(()=>{ S.phase="onboard"; }),
   "cancel-onboard": () => go(()=>{ S.phase = S.me ? "app" : "picker"; }),
+  tour: () => { try{ sessionStorage.setItem("iinote-tour","1"); localStorage.removeItem("iinote-demo-v2"); }catch(e){} ls.set("iinote-demo-signed","1"); ls.set("iinote-pid-g_demo","mom"); location.href="/?demo"; },
+  "tour-exit": () => { try{ sessionStorage.removeItem("iinote-tour"); }catch(e){} location.href="/"; },
   "reset-demo": () => { if(!confirm("체험 내용을 처음 상태로 되돌릴까요?")) return; B.reset(); location.reload(); },
   noop: () => {},
   tag: el => go(()=>{ const v=el.dataset.v; S.tag=(S.tag===v && S.tab==="shelf" && !S.sub)?"":v; S.tab="shelf"; S.sub=null; S.filter="all"; S.search=""; S.lb=null; }),

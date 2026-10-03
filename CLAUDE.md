@@ -28,7 +28,7 @@
 - 파이어베이스 프로젝트: iinote (Authentication 구글 로그인, Firestore 서울, Storage는 Blaze 전환 후 사용 예정)
 - 배포: 깃허브 저장소 github.com/vaca-at/iinote (루트에 index.html · icon.png · privacy.html · CNAME) → https://iinote.co.kr. 로컬 복제본: Downloads\iinote-repo
 - 예전 주소 jsun.site/iinote (저장소 vaca-at/jsun 의 iinote 폴더, 로컬 Downloads\jsun)는 옮기기 전 버전
-- FIREBASE_CONFIG의 apiKey가 "여기에"로 시작하면 localStorage로 도는 체험 모드
+- FIREBASE_CONFIG의 apiKey가 "여기에"로 시작하면 localStorage로 도는 체험 모드. 👀 로그인 없이 둘러보기(2026-10-03): 첫 화면 단추(act tour) 또는 iinote.co.kr/?demo → sessionStorage iinote-tour 가 있으면 TOUR=DEMO (예시 가족, 엄마로 바로 들어감, 맨 위 .tour-bar '진짜로 시작하기'=tour-exit). 검색 로봇용: #app 안에 정적 소개 글(.seo-intro, 앱이 뜨면 바뀜) + JSON-LD WebApplication
 - 데이터: users/{uid}, invites/{code}, groups/{gid} 아래 profiles(homeStyle 포함), diaries, comments, schedules, links, quizWords, aiReports(이상한 AI 답변 신고)
 - 🎙 이야기로 일기 쓰기 (5~7세, 2026-09-28): 아이 일기 쓰기 위 칸(talkOK). 엄마 · 아빠와 대화 녹음(최대 3분, recStart(true)) → 녹음은 d.audio 로 일기에 남음 → toWav16k 로 16kHz WAV → 워커 POST /transcribe (Workers AI @cf/openai/whisper-large-v3-turbo, 워커에 AI 바인딩 필요) → 워커 mode "talk" (Claude, TALK_BASE: 아이가 한 말만으로 "나는~" 일기, dialog · diary · mood · note) → 일기 칸에 넣고 부모가 고쳐 제출. diaries.talk = {transcript, dialog, note, diary, made}. 이야기 일기는 글자 수 · 다홍펜 조건 없이 제출. 일기당 만들기 3번(TALK_MAX_MAKE)
 - 날씨 · 기분 (2026-09-29): 일기 쓰기 위에 날씨 7(WEATHERS: 맑음 · 구름 조금 · 흐림 · 비 · 천둥 번개 · 눈 · 무지개 → diaries.weather) · 기분 7(MOODS: 좋아요 · 신나요 · 행복해요 · 그저 그래요 · 속상해요 · 화나요 · 피곤해요, 예전 5개 키 그대로) 이모지로 고르기. moodChip(mood, weather)
