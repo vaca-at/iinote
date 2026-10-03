@@ -258,6 +258,8 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 
 /* ============ 앱 틀 ============ */
 .shell{min-height:100dvh}
+/* 휴대폰 키보드가 올라와 있는 동안에는 아래 메뉴를 숨겨요 (아이폰에서 고정 메뉴가 화면 중간에 떠 버려서) */
+html.typing .nav{display:none}
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1.5px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
 .nav-brand,.nav-foot{display:none}
 .nav-items{display:flex;justify-content:space-around}
@@ -4929,6 +4931,11 @@ document.addEventListener("keydown", e => {
   }
   if(id==="w-loc" && e.key==="Enter" && !e.isComposing){ e.preventDefault(); acts["loc-set"](); }
 });
+// 글 칸에 들어가면 html.typing (아래 메뉴 숨김), 나오면 다시 보여요
+{ const isField=t=>t?.matches?.("textarea,select,input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=button]):not([type=submit]),[contenteditable=true]");
+  let tyT; const set=on=>{ clearTimeout(tyT); if(on) document.documentElement.classList.add("typing"); else tyT=setTimeout(()=>{ if(!isField(document.activeElement)) document.documentElement.classList.remove("typing"); },120); };
+  document.addEventListener("focusin",e=>{ if(isField(e.target)) set(true); });
+  document.addEventListener("focusout",()=>set(false)); }
 let touchX=null;
 // 옆으로 밀어 넘기기: 크게 보기 사진, 사진첩 올리기의 큰 사진 (고치는 칸 안에서는 넘기지 않아요)
 document.addEventListener("touchstart", e => { touchX = (S.lb && !e.target.closest(".lb-edit")) || e.target.closest(".al-swipe") ? e.touches[0].clientX : null; }, {passive:true});
