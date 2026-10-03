@@ -646,10 +646,18 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 /* 사진 없는 일기: 흰 카드 + 쓴 사람 색 띠 · 이름표 (배경색 없이 읽기 쉽게) */
 .al.txt{display:flex;flex-direction:column;justify-content:flex-start;gap:8px;padding:14px 14px 12px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-top:5px solid var(--pc);box-shadow:0 1px 2px rgba(31,42,68,.04),0 6px 16px rgba(31,42,68,.06)}
 .al.txt:hover{box-shadow:0 2px 4px rgba(31,42,68,.06),0 10px 24px rgba(31,42,68,.10)}
-.al.txt strong{font-family:var(--diary);font-size:calc(var(--diary-size) * .9);font-weight:400;line-height:1.55;color:var(--ink);overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
-.al.big.txt strong{font-size:var(--diary-size);-webkit-line-clamp:9}
+.al.txt strong{flex:1;min-height:0;display:block;font-family:var(--diary);font-weight:400;line-height:1.5;color:var(--ink);overflow:hidden;overflow-wrap:anywhere;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+.al.txt.t-s strong{font-size:calc(var(--diary-size) * 1.15)}
+.al.txt.t-xs strong{font-size:calc(var(--diary-size) * 1.7);line-height:1.3;display:flex;align-items:center;-webkit-mask-image:none;mask-image:none}
+.al.txt.t-m strong{font-size:calc(var(--diary-size) * .9)}
+.al.txt.t-l strong{font-size:calc(var(--diary-size) * .76)}
+.al.best.t-s strong{font-size:calc(var(--diary-size) * 1.3)}
+.al.best.t-m strong{font-size:calc(var(--diary-size) * 1.05)}
+.al.best.t-l strong{font-size:calc(var(--diary-size) * .9)}
+.al.best{background:color-mix(in srgb,var(--pc) 7%,var(--surface))}
 .al.txt small{align-self:flex-start;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--pc);color:var(--pt)}
-@media (max-width:640px){ .album{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:31vw;gap:5px} .al.txt strong{font-size:14px} .al.big.txt strong{font-size:19px} }
+@media (max-width:640px){ .album{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:31vw;gap:5px} .al.txt{padding:8px 9px;gap:5px} .al.txt small{font-size:10px;padding:1px 7px}
+  .al.txt.t-s strong{font-size:16px} .al.txt.t-xs strong{font-size:22px} .al.txt.t-m strong{font-size:13px} .al.txt.t-l strong{font-size:11.5px} .al.best.t-s strong{font-size:20px} .al.best.t-m strong{font-size:16px} .al.best.t-l strong{font-size:14px} }
 .sc-day{margin:0 0 12px}
 .sc-day h3{font-size:14px;margin:0 0 6px;color:var(--ink2)}
 .sc-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
@@ -2536,19 +2544,32 @@ function quadAlbum(){
 }
 
 /* ---------- 첫 화면: 앨범형 ---------- */
+/* 앨범형 (2026-10-03): 들어올 때마다 순서가 섞여요(🔀 섞기로 다시). 글이 가장 긴 일기 2편은 '베스트'로 큰 칸에 글을 꽉 채우고,
+   작은 칸은 사진과 글을 번갈아 놓아요. 글 칸은 글 길이에 맞춰 글자 크기를 골라 빈 곳이 없게 */
+const seeded = s => () => { s=(s*1664525+1013904223)>>>0; return s/4294967296; };
+const shuffled = (arr,r) => { const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 function viewHomeAlbum(){
-  const t=todayStr(), list=visibleDiaries().filter(d=>d.status==="submitted").sort((a,b)=>b.date.localeCompare(a.date)||(b.updatedAt||0)-(a.updatedAt||0));
-  const tiles=[]; let nPh=0;
-  list.forEach(d=>{ const p=prof(d.profileId), c=p?.color||"#1F2A44", ph=d.photos||[];
-    if(ph.length) ph.forEach(x=>{ nPh++; tiles.push({d,c,url:x.thumb||x.url}); });
-    else tiles.push({d,c}); });
-  const html=tiles.slice(0,80).map((x,i)=>{ const big=i%7===0, lab=`${fmtShort(x.d.date)} ${prof(x.d.profileId)?.name||""}`;
-    return x.url
-      ? `<button class="al ${big?"big":""}" style="--pc:${x.c}" data-act="open-diary" data-id="${x.d.id}" aria-label="${esc(lab)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><span class="al-t">${esc(lab)}</span></button>`
-      : `<button class="al txt ${big?"big":""}" style="--pc:${x.c};--pt:${onColor(x.c)}" data-act="open-diary" data-id="${x.d.id}"><small>${esc(lab)}</small><strong>${esc((x.d.text||"").slice(0,60))}</strong></button>`; }).join("");
-  return `<section class="hero-date"><div><p class="muted">우리 가족 앨범 · 사진 ${nPh}장 · 일기 ${list.length}편</p><h2 class="today-date">${fmtLong(t)}</h2></div>${homeCta(findDiary(S.me.id,t))}</section>
+  const t=todayStr(), list=visibleDiaries().filter(d=>d.status==="submitted");
+  if(!S.albumSeed) S.albumSeed=1+Math.floor(Math.random()*1e9);
+  const r=seeded(S.albumSeed), len=d=>countChars(d.text||"");
+  const best=list.filter(d=>len(d)>=60).sort((a,b)=>len(b)-len(a)).slice(0,2), bestIds=new Set(best.map(d=>d.id));
+  const photos=[]; let nPh=0;
+  list.forEach(d=>(d.photos||[]).forEach(x=>{ nPh++; photos.push({d,url:x.thumb||x.url}); }));
+  const texts=list.filter(d=>!bestIds.has(d.id) && len(d)>0 && !(d.photos||[]).length).map(d=>({d}));
+  const P=shuffled(photos,r), T=shuffled(texts,r), B=shuffled(best.map(d=>({d,best:true})),r);
+  // 사진과 글을 번갈아 (사진이 많으면 사진 2 · 글 1), 베스트는 앞쪽 아무 자리에, 사진 몇 장은 크게
+  const ratio=P.length>T.length*2?2:1, items=[];
+  while(P.length||T.length){ for(let k=0;k<ratio&&P.length;k++) items.push(P.shift()); if(T.length) items.push(T.shift()); }
+  B.forEach((x,i)=>items.splice(Math.min(items.length, Math.floor(r()*4)+i*7), 0, x));
+  let bigPhoto=0;
+  const html=items.slice(0,80).map((x,i)=>{ const p=prof(x.d.profileId), c=p?.color||"#1F2A44", lab=`${fmtShort(x.d.date)} ${p?.name||""}`;
+    if(x.url){ const big=!x.best && bigPhoto<3 && i%9===4 && (++bigPhoto);
+      return `<button class="al ${big?"big":""}" style="--pc:${c}" data-act="open-diary" data-id="${x.d.id}" aria-label="${esc(lab)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><span class="al-t">${esc(lab)}</span></button>`; }
+    const n=len(x.d), sz=x.best?(n>260?"t-l":n>140?"t-m":"t-s"):(n>90?"t-l":n>40?"t-m":n>20?"t-s":"t-xs");
+    return `<button class="al txt ${x.best?"big best":""} ${sz}" style="--pc:${c};--pt:${onColor(c)}" data-act="open-diary" data-id="${x.d.id}"><small>${x.best?"⭐ 베스트 · ":""}${esc(lab)}</small><strong>${esc((x.d.text||"").slice(0,x.best?420:160))}</strong></button>`; }).join("");
+  return `<section class="hero-date"><div><p class="muted">우리 가족 앨범 · 사진 ${nPh}장 · 일기 ${list.length}편</p><h2 class="today-date">${fmtLong(t)}</h2></div><div class="row">${html?`<button class="btn btn-ghost sm" data-act="album-shuffle">🔀 섞기</button>`:""}${homeCta(findDiary(S.me.id,t))}</div></section>
     ${html?`<div class="album">${html}</div>`:`<p class="empty">아직 올린 일기가 없어요. 사진과 함께 첫 일기를 올려 보세요.</p>`}
-    <p class="muted" style="font-size:13px;margin:12px 0 0">사진이나 일기를 누르면 그날 일기가 열려요. 사진이 없는 일기는 쓴 사람 색깔 카드로 보여요.</p>`;
+    <p class="muted" style="font-size:13px;margin:12px 0 0">들어올 때마다 순서가 바뀌어요. ⭐ 베스트는 글이 가장 긴 일기예요. 사진이나 글을 누르면 그날 일기가 열려요.</p>`;
 }
 // 한 줄 일정: "14시 태권도" · "15:30 피아노" · "오후 3시 수영" · "14시 30분 학원" → 시간은 떼어서 시간 칸으로 (없으면 하루 종일)
 function parseSchedule(s){
@@ -3755,6 +3776,7 @@ const acts = {
   "cmt-heart": el => { const ta=el.closest("form")?.querySelector("textarea"); if(!ta) return; const s=ta.selectionStart ?? ta.value.length, en=ta.selectionEnd ?? s; ta.setRangeText(el.dataset.v, s, en, "end"); ta.focus(); },
   dtab: el => go(()=>{ S.dtab=el.dataset.v; }),
   "home-day": el => { const n=+el.dataset.v, t=todayStr(); S.homeDay = n ? (()=>{ const d=addDays(homeDay(),n); return d>t?t:d; })() : t; render(); },
+  "album-shuffle": () => { S.albumSeed=1+Math.floor(Math.random()*1e9); render(); },
   "day-open": el => go(()=>{ S.tab="day"; S.dayView=el.dataset.v; }),
   "day-move": el => { const n=+el.dataset.v, t=todayStr(); S.dayView = n ? (()=>{ const d=addDays(S.dayView||t,n); return d>t?t:d; })() : t; render(); },
   "rep-mode": el => { S.rep={mode:el.value, off:0}; render(); },
