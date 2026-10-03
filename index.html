@@ -2226,7 +2226,7 @@ function viewLanding(){
       <p class="muted" style="font-size:14px;margin-top:20px">크롬 메뉴(⋮)에서 '홈 화면에 추가'를 누르면 다음부터 아이콘으로 바로 들어올 수 있어요.</p>
       <p style="margin-top:16px"><button class="link-btn" data-act="not-kid">${esc(n)}${hasBatchim(n)?"이가":"가"} 아니에요 · 처음 화면으로</button></p>
     </div></main>`; }
-  return `<main class="landing"><div class="land">
+  return `${tourBar()}<main class="landing"><div class="land">
     <section>
       <div class="land-brand">${logo(44)}<span>아이아이노트</span></div>
       <h1>가족이 함께 쓰고,<br>서로 읽어 주는 일기장</h1>
@@ -2243,7 +2243,7 @@ function viewLanding(){
         <li><span class="dot" style="background:var(--ink)"></span>사진 추가, 장소와 태그 추가하여 하루를 더욱 풍성하게</li>
       </ul>
       <div class="land-cta"><button class="btn btn-primary" data-act="signin">구글 계정으로 시작하기</button><button class="btn btn-kakao" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button></div>
-      ${TOUR?"":`<button class="btn btn-ghost tour-btn" data-act="tour">👀 로그인 없이 둘러보기 <small>예시 가족 일기장을 마음껏 눌러 봐요</small></button>`}
+      <button class="btn btn-ghost tour-btn" data-act="tour">👀 ${TOUR?"둘러보기 계속하기":"로그인 없이 둘러보기"} <small>예시 가족 일기장을 마음껏 눌러 봐요</small></button>
       ${S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:""}
       ${keepBox()}
       <p class="demo-note">구글과 카카오는 따로 가입돼요. 둘 다 쓰고 싶으면 처음 방법으로 로그인한 뒤 '우리 가족 설정 → 계정'에서 연결해 주세요.</p>
@@ -3833,10 +3833,10 @@ async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catc
    9. 버튼 동작
    ========================================================= */
 const acts = {
-  signin: () => guard(()=>B.signIn()),
+  signin: () => TOUR ? acts["tour-exit"]() : guard(()=>B.signIn()),
   "signin-kid": () => guard(()=>B.signInKid()),
   "not-kid": () => { ls.del("iinote-kidlink"); S.joinCode=""; S.kidId=""; S.kidName=""; history.replaceState(null,"",location.pathname); render(); },
-  "signin-kakao": () => guard(async()=>{ try{ await B.signInKakao(); }catch(e){
+  "signin-kakao": () => TOUR ? acts["tour-exit"]() : guard(async()=>{ try{ await B.signInKakao(); }catch(e){
     if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '우리 가족 설정 → 계정'에서 카카오를 연결해 주세요.");
     if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
     throw e; } }),
