@@ -1345,6 +1345,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 :root[data-dfont="pen"] :is(h3,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name){font-family:var(--hand-ui)}
 :root[data-dfont="pen"] :is(.w-text,.w-hl,.paper-lines,.today-date,.dcard-ex,.al.txt strong,.cmt-text,.fix-list,.ais-text,.ct-title,.qn-x){font-family:var(--diary)}
 :root[data-dfont="pen"] .hb-g span:not(.pen){font-family:var(--sans)}
+.inapp-note{margin:0 0 12px;padding:10px 14px;border-radius:12px;background:var(--butter-soft);border:1.5px dashed var(--butter);font-size:14px;line-height:1.6}
 /* 📸 사진첩 */
 .al-pick{cursor:pointer}
 .al-intro{margin:-4px 0 12px}
@@ -1402,11 +1403,15 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 /* =========================================================
    1. 설정 (여기만 바꾸면 돼요)
    ========================================================= */
+// 로그인 창 주소 (2026-10-03): 로그인 도우미 파일(__/auth/)을 iinote.co.kr 에도 올려 두었어요.
+// SELF_AUTH=true 면 로그인 창이 iinote.co.kr/__/auth/handler 로 열려요 (앱과 같은 주소라 아이폰 · 홈 화면 앱에서 'missing initial state' 오류가 안 나요).
+// 켜기 전에 구글 클라우드 OAuth 클라이언트 · 카카오 개발자 리다이렉트 URI 에 https://iinote.co.kr/__/auth/handler 를 꼭 넣어야 해요
+const SELF_AUTH = false;
 // 파이어베이스 콘솔 > 프로젝트 설정 > 내 앱 > SDK 설정값을 붙여 넣으세요.
 // apiKey가 "여기에"로 시작하면 저장 없이 둘러보는 '체험 모드'로 열려요.
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDAA9awvX3nmdY41Tgvy0KJDkEfxt7dxpM",
-  authDomain: "iinote.firebaseapp.com",
+  authDomain: SELF_AUTH && location.hostname==="iinote.co.kr" ? "iinote.co.kr" : "iinote.firebaseapp.com",
   projectId: "iinote",
   storageBucket: "iinote.firebasestorage.app",
   messagingSenderId: "412097553357",
@@ -1458,6 +1463,19 @@ let TOUR_ASK = false;
 const TOUR = (()=>{ try{ const q=new URLSearchParams(location.search), want=q.has("demo") || /^\/demo\b|[?&]demo(=|&|$)/.test(q.get("p")||"");   // /shelf?demo 처럼 하위 주소로 바로 와도 (404.html 이 ?p= 로 넘겨 줌)
   if(want && sessionStorage.getItem("iinote-tour")!=="1" && localStorage.getItem("iinote-login")){ TOUR_ASK=true; return false; }
   if(want){ sessionStorage.setItem("iinote-tour","1"); localStorage.setItem("iinote-demo-signed","1"); if(!localStorage.getItem("iinote-pid-g_demo")) localStorage.setItem("iinote-pid-g_demo","mom"); } return sessionStorage.getItem("iinote-tour")==="1"; }catch(e){ return false; } })();
+// 카카오톡 · 네이버 · 인스타그램 같은 앱 안 브라우저에서는 구글 로그인이 막히거나 'missing initial state' 오류가 나요 → 바깥 브라우저로 열어요
+// 카카오톡 · 안드로이드는 바로 넘기고, 아이폰의 다른 앱은 'Safari로 열기' 안내를 보여 줘요
+const INAPP = (()=>{ const ua=navigator.userAgent||"";
+  if(!/KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|FB_IAB|\bLine\/|DaumApps|everytimeApp|BAND\/|; wv\)/i.test(ua)) return "";
+  return /KAKAOTALK/i.test(ua) ? "kakao" : /Android/i.test(ua) ? "android" : "ios"; })();
+(()=>{ try{
+  if(!INAPP || INAPP==="ios" || sessionStorage.getItem("iinote-out")) return;
+  sessionStorage.setItem("iinote-out","1");
+  const u=location.href;
+  if(INAPP==="kakao") location.href="kakaotalk://web/openExternal?url="+encodeURIComponent(u);
+  else location.href="intent://"+u.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(u)+";end";
+}catch(e){} })();
+const STANDALONE = (()=>{ try{ return navigator.standalone===true || matchMedia("(display-mode: standalone)").matches; }catch(e){ return false; } })();
 const DEMO = TOUR || !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.startsWith("여기");
 
 /* =========================================================
@@ -1781,6 +1799,9 @@ async function makeFirebase(){
   const ST = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-storage.js`);
   const app = A.initializeApp(FIREBASE_CONFIG);
   const auth = AU.getAuth(app);
+  // 홈 화면에 추가한 앱은 새 창(팝업)이 따로 열려 로그인이 안 이어져요 → 로그인 창이 같은 주소일 때는 이 화면에서 넘어갔다 돌아와요
+  const redirectLogin = STANDALONE && FIREBASE_CONFIG.authDomain===location.hostname;
+  if(redirectLogin) AU.getRedirectResult(auth).catch(e=>{ console.warn("로그인",e); setTimeout(()=>toast(/account-exists/.test(e.code||"")?"같은 이메일로 이미 다른 방법으로 가입되어 있어요. 처음 가입한 방법으로 로그인해 주세요.":"로그인하지 못했어요. 다시 눌러 주세요."),500); });
   const db = F.getFirestore(app);
   const storage = ST.getStorage(app), albumStore = ST.getStorage(app, ALBUM_BUCKET);
   const bucketOf = where => where==="album" ? albumStore : storage;
@@ -1792,9 +1813,9 @@ async function makeFirebase(){
     demo:false,
     onAuth(f){ AU.onAuthStateChanged(auth,f); },
     // 앱(Capacitor)으로 포장할 때는 이 함수만 앱용 로그인으로 바꾸면 돼요.
-    async signIn(){ await AU.signInWithPopup(auth,new AU.GoogleAuthProvider()); },
+    async signIn(){ const pv=new AU.GoogleAuthProvider(); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
     // 카카오 로그인: 파이어베이스 로그인 방법에 OpenID Connect(oidc.kakao)로 등록해 둠
-    async signInKakao(){ await AU.signInWithPopup(auth,new AU.OAuthProvider("oidc.kakao")); },
+    async signInKakao(){ const pv=new AU.OAuthProvider("oidc.kakao"); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
     // 로그인은 늘 이 브라우저에 기억해요(새 탭 · 공부방 링크에서도 그대로). 로그아웃 시간은 autoLogoutCheck 가 정해요
     async setKeep(){},
     // 한 계정에 구글 · 카카오 둘 다 연결: 어느 쪽으로 로그인해도 같은 계정(uid)
@@ -2353,6 +2374,7 @@ function viewLanding(){
         <li><span class="dot" style="background:var(--sky)"></span>칭찬 스티커판과 성장 기록으로 커 가는 모습을 한눈에</li>
         <li><span class="dot" style="background:var(--ink)"></span>사진 추가, 장소와 태그 추가하여 하루를 더욱 풍성하게</li>
       </ul>
+      ${INAPP?`<p class="inapp-note" role="alert">📱 지금은 <b>앱 안의 브라우저</b>로 열려 있어서 로그인이 안 될 수 있어요. ${INAPP==="ios"?"··· (또는 공유) 단추를 눌러 <b>'Safari로 열기'</b>를 골라 주세요.":"로그인 단추를 누르면 <b>크롬 · 기본 브라우저</b>로 열어 드려요."}</p>`:""}
       <div class="land-cta"><button class="btn btn-primary" data-act="signin">구글 계정으로 시작하기</button><button class="btn btn-kakao" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button><button class="btn tour-btn" data-act="tour" title="예시 가족 일기장을 로그인 없이 마음껏 눌러 봐요">👀 로그인 없이 둘러보기</button></div>
       ${S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:""}
       ${keepBox()}
@@ -4040,11 +4062,18 @@ async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catc
 /* =========================================================
    9. 버튼 동작
    ========================================================= */
+// 앱 안 브라우저에서 로그인 단추를 누르면: 바깥 브라우저로 여는 방법 안내 (카카오톡 · 안드로이드는 한 번 더 넘겨 봐요)
+function inappHelp(){
+  try{ sessionStorage.removeItem("iinote-out"); }catch(e){}
+  if(INAPP==="kakao"){ location.href="kakaotalk://web/openExternal?url="+encodeURIComponent(location.href); return; }
+  if(INAPP==="android"){ location.href="intent://"+location.href.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;end"; return; }
+  alert("이 앱 안의 화면에서는 로그인이 되지 않아요.\n\n오른쪽 위나 아래의 ··· (또는 공유) 단추를 누르고 'Safari로 열기'를 골라 주세요.\n\n또는 Safari 에서 iinote.co.kr 을 직접 열어 주세요.");
+}
 const acts = {
-  signin: () => TOUR ? acts["tour-exit"]() : guard(()=>B.signIn()),
+  signin: () => TOUR ? acts["tour-exit"]() : INAPP ? inappHelp() : guard(()=>B.signIn()),
   "signin-kid": () => guard(()=>B.signInKid()),
   "not-kid": () => { ls.del("iinote-kidlink"); S.joinCode=""; S.kidId=""; S.kidName=""; history.replaceState(null,"",location.pathname); render(); },
-  "signin-kakao": () => TOUR ? acts["tour-exit"]() : guard(async()=>{ try{ await B.signInKakao(); }catch(e){
+  "signin-kakao": () => TOUR ? acts["tour-exit"]() : INAPP ? inappHelp() : guard(async()=>{ try{ await B.signInKakao(); }catch(e){
     if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '우리 가족 설정 → 계정'에서 카카오를 연결해 주세요.");
     if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
     throw e; } }),
