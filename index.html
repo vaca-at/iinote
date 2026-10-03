@@ -613,6 +613,7 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .qg-words span{background:var(--coral-soft);color:var(--coral-ink);border-radius:8px;padding:2px 7px;font-weight:650}
 /* 4. 앨범: 정사각형 사진 격자 (사진 위 작은 점 = 올린 사람 색) */
 .qa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:4px}
+.qa-fill{grid-template-columns:repeat(var(--qc),minmax(0,1fr))}
 .qa{position:relative;aspect-ratio:1;max-width:100%;border:0;padding:0;border-radius:8px;overflow:hidden;background:var(--surface2);cursor:pointer}
 .qa img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
 .qa:hover img{transform:scale(1.05)}
@@ -629,6 +630,10 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
   .q-body{flex:1;overflow:auto}
   .qc-grid{grid-template-rows:auto repeat(var(--rows,5),minmax(0,1fr))}
   .qg-kid{min-height:120px}
+  /* 앨범 칸: 사진이 칸 전체를 빈틈없이 덮게 */
+  .q-body:has(.qa-fill){overflow:hidden;display:flex}
+  .qa-fill{flex:1;grid-template-rows:repeat(var(--qr),minmax(0,1fr))}
+  .qa-fill .qa{aspect-ratio:auto;height:100%}
   /* 칸이 낮으면 덜 중요한 것부터 숨기기 */
   @container (max-height:300px){ .qc-legend{display:none} .qc-dots i{width:6px;height:6px} .qc-n{font-size:11px} .qc-d{padding:2px 3px} }
   @container (max-height:220px){ .qc-sc{width:5px;height:5px} }
@@ -640,6 +645,14 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .album{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-rows:150px;grid-auto-flow:dense}
 .al{position:relative;overflow:hidden;border:0;padding:0;border-radius:14px;background:var(--pc);color:var(--pt);text-align:left}
 .al.big{grid-column:span 2;grid-row:span 2}
+/* 앨범형: 왼쪽 베스트 세로 · 오른쪽 작은 칸 3개씩 8줄 */
+.album2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:8px;align-items:stretch}
+.album2.nobest{grid-template-columns:minmax(0,1fr)}
+.al-best{display:flex;flex-direction:column;gap:8px;min-width:0}
+.al-best .al{flex:1 1 0;min-height:0}
+.al-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-content:start}
+.album2.nobest .al-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.al-grid .al{aspect-ratio:1;max-width:100%}
 .al img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
 .al:hover img{transform:scale(1.04)}
 .al-t{position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(20,26,40,.6))}
@@ -656,7 +669,7 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .al.best.t-l strong{font-size:calc(var(--diary-size) * .9)}
 .al.best{background:color-mix(in srgb,var(--pc) 7%,var(--surface))}
 .al.txt small{align-self:flex-start;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--pc);color:var(--pt)}
-@media (max-width:640px){ .album{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:31vw;gap:5px} .al.txt{padding:8px 9px;gap:5px} .al.txt small{font-size:10px;padding:1px 7px}
+@media (max-width:640px){ .album2{grid-template-columns:minmax(0,1fr);gap:5px} .album2.nobest .al-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .al-best{gap:5px} .al-best .al{flex:none;height:56vw} .al-grid{gap:5px} .album{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:31vw;gap:5px} .al.txt{padding:8px 9px;gap:5px} .al.txt small{font-size:10px;padding:1px 7px}
   .al.txt.t-s strong{font-size:16px} .al.txt.t-xs strong{font-size:22px} .al.txt.t-m strong{font-size:13px} .al.txt.t-l strong{font-size:11.5px} .al.best.t-s strong{font-size:20px} .al.best.t-m strong{font-size:16px} .al.best.t-l strong{font-size:14px} }
 .sc-day{margin:0 0 12px}
 .sc-day h3{font-size:14px;margin:0 0 6px;color:var(--ink2)}
@@ -2536,8 +2549,10 @@ function quadAlbum(){
   const tiles=[];
   visibleDiaries().filter(d=>d.status==="submitted").sort((a,b)=>b.date.localeCompare(a.date)||(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0))
     .forEach(d=>(d.photos||[]).forEach(x=>tiles.push({d,url:x.thumb||x.url,p:prof(d.profileId)})));
+  // 칸을 꽉 채우게: 사진 수에 맞춰 열 × 줄을 고르고, 줄이 다 차는 만큼만 (12장 이상 4×3 · 6장 이상 3×2 · 4장 2×2 · 2장 2×1)
+  const n=tiles.length, [qc,qr]=n>=12?[4,3]:n>=6?[3,2]:n>=4?[2,2]:n>=2?[2,1]:[1,1];
   const body=tiles.length
-    ? `<div class="qa-grid">${tiles.slice(0,90).map(x=>`<button class="qa" data-act="open-diary" data-id="${x.d.id}" style="--pc:${x.p?.color||"var(--ink)"}" title="${esc(x.p?.name||"")} · ${fmtShort(x.d.date)}" aria-label="${esc(x.p?.name||"")}의 ${fmtShort(x.d.date)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><i></i></button>`).join("")}</div>`
+    ? `<div class="qa-grid qa-fill" style="--qc:${qc};--qr:${qr}">${tiles.slice(0,qc*qr).map(x=>`<button class="qa" data-act="open-diary" data-id="${x.d.id}" style="--pc:${x.p?.color||"var(--ink)"}" title="${esc(x.p?.name||"")} · ${fmtShort(x.d.date)}" aria-label="${esc(x.p?.name||"")}의 ${fmtShort(x.d.date)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><i></i></button>`).join("")}</div>`
     : `<p class="empty">아직 사진이 없어요. 일기에 사진을 넣으면 여기에 차곡차곡 모여요.</p>`;
   return `<section class="block q-cell" aria-labelledby="h-qa"><div class="block-h"><h2 id="h-qa">앨범</h2><span class="muted">${tiles.length?`사진 ${tiles.length}장`:"사진"}</span></div>
     <div class="q-body">${body}</div></section>`;
@@ -2552,7 +2567,7 @@ function viewHomeAlbum(){
   const t=todayStr(), list=visibleDiaries().filter(d=>d.status==="submitted");
   if(!S.albumSeed) S.albumSeed=1+Math.floor(Math.random()*1e9);
   const r=seeded(S.albumSeed), len=d=>countChars(d.text||"");
-  const best=list.filter(d=>len(d)>=60).sort((a,b)=>len(b)-len(a)).slice(0,2), bestIds=new Set(best.map(d=>d.id));
+  const best=list.filter(d=>len(d)>=60).sort((a,b)=>len(b)-len(a)).slice(0,3), bestIds=new Set(best.map(d=>d.id));
   const photos=[]; let nPh=0;
   list.forEach(d=>(d.photos||[]).forEach(x=>{ nPh++; photos.push({d,url:x.thumb||x.url}); }));
   const texts=list.filter(d=>!bestIds.has(d.id) && len(d)>0 && !(d.photos||[]).length).map(d=>({d}));
@@ -2560,16 +2575,18 @@ function viewHomeAlbum(){
   // 사진과 글을 번갈아 (사진이 많으면 사진 2 · 글 1), 베스트는 앞쪽 아무 자리에, 사진 몇 장은 크게
   const ratio=P.length>T.length*2?2:1, items=[];
   while(P.length||T.length){ for(let k=0;k<ratio&&P.length;k++) items.push(P.shift()); if(T.length) items.push(T.shift()); }
-  B.forEach((x,i)=>items.splice(Math.min(items.length, Math.floor(r()*4)+i*7), 0, x));
-  let bigPhoto=0;
-  const html=items.slice(0,80).map((x,i)=>{ const p=prof(x.d.profileId), c=p?.color||"#1F2A44", lab=`${fmtShort(x.d.date)} ${p?.name||""}`;
-    if(x.url){ const big=!x.best && bigPhoto<3 && i%9===4 && (++bigPhoto);
+  // 왼쪽: 베스트 일기를 큰 칸으로 세로로 · 오른쪽: 작은 칸 3개씩 8줄(24칸)
+  const tile=x=>{ const p=prof(x.d.profileId), c=p?.color||"#1F2A44", lab=`${fmtShort(x.d.date)} ${p?.name||""}`, big=false;
+    if(x.url){
       return `<button class="al ${big?"big":""}" style="--pc:${c}" data-act="open-diary" data-id="${x.d.id}" aria-label="${esc(lab)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><span class="al-t">${esc(lab)}</span></button>`; }
     const n=len(x.d), sz=x.best?(n>260?"t-l":n>140?"t-m":"t-s"):(n>90?"t-l":n>40?"t-m":n>20?"t-s":"t-xs");
-    return `<button class="al txt ${x.best?"big best":""} ${sz}" style="--pc:${c};--pt:${onColor(c)}" data-act="open-diary" data-id="${x.d.id}"><small>${x.best?"⭐ 베스트 · ":""}${esc(lab)}</small><strong>${esc((x.d.text||"").slice(0,x.best?420:160))}</strong></button>`; }).join("");
+    return `<button class="al txt ${x.best?"big best":""} ${sz}" style="--pc:${c};--pt:${onColor(c)}" data-act="open-diary" data-id="${x.d.id}"><small>${x.best?"⭐ 베스트 · ":""}${esc(lab)}</small><strong>${esc((x.d.text||"").slice(0,x.best?600:160))}</strong></button>`; };
+  // 격자에 꼭 맞게: 줄마다 칸이 다 차도록 (베스트가 있으면 3칸 × 8줄, 없으면 6칸 × 4줄), 남는 것은 🔀 섞기로
+  const cols=B.length?3:6, fit=Math.min(24, Math.floor(items.length/cols)*cols)||items.length;
+  const left=B.map(tile).join(""), grid=items.slice(0,fit).map(tile).join(""), html=left+grid;
   return `<section class="hero-date"><div><p class="muted">우리 가족 앨범 · 사진 ${nPh}장 · 일기 ${list.length}편</p><h2 class="today-date">${fmtLong(t)}</h2></div><div class="row">${html?`<button class="btn btn-ghost sm" data-act="album-shuffle">🔀 섞기</button>`:""}${homeCta(findDiary(S.me.id,t))}</div></section>
-    ${html?`<div class="album">${html}</div>`:`<p class="empty">아직 올린 일기가 없어요. 사진과 함께 첫 일기를 올려 보세요.</p>`}
-    <p class="muted" style="font-size:13px;margin:12px 0 0">들어올 때마다 순서가 바뀌어요. ⭐ 베스트는 글이 가장 긴 일기예요. 사진이나 글을 누르면 그날 일기가 열려요.</p>`;
+    ${html?`<div class="album2 ${left?"":"nobest"}">${left?`<div class="al-best">${left}</div>`:""}<div class="al-grid">${grid}</div></div>`:`<p class="empty">아직 올린 일기가 없어요. 사진과 함께 첫 일기를 올려 보세요.</p>`}
+    <p class="muted" style="font-size:13px;margin:12px 0 0">들어올 때마다 순서가 바뀌어요(🔀 섞기를 누르면 다른 사진 · 글도 나와요). ⭐ 베스트는 글이 가장 긴 일기예요. 사진이나 글을 누르면 그날 일기가 열려요.</p>`;
 }
 // 한 줄 일정: "14시 태권도" · "15:30 피아노" · "오후 3시 수영" · "14시 30분 학원" → 시간은 떼어서 시간 칸으로 (없으면 하루 종일)
 function parseSchedule(s){
