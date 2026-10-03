@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<title>아이아이노트</title>
+<script>
+/* iinote.co.kr/shelf 같은 주소로 바로 들어오면 깃허브 페이지가 이 파일을 보여 줘요.
+   앱(첫 화면)으로 넘기면서 원래 주소를 ?p= 로 전해 주면, 앱이 그 화면을 열어요 */
+(function(){
+  var path = location.pathname + location.search + location.hash;
+  if (/^\/(mine|chat|kids|day|shelf|report|quiz|family|write|pdf)\/?(\?|#|$)/.test(path)) location.replace("/?p=" + encodeURIComponent(path));
+})();
+</script>
+<style>body{font-family:system-ui,"Malgun Gothic",sans-serif;background:#FBF6EE;color:#1F2A44;display:grid;place-items:center;min-height:90vh;text-align:center}a{color:#B8452D}</style>
+</head>
+<body>
+<div><h1>페이지를 찾을 수 없어요</h1><p><a href="/">아이아이노트 첫 화면으로 가기</a></p></div>
+</body>
+</html>

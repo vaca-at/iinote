@@ -804,7 +804,13 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .bell{position:relative;flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font-size:18px;cursor:pointer}
 .bell.on{border-color:var(--ink)}
 .bell .cdot{position:absolute;top:-5px;right:-6px;margin:0}
-.news-panel{margin:10px 0 0;padding:14px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);box-shadow:0 10px 26px rgba(31,42,68,.1);max-width:560px}
+/* 🔔 새 소식: 오른쪽 위에 떠 있는 창 (아래 화면은 그대로, 바깥을 누르거나 Esc 로 닫기) */
+.news-bg{position:fixed;inset:0;z-index:44;background:rgba(20,26,40,.12)}
+.news-panel{position:fixed;z-index:45;top:calc(72px + env(safe-area-inset-top,0px));right:max(16px,calc((100vw - 1320px)/2 + 16px));width:min(420px,calc(100vw - 32px));max-height:min(72vh,620px);overflow:auto;padding:14px 16px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);box-shadow:0 18px 44px rgba(31,42,68,.22);animation:newsIn .16s ease-out}
+@keyframes newsIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.news-h{position:sticky;top:-14px;background:var(--surface);padding:4px 0 6px;z-index:1}
+@media (max-width:759px){ .news-panel{top:calc(112px + env(safe-area-inset-top,0px));right:12px;width:calc(100vw - 24px);max-height:calc(100dvh - 200px)} }
+@media (prefers-reduced-motion:reduce){ .news-panel{animation:none} }
 .news-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .news-panel ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
 .news-panel li button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:0;border-radius:10px;background:none;text-align:left;cursor:pointer;font:inherit}
@@ -1162,6 +1168,8 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .lb .ic{width:24px;height:24px}
 .lb-x{top:calc(10px + env(safe-area-inset-top));right:12px}
 .lb-p{left:12px;top:50%;transform:translateY(-50%)}
+.lb .lb-cap{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:6px 8px 6px 16px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;font-size:14px;white-space:nowrap;width:auto;height:auto}
+.lb .lb-cap .btn{position:static;width:auto;height:auto;background:#fff;color:#1F2A44;border:0;border-radius:999px;padding:4px 12px}
 .lb-n{right:12px;top:50%;transform:translateY(-50%)}
 .lb-c{position:absolute;top:calc(22px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);color:#fff;font-weight:650}
 
@@ -1874,6 +1882,8 @@ function variants(word){
    ========================================================= */
 const B = DEMO ? makeDemo() : await makeFirebase();
 // 아이 휴대폰 연결 링크: 새 모양 ?k=초대코드-아이번호&n=이름 (문자 앱이 & 뒤를 잘라도 열리게), 예전 모양 ?join=…&kid=…&n=… 도 그대로
+// 탭마다 주소 (2026-10-03): iinote.co.kr/shelf 처럼 바로 들어오면 깃허브 페이지의 404.html 이 /?p=/shelf 로 넘겨 줘요 → 원래 주소로 되돌리기
+{ const p0=new URLSearchParams(location.search).get("p"); if(p0 && /^\/[a-z]/.test(p0)) history.replaceState(null,"",p0); }
 const QS = new URLSearchParams(location.search), KQ = (QS.get("k")||"").split("-");
 const S = {
   phase:"loading", user:null, userDoc:null, gid:null, group:null,
@@ -1983,7 +1993,7 @@ function newsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(
 const newsBell = () => { const n=newsUnread(); return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">🔔${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
 function viewNews(){
   const seen=Number(ls.get(newsSeenKey(),"0")), items=newsItems();
-  return `<div class="news-panel" role="region" aria-label="새 소식"><div class="news-h"><b>🔔 새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>
+  return `<div class="news-bg" data-act="news-open" aria-hidden="true"></div><div class="news-panel" role="dialog" aria-label="새 소식"><div class="news-h"><b>🔔 새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>
     ${items.length?`<ul>${items.map(x=>`<li class="${x.at>S.newsSeenBefore?"new":""}"><button data-act="news-go" data-id="${esc(x.id)}"><span class="ni">${x.ic}</span><span class="nt">${esc(x.text)}</span><small>${relTime(x.at)}</small></button></li>`).join("")}</ul>`
       :`<p class="muted" style="margin:6px 0 0;font-size:14px">최근 2주 동안 새 소식이 없어요.</p>`}</div>`;
 }
@@ -2149,6 +2159,7 @@ function viewLightbox(){
   const l=S.lb, p=l.photos[l.i], many=l.photos.length>1;
   return `<div class="lb" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
     <img src="${esc(p.url)}" alt="${l.i+1}번째 사진" data-act="noop">
+    ${l.caps?.[l.i]?`<div class="lb-cap" data-act="noop"><span>${esc(l.caps[l.i].t)}</span><button class="btn btn-ghost sm" data-act="lb-diary" data-id="${esc(l.caps[l.i].id)}">일기 보기</button></div>`:""}
     ${many?`<span class="lb-c">${l.i+1} / ${l.photos.length}</span><button class="lb-p" data-act="lb-prev" aria-label="이전 사진">${ic("left")}</button><button class="lb-n" data-act="lb-next" aria-label="다음 사진">${ic("right")}</button>`:""}
     <button class="lb-x" data-act="lb-close" aria-label="닫기">${ic("x")}</button></div>`;
 }
@@ -2549,14 +2560,16 @@ function quadGrowth(){
     <div class="q-body qg-stack">${pool.map(growBlock).join("")}</div></section>`;
 }
 // 4. 앨범: 가족이 일기에 올린 사진을 정사각형 격자로 (최신순). 누르면 그 일기
-function quadAlbum(){
-  const tiles=[];
+function albumPhotos(){ const out=[];
   visibleDiaries().filter(d=>d.status==="submitted").sort((a,b)=>b.date.localeCompare(a.date)||(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0))
-    .forEach(d=>(d.photos||[]).forEach(x=>tiles.push({d,url:x.thumb||x.url,p:prof(d.profileId)})));
+    .forEach(d=>(d.photos||[]).forEach(x=>out.push({d,url:x.thumb||x.url,full:x.url||x.thumb,p:prof(d.profileId)})));
+  return out; }
+function quadAlbum(){
+  const tiles=albumPhotos();
   // 칸을 꽉 채우게: 사진 수에 맞춰 열 × 줄을 고르고, 줄이 다 차는 만큼만 (12장 이상 4×3 · 6장 이상 3×2 · 4장 2×2 · 2장 2×1)
   const n=tiles.length, [qc,qr]=n>=12?[4,3]:n>=6?[3,2]:n>=4?[2,2]:n>=2?[2,1]:[1,1];
   const body=tiles.length
-    ? `<div class="qa-grid qa-fill" style="--qc:${qc};--qr:${qr}">${tiles.slice(0,qc*qr).map(x=>`<button class="qa" data-act="open-diary" data-id="${x.d.id}" style="--pc:${x.p?.color||"var(--ink)"}" title="${esc(x.p?.name||"")} · ${fmtShort(x.d.date)}" aria-label="${esc(x.p?.name||"")}의 ${fmtShort(x.d.date)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><i></i></button>`).join("")}</div>`
+    ? `<div class="qa-grid qa-fill" style="--qc:${qc};--qr:${qr}">${tiles.slice(0,qc*qr).map((x,i)=>`<button class="qa" data-act="album-lb" data-i="${i}" style="--pc:${x.p?.color||"var(--ink)"}" title="${esc(x.p?.name||"")} · ${fmtShort(x.d.date)}" aria-label="${esc(x.p?.name||"")}의 ${fmtShort(x.d.date)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><i></i></button>`).join("")}</div>`
     : `<p class="empty">아직 사진이 없어요. 일기에 사진을 넣으면 여기에 차곡차곡 모여요.</p>`;
   return `<section class="block q-cell" aria-labelledby="h-qa"><div class="block-h"><h2 id="h-qa">앨범</h2><span class="muted">${tiles.length?`사진 ${tiles.length}장`:"사진"}</span></div>
     <div class="q-body">${body}</div></section>`;
@@ -3729,16 +3742,54 @@ function render(){
   else if(S.phase==="picker") $app.innerHTML=viewPicker();
   else {
     // 공부방 일기 단추 등에서 ?write 로 들어오면: 프로필이 정해진 뒤 바로 오늘 일기 쓰는 칸으로
-    if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; history.replaceState(null,"",location.pathname); }
+    if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; S.routed=true; history.replaceState({iinote:1},"","/write"); }
     const scTop=$app.querySelector(".sc-scroll")?.scrollTop;   // 다가오는 일정 칸 안 스크롤 위치는 다시 그려도 그대로
     $app.innerHTML=viewShell();
     if(scTop){ const sc=$app.querySelector(".sc-scroll"); if(sc) sc.scrollTop=scTop; }
     if(S.sub?.type==="write") penHL();
     afterChatRender();
+    if(syncUrl()==="again"){ render(); return; }
   }
   document.body.style.overflow = S.lb ? "hidden" : "";
 }
 function go(fn){ fn(); render(); window.scrollTo(0,0); }
+/* ---------- 주소와 뒤로 가기 ----------
+   / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
+   화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
+const ROUTE_TABS = ["mine","chat","kids","day","shelf","report","quiz","family"];
+function urlOf(){
+  let u = ROUTE_TABS.includes(S.tab) ? "/"+S.tab : "/";
+  if(S.sub?.type==="diary") return u+"?d="+encodeURIComponent(S.sub.id);
+  if(S.sub?.type==="write") return "/write"+(S.draft?.date && S.draft.date!==todayStr() ? "?date="+S.draft.date : "");
+  if(S.sub?.type==="pdf") return "/pdf";
+  if(S.tab==="day" && S.dayView && S.dayView!==todayStr()) u+="?date="+S.dayView;
+  return u;
+}
+function applyUrl(){
+  const seg=location.pathname.replace(/^\/+|\/+$/g,""), q=new URLSearchParams(location.search), d=q.get("d"), date=/^\d{4}-\d{2}-\d{2}$/.test(q.get("date")||"")?q.get("date"):"";
+  S.lb=null; S.newsOpen=false; S.replyTo=null; S.editing=null;
+  if(seg==="write"){ if(!(S.sub?.type==="write" && S.draft)) loadDraft(date||todayStr()); S.sub={type:"write"}; return; }
+  if(seg==="pdf"){ S.tab="shelf"; S.sub={type:"pdf"}; S.draft=null; return; }
+  S.tab = ROUTE_TABS.includes(seg) ? seg : "home";
+  if((S.tab==="quiz" && S.me?.type!=="child") || (["kids","report"].includes(S.tab) && S.me?.type==="child")) S.tab="home";
+  if(S.tab==="day") S.dayView=date||todayStr();
+  S.draft=null; S.sub = d && S.diaries.some(x=>x.id===d) ? {type:"diary",id:d} : null;
+}
+let routeFromPop=false;
+function syncUrl(){
+  if(S.phase!=="app" || !S.me || S.joinCode || S.kidId) return;
+  if(!S.routed){ S.routed=true; if(location.pathname!=="/" || /[?&](d|date)=/.test(location.search)){ applyUrl(); return "again"; } }
+  const u=urlOf(); if(u===location.pathname+location.search) return;
+  try{ if(routeFromPop) history.replaceState({iinote:1},"",u); else history.pushState({iinote:1},"",u); }catch(e){}
+}
+// 쓰던 일기를 저장하지 않고 나가려 하면 한 번 물어봐요
+const draftDirty = () => { const d=S.draft; if(!d || S.sub?.type!=="write") return false; const o=d.id&&S.diaries.find(x=>x.id===d.id); return (d.text||"").trim()!==((o?.text)||"").trim(); };
+addEventListener("popstate",()=>{
+  if(S.phase!=="app" || !S.me) return;
+  if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")){ try{ history.pushState({iinote:1},"",urlOf()); }catch(e){} return; }
+  if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop();
+  applyUrl(); routeFromPop=true; render(); routeFromPop=false; window.scrollTo(0,0);
+});
 let toastT;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2400); }
 
@@ -3938,6 +3989,9 @@ const acts = {
     await B.update(S.gid,"chats",m.id,{deleted:true,text:"",photo:null}); }),
   "lb-open": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return; S.lb={photos:d.photos,i:+el.dataset.i}; render(); document.querySelector(".lb-x")?.focus(); },
   "lb-close": () => { S.lb=null; render(); },
+  "lb-diary": el => go(()=>{ S.lb=null; S.sub={type:"diary",id:el.dataset.id}; }),
+  // 4분할 앨범: 가족 사진을 갤러리로 (좌우로 넘기기)
+  "album-lb": el => { const L=albumPhotos(); if(!L.length) return; S.lb={photos:L.map(x=>({url:x.full})),caps:L.map(x=>({t:`${x.p?.name||""} · ${fmtShort(x.d.date)}`,id:x.d.id})),i:Math.max(0,+el.dataset.i||0)}; render(); document.querySelector(".lb-x")?.focus(); },
   "photo-crop": el => cropPhoto(el.dataset.id),
   "lb-prev": () => lbMove(-1),
   "lb-next": () => lbMove(1)
@@ -4367,6 +4421,7 @@ document.addEventListener("change", e => {
 document.addEventListener("keydown", e => {
   // 채팅: 엔터로 보내기, Shift+엔터는 줄바꿈 (한글 조합 중에는 기다려요)
   if(e.target.classList?.contains("chat-ta") && e.key==="Enter" && !e.shiftKey && !e.isComposing && e.keyCode!==229){ e.preventDefault(); sendChat(null, e.target); return; }
+  if(S.newsOpen && e.key==="Escape"){ S.newsOpen=false; render(); document.querySelector(".bell")?.focus(); return; }
   if(S.lb){ if(e.key==="Escape") { S.lb=null; render(); } else if(e.key==="ArrowLeft") lbMove(-1); else if(e.key==="ArrowRight") lbMove(1); return; }
   const id=e.target.id;
   if(id==="w-tag" && !e.isComposing){

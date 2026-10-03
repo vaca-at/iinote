@@ -51,6 +51,8 @@
 - 운영 현황판 (2026-09-30): 글씨 윤탱체, 접속 현황 최근 7일 + 펼쳐 보기, 13주 접속 잔디, 로그인 계정 나눠 보기(users.kind = google · kakao · both · kid, 앱이 가족에 들어간 계정에만 markKind 로 적음)
 - 예전 가족일기장 jsun.site/diary 에서 iinote 같이 보기 (2026-09-30, 저장소 jsun): 두 번째 파이어베이스 앱 "iinote" 에 bellachord 구글로 로그인('🌐 iinote 일기 같이 보기') → 도윤 · 도진 프로필이 있는 가족의 제출한 일기 · 댓글 · 하트 · 도장을 읽기만 해서 S.entries 에 합침(같은 날 같은 사람이면 예전 일기장 것이 먼저, importKey old: 는 뺌). 쓰기 · 도장 · 댓글은 iinote 에서
 - 예전 주소 jsun.site/iinote 는 iinote.co.kr 로 넘기는 안내 페이지만 (쿼리 그대로). 더는 거기에 올리지 않음
+- 주소 · 뒤로 가기 (2026-10-03): 탭마다 주소 / · /mine · /chat · /kids · /day(?date=) · /shelf · /report · /quiz · /family, 일기 읽기 ?d=id, 쓰기 /write, PDF /pdf. 화면이 바뀌면 syncUrl 이 pushState, popstate 에 applyUrl (쓰던 일기가 저장 전이면 물어봄). 깃허브 페이지는 없는 주소를 404.html 로 보여 주므로 404.html 이 /?p=원래주소 로 넘기고 앱이 첫 줄에서 replaceState 로 되돌림. 하위 주소가 한 단계라 icon.png 같은 상대 주소도 그대로 됨
+- 첫 화면 4분할 (2026-10-03): ① 달력 미니(quadCal) ② 일기 히스토리 ③ 성장 기록(아이마다 위아래 growBlock) ④ 앨범(albumPhotos, 사진 수에 맞춰 4×3 · 3×2 · 2×2로 칸을 꽉, 누르면 갤러리 album-lb). 앨범형: 왼쪽 ⭐ 베스트(글 가장 긴 3편) · 오른쪽 3×8 격자, 🔀 섞기(S.albumSeed). 책장 · 내 일기 카드는 feedHTML(넓으면 3 · 2 · 1 기둥, 높이 어림해 짧은 기둥에), 사진은 원래 비율(phRatio). 🔔 새 소식은 오른쪽 위 떠 있는 창(.news-panel fixed + .news-bg)
 - 레이아웃(첫 화면 모양) 고르기는 홈에서만
 - 일정 순서 (2026-10-03): 시간과 상관없이 먼저 넣은 일정이 위(bySch: schedules.order ?? createdAt). 하루 목록 아래 '↕ 순서 · 고치기'(S.schEdit=날짜) → ▲▼(sch-move, 이웃과 order 맞바꿈, 가족 누구나) · ✏️ 고치기(sch-edit 폼, 쓴 사람 · 부모) · ✕ 지우기. 공통 그리기 schList(달력 카드 · 다가오는 일정)
 - 일기장 이름 바꾸기 (2026-10-03): 우리 가족 설정 > 초대 카드 아래(부모만, data-form="group-name") → groups/{gid}.name (최대 20자, 위쪽 '○○ 일기장'에 보임)
