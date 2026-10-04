@@ -1418,11 +1418,14 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .al-rimg{position:relative}
 .al-rimg img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:var(--line);display:block}
 .al-rimg img.bad{visibility:hidden}
-.al-rf{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;min-width:0}
+.al-rf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px;min-width:0}
 .al-rf label{display:block;font-size:13px;font-weight:650;min-width:0}
 .al-rf label small{margin-left:4px;font-weight:500}
 .al-rf input,.al-rf textarea{display:block;width:100%;margin-top:4px;font-size:14px;min-width:0}
 .al-rf textarea{resize:vertical;min-height:52px}
+/* 아이폰 사파리의 날짜 칸은 자기 너비를 고집해서 옆으로 넘쳐요 → 기본 모양을 끄고 칸 너비에 맞춰요 */
+.al-rf input[type=date]{-webkit-appearance:none;appearance:none;max-width:100%;box-sizing:border-box;min-height:42px;text-align:left}
+.al-rf input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
 .al-rf .al-wide{grid-column:1/-1}
 .al-amsg{color:var(--sage);font-weight:600}
 .al-same{display:flex;gap:6px;flex-wrap:wrap}
@@ -1432,19 +1435,19 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .al-car-nav b{min-width:60px;text-align:center;font-size:16px}
 .al-car .al-row{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start}
 .al-car .al-rimg img{aspect-ratio:auto;max-height:46vh;object-fit:contain;background:var(--surface2)}
-.al-car .al-rf{grid-template-columns:1fr}
+.al-car .al-rf{grid-template-columns:minmax(0,1fr)}
 .al-swipe{touch-action:pan-y}
 .al-strip{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
 .al-th{flex:none;width:58px;height:58px;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;background:var(--line);position:relative;opacity:.7}
 .al-th img{width:100%;height:100%;object-fit:cover;display:block}
 .al-th.on{border-color:var(--coral);opacity:1}
 .al-th.done::after{content:"✓";position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:var(--sage);color:var(--surface);font-size:10px;font-weight:800;display:grid;place-items:center}
-@media (max-width:640px){ .al-car .al-row{grid-template-columns:1fr} .al-car .al-rimg img{max-height:40vh} }
+@media (max-width:640px){ .al-car .al-row{grid-template-columns:minmax(0,1fr)} .al-car .al-rimg img{max-height:40vh} }
 /* 크게 보기에서 고치기 */
 .lb-edit{position:fixed;z-index:61;left:0;right:0;bottom:0;max-height:min(56dvh,520px);overflow:auto;background:var(--surface);color:var(--ink);border-radius:20px 20px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
 .lb-edit-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .lb-edit-h span{font-size:12.5px;color:var(--ink3)}
-.lb-edit .al-row{grid-template-columns:1fr;padding:0;border:0;background:none}
+.lb-edit .al-row{grid-template-columns:minmax(0,1fr);padding:0;border:0;background:none}
 .lb-edit .row{display:flex;flex-wrap:wrap;gap:6px;position:sticky;bottom:calc(-14px - env(safe-area-inset-bottom,0px));margin:0 -16px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
 .lb.editing{align-items:start;padding-bottom:calc(min(56dvh,520px) + 8px)}
 .lb.editing img{max-height:calc(100dvh - min(56dvh,520px) - 80px)}
@@ -1457,7 +1460,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
   .lb.editing .lb-n{right:420px}
   .lb.editing .lb-x{right:420px}
 }
-@media (max-width:640px){ .al-row{grid-template-columns:84px 1fr;gap:8px;padding:8px} .al-rf{grid-template-columns:1fr} }
+@media (max-width:640px){ .al-row{grid-template-columns:84px minmax(0,1fr);gap:8px;padding:8px} .al-rf{grid-template-columns:minmax(0,1fr)} }
 .al-x{position:absolute;top:4px;right:4px;width:26px;height:26px;padding:0;border-radius:50%;border:0;background:var(--ink);color:var(--surface);opacity:.8;font-size:12px}
 .al-f{border:0;padding:0;margin:0;font-weight:650}
 .al-f legend{padding:0;margin-bottom:6px}
@@ -3073,9 +3076,10 @@ function albumGroups(){
   return out;
 }
 // 누가 나왔나요? (올리기는 모든 사진에 같이, 고치기는 그 사진만)
-const albumPeople = (st,all) => `<fieldset class="al-f"><legend>🙂 누가 나왔나요? <small class="muted">${all?"고른 사람은 이번 사진 모두에 들어가요 (나중에 한 장씩 고칠 수 있어요)":"여러 명 고를 수 있어요"}</small></legend><div class="al-ppl">${sortedProfiles().map(p=>`<button type="button" class="chip ${st.people.includes(p.id)?"on":""}" data-act="al-person" data-v="${p.id}" aria-pressed="${st.people.includes(p.id)}">${av(p,26)}${esc(p.name)}</button>`).join("")}</div></fieldset>`;
+// key: 올리는 사진 한 장(it.k), 없으면 고치는 사진(S.alEdit)
+const albumPeople = (st,key) => `<fieldset class="al-f"><legend>🙂 ${key?"이 사진에 ":""}누가 나왔나요? <small class="muted">여러 명 고를 수 있어요</small></legend><div class="al-ppl">${sortedProfiles().map(p=>`<button type="button" class="chip ${st.people.includes(p.id)?"on":""}" data-act="al-person" data-v="${p.id}" ${key?`data-k="${esc(key)}"`:""} aria-pressed="${st.people.includes(p.id)}">${av(p,26)}${esc(p.name)}</button>`).join("")}</div></fieldset>`;
 // 사진 한 장의 칸: 찍은 날 · 장소 · 동네(장소를 쓰면 자동으로 찾음) · 메모
-const albumRow = (st,key,pic) => `<div class="al-row" data-alrow="${esc(key)}">${pic}<div class="al-rf">
+const albumRow = (st,key,pic,top="") => `<div class="al-row" data-alrow="${esc(key)}">${pic}<div class="al-rf">${top?`<div class="al-wide">${top}</div>`:""}
     <label>📅 찍은 날<input type="date" data-alf="date" value="${esc(st.date||"")}" max="${todayStr()}"></label>
     <label>📍 장소<input data-alf="place" list="al-pl" maxlength="30" value="${esc(st.place||"")}" placeholder="예) 서울아산병원, 할머니 댁" autocomplete="off"></label>
     <label>🗺️ 동네 <small class="al-amsg">${esc(st.areaMsg||"")}</small><input data-alf="area" maxlength="30" value="${esc(st.area||"")}" placeholder="장소를 쓰면 찾아 줘요 (예: 서울 송파구)" autocomplete="off"></label>
@@ -3120,14 +3124,13 @@ function viewAlbum(){
   const up=S.alUp, ed=S.alEdit, ea=ed&&alById(ed.id);
   const dl=`<datalist id="al-pl">${albumPlaces().map(pl=>`<option value="${esc(pl)}"></option>`).join("")}</datalist>`;
   const upForm = up ? `<form class="card al-up" data-form="al-up"><h2>사진 ${up.items.length}장 올리기</h2>
-      <p class="muted al-note">사진마다 찍은 날 · 장소 · 메모를 따로 쓸 수 있어요. 찍은 날은 사진에 적힌 날짜예요.</p>
-      ${albumPeople(up,true)}
-      ${up.items.length>1?`<div class="al-same"><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="place">📍 첫 사진 장소를 모두에</button><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="date">📅 첫 사진 날짜를 모두에</button></div>`:""}
+      <p class="muted al-note">옆으로 넘기면서 사진마다 누가 나왔는지 · 찍은 날 · 장소 · 메모를 따로 고를 수 있어요. 찍은 날은 사진에 적힌 날짜예요.</p>
+      ${up.items.length>1?`<div class="al-same"><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="people">🙂 이 사진 사람들을 모두에</button><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="place">📍 이 사진 장소를 모두에</button><button type="button" class="btn btn-ghost sm" data-act="al-same" data-v="date">📅 이 사진 날짜를 모두에</button></div>`:""}
       ${(()=>{ const n=up.items.length, c=Math.min(Math.max(0,up.cur||0),n-1), it=up.items[c]; up.cur=c;
         return `<div class="al-car">
           ${n>1?`<div class="al-car-nav"><button type="button" class="btn btn-ghost sm" data-act="al-cur" data-v="-1" aria-label="이전 사진" ${c?"":"disabled"}>◀</button><b>${c+1} / ${n}</b><button type="button" class="btn btn-ghost sm" data-act="al-cur" data-v="1" aria-label="다음 사진" ${c<n-1?"":"disabled"}>▶</button></div>`:""}
-          ${albumRow(it,it.k,`<div class="al-rimg al-swipe"><img src="${it.src}" alt="${c+1}번째 사진" onerror="this.classList.add('bad')"><button type="button" class="al-x" data-act="al-drop" data-k="${it.k}" aria-label="${c+1}번째 사진 빼기">✕</button></div>`)}
-          ${n>1?`<div class="al-strip" role="group" aria-label="고른 사진">${up.items.map((x,i)=>`<button type="button" class="al-th ${i===c?"on":""} ${(x.place||x.memo||"").trim()?"done":""}" data-act="al-cur-go" data-i="${i}" aria-label="${i+1}번째 사진${i===c?" (지금)":""}"><img src="${x.src}" alt=""></button>`).join("")}</div>`:""}
+          ${albumRow(it,it.k,`<div class="al-rimg al-swipe"><img src="${it.src}" alt="${c+1}번째 사진" onerror="this.classList.add('bad')"><button type="button" class="al-x" data-act="al-drop" data-k="${it.k}" aria-label="${c+1}번째 사진 빼기">✕</button></div>`, albumPeople(it,it.k))}
+          ${n>1?`<div class="al-strip" role="group" aria-label="고른 사진">${up.items.map((x,i)=>`<button type="button" class="al-th ${i===c?"on":""} ${(x.place||x.memo||"").trim()||x.people.length?"done":""}" data-act="al-cur-go" data-i="${i}" aria-label="${i+1}번째 사진${i===c?" (지금)":""}"><img src="${x.src}" alt=""></button>`).join("")}</div>`:""}
         </div>`; })()}
       ${up.items.length<ALBUM_MAX_PICK?pick("btn-ghost sm","＋ 사진 더 고르기"):""}
       <div class="row"><button class="btn btn-primary al-go">올리기</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button></div>${dl}</form>` : "";
@@ -3161,9 +3164,9 @@ async function albumPick(files){
   if(files.length>room){ toast(`한 번에 ${ALBUM_MAX_PICK}장까지 올릴 수 있어요`); files=files.slice(0,Math.max(0,room)); }
   if(!files.length) return;
   let read=0; upProg("🖼 사진 불러오는 중",0,files.length);
-  const items=await Promise.all(files.map(async f=>{ const m=await photoMeta(f); upProg("🖼 사진 불러오는 중",++read,files.length); return {k:rid(), file:f, src:URL.createObjectURL(f), date:m.date, gps:m.gps, place:"", area:"", memo:""}; })).finally(()=>upProg());
+  const items=await Promise.all(files.map(async f=>{ const m=await photoMeta(f); upProg("🖼 사진 불러오는 중",++read,files.length); return {k:rid(), file:f, src:URL.createObjectURL(f), date:m.date, gps:m.gps, people:[], place:"", area:"", memo:""}; })).finally(()=>upProg());
   const prev=S.alUp; S.alEdit=null;
-  S.alUp={items:[...(prev?.items||[]),...items], people:prev?.people||[], cur:prev?prev.items.length:0};
+  S.alUp={items:[...(prev?.items||[]),...items], cur:prev?prev.items.length:0};
   render(); if(!prev) document.querySelector(".al-up")?.scrollIntoView({block:"start"});
   items.filter(it=>it.gps).forEach(it=>gpsArea(it,it.k));   // 사진 속 위치가 있으면 동네를 찾아 둬요
 }
@@ -3181,7 +3184,6 @@ function gpsArea(st,key){
 }
 async function albumUpload(){
   const up=S.alUp; if(!up?.items.length || S.alBusy) return;
-  const people=up.people.filter(id=>prof(id));
   const btn=document.querySelector(".al-go"), n=up.items.length; let ok=0, fail=0, done=0; S.alBusy=true;
   const step=()=>{ upProg("📤 사진 저장 중",done,n); if(btn){ btn.disabled=true; btn.textContent=`올리는 중… ${done} / ${n}`; } };
   try{
@@ -3193,7 +3195,7 @@ async function albumUpload(){
         if(!big.blob) throw new Error("사진을 불러올 수 없어요");
         const id=rid(), base=`groups/${S.gid}/album`;
         const [r,th]=await Promise.all([B.uploadMedia(`${base}/${id}.jpg`,big.blob,"album"), thumb.blob?B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob,"album"):null]);
-        const data={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w,h:big.h,date:/^\d{4}-\d{2}-\d{2}$/.test(it.date)?it.date:todayStr(),people,...albumInfo(it),by:S.me.id,createdAt:Date.now()};
+        const data={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w,h:big.h,date:/^\d{4}-\d{2}-\d{2}$/.test(it.date)?it.date:todayStr(),people:it.people.filter(id=>prof(id)),...albumInfo(it),by:S.me.id,createdAt:Date.now()};
         const nid=await B.add(S.gid,"album",data); S.album.push({id:nid,...data}); ok++;
       }catch(e){ console.error(e); fail++; }
       done++; step();
@@ -4548,9 +4550,11 @@ const acts = {
   // 📸 사진첩
   "al-by": el => { S.albumBy=el.dataset.v; ls.set("iinote-album-by",el.dataset.v); render(); },
   "al-open": el => { const g=albumGroups()[+el.dataset.g]; if(!g) return; S.lb={photos:g.l.map(a=>({url:a.url})),caps:g.l.map(a=>({t:albumCap(a),al:a.id,m:a.memo||""})),i:+el.dataset.i||0}; render(); document.querySelector(".lb-x")?.focus(); },
-  "al-person": el => { const st=S.alEdit||S.alUp; if(!st) return; const v=el.dataset.v; st.people=st.people.includes(v)?st.people.filter(x=>x!==v):[...st.people,v]; render(); },
-  "al-same": el => { const up=S.alUp; if(!up?.items.length) return; const f=up.items[0];
-    up.items.forEach(it=>{ if(el.dataset.v==="date") it.date=f.date; else { it.place=f.place; it.area=f.area; it.areaMsg=f.areaMsg; it.areaManual=f.areaManual; } }); render(); toast(el.dataset.v==="date"?"모든 사진의 날짜를 맞췄어요":"모든 사진의 장소를 맞췄어요"); },
+  "al-person": el => { const st=el.dataset.k?alState(el.dataset.k):S.alEdit; if(!st) return; const v=el.dataset.v; st.people=st.people.includes(v)?st.people.filter(x=>x!==v):[...st.people,v]; render(); },
+  // 지금 보고 있는 사진의 사람 · 장소 · 날짜를 모든 사진에
+  "al-same": el => { const up=S.alUp; if(!up?.items.length) return; const f=up.items[up.cur||0]||up.items[0], v=el.dataset.v;
+    up.items.forEach(it=>{ if(v==="date") it.date=f.date; else if(v==="people") it.people=[...f.people]; else { it.place=f.place; it.area=f.area; it.areaMsg=f.areaMsg; it.areaManual=f.areaManual; } }); render();
+    toast({date:"모든 사진의 날짜를 맞췄어요",people:"모든 사진에 같은 사람을 골랐어요"}[v]||"모든 사진의 장소를 맞췄어요"); },
   "al-cur": el => { const up=S.alUp; if(!up) return; up.cur=Math.min(Math.max(0,(up.cur||0)+Number(el.dataset.v)),up.items.length-1); render(); },
   "al-cur-go": el => { const up=S.alUp; if(!up) return; up.cur=+el.dataset.i||0; render(); },
   "al-drop": el => { const up=S.alUp; if(!up || S.alBusy) return; const it=up.items.find(x=>x.k===el.dataset.k); if(!it) return; up.items=up.items.filter(x=>x!==it); URL.revokeObjectURL(it.src); up.cur=Math.min(up.cur||0,up.items.length-1); if(!up.items.length) S.alUp=null; render(); },
