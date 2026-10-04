@@ -72,6 +72,14 @@
 - 디자인: 색은 모두 :root CSS 변수. 아이보리 #FBF6EE, 네이비 #1F2A44, 코랄 #EF6F53, 버터 #F4BE45, 모눈 배경, 컴퓨터 화면의 노트 여백선
 - 글꼴: Pretendard(화면), 일기 글씨 4가지(바탕 · 손글씨 · 고딕 · 동글). 손글씨를 고르면 화면 전체가 손글씨: 제목 · 큰 글자(h1 · h2) = 온글잎 언즈체(2026-10-03 다예쁨체에서 바꿈), 일기 본문 = 온글잎 윤탱체, 작은 글 · 단추 = 카페24 아네모네 에어 (눈누, 셋 다 웹 임베딩 허용 확인). 디자인 제목 글씨 G마켓 산스. 일기 제목 기능은 쓰지 않음(사용자 결정 2026-09-28, 화면에서 모두 뺌)
 
+## 📱 안드로이드 앱 (2026-10-04 시작)
+- 앱 폴더: Downloadsiinote-app (Capacitor 8, appId kr.co.iinote.app, 앱 이름 아이아이노트). 로컬 git 만 (원격 없음). 원본 웹은 늘 iinote-repo 하나 → scripts/copy-web.js 가 www 로 복사 (CNAME · 404 · admin · 확인 파일 · __/ 등은 뺌)
+- 명령 (iinote-app 에서): npm run app = 복사 + cap sync / npm run apk = + 빌드(app-debug.apk) / npm run install = 블루스택(adb 127.0.0.1:5555)에 설치하고 켜기 / npm run go = 전부
+- 빌드 자바: 안드로이드 스튜디오의 자바 25 는 Gradle 8.14 와 안 맞아서 앱 폴더 .jdk 에 Temurin 21 을 받아 scripts/gradle.js 가 씀. android/local.properties 에 sdk.dir
+- 시험 기기: 블루스택 5 (설정 → 고급 → ADB 켜기, 안드로이드 9 · 웹 화면 크롬 138, 가로 1920×1080). 사용자는 아이폰만 있음
+- 웹 코드의 IS_APP (window.Capacitor.isNativePlatform) · html.is-app: 앱에서는 INAPP 감지 끔(; wv 로 크롬 튕김 막기), 홈 화면에 추가 · 출시 예정 · 데모 주소 숨김
+- 남은 일: ① 구글 · 카카오 로그인을 앱용(Capacitor Firebase Authentication · 파이어베이스에 안드로이드 앱 등록 + SHA-1) ② 다홍펜 워커 CORS 와 파이어베이스 승인된 도메인에 https://localhost ③ 뒤로 가기(지금은 앱이 바로 꺼짐) ④ 카메라 · 마이크 권한 ⑤ 바깥 링크 · 카카오 공유 ⑥ PDF · 상장 인쇄(새 창 안 됨) ⑦ 알림 ⑧ 플레이스토어 가족 정책 · 데이터 보안 양식
+
 ## 다른 PC에서 이어서 작업하기
 - `git clone https://github.com/vaca-at/iinote.git` 로 받은 폴더를 VS Code로 열고 그 폴더에서 바로 작업 (저장소 루트 = 작업 폴더)
 - 처음 한 번: `git config user.name vaca-at`, `git config user.email bellachord@gmail.com`
