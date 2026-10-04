@@ -202,6 +202,32 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
   .devices{max-height:110px}
 }
 .demo-note{margin-top:16px;font-size:14px;color:var(--ink3);max-width:32em}
+/* 📱 휴대폰 첫 화면: 아이아이노트 ~ 카카오톡 공유 · 링크 복사까지 한 화면에 (칩은 붙이고 점 목록은 줄 간격을 좁게, 2026-10-04) */
+@media (max-width:760px){
+  .landing{padding:12px 16px calc(24px + env(safe-area-inset-bottom))}
+  .land{gap:28px}
+  .land-brand{gap:10px;font-size:16px}
+  .land-brand .logo-wrap{width:34px!important;height:34px!important}
+  .land h1{font-size:27px;line-height:1.25;margin:8px 0 6px}
+  .land-lead{font-size:14.5px;line-height:1.5;margin:0 0 8px}
+  .app-soon{margin:0 0 8px;padding:6px 10px;font-size:12px}
+  .land-badges{gap:4px;margin:0 0 8px}
+  .land-badges li{gap:3px;padding:2px 8px 2px 6px;font-size:12.5px;line-height:1.5}
+  .land-badges .ic{width:12px;height:12px}
+  .land-feats{gap:0;margin:0 0 10px;font-size:14px;line-height:1.45}
+  .land-feats li{gap:8px}
+  .land-feats .dot{width:8px;height:8px;margin-top:6px}
+  .land-cta{gap:6px}
+  .land-cta .btn,.tour-box{min-height:50px;padding:5px 10px;font-size:14.5px;border-radius:14px}
+  .tour-main{font-size:14.5px}
+  .cta-t small{font-size:11px;margin-top:0}
+  .tour-addr{font-size:11px}
+  .keep-login{margin:8px 0 0;font-size:13.5px;flex-wrap:wrap;align-items:center}
+  .keep-login small{font-size:11.5px;flex-basis:100%;margin:0 0 0 26px}
+  .demo-note{margin-top:6px;font-size:12.5px;line-height:1.45}
+  .land section>.share-row{margin-top:8px;gap:6px}
+  .land section>.share-row .btn{min-height:40px;padding:6px 14px;font-size:13.5px}
+}
 .anywhere{background:var(--surface);border:1.5px solid var(--line);border-radius:28px;padding:28px}
 .anywhere h2{font-size:20px;margin:0 0 4px;letter-spacing:-.3px}
 .anywhere>p{margin:0 0 18px;color:var(--ink2)}
