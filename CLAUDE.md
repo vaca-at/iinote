@@ -75,6 +75,8 @@
 ## 📱 안드로이드 앱 (2026-10-04 시작)
 - 앱 폴더: Downloadsiinote-app (Capacitor 8, appId kr.co.iinote.app, 앱 이름 아이아이노트). 로컬 git 만 (원격 없음). 원본 웹은 늘 iinote-repo 하나 → scripts/copy-web.js 가 www 로 복사 (CNAME · 404 · admin · 확인 파일 · __/ 등은 뺌)
 - 명령 (iinote-app 에서): npm run app = 복사 + cap sync / npm run apk = + 빌드(app-debug.apk) / npm run install = 블루스택(adb 127.0.0.1:5555)에 설치하고 켜기 / npm run go = 전부
+- 시험용 바로 보기 앱 (npm run apk:live → 다운로드 폴더 아이아이노트-시험-바로보기.apk): capacitor server.url = https://iinote.co.kr 로 잠깐 바꿔 빌드한 뒤 설정을 되돌림. 웹을 푸쉬하면 앱을 껐다 켜기만 하면 반영 (디버그 앱은 MainActivity 가 캐시를 안 씀). 아이콘 · 권한 · 플러그인을 바꿀 때만 다시 설치. 시험 폰: 갤럭시 A17(아들 폰을 한 달 빌림, 안드로이드 15+, USB 연결이 자꾸 끊겨 드라이브로 APK 옮겨 설치)
+- 아이콘: npm run icons (iinote-repo/icon.png → assets → @capacitor/assets, 적응형 아이콘은 80% 로 줄여 모눈종이 색 #FAF6EE 위에)
 - 빌드 자바: 안드로이드 스튜디오의 자바 25 는 Gradle 8.14 와 안 맞아서 앱 폴더 .jdk 에 Temurin 21 을 받아 scripts/gradle.js 가 씀. android/local.properties 에 sdk.dir
 - 시험 기기: 블루스택 5 (설정 → 고급 → ADB 켜기, 안드로이드 9 · 웹 화면 크롬 138, 가로 1920×1080). 사용자는 아이폰만 있음
 - 웹 코드의 IS_APP (window.Capacitor.isNativePlatform) · html.is-app: 앱에서는 INAPP 감지 끔(; wv 로 크롬 튕김 막기), 홈 화면에 추가 · 출시 예정 · 데모 주소 숨김
