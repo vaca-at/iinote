@@ -1467,9 +1467,10 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .al-ppl,.al-places{display:flex;flex-wrap:wrap;gap:6px}
 .al-empty{text-align:center;padding:30px 12px}
 .lb .lb-cap{max-width:calc(100vw - 24px)}
-.lb.has-memo{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
-.lb.has-memo img{max-height:calc(100dvh - 230px)}
-.lb .lb-memo{position:absolute;left:50%;bottom:calc(68px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) rotate(-1.5deg);width:max-content;max-width:min(520px,calc(100vw - 48px));margin:0;padding:10px 18px 11px;border-radius:18px 18px 18px 6px;background:var(--butter-soft);color:var(--ink);border:2px dashed var(--butter);font-family:var(--diary);font-size:17px;line-height:1.5;text-align:center;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+/* 메모: 사진 바로 아래 가운데에 딱 붙은 얇은 노란 쪽지 (사진 + 메모를 한 묶음 .lb-fig 로, 기울이지 않음) */
+.lb-fig{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;max-width:100%}
+.lb.has-memo img{max-height:calc(100dvh - 168px);max-width:calc(100vw - 24px)}
+.lb .lb-memo{margin:0;max-width:min(520px,100%);padding:2px 12px;border-radius:8px;background:var(--butter-soft);color:var(--ink);border:1.5px dashed var(--butter);font-family:var(--diary);font-size:15px;line-height:1.4;text-align:center;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
 .lb .lb-cap span{overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){ .al-grid{grid-template-columns:repeat(3,1fr);gap:4px} .al-cell{border-radius:6px} }
 </style>
@@ -2440,8 +2441,7 @@ function viewLightbox(){
       <div class="row"><button class="btn btn-primary sm">저장</button><button type="button" class="btn btn-ghost sm" data-act="lb-edit-close">다 고쳤어요</button><button type="button" class="btn btn-ghost sm danger" data-act="al-del">🗑 지우기</button></div>
       <datalist id="al-pl">${albumPlaces().map(pl=>`<option value="${esc(pl)}"></option>`).join("")}</datalist></form>` : "";
   return panel+`<div class="lb ${memo?"has-memo":""} ${ed?"editing":""}" role="dialog" aria-modal="true" aria-label="사진 크게 보기" data-act="lb-close">
-    <img src="${esc(p.url)}" alt="${l.i+1}번째 사진" data-act="${many?"lb-tap":"noop"}" ${many?'title="왼쪽을 누르면 이전, 오른쪽을 누르면 다음 사진"':""}>
-    ${memo?`<p class="lb-memo" data-act="noop"><span aria-hidden="true">💌</span> ${esc(memo)}</p>`:""}
+    ${(img=>memo?`<div class="lb-fig">${img}<p class="lb-memo" data-act="noop"><span aria-hidden="true">💌</span> ${esc(memo)}</p></div>`:img)(`<img src="${esc(p.url)}" alt="${l.i+1}번째 사진" data-act="${many?"lb-tap":"noop"}" ${many?'title="왼쪽을 누르면 이전, 오른쪽을 누르면 다음 사진"':""}>`)}
     ${ed?"":(c=>c?`<div class="lb-cap" data-act="noop"><span>${esc(c.t)}</span>${c.id?`<button class="btn btn-ghost sm" data-act="lb-diary" data-id="${esc(c.id)}">일기 보기</button>`:""}${c.al && alById(c.al) && albumCanEdit(alById(c.al))?`<button class="btn btn-ghost sm" data-act="al-edit" data-id="${esc(c.al)}">✏️ 고치기</button>`:""}</div>`:"")(l.caps?.[l.i])}
     ${many?`<span class="lb-c">${l.i+1} / ${l.photos.length}</span><button class="lb-p" data-act="lb-prev" aria-label="이전 사진">${ic("left")}</button><button class="lb-n" data-act="lb-next" aria-label="다음 사진">${ic("right")}</button>`:""}
     <button class="lb-x" data-act="lb-close" aria-label="닫기">${ic("x")}</button></div>`;
