@@ -1945,6 +1945,10 @@ async function makeFirebase(){
   const app = A.initializeApp(FIREBASE_CONFIG);
   const auth = AU.getAuth(app);
   // 홈 화면에 추가한 앱은 새 창(팝업)이 따로 열려 로그인이 안 이어져요 → 로그인 창이 같은 주소일 때는 이 화면에서 넘어갔다 돌아와요
+  // 📱 앱: 구글 로그인은 휴대폰의 구글 로그인 창(Capacitor Firebase Authentication)으로 받아서 웹 로그인에 넘겨요 (앱 웹 화면에서는 팝업 로그인이 막혀요)
+  const appGoogleCred = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 구글 로그인 부품을 찾지 못했어요");
+    const r=await FA.signInWithGoogle(); const c=r?.credential; if(!c?.idToken) throw new Error("구글 로그인을 하지 못했어요. 다시 눌러 주세요");
+    return AU.GoogleAuthProvider.credential(c.idToken, c.accessToken||null); };
   const redirectLogin = STANDALONE && FIREBASE_CONFIG.authDomain===location.hostname;
   if(redirectLogin) AU.getRedirectResult(auth).catch(e=>{ console.warn("로그인",e); setTimeout(()=>toast(/account-exists/.test(e.code||"")?"같은 이메일로 이미 다른 방법으로 가입되어 있어요. 처음 가입한 방법으로 로그인해 주세요.":"로그인하지 못했어요. 다시 눌러 주세요."),500); });
   const db = F.getFirestore(app);
@@ -1958,14 +1962,17 @@ async function makeFirebase(){
     demo:false,
     onAuth(f){ AU.onAuthStateChanged(auth,f); },
     // 앱(Capacitor)으로 포장할 때는 이 함수만 앱용 로그인으로 바꾸면 돼요.
-    async signIn(){ const pv=new AU.GoogleAuthProvider(); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
+    async signIn(){ if(IS_APP){ await AU.signInWithCredential(auth, await appGoogleCred()); return; }
+      const pv=new AU.GoogleAuthProvider(); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
     // 카카오 로그인: 파이어베이스 로그인 방법에 OpenID Connect(oidc.kakao)로 등록해 둠
-    async signInKakao(){ const pv=new AU.OAuthProvider("oidc.kakao"); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
+    async signInKakao(){ if(IS_APP) throw new Error("앱에서 카카오 로그인은 곧 열려요. 지금은 구글로 시작해 주세요");
+      const pv=new AU.OAuthProvider("oidc.kakao"); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
     // 로그인은 늘 이 브라우저에 기억해요(새 탭 · 공부방 링크에서도 그대로). 로그아웃 시간은 autoLogoutCheck 가 정해요
     async setKeep(){},
     // 한 계정에 구글 · 카카오 둘 다 연결: 어느 쪽으로 로그인해도 같은 계정(uid)
     providers(){ const u=auth.currentUser; return u&&!u.isAnonymous ? u.providerData.map(p=>p.providerId) : []; },
-    async link(kind){ await AU.linkWithPopup(auth.currentUser, kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
+    async link(kind){ if(IS_APP){ if(kind==="kakao") throw new Error("앱에서 카카오 연결은 곧 열려요. 웹(iinote.co.kr)에서 연결해 주세요"); await AU.linkWithCredential(auth.currentUser, await appGoogleCred()); return; }
+      await AU.linkWithPopup(auth.currentUser, kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     // 연결하려는 계정이 이미 따로 가입돼 있으면, 오류 안에 든 로그인 정보로 그 계정을 확인할 수 있어요
     credFromError(kind,e){ try{ return kind==="kakao" ? AU.OAuthProvider.credentialFromError(e) : AU.GoogleAuthProvider.credentialFromError(e); }catch(x){ return null; } },
     // 다른 로그인(구글 ↔ 카카오)을 잠깐 따로 열어 확인해요. 지금 로그인은 그대로예요
@@ -1989,7 +1996,7 @@ async function makeFirebase(){
     },
     // 휴대폰 연결 링크로 들어온 아이: 구글 계정 없이 이 브라우저를 익명 계정으로 기억해요.
     async signInKid(){ await AU.signInAnonymously(auth); },
-    async signOut(){ await AU.signOut(auth); },
+    async signOut(){ if(IS_APP) try{ await window.Capacitor.Plugins.FirebaseAuthentication.signOut(); }catch(e){} await AU.signOut(auth); },   // 앱: 휴대폰 구글 로그인도 풀어서 다음에 계정을 다시 고르게
     async getIdToken(){ return auth.currentUser ? auth.currentUser.getIdToken() : ""; },
     async getUser(uid){ const s=await F.getDoc(F.doc(db,"users",uid)); return s.exists()?s.data():null; },
     async addUserGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{groupIds:F.arrayUnion(gid),lastGroupId:gid,kind:kindOf()},{merge:true}); },
@@ -2036,6 +2043,7 @@ async function makeFirebase(){
     // 계정 삭제 전 본인 확인: 구글 계정은 로그인 창을 한 번 더 띄워요 (익명 계정은 필요 없음)
     async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return;
       const kakao=u.providerData.some(p=>p.providerId==="oidc.kakao");
+      if(IS_APP){ if(kakao) throw new Error("앱에서는 카카오 계정 확인이 아직 안 돼요. 웹(iinote.co.kr)에서 지워 주세요"); await AU.reauthenticateWithCredential(u, await appGoogleCred()); return; }
       await AU.reauthenticateWithPopup(u,kakao?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     async deleteAccount(){ if(auth.currentUser) await AU.deleteUser(auth.currentUser); }
   };
