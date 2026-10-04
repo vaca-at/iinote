@@ -1227,6 +1227,10 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .upbar small{display:block;font-weight:400;font-size:12px;opacity:.8;margin-top:4px}
 .upbar .upbar-track{height:6px;border-radius:3px;background:rgba(255,255,255,.25);margin-top:8px;overflow:hidden}
 .upbar .upbar-fill{height:100%;width:0;background:var(--coral);transition:width .3s}
+.upbar.wait{cursor:pointer}
+.upbar.wait .upbar-fill{width:35%;animation:upwait 1.3s ease-in-out infinite alternate}
+@keyframes upwait{from{transform:translateX(-10%)}to{transform:translateX(195%)}}
+@media (prefers-reduced-motion:reduce){.upbar.wait .upbar-fill{animation:none;width:100%;opacity:.5}}
 @media (min-width:960px){.upbar{bottom:32px}}
 @media (max-width:760px){
   .land{grid-template-columns:1fr;gap:36px}
@@ -1486,7 +1490,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
   <noscript><p>아이아이노트는 자바스크립트를 켜야 쓸 수 있어요.</p></noscript>
 </main></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<div id="upbar" class="upbar" role="status" aria-live="polite" hidden><span class="upbar-t"></span><div class="upbar-track"><div class="upbar-fill"></div></div><small>다 될 때까지 이 화면을 닫지 말아 주세요</small></div>
+<div id="upbar" class="upbar" role="status" aria-live="polite" hidden><span class="upbar-t"></span><div class="upbar-track"><div class="upbar-fill"></div></div><small class="upbar-s"></small></div>
 
 <script type="module">
 /* =========================================================
@@ -3063,7 +3067,8 @@ function albumGroups(){
     const none=L.filter(a=>!(a.area||"").trim()); if(none.length) out.push({h:"동네를 모르는 사진",l:none});
   } else {
     const yOf=a=>(a.date||"").slice(0,4)||"?";
-    for(const y of [...new Set(L.map(yOf))]) out.push({h:y==="?"?"날짜 모름":`📅 ${y}년`,l:L.filter(a=>yOf(a)===y)});
+    // 연도는 최근 해가 위, 한 해 안에서는 찍은 날 순서대로 (3월 → 4월 → 12월)
+    for(const y of [...new Set(L.map(yOf))]) out.push({h:y==="?"?"날짜 모름":`📅 ${y}년`,l:L.filter(a=>yOf(a)===y).reverse()});
   }
   return out;
 }
@@ -3155,8 +3160,8 @@ async function albumPick(files){
   const room=ALBUM_MAX_PICK-(S.alUp?.items.length||0);
   if(files.length>room){ toast(`한 번에 ${ALBUM_MAX_PICK}장까지 올릴 수 있어요`); files=files.slice(0,Math.max(0,room)); }
   if(!files.length) return;
-  let read=0; upProg("🖼 사진 불러오는 중",1,files.length);
-  const items=await Promise.all(files.map(async f=>{ const m=await photoMeta(f); read++; upProg("🖼 사진 불러오는 중",Math.min(read+1,files.length),files.length); return {k:rid(), file:f, src:URL.createObjectURL(f), date:m.date, gps:m.gps, place:"", area:"", memo:""}; })).finally(()=>upProg());
+  let read=0; upProg("🖼 사진 불러오는 중",0,files.length);
+  const items=await Promise.all(files.map(async f=>{ const m=await photoMeta(f); upProg("🖼 사진 불러오는 중",++read,files.length); return {k:rid(), file:f, src:URL.createObjectURL(f), date:m.date, gps:m.gps, place:"", area:"", memo:""}; })).finally(()=>upProg());
   const prev=S.alUp; S.alEdit=null;
   S.alUp={items:[...(prev?.items||[]),...items], people:prev?.people||[], cur:prev?prev.items.length:0};
   render(); if(!prev) document.querySelector(".al-up")?.scrollIntoView({block:"start"});
@@ -3177,20 +3182,22 @@ function gpsArea(st,key){
 async function albumUpload(){
   const up=S.alUp; if(!up?.items.length || S.alBusy) return;
   const people=up.people.filter(id=>prof(id));
-  const btn=document.querySelector(".al-go"); let ok=0, fail=0; S.alBusy=true;
+  const btn=document.querySelector(".al-go"), n=up.items.length; let ok=0, fail=0, done=0; S.alBusy=true;
+  const step=()=>{ upProg("📤 사진 저장 중",done,n); if(btn){ btn.disabled=true; btn.textContent=`올리는 중… ${done} / ${n}`; } };
   try{
-    for(const [i,it] of up.items.entries()){
-      if(btn){ btn.disabled=true; btn.textContent=`올리는 중… ${i+1} / ${up.items.length}`; }
-      upProg("📤 사진 저장 중",i+1,up.items.length);
+    step();
+    // 두 장씩 같이 (휴대폰 메모리를 생각해서 더 많이는 안 해요), 큰 사진 · 미리보기도 같이 올려요
+    await pool(up.items,2,async it=>{
       try{
-        const img=await decodeImage(it.file), big=await drawJpeg(img,...ALBUM_BIG), thumb=await drawJpeg(img,...PHOTO_THUMB);
+        const img=await decodeImage(it.file), big=await drawJpeg(img,...ALBUM_BIG), thumb=await drawJpeg(img,...PHOTO_THUMB); img.close?.();
         if(!big.blob) throw new Error("사진을 불러올 수 없어요");
         const id=rid(), base=`groups/${S.gid}/album`;
-        const r=await B.uploadMedia(`${base}/${id}.jpg`,big.blob,"album"), th=thumb.blob?await B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob,"album"):null;
+        const [r,th]=await Promise.all([B.uploadMedia(`${base}/${id}.jpg`,big.blob,"album"), thumb.blob?B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob,"album"):null]);
         const data={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w,h:big.h,date:/^\d{4}-\d{2}-\d{2}$/.test(it.date)?it.date:todayStr(),people,...albumInfo(it),by:S.me.id,createdAt:Date.now()};
         const nid=await B.add(S.gid,"album",data); S.album.push({id:nid,...data}); ok++;
       }catch(e){ console.error(e); fail++; }
-    }
+      done++; step();
+    });
   }finally{ S.alBusy=false; upProg(); }
   up.items.forEach(it=>URL.revokeObjectURL(it.src)); S.alUp=null;
   toast(fail ? `${ok}장 올렸어요. ${fail}장은 올리지 못했어요 (아이폰 HEIC 사진이면 '높은 호환성'으로 찍은 사진을 골라 주세요)` : `사진 ${ok}장을 사진첩에 넣었어요`);
@@ -4268,13 +4275,30 @@ addEventListener("popstate",()=>{
   applyUrl(); routeFromPop=true; render(); routeFromPop=false; window.scrollTo(0,0);
 });
 let toastT;
-// 사진 저장 진행 띠: upProg("📤 사진 저장 중", 3, 30) → "📤 사진 저장 중 3 / 30", upProg() → 숨김. 도는 동안 창을 닫으려 하면 물어봐요
-let upBusy=false;
-function upProg(label,i,n){ const b=document.getElementById("upbar"); if(!b) return;
-  if(!label){ b.hidden=true; upBusy=false; return; }
-  upBusy=true; b.hidden=false; b.querySelector(".upbar-t").textContent=n?`${label} ${i} / ${n}`:label;
-  b.querySelector(".upbar-fill").style.width=n?`${Math.round(Math.max(0,i-1)/n*100)}%`:"0"; }
+// 사진 진행 띠: upProg("📤 사진 저장 중", 3, 30) → "📤 사진 저장 중 3 / 30"(3장 끝남), upProg() → 숨김. 저장하는 동안 창을 닫으려 하면 물어봐요
+// {wait:true} 는 끝을 모르는 기다림(왔다 갔다 막대) — 사진 고르는 창에서 ✓ 누른 뒤 휴대폰이 사진을 넘겨줄 때까지
+let upBusy=false, upWaitT=0;
+const UP_NOTE="다 될 때까지 이 화면을 닫지 말아 주세요";
+function upProg(label,done,n,o={}){ const b=document.getElementById("upbar"); if(!b) return;
+  clearTimeout(upWaitT);
+  if(!label){ b.hidden=true; b.classList.remove("wait"); upBusy=false; return; }
+  upBusy=!o.wait; b.hidden=false; b.classList.toggle("wait",!!o.wait);
+  b.querySelector(".upbar-t").textContent=n?`${label} ${done} / ${n}`:label;
+  b.querySelector(".upbar-s").textContent=o.note||UP_NOTE;
+  b.querySelector(".upbar-fill").style.width=n?`${Math.round(done/n*100)}%`:""; }
 addEventListener("beforeunload",e=>{ if(upBusy){ e.preventDefault(); e.returnValue=""; } });
+// 사진 고르는 칸을 누르면 바로 띠를 띄워 둬요: 아이폰은 ✓ 를 누르고도 사진을 넘겨주기까지(아이클라우드 원본 받기 · 바꾸기) 한참 걸릴 때가 있어서
+document.addEventListener("click",e=>{
+  const t=e.target; if(!(t instanceof HTMLInputElement) || t.type!=="file" || !/^image/.test(t.accept||"")) return;
+  upProg("📥 사진을 가져오는 중…",0,0,{wait:true,note:"사진이 많거나 아이클라우드에 있으면 조금 걸려요 · 안 골랐으면 눌러서 닫기"});
+  upWaitT=setTimeout(()=>upProg(),180000);
+  t.addEventListener("cancel",()=>upProg(),{once:true});
+},true);
+document.addEventListener("click",e=>{ if(e.target.closest?.("#upbar.wait")) upProg(); });
+// 여러 개를 k개씩 같이 처리 (결과 순서는 그대로)
+async function pool(list,k,fn){ const out=new Array(list.length); let next=0;
+  await Promise.all(Array.from({length:Math.min(k,list.length)},async()=>{ while(next<list.length){ const i=next++; out[i]=await fn(list[i],i); } }));
+  return out; }
 // ↕ 사진첩 순서 바꾸기: ☰ 를 잡고 끌면 그 줄이 손가락(마우스)을 따라 위아래로 (휴대폰 터치도 되게 pointer 이벤트로)
 document.addEventListener("pointerdown",e=>{
   const grip=e.target.closest?.(".al-grip"); if(!grip || !S.alWithEdit) return;
@@ -4560,10 +4584,11 @@ async function addPhotos(files){
   if(room<=0){ toast(`사진은 ${MAX_PHOTOS}장까지 넣을 수 있어요`); return; }
   if(files.length>room) toast(`사진은 ${MAX_PHOTOS}장까지라 앞의 ${room}장만 넣을게요`);
   const pick=files.slice(0,room).filter(f=>f.type.startsWith("image/") || /\.(hei[cf])$/i.test(f.name||""));
-  await guard(async()=>{ for(let i=0;i<pick.length;i++){
-    toast(`사진 줄이는 중… (${i+1}/${pick.length})`);
+  if(!pick.length){ upProg(); return; }
+  await guard(async()=>{ try{ for(let i=0;i<pick.length;i++){
+    upProg("🖼 사진 줄이는 중",i,pick.length);
     const {big,thumb}=await makePhotoPair(pick[i]);
-    d.photos.push({id:rid(),blob:big.blob,tblob:thumb.blob,url:URL.createObjectURL(big.blob),thumb:URL.createObjectURL(thumb.blob),w:big.w,h:big.h}); } });
+    d.photos.push({id:rid(),blob:big.blob,tblob:thumb.blob,url:URL.createObjectURL(big.blob),thumb:URL.createObjectURL(thumb.blob),w:big.w,h:big.h}); } }finally{ upProg(); } });
   render();
 }
 function addAudioFile(f){
@@ -4592,14 +4617,15 @@ async function recStart(talk){
 }
 async function uploadPending(d){
   const base=`groups/${S.gid}/diaries/${d.id}`;
-  const out=[], n=d.photos.filter(p=>p.blob).length; let k=0;
-  try{
-  for(const p of d.photos){
-    if(p.blob){ if(n>1) upProg("📤 사진 저장 중",++k,n); const r=await B.uploadMedia(`${base}/${p.id}.jpg`,p.blob);
-      const t=p.tblob ? await B.uploadMedia(`${base}/${p.id}_t.jpg`,p.tblob) : null;
-      out.push({id:p.id,url:r.url,path:r.path,thumb:t?.url||"",thumbPath:t?.path||"",w:p.w||0,h:p.h||0,...(p.fav?{fav:p.fav}:{})}); }
-    else out.push({id:p.id,url:p.url,path:p.path||"",thumb:p.thumb||"",thumbPath:p.thumbPath||"",w:p.w||0,h:p.h||0,...(p.fav?{fav:p.fav}:{})});
-  }
+  const n=d.photos.filter(p=>p.blob).length; let k=0, out;
+  // 새 사진은 세 장씩 같이 올려요 (이미 줄여 둔 사진이라 가벼워요). 순서는 그대로
+  try{ if(n>1) upProg("📤 사진 저장 중",0,n);
+  out=await pool(d.photos,3,async p=>{
+    if(!p.blob) return {id:p.id,url:p.url,path:p.path||"",thumb:p.thumb||"",thumbPath:p.thumbPath||"",w:p.w||0,h:p.h||0,...(p.fav?{fav:p.fav}:{})};
+    const [r,t]=await Promise.all([B.uploadMedia(`${base}/${p.id}.jpg`,p.blob), p.tblob?B.uploadMedia(`${base}/${p.id}_t.jpg`,p.tblob):null]);
+    if(n>1) upProg("📤 사진 저장 중",++k,n);
+    return {id:p.id,url:r.url,path:r.path,thumb:t?.url||"",thumbPath:t?.path||"",w:p.w||0,h:p.h||0,...(p.fav?{fav:p.fav}:{})};
+  });
   }finally{ upProg(); }
   d.photos=out;
   if(d.audio?.blob){ const t=d.audio.blob.type||""; const ext=t.includes("mp4")||t.includes("m4a")?"m4a":t.includes("mpeg")?"mp3":t.includes("wav")?"wav":"webm";
@@ -4972,6 +4998,7 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("change", e => {
   const t=e.target;
+  if(t.type==="file" && document.querySelector("#upbar.wait")) upProg();   // 사진이 왔어요: 기다림 띠를 닫고 각자 진행 띠로
   if(t.classList?.contains("chat-photo") && t.files?.[0]){ const file=t.files[0], ta=t.closest("form")?.querySelector(".chat-ta"); t.value=""; if(S.chatBusy){ toast("보내는 중이에요. 끝나면 사진을 다시 골라 주세요"); return; } sendChat(file, ta); return; }
   if(t.classList?.contains("al-files") && t.files?.length){ const fs=[...t.files]; t.value=""; albumPick(fs); return; }
   if(t.dataset?.alf==="place"){ const key=t.closest("[data-alrow]")?.dataset.alrow, st=alState(key); if(st){ st.place=t.value; findArea(st,key); } return; }
