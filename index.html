@@ -4217,6 +4217,14 @@ function viewFamily(){
    8. 그리기 · 알림
    ========================================================= */
 const $app=document.getElementById("app");
+// 작은 사진 줄: 보던 자리 그대로 두고, 지금 사진이 줄 밖이면 그만큼만 옮겨요 (화면 전체는 움직이지 않게 줄 안에서만)
+function keepStrip(x){
+  const st=$app.querySelector(".al-strip"); if(!st) return;
+  if(x) st.scrollLeft=x;
+  const on=st.querySelector(".al-th.on"); if(!on) return;
+  const l=on.getBoundingClientRect().left-st.getBoundingClientRect().left+st.scrollLeft, r=l+on.offsetWidth;
+  if(l<st.scrollLeft) st.scrollLeft=l-8; else if(r>st.scrollLeft+st.clientWidth) st.scrollLeft=r-st.clientWidth+8;
+}
 function render(){
   if(TOUR_ASK){ TOUR_ASK=false; S.tourAsk=true; }
   if(S.tourAsk && S.phase==="landing"){ S.tourAsk=false; acts.tour(); return; }
@@ -4228,8 +4236,10 @@ function render(){
     // 공부방 일기 단추 등에서 ?write 로 들어오면: 프로필이 정해진 뒤 바로 오늘 일기 쓰는 칸으로
     if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; S.routed=true; history.replaceState({iinote:1},"","/write"); }
     const scTop=$app.querySelector(".sc-scroll")?.scrollTop;   // 다가오는 일정 칸 안 스크롤 위치는 다시 그려도 그대로
+    const stripX=$app.querySelector(".al-strip")?.scrollLeft;   // 사진첩 올리기의 작은 사진 줄도 (맨 앞으로 돌아가지 않게)
     $app.innerHTML=viewShell();
     if(scTop){ const sc=$app.querySelector(".sc-scroll"); if(sc) sc.scrollTop=scTop; }
+    keepStrip(stripX);
     if(S.sub?.type==="write") penHL();
     afterChatRender();
     if(syncUrl()==="again"){ render(); return; }
