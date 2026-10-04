@@ -1390,6 +1390,18 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .al-n{font-style:normal;font-size:12px;font-weight:700;color:var(--coral-ink);background:var(--coral-soft);padding:1px 8px;border-radius:999px}
 .al-n:empty{display:none}
 .al-h small{color:var(--ink3);font-weight:600;font-size:13px}
+/* ↕ 함께 찍은 사진 순서 바꾸기 */
+.al-ord-btn{margin-left:auto}
+.al-ord-card h2{margin:0 0 6px}
+.al-ord{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.al-ord-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.al-ord-row.drag{border-color:var(--coral);box-shadow:0 6px 18px rgba(0,0,0,.15);position:relative;z-index:2}
+.al-grip{flex:none;width:40px;height:40px;display:grid;place-items:center;font-size:20px;color:var(--ink3);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:10px}
+.al-grip:active{cursor:grabbing;background:var(--surface2)}
+.al-ord-h{flex:1 1 auto;min-width:0;margin:0;flex-wrap:wrap}
+.al-ord-th{display:flex;gap:4px;flex:none}
+.al-ord-th img{width:40px;height:40px;object-fit:cover;border-radius:8px}
+@media (max-width:520px){.al-ord-th{display:none}}
 .al-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
 .al-cell{aspect-ratio:1;padding:0;border:0;border-radius:10px;overflow:hidden;background:var(--line);cursor:zoom-in;min-width:0}
 .al-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
@@ -3035,17 +3047,19 @@ function albumGroups(){
     const none=L.filter(a=>!(a.place||"").trim()); if(none.length) out.push({h:"장소를 안 쓴 사진",l:none});
   } else if(S.albumBy==="with"){
     // 👨‍👩‍👧 함께 찍은: 사진에 고른 사람들의 조합으로 저절로 묶어요 (집마다 다르게 · 사람 많은 묶음부터)
+    // 부모가 순서를 바꿨으면(groups.albumWithOrder · 고치는 중엔 S.alWithEdit) 그 순서가 먼저, 새 묶음은 뒤에
     const order=sortedProfiles().map(p=>p.id), all=order.length, g={};
+    const ord=S.alWithEdit||S.group?.albumWithOrder||[], pos=k=>{ const i=ord.indexOf(k); return i<0?1e9:i; };
     L.forEach(a=>{ const ids=order.filter(id=>(a.people||[]).includes(id)); if(ids.length) (g[ids.join(",")]=g[ids.join(",")]||[]).push(a); });
-    Object.entries(g).sort((x,y)=>y[0].split(",").length-x[0].split(",").length || y[1].length-x[1].length).forEach(([k,l])=>{
+    Object.entries(g).sort((x,y)=>pos(x[0])-pos(y[0]) || y[0].split(",").length-x[0].split(",").length || y[1].length-x[1].length).forEach(([k,l])=>{
       const ps=k.split(",").map(prof), n=ps.length;
       const name = n===all && all>1 ? "온 가족" : n===1 ? `${esc(ps[0].name)} 혼자` : ps.map(p=>esc(p.name)).join(" · ");
-      out.push({h:`<span class="al-avs">${ps.map(p=>av(p,24)).join("")}</span>${name} <em class="al-n">${n===all&&all>1?"모두":n===1?"":n===2?"둘이":n===3?"셋이":n===4?"넷이":n+"명"}</em>`,l});
+      out.push({k,h:`<span class="al-avs">${ps.map(p=>av(p,24)).join("")}</span>${name} <em class="al-n">${n===all&&all>1?"모두":n===1?"":n===2?"둘이":n===3?"셋이":n===4?"넷이":n+"명"}</em>`,l});
     });
     const none=L.filter(a=>!(a.people||[]).some(id=>prof(id))); if(none.length) out.push({h:"누가 나왔는지 안 고른 사진",l:none});
   } else if(S.albumBy==="area"){
     const n={}; L.forEach(a=>{ const v=(a.area||"").trim(); if(v) n[v]=(n[v]||0)+1; });
-    for(const v of Object.keys(n).sort((a,b)=>n[b]-n[a])) out.push({h:`🏘 ${esc(v)}`,l:L.filter(a=>(a.area||"").trim()===v)});
+    for(const v of Object.keys(n).sort((a,b)=>n[b]-n[a])) out.push({h:`🗺️ ${esc(v)}`,l:L.filter(a=>(a.area||"").trim()===v)});
     const none=L.filter(a=>!(a.area||"").trim()); if(none.length) out.push({h:"동네를 모르는 사진",l:none});
   } else {
     const yOf=a=>(a.date||"").slice(0,4)||"?";
@@ -3059,11 +3073,11 @@ const albumPeople = (st,all) => `<fieldset class="al-f"><legend>🙂 누가 나�
 const albumRow = (st,key,pic) => `<div class="al-row" data-alrow="${esc(key)}">${pic}<div class="al-rf">
     <label>📅 찍은 날<input type="date" data-alf="date" value="${esc(st.date||"")}" max="${todayStr()}"></label>
     <label>📍 장소<input data-alf="place" list="al-pl" maxlength="30" value="${esc(st.place||"")}" placeholder="예) 서울아산병원, 할머니 댁" autocomplete="off"></label>
-    <label>🏘 동네 <small class="al-amsg">${esc(st.areaMsg||"")}</small><input data-alf="area" maxlength="30" value="${esc(st.area||"")}" placeholder="장소를 쓰면 찾아 줘요 (예: 서울 송파구)" autocomplete="off"></label>
+    <label>🗺️ 동네 <small class="al-amsg">${esc(st.areaMsg||"")}</small><input data-alf="area" maxlength="30" value="${esc(st.area||"")}" placeholder="장소를 쓰면 찾아 줘요 (예: 서울 송파구)" autocomplete="off"></label>
     <label class="al-wide">💌 메모 <small class="muted">비워 둬도 돼요</small><textarea data-alf="memo" maxlength="100" rows="2" placeholder="예) 도윤이가 태어난 날 · 엄마 손가락을 꼭 잡았어요">${esc(st.memo||"")}</textarea></label>
   </div></div>`;
 const alState = key => key==="e" ? S.alEdit : S.alUp?.items.find(x=>x.k===key);
-/* 🏘 동네 찾기: 장소 이름 → OpenStreetMap(Nominatim)에서 '서울 송파구'처럼. 1초에 한 번씩만 물어봐요 (무료 이용 규칙) */
+/* 🗺️ 동네 찾기: 장소 이름 → OpenStreetMap(Nominatim)에서 '서울 송파구'처럼. 1초에 한 번씩만 물어봐요 (무료 이용 규칙) */
 const SIDO_SHORT = {"서울특별시":"서울","부산광역시":"부산","대구광역시":"대구","인천광역시":"인천","광주광역시":"광주","대전광역시":"대전","울산광역시":"울산","세종특별자치시":"세종","경기도":"경기","강원도":"강원","강원특별자치도":"강원","충청북도":"충북","충청남도":"충남","전라북도":"전북","전북특별자치도":"전북","전라남도":"전남","경상북도":"경북","경상남도":"경남","제주특별자치도":"제주"};
 function areaOf(a){
   const sido=a.province||a.city||a.state||"", si=a.province?(a.city||a.county||a.town||""):"", gu=a.borough||(!a.province?(a.county||""):"");
@@ -3117,11 +3131,22 @@ function viewAlbum(){
       ${albumRow(ed,"e",`<div class="al-rimg"><img src="${esc(ea.thumb||ea.url)}" alt=""></div>`)}
       <div class="row"><button class="btn btn-primary">저장</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button><button type="button" class="btn btn-ghost danger" data-act="al-del">🗑 사진 지우기</button></div>${dl}</form>` : "";
   if(!S.album.length) return head+upForm+`<div class="empty al-empty"><p>📷 아직 사진이 없어요.</p><p class="muted">우리 가족 사진을 올려 보세요. 찍은 날짜로 연도가 저절로 나뉘고, 누가 나왔는지 · 어디인지 적어 두면 사람별 · 장소별 · 동네별로도 모아 볼 수 있어요.</p></div>`;
-  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["with","👨‍👩‍👧 함께 찍은"],["place","📍 장소별"],["area","🏘 동네별"]];
+  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["with","👨‍👩‍👧 함께 찍은"],["area","🗺️ 동네별"],["place","📍 장소별"]];
   if(!BY.some(([k])=>k===S.albumBy)) S.albumBy="year";
-  const groups=albumGroups();
-  return head+upForm+edForm+`<p class="muted al-intro">우리 가족만 보는 사진첩이에요 · 사진 ${S.album.length}장</p>
-    <div class="al-by" role="group" aria-label="모아 보기">${BY.map(([k,l])=>`<button class="chip ${S.albumBy===k?"on":""}" data-act="al-by" data-v="${k}" aria-pressed="${S.albumBy===k}">${l}</button>`).join("")}</div>
+  if(S.albumBy!=="with") S.alWithEdit=null;
+  const groups=albumGroups(), movable=groups.filter(g=>g.k);
+  const ordBtn = S.albumBy==="with" && isParent() && movable.length>1 && !S.alWithEdit ? `<button class="btn btn-ghost sm al-ord-btn" data-act="al-ord">↕ 순서 바꾸기</button>` : "";
+  const by=`<p class="muted al-intro">우리 가족만 보는 사진첩이에요 · 사진 ${S.album.length}장</p>
+    <div class="al-by" role="group" aria-label="모아 보기">${BY.map(([k,l])=>`<button class="chip ${S.albumBy===k?"on":""}" data-act="al-by" data-v="${k}" aria-pressed="${S.albumBy===k}">${l}</button>`).join("")}${ordBtn}</div>`;
+  // ↕ 순서 바꾸기: 묶음을 한 줄씩 → ☰ 를 잡고 위아래로 끌거나 ▲▼
+  if(S.alWithEdit) return head+upForm+edForm+by+`<div class="card al-ord-card"><h2>↕ 함께 찍은 사진 순서 바꾸기</h2>
+      <p class="muted">☰ 를 꾹 잡고 위아래로 끌어 보세요. ▲▼ 로 한 칸씩 옮길 수도 있어요. 가족 모두에게 같은 순서로 보여요.</p>
+      <div class="al-ord">${movable.map((g,i)=>`<div class="al-ord-row" data-k="${esc(g.k)}"><span class="al-grip" aria-hidden="true">☰</span>
+        <div class="al-ord-h al-h">${g.h} <small>${g.l.length}장</small></div>
+        <span class="al-ord-th">${g.l.slice(0,3).map(a=>`<img src="${esc(a.thumb||a.url)}" alt="">`).join("")}</span>
+        <button type="button" class="btn btn-ghost sm" data-act="al-ord-move" data-k="${esc(g.k)}" data-v="-1" aria-label="위로" ${i?"":"disabled"}>▲</button><button type="button" class="btn btn-ghost sm" data-act="al-ord-move" data-k="${esc(g.k)}" data-v="1" aria-label="아래로" ${i<movable.length-1?"":"disabled"}>▼</button></div>`).join("")}</div>
+      <div class="row"><button class="btn btn-primary" data-act="al-ord-save">저장</button><button type="button" class="btn btn-ghost" data-act="al-ord-cancel">취소</button></div></div>`;
+  return head+upForm+edForm+by+`
     ${groups.map((g,gi)=>`<section class="al-sec"><h2 class="al-h">${g.h} <small>${g.l.length}장</small></h2><div class="al-grid">${g.l.map((a,i)=>`<button class="al-cell" data-act="al-open" data-g="${gi}" data-i="${i}" aria-label="${esc(albumCap(a))} 크게 보기"><img src="${esc(a.thumb||a.url)}" alt="" loading="lazy"></button>`).join("")}</div></section>`).join("")}`;
 }
 async function albumPick(files){
@@ -4250,6 +4275,18 @@ function upProg(label,i,n){ const b=document.getElementById("upbar"); if(!b) ret
   upBusy=true; b.hidden=false; b.querySelector(".upbar-t").textContent=n?`${label} ${i} / ${n}`:label;
   b.querySelector(".upbar-fill").style.width=n?`${Math.round(Math.max(0,i-1)/n*100)}%`:"0"; }
 addEventListener("beforeunload",e=>{ if(upBusy){ e.preventDefault(); e.returnValue=""; } });
+// ↕ 사진첩 순서 바꾸기: ☰ 를 잡고 끌면 그 줄이 손가락(마우스)을 따라 위아래로 (휴대폰 터치도 되게 pointer 이벤트로)
+document.addEventListener("pointerdown",e=>{
+  const grip=e.target.closest?.(".al-grip"); if(!grip || !S.alWithEdit) return;
+  const row=grip.closest(".al-ord-row"), box=row.parentElement; e.preventDefault(); row.classList.add("drag");
+  const mv=ev=>{ const y=ev.clientY;
+    const next=[...box.querySelectorAll(".al-ord-row")].find(r=>r!==row && y<r.getBoundingClientRect().top+r.offsetHeight/2);
+    if(next!==row.nextElementSibling) box.insertBefore(row,next||null);
+    if(y<70) scrollBy(0,-14); else if(y>innerHeight-110) scrollBy(0,14); };
+  const end=()=>{ removeEventListener("pointermove",mv); removeEventListener("pointerup",end); removeEventListener("pointercancel",end);
+    S.alWithEdit=[...box.querySelectorAll(".al-ord-row")].map(r=>r.dataset.k); render(); };
+  addEventListener("pointermove",mv); addEventListener("pointerup",end); addEventListener("pointercancel",end);
+});
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2400); }
 
 async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catch(e){ console.error(e); toast(e.message||"문제가 생겼어요. 다시 시도해 주세요."); }finally{ S.busy=false; } }
@@ -4493,6 +4530,12 @@ const acts = {
   "al-cur": el => { const up=S.alUp; if(!up) return; up.cur=Math.min(Math.max(0,(up.cur||0)+Number(el.dataset.v)),up.items.length-1); render(); },
   "al-cur-go": el => { const up=S.alUp; if(!up) return; up.cur=+el.dataset.i||0; render(); },
   "al-drop": el => { const up=S.alUp; if(!up || S.alBusy) return; const it=up.items.find(x=>x.k===el.dataset.k); if(!it) return; up.items=up.items.filter(x=>x!==it); URL.revokeObjectURL(it.src); up.cur=Math.min(up.cur||0,up.items.length-1); if(!up.items.length) S.alUp=null; render(); },
+  "al-ord": () => { S.alWithEdit=albumGroups().filter(g=>g.k).map(g=>g.k); render(); },
+  "al-ord-cancel": () => { S.alWithEdit=null; render(); },
+  "al-ord-move": el => { const o=S.alWithEdit; if(!o) return; const i=o.indexOf(el.dataset.k), j=i+Number(el.dataset.v);
+    if(i<0||j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; render(); },
+  "al-ord-save": () => guard(async()=>{ if(!S.alWithEdit || !isParent()) return; const o=[...S.alWithEdit];
+    await B.updateGroup(S.gid,{albumWithOrder:o}); S.group.albumWithOrder=o; S.alWithEdit=null; render(); toast("사진첩 순서를 저장했어요"); }),
   "al-cancel": () => { if(S.alBusy) return; S.alUp?.items.forEach(it=>URL.revokeObjectURL(it.src)); S.alUp=null; S.alEdit=null; render(); },
   "al-edit": el => { const a=alById(el.dataset.id); if(!albumCanEdit(a)) return; S.alUp=null; S.alEdit=albumEditState(a,!!S.lb); render(); if(!S.lb) window.scrollTo(0,0); },
   "lb-edit-close": () => guard(async()=>{ await albumSaveEdit(); S.alEdit=null; render(); }),
