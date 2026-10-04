@@ -41,6 +41,8 @@
 - 테스트 팁: Edge 헤드리스 --virtual-time-budget 에서는 홈 · 채팅 화면의 createImageBitmap 이 멈춤(가상 시간 탓). 사진은 --remote-debugging-port 로 실제 시간 실행 뒤 Runtime.evaluate 로 확인
 - 검색 등록: naver…html · google…html 확인 파일, robots.txt(다음 확인 코드 포함) · sitemap.xml
 - 🔔 새 소식(newsItems): 내 일기의 댓글 · 내 댓글의 답글 · 하트(hearts 값 = 누른 시각) · 도장(stampAt), 어른은 아이가 쓴 일기. 최근 2주, 안 본 것 수는 ls iinote-news-{gid}-{pid}. 따로 저장하는 컬렉션 없음
+- 🎉 연속 일기 축하 (2026-10-04, streakCelebrate): 아이가 제출해서 연속(streakOf)이 3 · 5 · 7 · 10 · 15 · 20일, 그다음 5일마다(streakMile) → 화면 가득 축하(.cele, 꽃가루 · 날짜 점 · 다음 축하까지 며칠). 같은 연속 기록에서 한 번만(ls iinote-cele-{gid}-{pid} = 시작일:날짜 수)
+- 🏆 이달의 상장 (2026-10-04, awardsOf): 지난 달 하루도 안 빠지면 개근상, 20일(AWARD_MIN) 이상이면 성실상. 계산만 하고 저장 안 함. 아이의 내 일기 · 아이들 현황 카드에 상장 단추(awardList), 달 바뀐 뒤 10일 동안 홈 맨 위 띠(awardBanner, 닫으면 ls iinote-awardseen-…), 누르면 새 창 A4 가로 상장(openAward, 인쇄 · PDF)
 - 🏅 스티커판(STICKERS 14개, stickerStats): 아이의 내 일기 탭 위 + 아이들 현황 카드. 제출하면 새 스티커 토스트. 계산만 하고 저장 안 함
 - 채팅 반응: chats.reactions = {프로필id: 이모지} (REACTS 6개, 한 사람당 하나)
 - 채팅 답장 (2026-09-29): 메시지 시간 아래 '답장' → S.chatReply, 글 칸 위 띠(chatReplyBar · drawReplyBars, 쓰던 글 유지) → chats.replyTo = {id, profileId, text(앞 60자), photo}. 말풍선 안 인용(chatQuote)을 누르면 원래 메시지로 스크롤 + 반짝(chat-jump, #cm-{id})

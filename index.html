@@ -1381,6 +1381,35 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 :root[data-dfont="pen"] :is(.w-text,.w-hl,.paper-lines,.today-date,.dcard-ex,.al.txt strong,.cmt-text,.fix-list,.ais-text,.ct-title,.qn-x){font-family:var(--diary)}
 :root[data-dfont="pen"] .hb-g span:not(.pen){font-family:var(--sans)}
 .inapp-note{margin:0 0 12px;padding:10px 14px;border-radius:12px;background:var(--butter-soft);border:1.5px dashed var(--butter);font-size:14px;line-height:1.6}
+/* 🎉 연속 일기 축하 · 🏆 상장 */
+.cele{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:rgba(20,26,40,.55);animation:celeIn .25s ease-out}
+@keyframes celeIn{from{opacity:0}to{opacity:1}}
+.cele-conf{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.cele-conf i{position:absolute;top:-40px;font-style:normal;animation:celeFall linear infinite}
+@keyframes celeFall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(110vh) rotate(540deg)}}
+.cele-box{position:relative;width:min(420px,100%);background:var(--surface);color:var(--ink);border-radius:28px;padding:26px 22px 22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:celePop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes celePop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.cele-e{font-size:64px;line-height:1;animation:celeBob 1.2s ease-in-out infinite alternate}
+@keyframes celeBob{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-8px) rotate(6deg)}}
+.cele-k{margin:10px 0 0;color:var(--ink3);font-weight:700}
+.cele-n{margin:2px 0 6px;font-size:30px}.cele-n b{font-size:56px;color:var(--coral);margin-right:4px}
+.cele-m{margin:0 0 12px;font-size:18px;font-weight:700}
+.cele-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:0 auto 12px;max-width:300px}
+.cele-dots span{width:14px;height:14px;border-radius:50%;background:var(--butter)}
+.cele-dots em{font-style:normal;color:var(--ink3)}
+.cele-next{margin:0 0 16px;color:var(--ink2);font-size:14px}
+.cele-ok{min-width:180px}
+@media (prefers-reduced-motion:reduce){ .cele-conf{display:none} .cele-e,.cele-box{animation:none} }
+.awards{margin:10px 0 0}
+.awards>b{font-size:14px}
+.aw-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.aw{display:flex;align-items:center;gap:6px;padding:7px 12px 7px 9px;border-radius:14px;border:1.5px solid var(--butter);background:var(--butter-soft);color:var(--ink);font-weight:700;font-size:14px}
+.aw i{font-style:normal;font-size:20px}.aw small{color:var(--ink3);font-weight:600}
+.aw.good{border-color:var(--sage);background:var(--sage-soft)}
+.aw-banner{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 16px;padding:14px 16px;border-radius:18px;border:2px solid var(--butter);background:var(--butter-soft)}
+.aw-banner p{flex:1;min-width:12em;margin:0;line-height:1.6}
+.aw-b-i{font-size:34px}
+.aw-b-btns{display:flex;flex-wrap:wrap;gap:6px}
 /* 📸 사진첩 */
 .al-pick{cursor:pointer}
 .al-intro{margin:-4px 0 12px}
@@ -2680,7 +2709,7 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  if(!S.tab || S.tab==="home") return awardBanner()+penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
 }
 
@@ -3508,12 +3537,94 @@ function viewStickers(p, small){
   return `<section class="stk ${small?"small":""}" aria-label="${esc(kidN(p))}의 스티커판"><div class="stk-h"><b>🏅 ${small?"스티커":`${esc(p.name)}의 스티커판`}</b><span>${got.size} / ${STICKERS.length}</span></div>
     <div class="stk-grid">${STICKERS.map(([k,e,n])=>`<span class="stk-i ${got.has(k)?"on":""}" title="${n}${got.has(k)?" · 받았어요!":" · 아직이에요"}"><i>${e}</i>${small?"":`<small>${n}</small>`}</span>`).join("")}</div></section>`;
 }
+/* ---------- 🎉 연속 일기 축하 (2026-10-04) ----------
+   아이가 일기를 제출해서 연속 날짜가 3 · 5 · 7 · 10 · 15 · 20일, 그다음은 5일마다 되면 화면 가득 축하해요.
+   같은 연속 기록에서 같은 날짜 수는 한 번만 (ls iinote-cele-{가족}-{아이} = "시작한 날:날짜 수") */
+const streakMile = n => [3,5,7,10,15,20].includes(n) || (n>20 && n%5===0);
+const nextMile = n => { for(let m=n+1;m<n+60;m++) if(streakMile(m)) return m; return n+5; };
+const CELE_MSG = {3:["🌱","일기 습관의 씨앗이 싹텄어요!"],5:["⭐","벌써 다섯 밤을 이어 썼어요!"],7:["🌈","일주일 내내 썼어요. 정말 대단해요!"],10:["🏅","두 자리 수 기록이에요!"],15:["🚀","꾸준함이 로켓처럼 날아올라요!"],20:["👑","일기 왕이 되었어요!"],30:["🏆","한 달 내내 이어 썼어요!"],50:["💎","보석처럼 반짝이는 기록이에요!"],100:["💯","백 일 연속! 전설의 기록이에요!"]};
+const CELE_MORE = ["🔥","🌟","🎖️","🦄","🌻","🐳","🍀","🎈"];
+function streakCelebrate(p){
+  if(!p || p.type!=="child") return;
+  const n=streakOf(p.id); if(!streakMile(n)) return;
+  const start=addDays(todayStr(), submittedOn(p.id,todayStr()) ? -(n-1) : -n), k=`iinote-cele-${S.gid}-${p.id}`, tag=`${start}:${n}`;
+  if(ls.get(k,"")===tag) return; ls.set(k,tag);
+  const [e,msg]=CELE_MSG[n] || [CELE_MORE[(n/5)%CELE_MORE.length|0], "멈추지 않고 이어 쓰는 힘, 정말 멋져요!"];
+  const nx=nextMile(n), who=`${esc(p.name)}${hasBatchim(p.name)?"이":""}`;
+  const bits=[..."🎉✨⭐🌸🎈💛🎊"]; let conf=""; for(let i=0;i<46;i++) conf+=`<i style="left:${Math.random()*100}%;animation-delay:${(Math.random()*1.4).toFixed(2)}s;animation-duration:${(2.4+Math.random()*1.6).toFixed(2)}s;font-size:${18+Math.random()*18|0}px">${bits[i%bits.length]}</i>`;
+  const box=document.createElement("div"); box.className="cele"; box.setAttribute("role","dialog"); box.setAttribute("aria-modal","true"); box.setAttribute("aria-label",`${n}일 연속 일기 축하`);
+  box.innerHTML=`<div class="cele-conf" aria-hidden="true">${conf}</div><div class="cele-box"><div class="cele-e" aria-hidden="true">${e}</div>
+    <p class="cele-k">${who}의 일기</p><h2 class="cele-n"><b>${n}</b>일 연속!</h2><p class="cele-m">${msg}</p>
+    <div class="cele-dots" aria-hidden="true">${Array.from({length:Math.min(n,30)},()=>"<span></span>").join("")}${n>30?"<em>…</em>":""}</div>
+    <p class="cele-next">다음 축하까지 <b>${nx-n}일</b> 남았어요 (${nx}일 연속)</p>
+    <button class="btn btn-primary cele-ok" type="button">고마워요! 🙌</button></div>`;
+  const close=()=>{ box.remove(); document.removeEventListener("keydown",esc1); };
+  const esc1=e=>{ if(e.key==="Escape") close(); };
+  box.addEventListener("click",e=>{ if(e.target===box || e.target.closest(".cele-ok")) close(); });
+  document.addEventListener("keydown",esc1); document.body.appendChild(box); box.querySelector(".cele-ok").focus();
+}
+/* ---------- 🏆 이달의 상장 (2026-10-04) ----------
+   지난 달을 하루도 빠짐없이 쓰면 개근상, 20일 이상이면 성실상. 일기 기록으로 계산만 하고 따로 저장하지 않아요.
+   '상장 보기'를 누르면 새 창에 A4 가로 상장이 열리고, 인쇄 · PDF로 저장할 수 있어요 */
+const AWARD_MIN = 20;
+function awardsOf(p){
+  const days={}; S.diaries.forEach(d=>{ if(d.profileId===p.id && d.status==="submitted" && (d.text||"").trim()) days[d.date]=1; });
+  const by={}; Object.keys(days).forEach(d=>{ const m=d.slice(0,7); by[m]=(by[m]||0)+1; });
+  const cur=todayStr().slice(0,7);
+  return Object.entries(by).filter(([m])=>m<cur).map(([m,n])=>{ const [y,mm]=m.split("-").map(Number), last=new Date(y,mm,0).getDate();
+    return n>=last ? {m,n,last,kind:"full"} : n>=AWARD_MIN ? {m,n,last,kind:"good"} : null; }).filter(Boolean).sort((a,b)=>b.m.localeCompare(a.m));
+}
+const awardName = a => a.kind==="full" ? "개근상" : "성실상";
+const monthName = m => { const [y,mm]=m.split("-").map(Number); return `${y}년 ${mm}월`; };
+function awardList(p){
+  const L=awardsOf(p); if(!L.length) return "";
+  return `<section class="awards" aria-label="상장"><b>🏆 ${p.id===S.me?.id?"내 상장":esc(p.name)+"의 상장"}</b><div class="aw-row">${L.slice(0,12).map(a=>`<button class="aw ${a.kind}" data-act="award" data-id="${p.id}" data-v="${a.m}" title="${monthName(a.m)} ${awardName(a)} · 상장 보기"><i>${a.kind==="full"?"🏆":"🎖️"}</i><span>${Number(a.m.slice(5))}월 ${awardName(a)}</span><small>${a.n}/${a.last}일</small></button>`).join("")}</div></section>`;
+}
+// 달이 바뀐 뒤 열흘 동안 홈 맨 위에 지난 달 상장 소식 (아이는 내 것, 부모는 우리 아이들 것 · 닫으면 그 달은 안 보여요)
+function awardBanner(){
+  if(!S.me || new Date().getDate()>10) return "";
+  const t=new Date(); t.setDate(0); const m=ymd(t).slice(0,7), k=`iinote-awardseen-${S.gid}-${S.me.id}-${m}`;
+  if(ls.get(k,"")) return "";
+  const kids=S.me.type==="child" ? [S.me] : isParent() ? sortedProfiles().filter(x=>x.type==="child") : [];
+  const got=kids.map(x=>({p:x, a:awardsOf(x).find(a=>a.m===m)})).filter(x=>x.a); if(!got.length) return "";
+  return `<div class="aw-banner" role="note"><span class="aw-b-i" aria-hidden="true">🏆</span><p><b>${monthName(m)} 상장이 나왔어요!</b><br>${got.map(x=>`${esc(x.p.name)} · ${awardName(x.a)} (${x.a.n}일)`).join("<br>")}</p>
+    <div class="aw-b-btns">${got.map(x=>`<button class="btn btn-primary sm" data-act="award" data-id="${x.p.id}" data-v="${m}">${got.length>1?esc(x.p.name)+" ":""}상장 보기</button>`).join("")}<button class="btn btn-ghost sm" data-act="award-seen" data-v="${m}">닫기</button></div></div>`;
+}
+function openAward(pid, m){
+  const p=prof(pid), a=p && awardsOf(p).find(x=>x.m===m); if(!a){ toast("상장을 찾지 못했어요"); return; }
+  const w=window.open("","_blank"); if(!w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }
+  const [y,mm]=m.split("-").map(Number), nd=new Date(y,mm,1), full=a.kind==="full", fam=S.group?.name||"우리집";
+  const body = full ? `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>하루도 빠짐없이</b> 일기를 써서<br>${a.last}일 모두 마음을 글로 남겼습니다.<br>그 꾸준함과 성실함을 칭찬하여 이 상장을 드립니다.`
+                     : `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>${a.n}일</b> 일기를 써서<br>날마다 마음을 글로 남기려고 힘썼습니다.<br>그 성실함을 칭찬하여 이 상장을 드립니다.`;
+  w.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(p.name)} ${monthName(m)} ${awardName(a)}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
+<style>@page{size:A4 landscape;margin:0}*{box-sizing:border-box}html,body{margin:0;background:#F3EEE6;font-family:'Gowun Batang',serif;color:#2B2A33}
+.bar{display:flex;gap:8px;justify-content:center;padding:14px;font-family:system-ui,sans-serif}.bar button{font:inherit;font-size:15px;padding:10px 18px;border-radius:999px;border:0;background:#1F2A44;color:#fff;cursor:pointer}.bar button.g{background:#fff;color:#1F2A44;border:1.5px solid #1F2A44}
+.page{width:297mm;height:210mm;margin:0 auto 20px;background:#FFFDF8;position:relative;padding:14mm;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+.frame{position:absolute;inset:10mm;border:3mm double ${full?"#C9963A":"#5E8F7A"};border-radius:4mm}
+.frame:after{content:"";position:absolute;inset:3mm;border:.6mm solid ${full?"#E6C27A":"#A9CBB9"};border-radius:2mm}
+.in{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30mm}
+.no{position:absolute;top:8mm;left:12mm;font-size:12pt;color:#8A8577}
+.medal{font-size:30pt;line-height:1}
+h1{font-size:46pt;letter-spacing:18pt;margin:2mm 0 8mm;padding-left:18pt;color:${full?"#8A5A12":"#2F5E4B"}}
+.name{font-size:24pt;margin:0 0 9mm}.name b{font-size:30pt;letter-spacing:4pt;border-bottom:.6mm solid #C9C2B0;padding:0 4mm}
+.body{font-size:17pt;line-height:2;margin:0}.body b{color:${full?"#B0731A":"#3F7F70"}}
+.date{font-size:14pt;margin:10mm 0 3mm}.from{font-size:18pt;font-weight:700;letter-spacing:2pt}
+.seal{position:absolute;right:30mm;bottom:22mm;width:30mm;height:30mm;border-radius:50%;border:1mm solid #D4583F;color:#D4583F;display:grid;place-items:center;font-size:12pt;line-height:1.2;transform:rotate(-8deg);opacity:.85}
+@media print{.bar{display:none}html,body{background:#fff}.page{margin:0;box-shadow:none}}</style></head><body>
+<div class="bar"><button onclick="print()">🖨️ 인쇄 · PDF로 저장</button><button class="g" onclick="close()">닫기</button></div>
+<div class="page"><div class="frame"></div><div class="in"><span class="no">제 ${y}-${pad(mm)} 호</span><div class="medal">${full?"🏆":"🎖️"}</div><h1>${awardName(a)}</h1>
+<p class="name"><b>${esc(p.name)}</b></p><p class="body">${body}</p>
+<p class="date">${nd.getFullYear()}년 ${nd.getMonth()+1}월 ${nd.getDate()}일</p><p class="from">${esc(fam)} 가족 · 아이아이노트</p>
+<div class="seal">참<br>잘했어요</div></div></div></body></html>`);
+  w.document.close();
+}
 function viewMyDiary(){
   const list=S.diaries.filter(d=>d.profileId===S.me.id).sort((a,b)=>b.date.localeCompare(a.date));
   const month=todayStr().slice(0,7), n=list.filter(d=>d.status==="submitted" && d.date.startsWith(month)).length;
   return `<div class="page-h"><h1>내 일기</h1><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div>
     <p class="muted" style="margin:-6px 0 16px">이번 달 ${n}편 · 🔥 ${streakOf(S.me.id)}일 연속</p>
-    ${S.me.type==="child"?viewStickers(S.me):""}
+    ${S.me.type==="child"?viewStickers(S.me)+awardList(S.me):""}
     ${list.length?`${feedHTML(list)}`:`<p class="empty">아직 쓴 일기가 없어요. 오늘 첫 일기를 써 보세요.</p>`}`;
 }
 // 👧 아이들 현황: 아이마다 오늘 · 이번 달 · 작은 달력
@@ -3534,7 +3645,7 @@ function viewKidsStatus(){
       <div class="kid-stats"><span>📔 <b>${mon.length}</b>편</span><span>🔥 <b>${streakOf(p.id)}</b>일 연속</span><span>✏️ 평균 <b>${avg}</b>자</span><span>🖍 고친 곳 <b>${fixes}</b></span></div>
       <div class="kid-cal">${cal}</div>
       <p class="muted" style="font-size:12px;margin:8px 0 0">색칠된 날 = 일기 쓴 날 · ⭐ = 칭찬 도장. 날짜를 누르면 그날 가족 일기를 펼쳐 봐요.</p>
-      ${viewStickers(p,true)}
+      ${viewStickers(p,true)}${awardList(p)}
     </section>`; }).join("")}</div>`;
 }
 // 📖 하루 펼쳐보기: 한 날짜의 가족 일기를 나란히
@@ -4554,6 +4665,8 @@ const acts = {
   "lb-open": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return; S.lb={photos:d.photos,i:+el.dataset.i}; render(); document.querySelector(".lb-x")?.focus(); },
   // 사진의 왼쪽 반을 누르면 이전, 오른쪽 반을 누르면 다음 사진
   "lb-tap": (el,e) => { const r=el.getBoundingClientRect(); lbMove(e.clientX < r.left+r.width/2 ? -1 : 1); },
+  award: el => openAward(el.dataset.id, el.dataset.v),
+  "award-seen": el => { ls.set(`iinote-awardseen-${S.gid}-${S.me.id}-${el.dataset.v}`,"1"); render(); },
   "lb-close": () => { if(S.alEdit?.inLb){ guard(async()=>{ await albumSaveEdit(); S.alEdit=null; S.lb=null; render(); }); return; } S.lb=null; render(); },
   "lb-diary": el => go(()=>{ S.lb=null; S.sub={type:"diary",id:el.dataset.id}; }),
   // 4분할 앨범: 가족 사진을 갤러리로 (좌우로 넘기기)
@@ -4884,7 +4997,8 @@ async function saveDiary(status){
   await reload("diaries");
   if(status==="submitted"){ toast(child?"제출했어요":"올렸어요"); S.sub={type:"diary",id:d.id}; S.draft=null; render(); window.scrollTo(0,0);
     const got = before ? STICKERS.filter(x=>!before.has(x[0]) && stickersOf(S.me).includes(x[0])) : [];
-    if(got.length) setTimeout(()=>toast(`🎉 새 스티커를 받았어요! ${got.map(x=>x[1]+" "+x[2]).join(" · ")}`),1300); }
+    if(got.length) setTimeout(()=>toast(`🎉 새 스티커를 받았어요! ${got.map(x=>x[1]+" "+x[2]).join(" · ")}`),1300);
+    if(child) setTimeout(()=>streakCelebrate(S.me),700); }
   else { toast("임시 저장했어요"); render(); }
 }
 
