@@ -4300,11 +4300,13 @@ function upProg(label,done,n,o={}){ const b=document.getElementById("upbar"); if
   b.querySelector(".upbar-fill").style.width=n?`${Math.round(done/n*100)}%`:""; }
 addEventListener("beforeunload",e=>{ if(upBusy){ e.preventDefault(); e.returnValue=""; } });
 // 사진 고르는 칸을 누르면 바로 띠를 띄워 둬요: 아이폰은 ✓ 를 누르고도 사진을 넘겨주기까지(아이클라우드 원본 받기 · 바꾸기) 한참 걸릴 때가 있어서
+// 아이폰은 '사진 보관함'을 고르는 사이에 cancel 을 잘못 보내기도 해서, 아이폰에서는 cancel 로 닫지 않아요 (사진이 오거나 · 띠를 누르거나 · 3분 뒤 닫힘)
 document.addEventListener("click",e=>{
-  const t=e.target; if(!(t instanceof HTMLInputElement) || t.type!=="file" || !/^image/.test(t.accept||"")) return;
-  upProg("📥 사진을 가져오는 중…",0,0,{wait:true,note:"사진이 많거나 아이클라우드에 있으면 조금 걸려요 · 안 골랐으면 눌러서 닫기"});
+  const t=e.target instanceof HTMLInputElement ? e.target : e.target.closest?.("label")?.querySelector('input[type="file"]');
+  if(!t || t.type!=="file" || !/^image/.test(t.accept||"") || document.querySelector("#upbar:not([hidden])")) return;
+  upProg("📥 사진을 가져오는 중…",0,0,{wait:true,note:"✓ 를 누른 뒤 사진을 받아 오는 데 조금 걸릴 수 있어요 · 안 골랐으면 눌러서 닫기"});
   upWaitT=setTimeout(()=>upProg(),180000);
-  t.addEventListener("cancel",()=>upProg(),{once:true});
+  if(!IS_IOS) t.addEventListener("cancel",()=>{ if(document.querySelector("#upbar.wait")) upProg(); },{once:true});
 },true);
 document.addEventListener("click",e=>{ if(e.target.closest?.("#upbar.wait")) upProg(); });
 // 여러 개를 k개씩 같이 처리 (결과 순서는 그대로)
