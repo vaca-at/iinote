@@ -798,6 +798,8 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .cmt-meta{display:flex;align-items:baseline;gap:8px;font-size:14px}
 .cmt-meta .muted{font-size:13px}
 .cmt-text{margin:2px 0 4px;white-space:pre-wrap}
+.dc-del{margin-left:4px;padding:0 6px;border:0;background:none;color:var(--ink3);font-size:12px;line-height:1.6;border-radius:6px;cursor:pointer}
+.dc-del:hover{background:var(--coral-soft);color:var(--coral-ink)}
 .cmt-acts{display:flex;gap:12px}
 .cmt-form{display:grid;gap:8px;margin-top:10px}
 .comments>.cmt-form{margin-top:24px}
@@ -2233,7 +2235,7 @@ const B = DEMO ? makeDemo() : await makeFirebase();
 const QS = new URLSearchParams(location.search), KQ = (QS.get("k")||"").split("-");
 const S = {
   phase:"loading", user:null, userDoc:null, gid:null, group:null,
-  profiles:[], diaries:[], comments:[], schedules:[], links:[], quizWords:[], album:[], albumReady:false, albumBy:ls.get("iinote-album-by","year"),
+  profiles:[], diaries:[], comments:[], schedules:[], links:[], quizWords:[], album:[], albumReady:false, albumBy:ls.get("iinote-album-by2","all"),
   me:null, tab:"home", sub:null, filter:"all", draft:null,
   replyTo:null, editing:null, quiz:null, pinFor:null, busy:false,
   search:"", tag:"", lb:null, rec:null, locEdit:false,
@@ -3117,7 +3119,9 @@ const albumCap = a => [a.date?`${a.date.slice(0,4)}년 ${fmtShort(a.date)}`:"", 
 // 모아 보기: 연도별 · 사람별 · 장소별 → [{h:제목, l:사진들}]
 function albumGroups(){
   const L=albumSorted(), out=[];
-  if(S.albumBy==="person"){
+  if(S.albumBy==="all"){   // 🖼️ 전체: 모든 사진을 찍은 날 최신순으로 한 묶음 (2026-10-04, 첫 칸 · 처음 열면 이것부터)
+    if(L.length) out.push({h:"🖼️ 전체 사진 <small class=\"muted\">최신순</small>",l:L});
+  } else if(S.albumBy==="person"){
     for(const p of sortedProfiles()){ const l=L.filter(a=>(a.people||[]).includes(p.id)); if(l.length) out.push({h:`${av(p,26)}${esc(p.name)}`,l}); }
     const none=L.filter(a=>!(a.people||[]).some(id=>prof(id))); if(none.length) out.push({h:"누가 나왔는지 안 고른 사진",l:none});
   } else if(S.albumBy==="place"){
@@ -3210,8 +3214,8 @@ function viewAlbum(){
       ${albumRow(ed,"e",`<div class="al-rimg"><img src="${esc(ea.thumb||ea.url)}" alt=""></div>`)}
       <div class="row"><button class="btn btn-primary">저장</button><button type="button" class="btn btn-ghost" data-act="al-cancel">취소</button><button type="button" class="btn btn-ghost danger" data-act="al-del">🗑 사진 지우기</button></div>${dl}</form>` : "";
   if(!S.album.length) return head+upForm+`<div class="empty al-empty"><p>📷 아직 사진이 없어요.</p><p class="muted">우리 가족 사진을 올려 보세요. 찍은 날짜로 연도가 저절로 나뉘고, 누가 나왔는지 · 어디인지 적어 두면 사람별 · 장소별 · 동네별로도 모아 볼 수 있어요.</p></div>`;
-  const BY=[["year","📅 연도별"],["person","🙂 사람별"],["with","👨‍👩‍👧 함께 찍은"],["area","🗺️ 동네별"],["place","📍 장소별"]];
-  if(!BY.some(([k])=>k===S.albumBy)) S.albumBy="year";
+  const BY=[["all","🖼️ 전체"],["year","📅 연도별"],["person","🙂 사람별"],["with","👨‍👩‍👧 함께 찍은"],["area","🗺️ 동네별"],["place","📍 장소별"]];
+  if(!BY.some(([k])=>k===S.albumBy)) S.albumBy="all";
   if(S.albumBy!=="with") S.alWithEdit=null;
   const groups=albumGroups(), movable=groups.filter(g=>g.k);
   const ordBtn = S.albumBy==="with" && isParent() && movable.length>1 && !S.alWithEdit ? `<button class="btn btn-ghost sm al-ord-btn" data-act="al-ord">↕ 순서 바꾸기</button>` : "";
@@ -3724,7 +3728,7 @@ function dayCard(p,x){
     </div>`:"";
   const canStamp=sub && isParent() && !mine && p.type==="child";
   const thread=(pid,depth)=>cs.filter(k=>(k.parentId||null)===pid).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).map(k=>{ const q=prof(k.profileId);
-    return `<li class="${depth?"re":""}" style="--d:${Math.min(depth,3)}">${depth?"↪ ":""}<b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${k.deleted?'<span class="muted">(지운 댓글이에요)</span>':esc(k.text)} <small class="cm-when">${cmtTime(k.createdAt)}${k.edited?" · 고침":""}</small></li>${thread(k.id,depth+1)}`; }).join("");
+    return `<li class="${depth?"re":""}" style="--d:${Math.min(depth,3)}">${depth?"↪ ":""}<b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${k.deleted?`<span class="muted">${delCmtNote(k)}</span>`:esc(k.text)} <small class="cm-when">${cmtTime(k.createdAt)}${k.edited?" · 고침":""}</small>${!k.deleted && canDelCmt(k)?`<button class="dc-del" data-act="del-comment" data-id="${k.id}" aria-label="${esc(q?.name||"")}의 댓글 지우기" title="댓글 지우기">✕</button>`:""}</li>${thread(k.id,depth+1)}`; }).join("");
   return `<article class="day-col${x.stamp?" has-stamp":""}" style="--pc:${c}">
       <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${moodChip(x.mood,x.weather)}${!sub?'<span class="pill draft">쓰는 중</span>':""}</div>
       ${x.stamp?`<div class="day-stamp" role="img" aria-label="칭찬 도장: ${esc(x.stamp)}">${esc(x.stamp)}</div>`:""}
@@ -3854,6 +3858,9 @@ function viewDiaryDetail(){
       <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
     </section></article>`;
 }
+// 댓글 지우기: 쓴 사람, 그리고 아이가 쓴 댓글은 보호자(부모)도 (2026-10-04)
+const canDelCmt = c => !!S.me && (c.profileId===S.me.id || (isParent() && prof(c.profileId)?.type==="child"));
+const delCmtNote = c => c.delBy && c.delBy!==c.profileId ? "(보호자가 지운 댓글이에요)" : "(지운 댓글이에요)";
 function renderThread(cs,parent,depth){
   const kids=cs.filter(c=>(c.parentId||null)===parent).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
   if(!kids.length) return "";
@@ -3862,8 +3869,8 @@ function renderThread(cs,parent,depth){
       <div class="cmt-meta"><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${relTime(c.createdAt)}${c.edited?" (수정됨)":""}</span><time class="cm-when cmt-at">${cmtFull(c.createdAt)}</time></div>
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
-        : c.deleted ? `<p class="cmt-text muted">(지운 댓글이에요)</p>`
-        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button><button class="link-btn" data-act="del-comment" data-id="${c.id}">${ic("trash")}${labelDel()}</button>`:""}</div>`}
+        : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
+        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}</div>`}
       ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
@@ -4597,9 +4604,13 @@ const acts = {
   "del-diary": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
     if(!confirm(`${fmtShort(d.date)} 일기를 지울까요?\n사진 · 소리와 달린 댓글도 함께 지워지고 되돌릴 수 없어요.`)) return;
     guard(async()=>{ await removeDiary(S.gid,d,S.comments); await Promise.all([reload("diaries"),reload("comments")]); S.sub=null; render(); window.scrollTo(0,0); toast("일기를 지웠어요"); }); },
-  "del-comment": el => { const c=S.comments.find(x=>x.id===el.dataset.id); if(!c || !confirm("이 댓글을 지울까요?")) return;
-    guard(async()=>{ // 답글이 달려 있으면 자리는 남기고 내용만 지워요
-      if(S.comments.some(x=>x.parentId===c.id)) await B.update(S.gid,"comments",c.id,{text:"",deleted:true}); else await B.remove(S.gid,"comments",c.id);
+  "del-comment": el => { const c=S.comments.find(x=>x.id===el.dataset.id); if(!c || !canDelCmt(c)) return;
+    const other=c.profileId!==S.me.id, w=prof(c.profileId)?.name||"";
+    if(!confirm(other?`${w}의 댓글을 보호자로 지울까요?
+"${String(c.text||"").slice(0,40)}"
+지우면 되돌릴 수 없어요.`:"이 댓글을 지울까요?")) return;
+    guard(async()=>{ // 답글이 달려 있으면 자리는 남기고 내용만 지워요 (보호자가 지우면 그렇게 표시)
+      if(S.comments.some(x=>x.parentId===c.id)) await B.update(S.gid,"comments",c.id,{text:"",deleted:true,delBy:S.me.id}); else await B.remove(S.gid,"comments",c.id);
       await reload("comments"); render(); toast("댓글을 지웠어요"); }); },
   "del-child": el => { const p=prof(el.dataset.id); if(!p) return;
     if(!confirm(`${p.name} 프로필을 지울까요?\n${kidN(p)}의 일기, 사진 · 소리, 댓글, 받아쓰기 기록이 모두 지워지고 되돌릴 수 없어요.`)) return;
@@ -4715,7 +4726,7 @@ const acts = {
   "album-lb": el => { const L=albumPhotos(); if(!L.length) return; S.lb={photos:L.map(x=>({url:x.full})),caps:L.map(x=>({t:`${x.p?.name||""} · ${fmtShort(x.d.date)}`,id:x.d.id})),i:Math.max(0,+el.dataset.i||0)}; render(); document.querySelector(".lb-x")?.focus(); },
   "photo-crop": el => cropPhoto(el.dataset.id),
   // 📸 사진첩
-  "al-by": el => { S.albumBy=el.dataset.v; ls.set("iinote-album-by",el.dataset.v); render(); },
+  "al-by": el => { S.albumBy=el.dataset.v; ls.set("iinote-album-by2",el.dataset.v); render(); },
   "al-open": el => { const g=albumGroups()[+el.dataset.g]; if(!g) return; S.lb={photos:g.l.map(a=>({url:a.url})),caps:g.l.map(a=>({t:albumCap(a),al:a.id,m:a.memo||""})),i:+el.dataset.i||0}; render(); document.querySelector(".lb-x")?.focus(); },
   "al-person": el => { const st=el.dataset.k?alState(el.dataset.k):S.alEdit; if(!st) return; const v=el.dataset.v; st.people=st.people.includes(v)?st.people.filter(x=>x!==v):[...st.people,v]; render(); },
   // 지금 보고 있는 사진의 사람 · 장소 · 날짜를 모든 사진에
