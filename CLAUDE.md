@@ -78,7 +78,9 @@
 - 빌드 자바: 안드로이드 스튜디오의 자바 25 는 Gradle 8.14 와 안 맞아서 앱 폴더 .jdk 에 Temurin 21 을 받아 scripts/gradle.js 가 씀. android/local.properties 에 sdk.dir
 - 시험 기기: 블루스택 5 (설정 → 고급 → ADB 켜기, 안드로이드 9 · 웹 화면 크롬 138, 가로 1920×1080). 사용자는 아이폰만 있음
 - 웹 코드의 IS_APP (window.Capacitor.isNativePlatform) · html.is-app: 앱에서는 INAPP 감지 끔(; wv 로 크롬 튕김 막기), 홈 화면에 추가 · 출시 예정 · 데모 주소 숨김
-- 남은 일: ① 구글 · 카카오 로그인을 앱용(Capacitor Firebase Authentication · 파이어베이스에 안드로이드 앱 등록 + SHA-1) ② 다홍펜 워커 CORS 와 파이어베이스 승인된 도메인에 https://localhost ③ 뒤로 가기(지금은 앱이 바로 꺼짐) ④ 카메라 · 마이크 권한 ⑤ 바깥 링크 · 카카오 공유 ⑥ PDF · 상장 인쇄(새 창 안 됨) ⑦ 알림 ⑧ 플레이스토어 가족 정책 · 데이터 보안 양식
+- ✅ (2026-10-04) 앱 구글 로그인 성공: @capacitor-firebase/authentication (skipNativeAuth, providers google.com, variables.gradle rgcfaIncludeGoogle) → 웹 코드 appGoogleCred 가 FA.signInWithGoogle 의 idToken 으로 signInWithCredential. 파이어베이스에 안드로이드 앱(kr.co.iinote.app) 등록 + 디버그 SHA-1 AC:B9:11:0F:06:A4:94:2C:34:7A:54:A0:9F:C3:CD:B8:75:FA:E6:07, android/app/google-services.json (SHA-1 넣은 뒤 다시 받아야 oauth client_type 1 이 들어감). 출시 서명 키 · 플레이 앱 서명 SHA-1 도 나중에 추가해야 함
+- 플레이 콘솔 개발자 계정 (2026-10-04 만듦): 개인 계정, 개발자 이름 Moontr, bellachord@gmail.com, 카테고리 아동 · 가족. 본인 인증 · 전화 인증 · (기기 인증) 남음. 개인 계정은 테스터 12명 · 14일 비공개 테스트 뒤 정식 출시 가능
+- 남은 일: ① 카카오 로그인을 앱용(Capacitor Firebase Authentication · 파이어베이스에 안드로이드 앱 등록 + SHA-1) ② 다홍펜 워커 CORS 와 파이어베이스 승인된 도메인에 https://localhost ③ 뒤로 가기(지금은 앱이 바로 꺼짐) ④ 카메라 · 마이크 권한 ⑤ 바깥 링크 · 카카오 공유 ⑥ PDF · 상장 인쇄(새 창 안 됨) ⑦ 알림 ⑧ 플레이스토어 가족 정책 · 데이터 보안 양식
 
 ## 다른 PC에서 이어서 작업하기
 - `git clone https://github.com/vaca-at/iinote.git` 로 받은 폴더를 VS Code로 열고 그 폴더에서 바로 작업 (저장소 루트 = 작업 폴더)
