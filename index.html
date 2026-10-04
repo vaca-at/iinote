@@ -1522,7 +1522,7 @@ const OLD_DIARY_CONFIG = {
   messagingSenderId: "124372121061",
   appId: "1:124372121061:web:b1596628daae0bb08eab0c"
 };
-const OLD_PEOPLE = [["me","엄마"],["doyun","도윤"],["dojin","도진"]];   // 예전 일기장의 author 값과 이름
+const OLD_PEOPLE = [["me"],["doyun"],["dojin"]];   // 예전 일기장의 author 값 (이름은 코드에 적지 않아요)
 // '예전 가족일기장 가져오기'는 운영자 가족만 써요: 운영자 구글 계정일 때만 보여요 (이메일은 코드에 적지 않고 SHA-256 값으로만 비교)
 const OPERATOR_EMAIL_SHA256 = "22fa372a479af0929cadcbf6b12b6c2dace34800344067ef44b21a0c187487fb";
 async function isOperatorUser(u){
@@ -1598,7 +1598,7 @@ const weekDates = () => { const t = todayStr(); const back = (toDate(t).getDay()
 const rid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
 const makeCode = () => { const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; return [...Array(6)].map(()=>A[Math.floor(Math.random()*A.length)]).join(""); };
 const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; };
-// 마지막 글자에 받침이 있는지 (도윤아/서희야, 이모랑/엄마랑)
+// 마지막 글자에 받침이 있는지 (지우야/서희야, 이모랑/엄마랑)
 const hasBatchim = s => { const c=String(s||"").trim().slice(-1).charCodeAt(0); return c>=0xAC00 && c<=0xD7A3 && (c-0xAC00)%28!==0; };
 const kidInviteMsg = (kid,url) => `${kid.name}${hasBatchim(kid.name)?"아":"야"}! ${S.me.name}${hasBatchim(S.me.name)?"이랑":"랑"} 같이 일기 쓰자 ✏️\n아래 링크를 누르고 '시작하기'만 누르면 돼.\n${url}`;
 const onColor = hex => { const n=parseInt(hex.slice(1),16); const r=n>>16&255,g=n>>8&255,b=n&255; return (0.299*r+0.587*g+0.114*b)>140?"#1F2A44":"#FFFFFF"; };
@@ -2606,7 +2606,7 @@ function favRow(){
 }
 // 부모 폰으로 아이가 쓸 때: 부모 화면에는 '아이가 쓰기' 단추, 아이로 쓰는 중에는 '부모로 돌아가기'
 // 받침에 따라 "로" · "으로" (ㄹ 받침은 "로")
-// 아이 이름 부르기: 받침이 있으면 '이'를 붙여요 (도진 → 도진이의 · 지아 → 지아의). 어른 이름은 그대로
+// 아이 이름 부르기: 받침이 있으면 '이'를 붙여요 (서준 → 서준이의 · 지아 → 지아의). 어른 이름은 그대로
 const kidN = p => { const n=String(p?.name||""); if(p?.type!=="child") return n; const c=n.slice(-1).charCodeAt(0)-0xAC00; return c>=0&&c<11172&&c%28 ? n+"이" : n; };
 const ro = w => { const c=String(w||"").slice(-1).charCodeAt(0)-0xAC00; const j=c>=0&&c<11172?c%28:0; return j&&j!==8?"으로":"로"; };
 // 아이 프로필로 쓰던 기기에서 부모 프로필로 넘어갈 때만 부모 비밀번호를 물어요 (처음 로그인해 들어올 때는 안 물어요)
@@ -3083,7 +3083,7 @@ const albumRow = (st,key,pic,top="") => `<div class="al-row" data-alrow="${esc(k
     <label>📅 찍은 날<input type="date" data-alf="date" value="${esc(st.date||"")}" max="${todayStr()}"></label>
     <label>📍 장소<input data-alf="place" list="al-pl" maxlength="30" value="${esc(st.place||"")}" placeholder="예) 서울아산병원, 할머니 댁" autocomplete="off"></label>
     <label>🗺️ 동네 <small class="al-amsg">${esc(st.areaMsg||"")}</small><input data-alf="area" maxlength="30" value="${esc(st.area||"")}" placeholder="장소를 쓰면 찾아 줘요 (예: 서울 송파구)" autocomplete="off"></label>
-    <label class="al-wide">💌 메모 <small class="muted">비워 둬도 돼요</small><textarea data-alf="memo" maxlength="100" rows="2" placeholder="예) 도윤이가 태어난 날 · 엄마 손가락을 꼭 잡았어요">${esc(st.memo||"")}</textarea></label>
+    <label class="al-wide">💌 메모 <small class="muted">비워 둬도 돼요</small><textarea data-alf="memo" maxlength="100" rows="2" placeholder="예) 처음 걸음마 한 날 · 엄마 손가락을 꼭 잡았어요">${esc(st.memo||"")}</textarea></label>
   </div></div>`;
 const alState = key => key==="e" ? S.alEdit : S.alUp?.items.find(x=>x.k===key);
 /* 🗺️ 동네 찾기: 장소 이름 → OpenStreetMap(Nominatim)에서 '서울 송파구'처럼. 1초에 한 번씩만 물어봐요 (무료 이용 규칙) */
