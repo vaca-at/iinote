@@ -1535,9 +1535,160 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .lb .lb-memo{margin:0;max-width:min(520px,100%);padding:2px 12px;border-radius:8px;background:var(--butter-soft);color:var(--ink);border:1.5px dashed var(--butter);font-family:var(--diary);font-size:15px;line-height:1.4;text-align:center;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
 .lb .lb-cap span{overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){ .al-grid{grid-template-columns:repeat(3,1fr);gap:4px} .al-cell{border-radius:6px} }
+
+/* ---------- 📱 앱 시작 화면 · 앱 로그인 화면 (2026-10-05, 앱에서만) ----------
+   글꼴은 이 두 화면에 나오는 글자만 뽑은 작은 파일(fonts/)이라 인터넷이 느려도 바로 보여요. 글자를 바꾸면 그 글자도 넣어서 다시 만들어야 해요 (iinote-app/scripts/make-fonts.js)
+   두 아이 로고(.bl): 왼쪽 아이는 다 찬 채로, 시작 화면에서는 오른쪽 아이가 차오르며 진행률을 보여 줘요 */
+@font-face{font-family:'UnzS';src:url('fonts/unz-s.woff2') format('woff2');font-display:block}
+@font-face{font-family:'YuntaengS';src:url('fonts/yuntaeng-s.woff2') format('woff2');font-display:block}
+#boot{position:fixed;inset:0;z-index:2147483000;overflow:hidden;background-color:#FBF6EE;color:#1F2A44;font-family:"Gowun Dodum","Pretendard Variable",Pretendard,sans-serif;transition:opacity .28s}
+#boot.out{opacity:0;pointer-events:none}
+/* 글씨체 설정(손글씨 등)이 이 두 화면의 글자까지 바꾸지 않게 */
+#boot :where(span,p,a,button,small){font-family:inherit}
+#app .alog :where(span,p,a,button,small){font-family:inherit}
+.bt-A,.alog-A{background-color:#FBF6EE;background-image:linear-gradient(#F1E9DC 1.5px,transparent 1.5px),linear-gradient(90deg,#F1E9DC 1.5px,transparent 1.5px);background-size:36px 36px}
+.bt-C,.alog-C{background-color:#FFFDF9;background-image:repeating-linear-gradient(transparent 0,transparent 43px,#E9DCC8 43px,#E9DCC8 44px)}
+.bt-A::before,.bt-C::before,.alog-A::before,.alog-C::before{content:"";position:absolute;top:0;bottom:0;left:52px;width:2px;background:#F2B5A4}
+#boot.bt-D,.alog-D{background:#1F2A44;color:#FBF6EE}
+.bl{--d:64px;--w:54px;--h:170px;--h2:122px;--g:28px;--dg:16px;--bar:#1F2A44;--track:#E7DDCD;display:flex;align-items:flex-end;gap:var(--g)}
+.bl-i{display:flex;flex-direction:column;align-items:center;gap:var(--dg)}
+.bl-dot{display:block;width:var(--d);height:var(--d);border-radius:50%;background:#EF6F53}
+.bl-r .bl-dot{background:#F4BE45}
+.bl-bar{display:block;position:relative;width:var(--w);height:var(--h);border-radius:calc(var(--w) / 2);background:var(--bar);overflow:hidden}
+.bl-r .bl-bar{height:var(--h2)}
+#boot .bl-r .bl-bar{background:var(--track)}
+#boot .bl-r .bl-bar b{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--bar)}
+#boot .bl-r .bl-dot{transform:scale(.35);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+#boot.full .bl-r .bl-dot{transform:none}
+.bt-D .bl,.alog-D .bl{--bar:#FBF6EE;--track:rgba(251,246,238,.14)}
+.bt-name{font-family:UnzS,"Gowun Dodum",sans-serif;font-size:40px;line-height:1}
+.bt-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding-bottom:6vh}
+.bt-A .bt-mid{justify-content:flex-start;padding:28vh 0 0}
+.bt-foot{position:absolute;left:0;right:0;bottom:calc(14vh + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:4px}
+#boot .bt-pct{font-family:UnzS,"Gowun Dodum",sans-serif;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.bt-step{font-size:14px;color:#4E5870}
+.bt-row{display:flex;align-items:baseline;gap:10px;margin-top:-14px}
+.bt-sep{width:4px;height:4px;border-radius:50%;background:#B9AE9C;align-self:center}
+.bt-B .bt-name,.bt-D .bt-name{font-size:36px}
+#boot.bt-B .bt-pct{font-family:"Gowun Batang",serif;font-weight:700;font-size:22px}
+#boot.bt-D .bt-pct{font-size:26px;color:#F4BE45}
+.bt-D .bt-step{color:#C6C0B4}
+.bt-c{position:absolute;left:78px;right:28px;top:21vh;display:flex;flex-direction:column}
+.bt-C .bl{--d:42px;--w:36px;--h:114px;--h2:82px;--g:18px;--dg:10px;--track:#E9DCC8}
+.bt-head{font-family:UnzS,"Gowun Dodum",sans-serif;font-size:38px;line-height:44px;margin:40px 0 24px}
+.bt-C .bt-row{justify-content:space-between;margin:0}
+#boot.bt-C .bt-step{font-family:YuntaengS,"Gowun Dodum",sans-serif;font-size:23px;line-height:44px}
+#boot.bt-C .bt-pct{font-size:28px;color:#B8452D}
+.bt-e{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding-bottom:4vh}
+.bt-bub{position:relative;margin:0 0 -18px 150px;padding:10px 16px;border-radius:18px;background:#FFFDF9;border:2px solid #1F2A44;font-family:UnzS,"Gowun Dodum",sans-serif;font-size:22px;line-height:1.25;white-space:nowrap}
+.bt-bub::after{content:"";position:absolute;left:24px;bottom:-9px;width:14px;height:14px;background:#FFFDF9;border-right:2px solid #1F2A44;border-bottom:2px solid #1F2A44;transform:rotate(45deg)}
+#boot .bt-big .bt-pct{font-size:48px}
+.bt-E .bt-name{position:absolute;left:0;right:0;text-align:center;bottom:calc(8vh + env(safe-area-inset-bottom));font-family:"Gowun Batang",serif;font-weight:700;font-size:15px;letter-spacing:1px;color:#4E5870}
+@media (prefers-reduced-motion:reduce){ #boot,#boot .bl-r .bl-dot{transition:none} }
+/* 앱 로그인 화면: 웹 첫 화면 대신 로고 · 이름 · 단추만 */
+.alog{position:relative;min-height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;gap:40px;padding:calc(20vh + env(safe-area-inset-top)) 28px calc(56px + env(safe-area-inset-bottom));background:#FBF6EE;color:#1F2A44;font-family:"Gowun Dodum","Pretendard Variable",Pretendard,sans-serif}
+.alog-top{display:flex;flex-direction:column;align-items:center;gap:22px}
+.alog .bl{--d:50px;--w:42px;--h:132px;--h2:95px;--g:22px;--dg:12px}
+.alog-name{margin:0;font-family:UnzS,"Gowun Dodum",sans-serif;font-size:40px;font-weight:400;line-height:1;letter-spacing:0}
+.alog-tag{margin:-14px 0 0;font-size:15px;color:#4E5870;text-align:center}
+.alog-B .alog-name{font-size:36px}
+#app .alog-B .alog-tag{margin:0;font-family:"Gowun Batang",serif;font-size:16px;line-height:1.6}
+.alog-rule{width:28px;height:2px;margin:-8px 0;background:#F2B5A4}
+.alog-D .alog-tag{color:#C6C0B4}
+.alog-bottom{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:420px;margin:0 auto}
+.alog-btns{display:flex;flex-direction:column;gap:12px;width:100%}
+.alog-btns button{display:flex;align-items:center;justify-content:center;gap:10px;height:56px;border:0;border-radius:16px;font:inherit;font-size:17px;cursor:pointer}
+.alog-btns svg{width:20px;height:20px;flex:none}
+.alog-k .ic{fill:currentColor;stroke:none}
+.alog-g{background:#FFFDF9;color:#1F2A44;box-shadow:inset 0 0 0 1.5px #E7DDCD}
+.alog-k{background:#FEE500;color:#191919}
+.alog-B .alog-btns button{border-radius:28px}
+.alog-B .alog-g{background:#1F2A44;color:#FBF6EE;box-shadow:none}
+.alog-B .alog-g .g-logo{width:28px;height:28px;padding:6px;box-sizing:border-box;border-radius:50%;background:#fff}
+.alog-D .alog-g{background:#fff;box-shadow:none}
+.alog-links{display:flex;flex-direction:column;align-items:center;gap:18px}
+.alog-tour{padding:4px;border:0;background:none;font:inherit;font-size:14px;color:#4E5870;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.alog-legal{font-size:12px;color:#767E91}
+.alog-legal a{color:inherit}
+.alog-D .alog-tour{color:#C6C0B4}
+.alog-D .alog-legal{color:#9CA2B0}
+.alog-C{padding-left:78px;font-family:YuntaengS,"Gowun Dodum",sans-serif}
+.alog-C .alog-top{align-items:flex-start;gap:0;margin-top:-6vh}
+.alog-C .bl{--d:32px;--w:27px;--h:86px;--h2:62px;--g:14px;--dg:8px;margin-bottom:40px}
+.alog-head{font-family:UnzS,"Gowun Dodum",sans-serif;font-size:38px;line-height:44px}
+.alog-C .alog-tag{margin:0;font-size:23px;line-height:44px;text-align:left}
+.alog-C .alog-bottom{align-items:stretch}
+.alog-C .alog-btns button{height:54px;border-radius:14px;box-shadow:inset 0 0 0 2px #1F2A44;font-size:22px}
+.alog-C .alog-links{flex-direction:row;justify-content:space-between;align-items:baseline}
+.alog-C .alog-tour{font-size:21px;color:#B8452D}
+#app .alog-C .alog-legal{font-family:"Gowun Dodum",sans-serif}
+/* 📱 당겨서 새로고침 동그라미 */
+.ptr{position:fixed;top:calc(env(safe-area-inset-top) + 8px);left:50%;z-index:60;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.18);transform:translate(-50%,-56px);opacity:0;pointer-events:none}
+.ptr svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.ptr.go{background:var(--butter);color:#1F2A44}
+.ptr.go:not(.spin) svg{transform:rotate(180deg)}
+.ptr.spin svg{animation:ptr-spin .8s linear infinite}
+@keyframes ptr-spin{to{transform:rotate(360deg)}}
+/* 📱 PDF 미리 보기 (일기책 · 상장): 위 닫기 · 가운데 미리 보기 · 아래 저장/보내기 */
+.docv{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;background:var(--paper);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.docv-top{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.docv-top b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+.docv-x{display:grid;place-items:center;width:44px;height:44px;flex:none;border:0;border-radius:50%;background:none;color:var(--ink);cursor:pointer}
+.docv-f{flex:1;min-height:0;width:100%;border:0;background:#E9EBF0}
+.docv-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 4px}
+.docv-btns .btn{justify-content:center;min-height:50px}
+.docv-hint{margin:0;padding:4px 16px 12px;font-size:12px;color:var(--ink3);text-align:center}
+/* 📱 앱 잠금 화면 */
+.applock{position:fixed;inset:0;z-index:2147483600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#FBF6EE;color:#1F2A44}
+.applock .bl{--d:40px;--w:34px;--h:104px;--h2:75px;--g:18px;--dg:10px}
+.applock-t{margin:0;font-family:UnzS,"Gowun Dodum",sans-serif;font-size:24px}
+/* 📱 인터넷 끊김 띠 */
+.netbar{position:fixed;left:0;right:0;top:0;z-index:70;padding:calc(env(safe-area-inset-top) + 6px) 16px 6px;background:#1F2A44;color:#FBF6EE;font-size:13px;text-align:center}
+/* 📱 앱 설정 칸 */
+.app-sw{display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;cursor:pointer}
+.app-sw input{width:22px;height:22px;margin:2px 0 0;flex:none;accent-color:var(--ink)}
+.set-sub{display:block;font-size:12.5px;color:var(--ink3);font-weight:400;line-height:1.45;margin-top:2px}
+.app-time{width:auto;padding:8px 10px}
 </style>
 </head>
 <body>
+<script>
+/* 📱 앱 시작 화면 (2026-10-05): 앱에서만, 켤 때마다 다섯 가지(A~E) 중 하나가 무작위로 떠요.
+   웹 코드가 bootTo(목표 %, 단계) · bootDone() 으로 어디까지 왔는지 알려 주고, 그 사이에는 목표 바로 앞까지 천천히 차올라요.
+   웹(브라우저)에서는 아무것도 하지 않아요 */
+(function(){
+  var C=window.Capacitor;
+  if(!(C && C.isNativePlatform && C.isNativePlatform())){ window.bootTo=window.bootDone=function(){}; return; }
+  document.documentElement.classList.add("is-app");
+  var V="ABCDE".charAt(Math.floor(Math.random()*5));
+  var STEP=["앱을 준비하고 있어요","로그인을 확인하고 있어요","내 정보를 불러오고 있어요","가족 일기장을 펼치고 있어요","다 됐어요"];
+  var SAY=["일어나는 중…","누군지 확인 중!","내 일기 찾는 중","가족 일기장 펼치는 중","다 왔어!"];
+  var logo='<div class="bl"><span class="bl-i"><i class="bl-dot"></i><i class="bl-bar"></i></span><span class="bl-i bl-r"><i class="bl-dot"></i><i class="bl-bar"><b></b></i></span></div>';
+  var name='<div class="bt-name">아이아이노트</div>', pct='<span class="bt-pct">0%</span>', step='<span class="bt-step"></span>';
+  var html = V==="C" ? '<div class="bt-c">'+logo+'<div class="bt-head">오늘도<br>우리 가족 일기장</div><div class="bt-row">'+step+pct+'</div></div>'
+    : V==="E" ? '<div class="bt-e"><div class="bt-bub"><span class="bt-say"></span></div>'+logo+'<div class="bt-big">'+pct+'</div></div>'+name
+    : '<div class="bt-mid">'+logo+name+(V==="A" ? '' : '<div class="bt-row">'+pct+(V==="B"?'<i class="bt-sep"></i>':'')+step+'</div>')+'</div>'+(V==="A" ? '<div class="bt-foot">'+pct+step+'</div>' : '');
+  var el=document.createElement("div"); el.id="boot"; el.className="bt-"+V; el.innerHTML=html;
+  el.setAttribute("role","progressbar"); el.setAttribute("aria-label","아이아이노트를 여는 중"); el.setAttribute("aria-valuemin","0"); el.setAttribute("aria-valuemax","100");
+  document.body.appendChild(el);
+  var shown=0, target=20, idx=0, done=false, t0=Date.now();
+  var $p=el.querySelectorAll(".bt-pct"), $s=el.querySelector(".bt-step"), $y=el.querySelector(".bt-say"), $f=el.querySelector(".bl-r b");
+  function paint(){ var p=Math.round(shown); for(var i=0;i<$p.length;i++) $p[i].textContent=p+"%"; if($s) $s.textContent=STEP[idx]; if($y) $y.textContent=SAY[idx]; $f.style.height=p+"%"; el.setAttribute("aria-valuenow",p); }
+  var tick=setInterval(function(){
+    if(done) shown=Math.min(100,shown+5);
+    else { var cap=target-1; if(shown<cap) shown=Math.min(cap, shown+Math.max(.15,(cap-shown)*.08)); }
+    paint();
+    if(done && shown>=100){ clearInterval(tick); idx=4; paint(); el.classList.add("full");
+      setTimeout(function(){ el.classList.add("out"); setTimeout(function(){ el.remove(); },320); },450); }
+  },40);
+  window.bootTo=function(p,i){ if(p>target){ target=p; idx=i; } };
+  // 너무 빨리 끝나면 깜빡이기만 하니 0.7초는 보여 줘요
+  window.bootDone=function(){ if(window.bootDone.called) return; window.bootDone.called=true;
+    setTimeout(function(){ done=true; if(idx<3) idx=3; }, Math.max(0, 700-(Date.now()-t0))); };
+  setTimeout(window.bootDone, 15000);   // 무언가 막혀도 15초 뒤에는 화면을 열어 줘요
+  paint();
+})();
+</script>
 <div id="app"><main class="seo-intro">
   <img src="icon.png" alt="아이아이노트 로고" width="64" height="64">
   <h1>아이아이노트 · 가족이 함께 쓰는 일기장</h1>
@@ -1677,7 +1828,7 @@ const host = u => { try { return new URL(u).hostname.replace(/^www\./,""); } cat
 // 자동 로그아웃: '로그인 유지'를 켜면 30일 뒤, 끄면 30분 동안 아무것도 안 하면 (일기를 쓰는 중에는 기다려요). 브라우저를 다시 열었을 때도 같은 시간으로 판단
 // 아이 휴대폰 연결(익명) 계정은 로그아웃하면 연결 링크로 다시 들어와야 해서 빼요
 const KEEP_DAYS = 30, IDLE_MIN = 30;
-const keepLogin = () => ls.get("iinote-keep")==="1";
+const keepLogin = () => IS_APP || ls.get("iinote-keep")==="1";   // 📱 앱은 카카오톡처럼 직접 로그아웃할 때까지 로그인 유지
 const ls = { get(k,d){ try{ const v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }, del(k){ try{ localStorage.removeItem(k); }catch(e){} } };
 const blobToDataURL = b => new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(b); });
 const mmss = s => `${Math.floor(s/60)}:${pad(s%60)}`;
@@ -1980,6 +2131,14 @@ async function makeFirebase(){
   const appGoogleCred = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 구글 로그인 부품을 찾지 못했어요");
     const r=await FA.signInWithGoogle(); const c=r?.credential; if(!c?.idToken) throw new Error("구글 로그인을 하지 못했어요. 다시 눌러 주세요");
     return AU.GoogleAuthProvider.credential(c.idToken, c.accessToken||null); };
+  // 📱 앱 카카오 로그인 (2026-10-05): 휴대폰 로그인 창(OpenID Connect oidc.kakao)에서 받은 토큰을 웹 로그인에 넘겨요.
+  // 아이디 토큰(+nonce)이 안 받아지면 액세스 토큰으로 한 번 더 시도해요
+  const appKakaoCreds = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 로그인 부품을 찾지 못했어요");
+    const r=await FA.signInWithOpenIdConnect({providerId:"oidc.kakao", skipNativeAuth:true}), c=r?.credential||{};
+    const L=[]; if(c.idToken) L.push({idToken:c.idToken, ...(c.nonce?{rawNonce:c.nonce}:{}), ...(c.accessToken?{accessToken:c.accessToken}:{})}); if(c.accessToken) L.push({accessToken:c.accessToken});
+    if(!L.length) throw new Error("카카오 로그인을 하지 못했어요. 다시 눌러 주세요");
+    return L.map(o=>new AU.OAuthProvider("oidc.kakao").credential(o)); };
+  const withKakao = async fn => { const L=await appKakaoCreds(); let err; for(const c of L){ try{ return await fn(c); }catch(e){ err=e; if(/account-exists|credential-already-in-use|provider-already-linked/.test(e.code||"")) throw e; } } throw err; };
   const redirectLogin = STANDALONE && FIREBASE_CONFIG.authDomain===location.hostname;
   if(redirectLogin) AU.getRedirectResult(auth).catch(e=>{ console.warn("로그인",e); setTimeout(()=>toast(/account-exists/.test(e.code||"")?"같은 이메일로 이미 다른 방법으로 가입되어 있어요. 처음 가입한 방법으로 로그인해 주세요.":"로그인하지 못했어요. 다시 눌러 주세요."),500); });
   const db = F.getFirestore(app);
@@ -1996,13 +2155,13 @@ async function makeFirebase(){
     async signIn(){ if(IS_APP){ await AU.signInWithCredential(auth, await appGoogleCred()); return; }
       const pv=new AU.GoogleAuthProvider(); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
     // 카카오 로그인: 파이어베이스 로그인 방법에 OpenID Connect(oidc.kakao)로 등록해 둠
-    async signInKakao(){ if(IS_APP) throw new Error("앱에서 카카오 로그인은 곧 열려요. 지금은 구글로 시작해 주세요");
+    async signInKakao(){ if(IS_APP){ await withKakao(c=>AU.signInWithCredential(auth,c)); return; }
       const pv=new AU.OAuthProvider("oidc.kakao"); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
     // 로그인은 늘 이 브라우저에 기억해요(새 탭 · 공부방 링크에서도 그대로). 로그아웃 시간은 autoLogoutCheck 가 정해요
     async setKeep(){},
     // 한 계정에 구글 · 카카오 둘 다 연결: 어느 쪽으로 로그인해도 같은 계정(uid)
     providers(){ const u=auth.currentUser; return u&&!u.isAnonymous ? u.providerData.map(p=>p.providerId) : []; },
-    async link(kind){ if(IS_APP){ if(kind==="kakao") throw new Error("앱에서 카카오 연결은 곧 열려요. 웹(iinote.co.kr)에서 연결해 주세요"); await AU.linkWithCredential(auth.currentUser, await appGoogleCred()); return; }
+    async link(kind){ if(IS_APP){ if(kind==="kakao") await withKakao(c=>AU.linkWithCredential(auth.currentUser,c)); else await AU.linkWithCredential(auth.currentUser, await appGoogleCred()); return; }
       await AU.linkWithPopup(auth.currentUser, kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     // 연결하려는 계정이 이미 따로 가입돼 있으면, 오류 안에 든 로그인 정보로 그 계정을 확인할 수 있어요
     credFromError(kind,e){ try{ return kind==="kakao" ? AU.OAuthProvider.credentialFromError(e) : AU.GoogleAuthProvider.credentialFromError(e); }catch(x){ return null; } },
@@ -2011,6 +2170,7 @@ async function makeFirebase(){
       const app2=A.getApps().find(a=>a.name==="other") || A.initializeApp(FIREBASE_CONFIG,"other");
       const a2=AU.getAuth(app2), db2=F.getFirestore(app2);
       if(cred) await AU.signInWithCredential(a2,cred);
+      else if(IS_APP){ if(kind==="kakao") await withKakao(c=>AU.signInWithCredential(a2,c)); else await AU.signInWithCredential(a2, await appGoogleCred()); }   // 앱은 팝업 대신 휴대폰 로그인 창
       else { const p=kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider(); if(kind!=="kakao") p.setCustomParameters({prompt:"select_account"}); await AU.signInWithPopup(a2,p); }
       const uid=a2.currentUser.uid;
       return { uid,
@@ -2030,6 +2190,8 @@ async function makeFirebase(){
     async signOut(){ if(IS_APP) try{ await window.Capacitor.Plugins.FirebaseAuthentication.signOut(); }catch(e){} await AU.signOut(auth); },   // 앱: 휴대폰 구글 로그인도 풀어서 다음에 계정을 다시 고르게
     async getIdToken(){ return auth.currentUser ? auth.currentUser.getIdToken() : ""; },
     async getUser(uid){ const s=await F.getDoc(F.doc(db,"users",uid)); return s.exists()?s.data():null; },
+    // 📱 앱 푸시 알림: 이 휴대폰의 알림 주소(FCM 토큰)를 내 계정에 적어 두면, 가족 소식이 생길 때 서버(iinote-app/firebase)가 보내요
+    async savePushToken(uid,token,on=true){ await F.setDoc(F.doc(db,"users",uid),{pushTokens:on?F.arrayUnion(token):F.arrayRemove(token)},{merge:true}); },
     async addUserGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{groupIds:F.arrayUnion(gid),lastGroupId:gid,kind:kindOf()},{merge:true}); },
     async setLastGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{lastGroupId:gid},{merge:true}); },
     // 예전 계정 · 나중에 카카오를 연결한 계정도 들어올 때 종류를 맞춰 둬요 (가족에 들어간 계정만)
@@ -2229,6 +2391,7 @@ function variants(word){
    5. 상태
    ========================================================= */
 const B = DEMO ? makeDemo() : await makeFirebase();
+window.bootTo(45,1);   // 📱 앱 시작 화면: 로그인 확인 단계로
 // 아이 휴대폰 연결 링크: 새 모양 ?k=초대코드-아이번호&n=이름 (문자 앱이 & 뒤를 잘라도 열리게), 예전 모양 ?join=…&kid=…&n=… 도 그대로
 // 탭마다 주소 (2026-10-03): iinote.co.kr/shelf 처럼 바로 들어오면 깃허브 페이지의 404.html 이 /?p=/shelf 로 넘겨 줘요 → 원래 주소로 되돌리기
 { const p0=new URLSearchParams(location.search).get("p"); if(p0 && /^\/[a-z]/.test(p0)) history.replaceState(null,"",p0); }
@@ -2484,6 +2647,7 @@ const ICONS = {
   stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   left:'<path d="M15 5l-7 7 7 7"/>', right:'<path d="M9 5l7 7-7 7"/>',
+  camera:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5L9 5h6l1.5 2H19a1.5 1.5 0 0 1 1.5 1.5V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/><circle cx="12" cy="13" r="3.5"/>',
   talk:'<path d="M12 3.5c-5.2 0-9.5 3.3-9.5 7.4 0 2.6 1.7 4.9 4.3 6.2l-.9 3.4c-.1.3.3.6.6.4l4-2.7c.5.1 1 .1 1.5.1 5.2 0 9.5-3.3 9.5-7.4S17.2 3.5 12 3.5z"/>'
 };
 // 구글 로그인 단추의 G 로고 (구글 상표 색 그대로라 CSS 변수 대신 고정 색)
@@ -2540,6 +2704,19 @@ const devicesArt = () => `<svg class="devices" viewBox="0 0 400 210" aria-hidden
 /* =========================================================
    7. 화면들
    ========================================================= */
+// 📱 앱 로그인 화면 (2026-10-05): 웹 첫 화면처럼 글이 많지 않게 로고 · 이름 · 단추만. 켤 때마다 네 가지(A~D) 중 하나
+const ALOG = "ABCD".charAt(Math.floor(Math.random()*4));
+function viewAppLogin(){
+  const logo = `<div class="bl"><span class="bl-i"><i class="bl-dot"></i><i class="bl-bar"></i></span><span class="bl-i bl-r"><i class="bl-dot"></i><i class="bl-bar"></i></span></div>`;
+  const top = ALOG==="C" ? `${logo}<div class="alog-head">오늘 일기,<br>같이 써 볼까요?</div><p class="alog-tag">아이아이노트 · 가족이 함께 쓰는 일기장</p>`
+    : ALOG==="B" ? `${logo}<h1 class="alog-name">아이아이노트</h1><i class="alog-rule"></i><p class="alog-tag">서로 읽어 주는<br>우리 가족 일기장</p>`
+    : `${logo}<h1 class="alog-name">아이아이노트</h1><p class="alog-tag">가족이 함께 쓰는 일기장</p>`;
+  return `<main class="alog alog-${ALOG}"><div class="alog-top">${top}</div>
+    <div class="alog-bottom">
+      <div class="alog-btns"><button type="button" class="alog-g" data-act="signin">${G_LOGO}구글로 시작하기</button><button type="button" class="alog-k" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button></div>
+      <div class="alog-links"><button type="button" class="alog-tour" data-act="tour">먼저 둘러볼게요</button><span class="alog-legal"><a href="terms.html">이용약관</a> · <a href="privacy.html">개인정보처리방침</a></span></div>
+    </div></main>`;
+}
 function viewLanding(){
   if(S.joinCode && S.kidId){ const n=S.kidName||"우리 아이";
     return `<main class="center-page"><div class="onb kid-start">
@@ -2550,6 +2727,7 @@ function viewLanding(){
       <p class="muted" style="font-size:14px;margin-top:20px">크롬 메뉴(⋮)에서 '홈 화면에 추가'를 누르면 다음부터 아이콘으로 바로 들어올 수 있어요.</p>
       <p style="margin-top:16px"><button class="link-btn" data-act="not-kid">${esc(n)}${hasBatchim(n)?"이가":"가"} 아니에요 · 처음 화면으로</button></p>
     </div></main>`; }
+  if(IS_APP) return viewAppLogin();
   return `${tourBar()}<main class="landing"><div class="land">
     <section>
       <div class="land-brand">${logo(44)}<span>아이아이노트</span></div>
@@ -3384,7 +3562,7 @@ function makePdf(form){
   const list=visibleDiaries().filter(d=>d.status==="submitted" && who.includes(d.profileId) && d.date>=from && d.date<=to)
     .sort((a,b)=>a.date.localeCompare(b.date)||(a.createdAt||0)-(b.createdAt||0));
   if(!list.length){ toast("고른 기간에 올린 일기가 없어요"); return; }
-  const w=window.open("","_blank"); if(!w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }
+  const w=IS_APP?null:window.open("","_blank"); if(!IS_APP && !w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }   // 📱 앱은 새 창 대신 appDoc 미리 보기
   const people=who.map(prof).filter(Boolean), total=list.length, fam=S.group?.name||"우리집 일기장";
   const nPh=list.reduce((s,d)=>s+(d.photos||[]).length,0), nCm=list.reduce((s,d)=>s+S.comments.filter(c=>c.diaryId===d.id).length,0);
   const dotDate=s=>{ const d=toDate(s); return `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`; };
@@ -3437,15 +3615,16 @@ function makePdf(form){
       <div class="cv-stats"><div><b>${total}</b>편의 일기</div><div><b>${nPh}</b>장의 사진</div><div><b>${nCm}</b>개의 댓글</div></div></div>
     <p class="cv-foot">아이아이노트 · ${esc(SITE_ADDRESS)}</p></section>`;
   const layName=PDF_LAYOUTS.find(x=>x[0]===lay)?.[1]||"";
-  w.document.open();
-  w.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(fam)} ${list[0].date}~${list[total-1].date} (${esc(layName)})</title>
+  const docName=`${fam} ${list[0].date}~${list[total-1].date} (${layName})`;
+  const html=(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(docName)}</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Pen+Script&display=swap">
 <style>${PDF_CSS}${land?PDF_CSS_LAND:""}:root{--diary:${getComputedStyle(document.documentElement).getPropertyValue("--diary")}}</style></head><body>
 <div class="bar"><b>📄 ${esc(layName)} · 일기 ${total}편</b><span>대상(프린터)을 <b>‘PDF로 저장’</b>으로, 더 보기에서 <b>‘배경 그래픽’</b>을 켜 주세요.</span><button onclick="print()">인쇄 · PDF로 저장</button></div>
 ${cover}${pages}
 <script>document.fonts.ready.then(()=>setTimeout(()=>print(),800));<\/script></body></html>`);
-  w.document.close();
+  if(IS_APP){ appDoc(html,{name:docName,landscape:land}); return; }
+  w.document.open(); w.document.write(html); w.document.close();
 }
 // PDF 모양 (새 창 안에서만 쓰는 색 · 크기)
 const PDF_CSS = `@page{size:A4;margin:0}
@@ -3638,11 +3817,12 @@ function awardBanner(){
 }
 function openAward(pid, m){
   const p=prof(pid), a=p && awardsOf(p).find(x=>x.m===m); if(!a){ toast("상장을 찾지 못했어요"); return; }
-  const w=window.open("","_blank"); if(!w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }
+  const w=IS_APP?null:window.open("","_blank"); if(!IS_APP && !w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }   // 📱 앱은 새 창 대신 appDoc 미리 보기
   const [y,mm]=m.split("-").map(Number), nd=new Date(y,mm,1), full=a.kind==="full", fam=S.group?.name||"우리집";
   const body = full ? `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>하루도 빠짐없이</b> 일기를 써서<br>${a.last}일 모두 마음을 글로 남겼습니다.<br>그 꾸준함과 성실함을 칭찬하여 이 상장을 드립니다.`
                      : `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>${a.n}일</b> 일기를 써서<br>날마다 마음을 글로 남기려고 힘썼습니다.<br>그 성실함을 칭찬하여 이 상장을 드립니다.`;
-  w.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(p.name)} ${monthName(m)} ${awardName(a)}</title>
+  const docName=`${p.name} ${monthName(m)} ${awardName(a)}`;
+  const html=(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(docName)}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
 <style>@page{size:A4 landscape;margin:0}*{box-sizing:border-box}html,body{margin:0;background:#F3EEE6;font-family:'Gowun Batang',serif;color:#2B2A33}
 .bar{display:flex;gap:8px;justify-content:center;padding:14px;font-family:system-ui,sans-serif}.bar button{font:inherit;font-size:15px;padding:10px 18px;border-radius:999px;border:0;background:#1F2A44;color:#fff;cursor:pointer}.bar button.g{background:#fff;color:#1F2A44;border:1.5px solid #1F2A44}
@@ -3663,7 +3843,8 @@ h1{font-size:46pt;letter-spacing:18pt;margin:2mm 0 8mm;padding-left:18pt;color:$
 <p class="name"><b>${esc(p.name)}</b></p><p class="body">${body}</p>
 <p class="date">${nd.getFullYear()}년 ${nd.getMonth()+1}월 ${nd.getDate()}일</p><p class="from">${esc(fam)} 가족 · 아이아이노트</p>
 <div class="seal">참<br>잘했어요</div></div></div></body></html>`);
-  w.document.close();
+  if(IS_APP){ appDoc(html,{name:docName,landscape:true}); return; }
+  w.document.write(html); w.document.close();
 }
 function viewMyDiary(){
   const list=S.diaries.filter(d=>d.profileId===S.me.id).sort((a,b)=>b.date.localeCompare(a.date));
@@ -3884,6 +4065,7 @@ function loadDraft(date){
                  photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[],talk:d.talk?{...d.talk}:null}
               : {id:null,date,mood:"",weather:"",prompt:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null};
   S.talkBusy=null; S.kwQ=null;
+  restoreWip();   // 📱 인터넷이 끊기거나 앱이 꺼져서 저장 못 한 글이 있으면 이어서 쓰게
 }
 // 쓰는 중에 날짜를 바꾸면 내용은 그대로 두고 날짜만 옮겨요. 그날 쓴 일기가 이미 있으면 불러올지 물어봐요.
 function changeDraftDate(input){
@@ -4064,7 +4246,7 @@ function viewMedia(d){
   const secs=[];
   if(allow("photos")) secs.push(`<section class="media-sec" aria-label="사진"><div class="media-h">사진<span>${d.photos.length}/${MAX_PHOTOS}장</span></div>
     <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.thumb||p.url)}" alt="${i+1}번째 사진">${d.photos.length>1?`<button type="button" class="fav-btn ${p.fav?"on":""}" data-act="photo-fav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${i+1}번째 사진 미리보기로 고르기" title="목록 미리보기에 보일 사진 (2장까지)">${p.fav?"★":"☆"}</button>`:""}<button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button><button type="button" class="crop-btn" data-act="photo-crop" data-id="${esc(p.id)}" aria-label="${i+1}번째 사진 자르기 · 돌리기" title="자르기 · 돌리기">✂️</button></div>`).join("")}
-    ${d.photos.length<MAX_PHOTOS?`<label class="thumb-add">${ic("image")}<span>사진 추가</span><input type="file" id="w-photos" accept="image/*" multiple></label>`:""}</div>
+    ${d.photos.length<MAX_PHOTOS?`<label class="thumb-add">${ic("image")}<span>사진 추가</span><input type="file" id="w-photos" accept="image/*" multiple></label>${IS_APP?`<label class="thumb-add">${ic("camera")}<span>사진 찍기</span><input type="file" id="w-camera" accept="image/*" capture="environment"></label>`:""}`:""}</div>
     ${d.photos.length>1?`<p class="muted" style="margin:10px 0 0;font-size:13px">${d.photos.length}장은 일기장에 ${d.photos.length}분할로 보이고, 누르면 크게 볼 수 있어요.</p>`:""}</section>`);
   if(allow("location")){ const l=d.location;
     secs.push(`<section class="media-sec" aria-label="위치"><div class="media-h">위치${l&&l.lat!=null?"<span>지도에 약 100m 범위로 표시돼요</span>":""}</div>
@@ -4349,6 +4531,7 @@ function viewFamily(){
         <p style="margin:0 0 12px;color:var(--ink2)">우리 가족의 일기와 댓글을 엑셀에서 열 수 있는 CSV 파일로 이 기기에 저장해요. 사진 · 소리는 파일 안에 주소(링크)로 들어가요. 가끔 받아 두면 안심이에요.</p>
         <div class="row"><button class="btn btn-ghost sm" data-act="backup" data-v="diaries">${ic("download")}일기 받기 (${S.diaries.length}편)</button><button class="btn btn-ghost sm" data-act="backup" data-v="comments">${ic("download")}댓글 받기 (${S.comments.length}개)</button></div>
       </section>`:""}
+      ${IS_APP?appSettings():""}
       <section class="block" aria-labelledby="h-acc"><div class="block-h"><h2 id="h-acc">계정</h2></div>
         <div class="row">
           <button class="btn btn-ghost sm" data-act="switch-profile">프로필 바꾸기</button>
@@ -4388,6 +4571,7 @@ function keepStrip(x){
 function render(){
   if(TOUR_ASK){ TOUR_ASK=false; S.tourAsk=true; }
   if(S.tourAsk && S.phase==="landing"){ S.tourAsk=false; acts.tour(); return; }
+  if(S.phase!=="loading") window.bootDone();   // 📱 앱 시작 화면을 다 채우고 닫아요
   if(S.phase==="loading") $app.innerHTML=`<div class="loading">불러오는 중...</div>`;
   else if(S.phase==="landing") $app.innerHTML=viewLanding();
   else if(S.phase==="onboard") $app.innerHTML=viewOnboard();
@@ -4404,7 +4588,8 @@ function render(){
     afterChatRender();
     if(syncUrl()==="again"){ render(); return; }
   }
-  document.body.style.overflow = S.lb ? "hidden" : "";
+  document.body.style.overflow = S.lb || document.querySelector(".docv") ? "hidden" : "";
+  if(IS_APP && window.appReady) appAfterRender();   // 📱 위젯 글 · 처음 들어왔을 때 할 일 (아래 '앱 전용 기능')
 }
 function go(fn){ fn(); render(); window.scrollTo(0,0); }
 /* ---------- 주소와 뒤로 가기 ----------
@@ -5046,9 +5231,10 @@ async function saveDiary(status){
     tags:[...new Set([...d.tags,...extractTags(d.title+" "+d.text)])].slice(0,20) });
   const before = child ? new Set(stickersOf(S.me)) : null;   // 새 스티커를 받았는지 보려고
   await B.update(S.gid,"diaries",d.id,data);
-  d.status=status;
+  d.status=status; dropWip(d);   // 📱 서버에 저장됐으니 휴대폰에 보관하던 쓰던 일기는 지워요
   await reload("diaries");
-  if(status==="submitted"){ toast(child?"제출했어요":"올렸어요"); S.sub={type:"diary",id:d.id}; S.draft=null; render(); window.scrollTo(0,0);
+  if(status==="submitted") planRemind();   // 📱 오늘 썼으면 오늘 일기 알림은 건너뛰어요
+  if(status==="submitted"){ toast(child?"제출했어요":"올렸어요"); buzz("ok"); S.sub={type:"diary",id:d.id}; S.draft=null; render(); window.scrollTo(0,0);
     const got = before ? STICKERS.filter(x=>!before.has(x[0]) && stickersOf(S.me).includes(x[0])) : [];
     if(got.length) setTimeout(()=>toast(`🎉 새 스티커를 받았어요! ${got.map(x=>x[1]+" "+x[2]).join(" · ")}`),1300);
     if(child) setTimeout(()=>streakCelebrate(S.me),700); }
@@ -5176,8 +5362,8 @@ document.addEventListener("input", e => {
     const prev = e.target.id==="w-text" ? S.draft.text : S.draft.title;
     if(e.target.value.length-prev.length >= KID_MAX_BURST){ e.target.value=prev; toast(KID_TYPE_MSG); return; }
   }
-  if(e.target.id==="w-text"){ S.draft.text=e.target.value; syncLen(); refreshPen(); }
-  else if(e.target.id==="w-title") S.draft.title=e.target.value;
+  if(e.target.id==="w-text"){ S.draft.text=e.target.value; syncLen(); refreshPen(); saveWip(); }
+  else if(e.target.id==="w-title"){ S.draft.title=e.target.value; saveWip(); }
 });
 document.addEventListener("change", e => {
   const t=e.target;
@@ -5186,7 +5372,7 @@ document.addEventListener("change", e => {
   if(t.classList?.contains("al-files") && t.files?.length){ const fs=[...t.files]; t.value=""; albumPick(fs); return; }
   if(t.dataset?.alf==="place"){ const key=t.closest("[data-alrow]")?.dataset.alrow, st=alState(key); if(st){ st.place=t.value; findArea(st,key); } return; }
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
-  if(t.id==="w-photos" && t.files?.length){ addPhotos([...t.files]); return; }
+  if((t.id==="w-photos" || t.id==="w-camera") && t.files?.length){ addPhotos([...t.files]); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
   if(t.name==="mood" && S.draft){ S.draft.mood=t.value; const n=document.getElementById("wm-mood"); if(n) n.textContent=MOODS.find(m=>m[0]===t.value)?.[1]||""; return; }
   if(t.dataset.kwq!=null && S.draft){ S.draft.prompt=t.checked?t.dataset.kwq:""; render(); return; }
@@ -5246,7 +5432,7 @@ function loginAt(u){   // 이 기기에서 이 계정으로 로그인한 때
   return s.at;
 }
 async function autoLogoutCheck(){
-  const u=S.user; if(!u || u.isAnonymous || DEMO) return false;
+  const u=S.user; if(!u || u.isAnonymous || DEMO || IS_APP) return false;   // 앱은 자동 로그아웃 없음
   const now=Date.now(), at=loginAt(u), active=Math.max(lastAct, Number(ls.get("iinote-active"))||0);
   const writing=S.sub?.type==="write" && (S.draft?.text||"").trim();
   let why="";
@@ -5260,7 +5446,252 @@ async function autoLogoutCheck(){
 }
 setInterval(()=>{ autoLogoutCheck().catch(()=>{}); },60000);
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) autoLogoutCheck().catch(()=>{}); });
-const keepBox = () => DEMO ? "" : `<label class="keep-login"><input type="checkbox" data-pref="keep" ${keepLogin()?"checked":""}> 이 기기에서 로그인 유지 <small>(${KEEP_DAYS}일 · 내 휴대폰이나 집 컴퓨터일 때만 켜 주세요. 끄면 ${IDLE_MIN}분 동안 안 쓰면 로그아웃돼요)</small></label>`;
+const keepBox = () => DEMO || IS_APP ? "" : `<label class="keep-login"><input type="checkbox" data-pref="keep" ${keepLogin()?"checked":""}> 이 기기에서 로그인 유지 <small>(${KEEP_DAYS}일 · 내 휴대폰이나 집 컴퓨터일 때만 켜 주세요. 끄면 ${IDLE_MIN}분 동안 안 쓰면 로그아웃돼요)</small></label>`;
+
+/* ---------- 📱 당겨서 새로고침 (앱에서만, 2026-10-05) ----------
+   화면 맨 위에서 아래로 끌어내렸다 놓으면 가족 일기 · 댓글 · 일정 등을 다시 받아와요.
+   일기 쓰는 중 · 사진 크게 보기 · 채팅처럼 안쪽 칸을 스크롤할 때는 하지 않아요 */
+if(IS_APP){
+  const ARROW=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 12l6 6 6-6"/></svg>`, SPIN=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>`;
+  const ptr=document.createElement("div"); ptr.className="ptr"; ptr.setAttribute("aria-hidden","true"); ptr.innerHTML=ARROW; document.body.appendChild(ptr);
+  const MAX=110, GO=70; let y0=null, dy=0, busy=false;
+  const ok = e => !busy && window.scrollY<=0 && S.phase==="app" && !S.lb && S.sub?.type!=="write" && !e.target.closest(".chat-list,.sc-scroll,.al-strip,textarea,input,select");
+  const show = d => { ptr.style.transform=`translate(-50%,${Math.min(d,MAX)-56}px)`; ptr.style.opacity=Math.min(1,d/GO);
+    if(d>=GO && !ptr.classList.contains("go")) buzz("light");   // 놓으면 새로고침되는 지점에서 톡
+    ptr.classList.toggle("go", d>=GO); };
+  const hide = () => { ptr.style.transition="transform .2s,opacity .2s"; show(0); setTimeout(()=>{ ptr.style.transition=""; ptr.classList.remove("spin"); ptr.innerHTML=ARROW; busy=false; },220); };
+  addEventListener("touchstart", e=>{ y0 = e.touches.length===1 && ok(e) ? e.touches[0].clientY : null; dy=0; }, {passive:true});
+  addEventListener("touchmove", e=>{ if(y0===null) return; dy=Math.max(0,(e.touches[0].clientY-y0)*.5); if(window.scrollY>0) dy=0; show(dy); }, {passive:true});
+  addEventListener("touchend", async ()=>{ if(y0===null) return; y0=null;
+    if(dy<GO){ hide(); return; }
+    busy=true; ptr.classList.add("spin"); ptr.innerHTML=SPIN; ptr.style.transition="transform .2s"; ptr.style.transform="translate(-50%,16px)";
+    try{ await Promise.all([reloadAll(), wait(600)]); render(); }catch(e){ console.warn("새로고침",e); toast("새로 불러오지 못했어요. 인터넷 연결을 확인해 주세요"); }
+    hide();
+  });
+}
+
+/* =========================================================
+   📱 앱 전용 기능 (2026-10-05, 앱에서만 · 웹은 그대로)
+   뒤로 가기 · 바깥 링크 · PDF 저장/보내기 · 공유 · 진동 · 쓰던 일기 지키기(인터넷 끊김)
+   푸시 알림 · 아이콘 숫자 · 일기 쓰기 알림 · 앱 잠금 · 홈 화면 위젯 · 아이콘 길게 누르기 바로가기
+   앱 부품(플러그인)은 iinote-app 에 설치돼 있어요. 우리 앱 전용 부품 Iinote 는 IinotePlugin.java
+   ========================================================= */
+function plug(n){ return IS_APP ? (window.Capacitor?.Plugins?.[n] || null) : null; }   // 함수라서 이 아래가 실행되기 전에 불러도 괜찮아요
+
+// 진동: 하트 · 아래 메뉴는 가볍게, 도장은 조금 세게, 일기를 올리면 '됐다' 진동
+function buzz(kind){ const H=plug("Haptics"); if(!H) return;
+  try{ kind==="ok" ? H.notification({type:"SUCCESS"}) : H.impact({style:kind==="mid"?"MEDIUM":"LIGHT"}); }catch(e){} }
+const BUZZ = { heart:"light", stamp:"mid", tab:"light", "chat-react":"light", "save-diary":"light" };
+
+// 쓰던 일기 지키기: 쓰는 동안 이 휴대폰에 글을 계속 보관 → 인터넷이 끊기거나 앱이 꺼져도 다시 열면 이어서 써요
+function wipKey(d){ return `iinote-wip-${S.gid}-${S.me?.id}-${d?.date}`; }
+let wipT=0;
+function saveWip(){ if(!IS_APP || !S.draft || !S.me) return; clearTimeout(wipT);
+  wipT=setTimeout(()=>{ const d=S.draft; if(d) ls.set(wipKey(d), JSON.stringify({text:d.text,title:d.title,mood:d.mood,weather:d.weather,at:Date.now()})); },400); }
+function restoreWip(){ if(!IS_APP || !S.draft || !S.me) return;
+  let w=null; try{ w=JSON.parse(ls.get(wipKey(S.draft),"null")); }catch(e){}
+  if(!w || !(w.text||"").trim() || w.text===S.draft.text) return;
+  const o=S.draft.id && S.diaries.find(x=>x.id===S.draft.id);
+  if(o && (o.updatedAt||0)>w.at){ ls.del(wipKey(S.draft)); return; }   // 그 뒤에 다른 기기에서 고쳤으면 그쪽이 최신
+  Object.assign(S.draft,{text:w.text, title:w.title||S.draft.title, mood:w.mood||S.draft.mood, weather:w.weather||S.draft.weather});
+  setTimeout(()=>toast("저장하지 못한 일기가 있어서 이어서 쓸 수 있게 불러왔어요"),500); }
+function dropWip(d){ if(IS_APP && d) ls.del(wipKey(d)); }
+
+// 일기 쓰기 알림: 정한 시간에 앞으로 14일 동안 하루 한 번 (오늘 이미 썼으면 내일부터). 앱을 열 때마다 다시 맞춰요
+const REMIND_BASE=7000, REMIND_DAYS=14;
+async function planRemind(){ const L=plug("LocalNotifications"); if(!L) return;
+  await L.cancel({notifications:Array.from({length:REMIND_DAYS},(_,i)=>({id:REMIND_BASE+i}))}).catch(()=>{});
+  const time=ls.get("iinote-remind",""); if(!time || !S.me) return;
+  const [h,m]=time.split(":").map(Number), now=Date.now(), wrote=S.diaries.some(x=>x.profileId===S.me.id && x.date===todayStr() && x.status==="submitted");
+  const list=[]; for(let i=0;i<REMIND_DAYS;i++){ const at=new Date(); at.setDate(at.getDate()+i); at.setHours(h,m,0,0);
+    if(at.getTime()<=now || (i===0 && wrote)) continue;
+    list.push({id:REMIND_BASE+i, title:"오늘 일기 썼나요? ✏️", body:`${S.me.name}의 오늘을 한 줄만 남겨 봐요. 가족이 읽어 줄 거예요`, channelId:"remind", smallIcon:"ic_stat_iinote", schedule:{at, allowWhileIdle:true}, extra:{url:"/write"}}); }
+  if(list.length) await L.schedule({notifications:list}).catch(e=>console.warn("일기 알림",e)); }
+async function setRemind(time){ const L=plug("LocalNotifications"); if(!L) return false;
+  if(time){ let p=await L.checkPermissions(); if(p.display!=="granted") p=await L.requestPermissions();
+    if(p.display!=="granted"){ toast("알림 권한이 꺼져 있어요. 휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림에서 켜 주세요"); return false; }
+    await L.createChannel?.({id:"remind",name:"일기 쓰기 알림",description:"정한 시간에 오늘 일기를 알려 줘요",importance:4}).catch(()=>{});
+    ls.set("iinote-remind",time); }
+  else ls.del("iinote-remind");
+  await planRemind(); return true; }
+
+// 푸시 알림 (가족 소식): 알림 주소(FCM 토큰)를 내 계정에 적어 두면 서버가 보내요. 알림을 누르면 그 일기 · 채팅으로
+async function pushSetup(ask){ const P=plug("PushNotifications"); if(!P || !S.user || DEMO) return "none";
+  let st=await P.checkPermissions().catch(()=>({receive:"denied"}));
+  if(st.receive!=="granted"){ if(st.receive==="denied" && !ask) return "denied"; st=await P.requestPermissions().catch(()=>({receive:"denied"})); }
+  if(st.receive!=="granted") return "denied";
+  if(!pushSetup.on){ pushSetup.on=true;
+    await P.createChannel({id:"family",name:"가족 소식",description:"가족 일기 · 댓글 · 도장 · 채팅",importance:4,visibility:0,vibration:true,lights:true}).catch(()=>{});
+    P.addListener("registration",t=>{ ls.set("iinote-push",t.value); if(S.user) B.savePushToken?.(S.user.uid,t.value).catch(e=>console.warn("알림 주소 저장",e)); });
+    P.addListener("registrationError",e=>console.warn("알림 등록",e));
+    P.addListener("pushNotificationActionPerformed",a=>openAppUrl(a.notification?.data?.url||"/"));
+    P.addListener("pushNotificationReceived",()=>{ if(S.phase==="app" && S.gid) reloadAll().then(()=>render()).catch(()=>{}); });   // 앱을 보고 있을 때 온 소식은 바로 화면에
+  }
+  await P.register().catch(e=>console.warn("알림 등록",e)); return "on"; }
+// 앱 아이콘 숫자 · 알림 줄: 앱을 열면 다 읽은 걸로
+function clearBadge(){ plug("Badge")?.clear().catch(()=>{}); plug("PushNotifications")?.removeAllDeliveredNotifications().catch(()=>{}); }
+
+// 앱 잠금: 앱을 열 때와 30초 넘게 다른 앱을 쓰다 돌아올 때 지문 · 얼굴 · 휴대폰 잠금으로 확인
+const lockOn = () => IS_APP && ls.get("iinote-lock","")==="1";
+let leftAt=0, outAt=0;   // outAt: 사진 고르기 · 공유 · 바깥 링크로 잠깐 나간 때 (그때는 다시 묻지 않아요)
+const LOGO_FULL = `<div class="bl"><span class="bl-i"><i class="bl-dot"></i><i class="bl-bar"></i></span><span class="bl-i bl-r"><i class="bl-dot"></i><i class="bl-bar"></i></span></div>`;
+function showLock(){ if(document.querySelector(".applock")) return;
+  const el=document.createElement("div"); el.className="applock"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label","앱 잠금");
+  el.innerHTML=`${LOGO_FULL}<p class="applock-t">아이아이노트가 잠겨 있어요</p><button type="button" class="btn btn-primary" data-act="app-unlock">잠금 풀기</button>`;
+  document.body.appendChild(el); unlock(); }
+async function unlock(){ const NB=plug("NativeBiometric"); if(!NB){ document.querySelector(".applock")?.remove(); return; }
+  try{ await NB.verifyIdentity({reason:"아이아이노트 잠금 풀기", title:"아이아이노트", subtitle:"잠금을 풀어 주세요", negativeButtonText:"취소", useFallback:true});
+    document.querySelector(".applock")?.remove(); buzz("light"); }catch(e){ /* 취소하면 잠금 화면에 남아요 */ } }
+
+// 바깥 링크: 앱 안에 갇히지 않게 휴대폰 브라우저 창(크롬 탭)으로. 우리 사이트의 다른 페이지(약관 등)도 같이
+function openExternal(url){
+  try{ const u=new URL(url,location.href); url = u.origin===location.origin ? "https://iinote.co.kr"+u.pathname+u.search+u.hash : u.href; }catch(e){}
+  outAt=Date.now(); const Br=plug("Browser");
+  if(Br) Br.open({url, toolbarColor:"#FBF6EE"}).catch(()=>{ location.href=url; }); else location.href=url; }
+
+// PDF (일기책 · 상장): 새 창 대신 미리 보기 → 'PDF 저장'(다운로드 폴더) · '보내기'(카카오톡 · 드라이브 · 문자 · 메일)
+let docCur=null;
+function appDoc(html,opt){
+  closeDoc();
+  const clean=html.replace(/<script>[\s\S]*?<\/script>/g,"").replace("</head>","<style>.bar{display:none!important}</style></head>");
+  docCur={html:clean, name:opt.name||"아이아이노트", landscape:!!opt.landscape, file:null};
+  const z=Math.min(1,(innerWidth-20)/(opt.landscape?1123:794));
+  const el=document.createElement("div"); el.className="docv"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label","PDF 미리 보기");
+  el.innerHTML=`<div class="docv-top"><button type="button" class="docv-x" data-act="doc-close" aria-label="닫기">${ic("x")}</button><b>${esc(docCur.name)}</b></div>
+    <iframe class="docv-f" title="PDF 미리 보기"></iframe>
+    <div class="docv-btns"><button type="button" class="btn btn-ghost" data-act="doc-save">${ic("download")}PDF 저장</button><button type="button" class="btn btn-primary" data-act="doc-send">${ic("link")}보내기</button></div>
+    <p class="docv-hint">보내기를 누르면 카카오톡 · 구글 드라이브 · 문자 · 메일 중에서 골라 보낼 수 있어요</p>`;
+  document.body.appendChild(el);
+  el.querySelector("iframe").srcdoc=clean.replace("</head>",`<style>html{zoom:${z.toFixed(3)}}</style></head>`);
+  document.body.style.overflow="hidden"; }
+function closeDoc(){ document.querySelector(".docv")?.remove(); docCur=null; document.body.style.overflow=S.lb?"hidden":""; }
+async function docFile(){ if(docCur.file) return docCur.file;
+  const I=plug("Iinote"); if(!I) throw new Error("PDF를 만들려면 앱을 새로 설치해 주세요");
+  toast("PDF를 만들고 있어요. 잠깐만요…");
+  docCur.file=await I.makePdf({html:docCur.html, name:docCur.name, landscape:docCur.landscape, baseUrl:"https://iinote.co.kr/"});
+  return docCur.file; }
+
+// 홈 화면 위젯: 가족 이름 · 오늘 가족 일기 · 내 연속 기록 (바뀌었을 때만 보내요)
+let widgetLast="";
+function syncWidget(){ const I=plug("Iinote"); if(!I || S.phase!=="app" || !S.group || !S.me) return;
+  const t=todayStr(), today=S.diaries.filter(d=>d.date===t && d.status==="submitted");
+  const names=[...new Set(today.map(d=>prof(d.profileId)?.name).filter(Boolean))], st=streakOf(S.me.id);
+  const big = today.length ? `오늘 가족 일기 ${today.length}편` : "오늘 첫 일기를 써 볼까요?";
+  const small = [names.length?`${names.slice(0,4).join(" · ")} 썼어요`:"", st?`${S.me.name} 🔥 ${st}일 연속`:""].filter(Boolean).join("  ·  ") || "오늘 있었던 일을 한 줄 남겨 봐요";
+  const k=[S.group.name,big,small].join("|"); if(k===widgetLast) return; widgetLast=k;
+  I.updateWidget({title:`${S.group.name||"우리 가족"} 일기장`, big, small}).catch(()=>{}); }
+
+// 바로가기 · 위젯 · 알림이 연 주소(iinote://write 같은)를 앱 화면 주소로
+function appPath(url){
+  try{ const u=new URL(url);
+    if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase(); return ({write:"/write",chat:"/chat",album:"/album",home:"/"})[k]||"/"; }
+    return u.pathname+u.search; }catch(e){ return /^\//.test(String(url||"")) ? String(url) : "/"; } }
+function openAppUrl(url){ const p=appPath(url);
+  if(S.phase==="app" && S.me && S.routed){
+    if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")) return;
+    try{ history.pushState({iinote:1},"",p); }catch(e){} applyUrl(); render(); window.scrollTo(0,0); }
+  else { try{ history.replaceState(null,"",p); }catch(e){} }   // 아직 여는 중이면 주소만 바꿔 두면 들어간 뒤 그 화면으로 가요
+}
+
+// 앱 설정 (우리 가족 화면)
+function appSettings(){
+  const rt=ls.get("iinote-remind",""), lk=lockOn();
+  return `<section class="block" aria-labelledby="h-app"><div class="block-h"><h2 id="h-app">앱 설정</h2></div>
+    <div class="set-row"><span>가족 소식 알림<small class="set-sub">일기 · 댓글 · 도장 · 채팅이 오면 알려 주고 앱 아이콘에 숫자가 떠요</small></span><button type="button" class="btn btn-ghost sm" data-act="app-push">${S.pushState==="on"?"켜져 있어요":"알림 켜기"}</button></div>
+    <div class="set-row"><label class="app-sw" for="app-remind"><input type="checkbox" id="app-remind" ${rt?"checked":""}><span>일기 쓰기 알림<small class="set-sub">정한 시간에 "오늘 일기 썼나요?" 하고 알려 줘요. 오늘 이미 썼으면 내일부터</small></span></label><label class="sr" for="app-remind-time">알림 시간</label><input type="time" id="app-remind-time" class="app-time" value="${esc(rt||"20:00")}" ${rt?"":"disabled"}></div>
+    <div class="set-row"><label class="app-sw" for="app-lock"><input type="checkbox" id="app-lock" ${lk?"checked":""}><span>앱 잠금<small class="set-sub">앱을 열 때 지문 · 얼굴 · 휴대폰 잠금으로 확인해요 (30초 넘게 나갔다 오면 다시)</small></span></label></div>
+  </section>`; }
+
+// 화면을 그린 뒤: 처음 들어왔을 때 알림 · 알림 맞추기, 위젯 글
+function appAfterRender(){
+  if(S.phase!=="app" || !S.me) return;
+  if(appAfterRender.uid!==S.user?.uid){ appAfterRender.uid=S.user?.uid; clearBadge(); planRemind();
+    pushSetup(false).then(r=>{ S.pushState=r; }).catch(()=>{}); }
+  syncWidget(); }
+
+if(IS_APP){
+  const AP=plug("App");
+  // 뒤로 가기: 열린 창 닫기 → 이전 화면 → 홈 → 첫 화면에서는 '한 번 더 누르면 닫아요'
+  let backAt=0;
+  AP?.addListener("backButton", ({canGoBack})=>{
+    if(document.querySelector(".applock")){ AP.minimizeApp(); return; }
+    if(document.querySelector(".docv")){ closeDoc(); return; }
+    if(S.lb){ S.lb=null; render(); return; }
+    if(S.newsOpen){ S.newsOpen=false; render(); return; }
+    if(S.phase==="picker" && S.pinFor){ S.pinFor=null; render(); return; }
+    if(S.phase==="app" && S.me && (S.sub || (S.tab && S.tab!=="home"))){
+      if(canGoBack && history.state?.iinote) history.back();
+      else { if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")) return; go(()=>{ S.sub=null; S.draft=null; S.tab="home"; }); }
+      return; }
+    if(Date.now()-backAt<2000){ AP.minimizeApp(); return; }
+    backAt=Date.now(); toast("한 번 더 누르면 앱을 닫아요");
+  });
+  // 앱으로 돌아올 때: 아이콘 숫자 지우기 · 잠금 · 새 소식
+  AP?.addListener("appStateChange", ({isActive})=>{
+    if(!isActive){ leftAt=Date.now(); return; }
+    clearBadge();
+    if(lockOn() && leftAt && Date.now()-leftAt>30000 && leftAt-outAt>5000) showLock();
+    if(S.phase==="app" && S.gid && leftAt && Date.now()-leftAt>60000) reloadAll().then(()=>render()).catch(()=>{});
+  });
+  // 바로가기 · 위젯 · 알림으로 열기
+  AP?.addListener("appUrlOpen", e=>openAppUrl(e.url));
+  AP?.getLaunchUrl().then(r=>{ if(r?.url) openAppUrl(r.url); }).catch(()=>{});
+  plug("LocalNotifications")?.addListener("localNotificationActionPerformed", a=>openAppUrl(a.notification?.extra?.url||"/"));
+  if(lockOn()) showLock();
+
+  // 바깥 링크 · 새 창 링크 · 우리 사이트의 다른 페이지 → 휴대폰 브라우저 창
+  document.addEventListener("click", e=>{
+    const el=e.target.closest?.("[data-act]"); if(el && BUZZ[el.dataset.act]) buzz(BUZZ[el.dataset.act]);
+    if(e.target.closest?.('input[type="file"],label.thumb-add,label.al-pick,label.chat-ph,label.file-btn')) outAt=Date.now();   // 사진 고르기 · 찍기
+    const a=e.target.closest?.("a[href]"); if(!a || a.dataset.act) return;
+    const href=a.getAttribute("href")||""; if(/^(#|javascript:)/i.test(href)) return;
+    let u; try{ u=new URL(href,location.href); }catch(x){ return; }
+    if(!/^https?:$/.test(u.protocol)) return;   // tel: · mailto: 는 휴대폰이 알아서 열어요
+    if(u.origin!==location.origin || a.target==="_blank" || /\.html$/.test(u.pathname)){ e.preventDefault(); e.stopPropagation(); openExternal(u.href); }
+  }, true);
+
+  // 인터넷 끊김: 위에 띠를 보여 주고, 올리기는 연결된 뒤에
+  const netState = on => { document.documentElement.classList.toggle("offline",!on); let b=document.getElementById("netbar");
+    if(on){ b?.remove(); return; }
+    if(!b){ b=document.createElement("div"); b.id="netbar"; b.className="netbar"; b.setAttribute("role","status"); b.textContent="인터넷이 끊겼어요 · 쓰던 일기는 이 휴대폰에 보관하고 있어요"; document.body.appendChild(b); } };
+  const NW=plug("Network");
+  if(NW){ NW.getStatus().then(s=>netState(s.connected)).catch(()=>{}); NW.addListener("networkStatusChange", s=>{ const was=!document.documentElement.classList.contains("offline"); netState(s.connected); if(s.connected && !was) toast("인터넷이 다시 연결됐어요"); }); }
+  else { addEventListener("online",()=>netState(true)); addEventListener("offline",()=>netState(false)); }
+
+  // 앱 설정 칸 바꾸기
+  document.addEventListener("change", async e=>{
+    const t=e.target;
+    if(t.id==="app-remind"){ const tm=document.getElementById("app-remind-time"); const ok=await setRemind(t.checked?(tm?.value||"20:00"):"");
+      if(!ok) t.checked=false; if(tm) tm.disabled=!t.checked; if(ok) toast(t.checked?`매일 ${tm?.value||"20:00"}에 일기 쓰기를 알려 줄게요`:"일기 쓰기 알림을 껐어요"); }
+    if(t.id==="app-remind-time" && ls.get("iinote-remind","")){ await setRemind(t.value||"20:00"); toast(`매일 ${t.value}에 알려 줄게요`); }
+    if(t.id==="app-lock"){ const NB=plug("NativeBiometric"); const want=t.checked; t.checked=!want;
+      if(!NB){ toast("앱을 새로 설치하면 앱 잠금을 쓸 수 있어요"); return; }
+      const av=await NB.isAvailable({useFallback:true}).catch(()=>({isAvailable:false}));
+      if(!av.isAvailable){ toast("휴대폰 설정에서 지문이나 화면 잠금을 먼저 만들어 주세요"); return; }
+      try{ await NB.verifyIdentity({reason:want?"앱 잠금 켜기":"앱 잠금 끄기", title:"아이아이노트", subtitle:want?"앱 잠금을 켜요":"앱 잠금을 꺼요", negativeButtonText:"취소", useFallback:true}); }catch(x){ return; }
+      if(want) ls.set("iinote-lock","1"); else ls.del("iinote-lock"); t.checked=want; buzz("ok");
+      toast(want?"이제 앱을 열 때 잠금을 풀어야 해요":"앱 잠금을 껐어요"); }
+  });
+
+  // 공유하기는 휴대폰 공유 창으로 (카카오톡 · 문자 · 메일 · 드라이브)
+  Object.assign(acts,{
+    "kakao-share": ()=>{ outAt=Date.now(); plug("Share")?.share({title:"아이아이노트", text:"가족이 함께 쓰고 서로 읽어 주는 일기장, 아이아이노트", url:SHARE_URL, dialogTitle:"아이아이노트 알리기"}).catch(()=>{}); },
+    "doc-close": ()=>closeDoc(),
+    "doc-save": ()=>guard(async()=>{ const f=await docFile(); const r=await plug("Iinote").saveToDownloads({path:f.path}); buzz("ok"); toast(`${r.folder} 폴더에 저장했어요`); }),
+    "doc-send": ()=>guard(async()=>{ const f=await docFile(); outAt=Date.now();
+      await plug("Share").share({title:docCur?.name||"아이아이노트", files:[f.uri], dialogTitle:"PDF 보내기"}).catch(e=>{ if(!/cancel/i.test(e?.message||"")) throw e; }); }),
+    "app-unlock": ()=>unlock(),
+    "app-push": ()=>guard(async()=>{ const r=await pushSetup(true); S.pushState=r; render();
+      toast(r==="on"?"가족 소식이 오면 알려 줄게요":"알림이 꺼져 있어요. 휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림에서 켜 주세요"); }),
+  });
+  // 인터넷이 끊겼을 때 올리기를 누르면: 기다리지 않고 안내 (글은 휴대폰에 보관돼 있어요)
+  const saveAct=acts["save-diary"];
+  acts["save-diary"]=el=>{ if(!navigator.onLine || document.documentElement.classList.contains("offline")){ saveWip(); toast("인터넷이 연결되면 다시 눌러 주세요. 쓰던 일기는 이 휴대폰에 보관돼 있어요"); return; } return saveAct(el); };
+  // 로그아웃하면 이 휴대폰으로 알림이 가지 않게 알림 주소를 지워요
+  const outAct=acts.signout;
+  acts.signout=async el=>{ const tk=ls.get("iinote-push",""); if(tk && S.user && !S.user.isAnonymous) await B.savePushToken?.(S.user.uid,tk,false).catch(()=>{}); return outAct(el); };
+  window.appReady=true;
+}
 
 B.onAuth(async u => {
   S.isOperator = await isOperatorUser(u);
@@ -5269,9 +5700,10 @@ B.onAuth(async u => {
   if(!u.isAnonymous && !(S.joinCode && S.kidId)) ls.del("iinote-kidlink");   // 어른이 구글 · 카카오로 들어오면 기억한 아이 링크는 지워요
   if(await autoLogoutCheck()) return;
   countVisit(true);
-  S.phase="loading"; render();
+  S.phase="loading"; render(); window.bootTo(70,2);
   try{
     S.userDoc = (await B.getUser(u.uid)) || {};
+    window.bootTo(90,3);
     B.markKind?.(u.uid,S.userDoc).catch(()=>{});
     if(S.joinCode && S.kidId){ // 아이 휴대폰 연결 링크: 가족에 들어가서 그 아이 프로필로 바로 열기
       const gid=await B.joinGroup(S.joinCode,u,"",null), kid=S.kidId;
