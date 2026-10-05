@@ -1808,6 +1808,64 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .help-form{display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:var(--surface);box-shadow:0 -1px 8px rgba(46,36,51,.06)}
 .help-form textarea{flex:1;min-height:46px;max-height:120px;border-radius:23px;padding:11px 16px;resize:none}
 .help-send{display:grid;place-items:center;width:46px;height:46px;flex:none;border:0;border-radius:50%;background:var(--ink);color:var(--surface);cursor:pointer}
+/* 9. 마지막 칸이 가운데 ✏️ · 도움 단추에 가리지 않게: 아래 여백을 넉넉히, 내릴 때 도움 단추는 숨김 */
+.ashell{padding-bottom:calc(128px + env(safe-area-inset-bottom))}
+.a-help{transition:transform .2s,opacity .2s}
+.hide-help .a-help{transform:translateY(160%);opacity:0;pointer-events:none}
+.ah .bell .ic{width:24px;height:24px}
+/* 1. 일기 쓰기: 아래 메뉴 없이, 임시 저장 · 올리기 막대를 맨 아래에 고정 */
+.ashell.writing{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+.writing .w-acts{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:var(--surface);box-shadow:0 -2px 12px rgba(46,36,51,.1);flex-wrap:nowrap}
+.writing .w-acts .btn{flex:1;justify-content:center;min-height:50px}
+.w-top{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.w-top input[type=date]{flex:1;min-width:0;width:auto;padding:8px 10px;font-size:15px}
+.w-top .muted{flex:none;font-size:13px}
+/* 3. 날씨 · 기분: 단추 두 개, 누르면 그 줄만 */
+.wm-app{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.wm-pick{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;align-items:center;column-gap:10px;padding:8px 14px;border:0;border-radius:16px;background:var(--surface);box-shadow:0 1px 6px rgba(46,36,51,.08);font:inherit;color:var(--ink);text-align:left;cursor:pointer}
+.wm-pick small{grid-column:2;font-size:12px;color:var(--ink3)}
+.wm-pick span{grid-row:1/3;font-size:28px;line-height:1}
+.wm-pick b{grid-column:2;font-weight:400;font-size:15px}
+.wm-pick.on{box-shadow:0 0 0 2px var(--ink)}
+.wm-pop{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:-2px 0 12px;padding:10px;border:0;border-radius:16px;background:var(--surface2)}
+.wm-pop .wm-o{display:flex;flex-direction:column;align-items:center;gap:2px}
+.wm-pop .wm-o small{font-size:11.5px;color:var(--ink2);text-align:center}
+/* 4. 채팅: 상자 없이 화면 가득, 입력 칸은 맨 아래 */
+.ashell.chatting{padding-bottom:0}
+.chatting .a-main{padding:0}
+.chatting .chat{display:flex;flex-direction:column;height:calc(100dvh - 64px - env(safe-area-inset-top))}
+.chatting .chat .page-h{display:none}
+.chatting .chat-list{flex:1;height:auto;min-height:0;margin:0;border:0;border-radius:0;background:transparent;padding:12px 14px}
+.chatting .chat-in{margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--surface);box-shadow:0 -2px 12px rgba(46,36,51,.08)}
+/* 5. 하루 펼쳐보기: 가로로 나란히, 누르면 그 칸만 넓게 */
+.app-day .day-nav{margin-bottom:4px}
+.day-tip{margin:0 0 8px;text-align:center;font-size:12.5px;color:var(--ink3)}
+.app-day .day-cols{gap:6px;transition:grid-template-columns .25s}
+.app-day .day-col{min-width:0;padding:10px 8px;border-radius:14px;overflow:hidden}
+.day-cover{position:absolute;inset:0;z-index:4;border:0;background:none;cursor:pointer}
+.app-day .day-col.side .day-h,.app-day .day-col.narrow .day-h{flex-wrap:wrap;gap:4px}
+.app-day .day-col:not(.focus) .day-text{font-size:13.5px;line-height:1.6;max-height:30em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 85%,transparent)}
+.app-day .day-col:not(.focus) :is(.day-pen,.day-stamps,.day-cform,.day-cmts,.day-q,.day-hearts,.mood-chip){display:none}
+.app-day .day-col:not(.focus) .day-ph{grid-template-columns:1fr}
+.app-day .day-col.narrow{padding:10px 4px}
+.app-day .day-col.narrow .day-h b{font-size:11px;writing-mode:vertical-rl}
+.app-day .day-col.narrow :is(.day-text,.day-ph,.day-stamp,.pill){opacity:.35}
+.app-day .day-col.narrow .day-text{font-size:11px}
+.app-day .day-col.narrow .day-h .av{width:24px!important;height:24px!important;font-size:11px!important}
+.app-day .day-col.focus .day-stamp{right:8px}
+/* 10. 우리 가족 설정: 제목 목록, 누르면 그 칸만 펼침 */
+.fam-menu .block.acc{padding:0;margin-bottom:10px}
+.fam-menu .block.acc > .block-h{margin:0;padding:16px 18px;cursor:pointer;position:relative}
+.fam-menu .block.acc > .block-h::after{content:"";position:absolute;right:20px;top:50%;width:9px;height:9px;border-right:2px solid var(--ink3);border-bottom:2px solid var(--ink3);transform:translateY(-70%) rotate(45deg);transition:transform .15s}
+.fam-menu .block.acc.open > .block-h::after{transform:translateY(-30%) rotate(-135deg)}
+.fam-menu .block.acc:not(.open) > :not(.block-h){display:none}
+.fam-menu .block.acc.open{padding-bottom:16px}
+.fam-menu .block.acc.open > :not(.block-h){margin-left:18px;margin-right:18px}
+.fam-menu .page-h{margin-bottom:12px}
+.fam-menu .block.acc > .block-h{padding-right:48px}
+.fam-menu :is(.col,.fam-grid,.home-grid){gap:0}
+.chatting .chat-list > :first-child{margin-top:auto}
+.app-day .day-col.side .day-stamp{transform:scale(.72) rotate(-8deg);transform-origin:top right}
 </style>
 </head>
 <body>
@@ -2663,7 +2721,7 @@ function newsItems(){
   return out.sort((a,b)=>b.at-a.at).slice(0,30);
 }
 function newsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return newsItems().filter(x=>x.at>seen).length; }
-const newsBell = () => { const n=newsUnread(); return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">🔔${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
+const newsBell = () => { const n=newsUnread(); return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">${IS_APP?ic("bell"):"🔔"}${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
 function viewNews(){
   const seen=Number(ls.get(newsSeenKey(),"0")), items=newsItems();
   return `<div class="news-bg" data-act="news-open" aria-hidden="true"></div><div class="news-panel" role="dialog" aria-label="새 소식"><div class="news-h"><b>🔔 새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>
@@ -2809,6 +2867,7 @@ const ICONS = {
   stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   left:'<path d="M15 5l-7 7 7 7"/>', right:'<path d="M9 5l7 7-7 7"/>',
+  bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
   palette:'<path d="M12 3a9 9 0 0 0 0 18c1 0 1.6-.8 1.6-1.6 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7.2" r="1.2"/><circle cx="14.5" cy="7.2" r="1.2"/>',
   help:'<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19c0 1.5-2 2-5 2"/>',
   heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
@@ -3069,7 +3128,13 @@ function viewAppShell(){
   const home=(!S.tab || S.tab==="home") && !S.sub, pg=HPAGES.find(x=>x[0]===hpage());
   const seen=Number(ls.get(newsSeenKey(),"0")), nn=famNews().filter(x=>x.at>seen).length;
   const nb=(k,l,i)=>`<button class="an-it ${S.tab===k||(k==="home"&&!S.tab)?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`;
-  return `${tourBar()}<div class="ashell">
+  // 일기 쓰기 · 채팅은 아래 메뉴 없이 화면을 다 써요 (저장 막대 · 입력 칸이 맨 아래)
+  const writing=S.sub?.type==="write", chatting=S.tab==="chat" && !S.sub, bare=writing||chatting;
+  // 다른 화면: 제목 앞 큰 이모지는 빼고(아이콘을 선 모양 하나로), 하루 펼쳐보기 · 우리 가족 설정은 휴대폰 배치로
+  let body = home ? viewHomePages() : viewMain().replace(/(<div class="page-h"><h1>)\s*(?:\p{Extended_Pictographic}️?\s*)+/u,"$1");
+  if(!S.sub && S.tab==="day") body=`<div class="app-day">${body}</div>`;
+  if(!S.sub && S.tab==="family") body=`<div class="fam-menu">${body}</div>`;
+  return `${tourBar()}<div class="ashell ${writing?"writing":""} ${chatting?"chatting":""}">
     <div class="a-top ${home?"band":""}" style="--band:${home?pg[3]:"transparent"}">
       <header class="ah">
         <button class="ah-l" data-act="tab" data-v="home" aria-label="홈으로">${logo(30)}<span class="ah-t">${esc(S.group.name)}</span></button>
@@ -3080,14 +3145,14 @@ function viewAppShell(){
     </div>
     ${S.me.type==="child"?kidBar():""}
     ${S.newsOpen?viewNews():""}
-    <main class="a-main ${home?"is-home":""}" id="main">${dupBanner()}${home?viewHomePages():viewMain()}</main>
+    <main class="a-main ${home?"is-home":""}" id="main">${dupBanner()}${body}</main>
     ${home?`<button class="a-help" data-act="help-open" aria-label="도움 · 문의">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
-    <nav class="a-nav" aria-label="메뉴">
+    ${bare?"":`<nav class="a-nav" aria-label="메뉴">
       ${nb("home","홈","home")}${nb("mine","내 일기","lay-diary")}
       <button class="a-fab" data-act="write" aria-label="오늘 일기 쓰기">${ic("pen")}</button>
       ${nb("chat","채팅","talk")}
       <button class="an-it ${S.moreOpen?"on":""}" data-act="app-more" aria-expanded="${!!S.moreOpen}">${ic("lay-quad")}<span>더보기</span></button>
-    </nav>
+    </nav>`}
     ${S.moreOpen?viewMore():""}
     ${S.helpOpen?viewHelp():""}
     ${S.lb?viewLightbox():""}
@@ -4192,6 +4257,13 @@ function viewDayOpen(){
   const list=sortedProfiles().map(p=>({p, x:S.diaries.find(y=>y.profileId===p.id && y.date===d && (y.status==="submitted" || y.profileId===S.me.id))})).filter(o=>o.x);
   const nav=`<div class="day-nav"><button class="icon-btn" data-act="day-move" data-v="-1" aria-label="전날">${ic("back")}</button><h1>${fmtLong(d)}</h1><button class="icon-btn flip" data-act="day-move" data-v="1" aria-label="다음 날" ${d>=t?"disabled":""}>${ic("back")}</button>${d!==t?`<button class="btn btn-ghost sm" data-act="day-move" data-v="0">오늘</button>`:""}</div>`;
   if(!list.length) return nav+`<p class="empty">${d===t?"오늘은 아직 아무도 일기를 쓰지 않았어요.":"이날은 가족이 쓴 일기가 없어요."}</p>`;
+  // 📱 앱: 가족 일기를 가로로 나란히(엄마 | 아이 | 아이). 칸을 누르면 그 칸이 넓어지고 나머지는 좁게 접혀요 (다시 '나란히 보기')
+  if(IS_APP && list.length>1){
+    const f=list.findIndex(o=>o.p.id===S.dayFocus);
+    const cols=list.map((_,i)=>`minmax(0,${f<0?1:i===f?6:1}fr)`).join(" ");
+    return nav+`<p class="day-tip">${f<0?"칸을 누르면 그 사람 일기가 넓어져요":`<button class="link-btn" data-act="day-focus" data-v="">⇆ 나란히 보기</button>`}</p>
+      <div class="day-cols" style="grid-template-columns:${cols}">${list.map(({p,x},i)=>dayCard(p,x,f<0?"side":i===f?"focus":"narrow")).join("")}</div>`;
+  }
   return nav+`<div class="day-cols">${list.map(({p,x})=>dayCard(p,x)).join("")}</div>`;
 }
 // 하루 펼쳐보기 카드 (가족일기장처럼): 도장은 본문 위에 쾅, 아이 일기는 다홍펜 고친 곳 · 칭찬, 댓글 · 답글 다 보이고 바로 쓰기
@@ -4206,7 +4278,7 @@ function markWords(text, words, cls){
   let h="", pos=0; spans.forEach(s=>{ h+=esc(text.slice(pos,s.i))+`<span class="${cls}">${esc(text.slice(s.i,s.e))}</span>`; pos=s.e; });
   return h+esc(text.slice(pos));
 }
-function dayCard(p,x){
+function dayCard(p,x,mode){
   const c=p.color||"#1F2A44", mine=x.profileId===S.me.id, hsIds=heartsOf(x), hs=hsIds.map(id=>prof(id)?.name).filter(Boolean), on=hsIds.includes(S.me.id);
   const cs=S.comments.filter(k=>k.diaryId===x.id), sub=x.status==="submitted";
   const r=p.type==="child" && x.aiResult && (mine||isParent()) ? x.aiResult : null;
@@ -4221,7 +4293,7 @@ function dayCard(p,x){
   const canStamp=sub && isParent() && !mine && p.type==="child";
   const thread=(pid,depth)=>cs.filter(k=>(k.parentId||null)===pid).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).map(k=>{ const q=prof(k.profileId);
     return `<li class="${depth?"re":""}" style="--d:${Math.min(depth,3)}">${depth?"↪ ":""}<b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${k.deleted?`<span class="muted">${delCmtNote(k)}</span>`:esc(k.text)} <small class="cm-when">${cmtTime(k.createdAt)}${k.edited?" · 고침":""}</small>${!k.deleted && canDelCmt(k)?`<button class="dc-del" data-act="del-comment" data-id="${k.id}" aria-label="${esc(q?.name||"")}의 댓글 지우기" title="댓글 지우기">✕</button>`:""}</li>${thread(k.id,depth+1)}`; }).join("");
-  return `<article class="day-col${x.stamp?" has-stamp":""}" style="--pc:${c}">
+  return `<article class="day-col${x.stamp?" has-stamp":""}${mode?" "+mode:""}" style="--pc:${c}">${mode&&mode!=="focus"?`<button class="day-cover" data-act="day-focus" data-v="${esc(p.id)}" aria-label="${esc(p.name)} 일기 넓게 보기"></button>`:""}
       <div class="day-h">${av(p,30)}<b>${esc(p.name)}</b>${moodChip(x.mood,x.weather)}${!sub?'<span class="pill draft">쓰는 중</span>':""}</div>
       ${x.stamp?`<div class="day-stamp" role="img" aria-label="칭찬 도장: ${esc(x.stamp)}">${esc(x.stamp)}</div>`:""}
       ${x.prompt?`<p class="day-q">💡 ${esc(x.prompt)}</p>`:""}
@@ -4425,12 +4497,14 @@ function viewWrite(){
   const d=S.draft, child=S.me.type==="child", submitted=d.status==="submitted", kid=kidUI();
   const kp=kid?kwProgress():null;
   return `<div class="write ${kid?"kw":""}">
-    ${kid?kwHead(d):`<div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${submitted?(child?"제출한 일기를 고치고 있어요":"올린 일기를 고치고 있어요"):d.status==="draft"?"임시 저장된 일기예요":"새 일기"}</span></div>
+    ${kid?kwHead(d):IS_APP
+      ? `<div class="sub-top w-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><label class="sr" for="w-date">날짜</label><input type="date" id="w-date" value="${d.date}" max="${todayStr()}"><span class="muted">${submitted?"고치는 중":d.status==="draft"?"임시 저장됨":"새 일기"}</span></div>`
+      : `<div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${submitted?(child?"제출한 일기를 고치고 있어요":"올린 일기를 고치고 있어요"):d.status==="draft"?"임시 저장된 일기예요":"새 일기"}</span></div>
     <label class="date-l">날짜<input type="date" id="w-date" value="${d.date}" max="${todayStr()}"></label>`}
-    <div class="wm">
+    ${IS_APP?wmApp(d):`<div class="wm">
       <fieldset class="wm-row"><legend>날씨</legend><div class="wm-opts">${WEATHERS.map(([k,l,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="weather" value="${k}" ${d.weather===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-weather">${weatherOf(d.weather)?.[1]||""}</em></fieldset>
       <fieldset class="wm-row"><legend>기분</legend><div class="wm-opts">${MOODS.map(([k,l,,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-mood">${MOODS.find(m=>m[0]===d.mood)?.[1]||""}</em></fieldset>
-    </div>
+    </div>`}
     ${child&&talkOK(S.me)?viewTalk(d):""}
     ${kid?kwQuestion(d):""}
     ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} ${talkOK(S.me)?"직접 쓰거나, 위의 '이야기로 일기 쓰기'로 엄마 · 아빠와 함께 만들어요. 붙여넣기는 안 돼요.":"아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요."}</p>`:""}
@@ -4540,8 +4614,19 @@ function emoList(){
 // 댓글 · 답글 칸 아래 하트 줄: 색깔별 하트와 여러 모양 하트를 눌러서 쏙
 // 🩷 🩵 🩶 🫶 ❤️‍🔥 는 최신 이모지라 윈도우 · 옛 휴대폰에서 네모로 보여서 뺐어요
 const HEARTS = ["❤️","🧡","💛","💚","💙","💜","🤎","🖤","🤍","💖","💗","💓","💞","💕","💘","💝","💟","❣️","🥰","😍","😘"];
-const heartBar = () => `<div class="heart-bar" role="group" aria-label="하트 넣기">${HEARTS.map(e=>`<button type="button" class="emo" data-act="cmt-heart" data-v="${e}" aria-label="${e} 넣기">${e}</button>`).join("")}</div>`;
-const viewEmoBar = () => `<div class="emo-bar" role="group" aria-label="이모지 넣기">${emoList().map(e=>`<button type="button" class="emo" data-act="emo" data-v="${e}" aria-label="${e} 넣기">${e}</button>`).join("")}</div>`;
+// 📱 앱(휴대폰)은 키보드에 이모지가 있어서 하트 · 이모지 줄을 빼요 (2026-10-05)
+// 📱 앱 일기 쓰기의 날씨 · 기분: 고른 것만 단추로 보여 주고, 누르면 그 줄만 펼쳐져요
+function wmApp(d){
+  const w=weatherOf(d.weather), m=MOODS.find(x=>x[0]===d.mood), open=S.wmOpen;
+  const opts = open==="weather" ? WEATHERS.map(([k,l,e])=>[k,l,e,d.weather===k]) : open==="mood" ? MOODS.map(([k,l,,e])=>[k,l,e,d.mood===k]) : [];
+  return `<div class="wm-app">
+    <button type="button" class="wm-pick ${open==="weather"?"on":""}" data-act="wm-open" data-v="weather" aria-expanded="${open==="weather"}"><small>날씨</small><span>${w?w[2]:"＋"}</span><b>${w?w[1]:"고르기"}</b></button>
+    <button type="button" class="wm-pick ${open==="mood"?"on":""}" data-act="wm-open" data-v="mood" aria-expanded="${open==="mood"}"><small>기분</small><span>${m?m[3]:"＋"}</span><b>${m?m[1]:"고르기"}</b></button>
+  </div>
+  ${open?`<fieldset class="wm-pop"><legend class="sr">${open==="weather"?"날씨":"기분"}고르기</legend>${opts.map(([k,l,e,on])=>`<label class="wm-o" title="${l}"><input type="radio" name="${open}" value="${k}" ${on?"checked":""} aria-label="${l}"><span>${e}</span><small>${l}</small></label>`).join("")}</fieldset>`:""}`;
+}
+const heartBar = () => IS_APP ? "" : `<div class="heart-bar" role="group" aria-label="하트 넣기">${HEARTS.map(e=>`<button type="button" class="emo" data-act="cmt-heart" data-v="${e}" aria-label="${e} 넣기">${e}</button>`).join("")}</div>`;
+const viewEmoBar = () => IS_APP ? "" : `<div class="emo-bar" role="group" aria-label="이모지 넣기">${emoList().map(e=>`<button type="button" class="emo" data-act="emo" data-v="${e}" aria-label="${e} 넣기">${e}</button>`).join("")}</div>`;
 function insertEmoji(e){
   const ta=document.getElementById("w-text"); if(!ta || !S.draft) return;
   const s=ta.selectionStart ?? ta.value.length, en=ta.selectionEnd ?? s;
@@ -5923,7 +6008,11 @@ function appAfterRender(){
     pushSetup(false).then(r=>{ S.pushState=r; }).catch(()=>{});
     if(S.wantHelp){ S.wantHelp=false; setTimeout(()=>acts["help-open"](),0); } }
   const hl=document.getElementById("help-list"); if(hl) hl.scrollTop=hl.scrollHeight;   // 도우미 채팅은 늘 맨 아래(새 말)부터
+  famMenu();
   syncWidget(); }
+// 우리 가족 설정 칸들: 열어 둔 칸(S.famOpen)만 펼치고 나머지는 제목만
+function famMenu(){ document.querySelectorAll(".fam-menu .block[aria-labelledby]").forEach(s=>{ const on=s.getAttribute("aria-labelledby")===S.famOpen;
+  s.classList.add("acc"); s.classList.toggle("open",on); s.querySelector(".block-h")?.setAttribute("aria-expanded",on); }); }
 
 if(IS_APP){
   const AP=plug("App");
@@ -6013,10 +6102,21 @@ if(IS_APP){
     "help-open": () => { S.helpOpen=true; S.moreOpen=false; S.newsOpen=false; S.helpNew=false; render();
       if(!DEMO) B.callFn?.("supportList").then(r=>{ S.helpMsgs=r.msgs||[]; if(S.helpOpen) render(); }).catch(e=>console.warn("문의",e)); },
     "help-close": () => { S.helpOpen=false; render(); },
+    // 일기 쓰기 날씨 · 기분: 단추를 누르면 그 줄만 펼쳐요
+    "wm-open": el => { S.wmOpen = S.wmOpen===el.dataset.v ? null : el.dataset.v; render(); },
+    // 하루 펼쳐보기: 누른 사람 칸을 넓게 (빈 값이면 다시 나란히)
+    "day-focus": el => { S.dayFocus = el.dataset.v || null; render(); },
     "help-faq": el => { const [q,a]=FAQ[+el.dataset.v]||[]; if(!q) return; S.helpLocal=[...(S.helpLocal||[]),{from:"me",text:q},{from:"bot",text:a+"\n\n더 궁금한 게 있으면 아래에 적어 운영자에게 보내 주세요."}]; render(); },
     "app-push": ()=>guard(async()=>{ const r=await pushSetup(true); S.pushState=r; render();
       toast(r==="on"?"가족 소식이 오면 알려 줄게요":"알림이 꺼져 있어요. 휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림에서 켜 주세요"); }),
   });
+  // 날씨 · 기분을 고르면 펼친 줄을 닫아요 (고른 값은 위쪽 기존 처리에서 S.draft 에 들어가요)
+  document.addEventListener("change", e=>{ if(S.wmOpen && (e.target.name==="weather"||e.target.name==="mood") && e.target.closest?.(".wm-pop")){ S.wmOpen=null; render(); } });
+  // 우리 가족 설정: 휴대폰 설정 앱처럼 제목 목록 → 누르면 그 칸만 펼쳐요
+  document.addEventListener("click", e=>{ const h=e.target.closest?.(".fam-menu .block > .block-h"); if(!h || e.target.closest("button,a,input,select,label")) return;
+    const sec=h.parentElement, id=sec.getAttribute("aria-labelledby")||""; S.famOpen = S.famOpen===id ? null : id; famMenu(); if(S.famOpen) sec.scrollIntoView({block:"start",behavior:"smooth"}); });
+  // 아래로 내릴 때는 도움 단추를 숨겨서 마지막 칸을 가리지 않게
+  let lastY=0; addEventListener("scroll", ()=>{ const y=window.scrollY; document.documentElement.classList.toggle("hide-help", y>lastY+4 && y>60); if(y<lastY-4) document.documentElement.classList.remove("hide-help"); lastY=y; }, {passive:true});
   // 운영자에게 문의 보내기
   forms.help = (fd,f) => { const text=String(fd.get("text")||"").trim(); if(!text) return;
     if(DEMO){ toast("둘러보기에서는 문의를 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
