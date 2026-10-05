@@ -32,6 +32,20 @@ button{font:inherit;color:inherit;cursor:pointer}
 .login .btn{width:100%;margin-top:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .g-logo{width:24px;height:24px;flex:none;background:#fff;border-radius:50%;padding:3px;box-sizing:border-box}
 .alert{color:var(--warn);font-size:16px;margin:10px 0 0}
+/* 💌 문의함 */
+.sp-new{display:inline-block;margin-left:6px;padding:1px 9px;border-radius:10px;background:#E4507F;color:#fff;font-size:14px}
+.sp-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sp-list button{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:baseline;width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px;background:none;font:inherit;text-align:left;cursor:pointer}
+.sp-list em{grid-column:1/-1;font-style:normal;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-list small{grid-column:1/-1;font-size:13px;opacity:.7}
+.sp-msgs{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;margin:10px 0}
+.sp{margin:0;max-width:80%;display:flex;flex-direction:column;gap:2px}
+.sp span{padding:8px 12px;border-radius:14px;background:var(--line);white-space:pre-line}
+.sp.op{align-self:flex-end;text-align:right}
+.sp.op span{background:#5A2E45;color:#fff}
+.sp small{font-size:12px;opacity:.7}
+#sp-form{display:flex;flex-direction:column;gap:8px}
+#sp-form textarea{font:inherit;padding:10px;border-radius:12px;border:1.5px solid var(--line)}
 /* 숫자 칸: 무리마다 위쪽 색 띠 (방문 = 하늘, 가족 · 사람 = 초록, 일기 = 코랄, AI = 버터) */
 .group-h{font-size:18px;color:var(--sub);margin:4px 2px 8px;display:flex;align-items:center;gap:8px}
 .group-h::after{content:"";flex:1;height:1.5px;background:var(--line)}
@@ -289,6 +303,7 @@ function render(fams,users,idx,usage,stats,kinds){
   const m0=usage?.months?.[0];
   $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="when">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
       <button class="pill" data-act="reload">🔄 새로고침</button><button class="pill" data-act="logout">로그아웃</button></header>
+    <div class="card" id="inbox"><h2>💌 문의함</h2><p class="sub">불러오는 중…</p></div>
     <div class="group-h">👨‍👩‍👧 사람 · 가족</div>
     <div class="tiles people">
       ${stats?tile("t-visit","🚪",(stats.find(x=>x.day===dayStr(new Date()))||{}).visitors||0,"오늘 방문자"):""}
@@ -314,7 +329,30 @@ function render(fams,users,idx,usage,stats,kinds){
     </table></div>
     <p class="note">일기 수는 쓰는 중(임시 저장)을 포함해요. 사람별 ‘전체’는 제출한 일기 수예요. 이 화면은 이름과 일기 내용을 보여 주지 않고 숫자만 세요.</p>
     ${idx.length?`<p class="alert">사람별 최근 7일(?)을 세려면 파이어베이스 색인이 한 번 필요해요. <a href="${esc(idx[0])}" target="_blank" rel="noopener">여기를 눌러 색인 만들기</a> → 몇 분 뒤 새로고침.</p>`:""}</div>`;
+  loadInbox(inboxUid);
 }
+
+/* ---------- 💌 문의함 (2026-10-05) ----------
+   앱의 '도움 · 문의' 채팅으로 온 문의를 보고 답장해요. 서버 함수 supportAdmin(운영자만)으로만 읽고 써요 (iinote-app/firebase/functions).
+   답장을 보내면 그 사람 휴대폰으로 푸시가 가요 */
+let inboxUid=null, threads=[];
+const when=t=>t?new Date(t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+async function callAdmin(data){ const FN=await import(`https://www.gstatic.com/firebasejs/${V}/firebase-functions.js`); return (await FN.httpsCallable(FN.getFunctions(app,"asia-northeast3"),"supportAdmin")(data||{})).data; }
+async function loadInbox(uid,reply){
+  const el=document.getElementById("inbox"); if(!el) return; inboxUid=uid||null;
+  try{
+    const r=await callAdmin(uid?(reply?{uid,text:reply}:{uid}):{});
+    if(uid){ const t=threads.find(x=>x.uid===uid)||{};
+      el.innerHTML=`<h2>💌 ${esc(t.name||"사용자")} <span class="sub">${esc(t.family||"")}</span> <button class="pill" data-act="inbox">← 문의함</button></h2>
+        <div class="sp-msgs">${(r.msgs||[]).map(m=>`<p class="sp ${m.from==="op"?"op":"user"}"><span>${esc(m.text)}</span><small>${m.from==="op"?"운영자 · ":""}${when(m.at)}</small></p>`).join("")}</div>
+        <form id="sp-form"><label class="sub" for="sp-t">답장 (보내면 그 사람 휴대폰으로 알림이 가요)</label><textarea id="sp-t" name="t" rows="3" required></textarea><button class="pill">답장 보내기</button></form>`;
+      const box=el.querySelector(".sp-msgs"); if(box) box.scrollTop=box.scrollHeight;
+    } else { threads=r.threads||[]; const n=threads.reduce((s,x)=>s+(x.unreadOp||0),0);
+      el.innerHTML=`<h2>💌 문의함 ${n?`<span class="sp-new">새 문의 ${n}</span>`:""}</h2>${threads.length?`<ul class="sp-list">${threads.map(x=>`<li><button data-act="inbox-open" data-v="${esc(x.uid)}"><b>${esc(x.name||"사용자")}</b><span class="sub">${esc(x.family||"")}</span>${x.unreadOp?`<span class="sp-new">${x.unreadOp}</span>`:""}<em>${esc(x.last||"")}</em><small>${when(x.updatedAt)}</small></button></li>`).join("")}</ul>`:`<p class="sub">아직 문의가 없어요.</p>`}`;
+    }
+  }catch(e){ console.warn("문의함",e); el.innerHTML=`<h2>💌 문의함</h2><p class="alert">문의함을 불러오지 못했어요 (${esc(e.message||e.code||"")})</p>`; }
+}
+document.addEventListener("submit", e=>{ if(e.target.id!=="sp-form") return; e.preventDefault(); const t=e.target.t.value.trim(); if(!t) return; e.target.querySelector("button").disabled=true; loadInbox(inboxUid,t); });
 
 function showRuleHelp(e){
   $app.innerHTML = `<div class="card"><h2>🔒 파이어베이스 규칙을 한 번 추가해 주세요</h2>
@@ -334,6 +372,8 @@ document.addEventListener("click", async e => {
   if(act==="reload") load();
   if(act==="acct"){ const p=document.getElementById("acct"); p.hidden=!p.hidden; b.setAttribute("aria-expanded",!p.hidden); b.querySelector("em").textContent=p.hidden?"▾ 나눠 보기":"▴ 접기"; }
   if(act==="visit-more"){ const t=document.getElementById("visit-more"); t.hidden=!t.hidden; b.textContent=t.hidden?"▾ 이전 23일 펼쳐 보기":"▴ 접기 (최근 7일만)"; }
+  if(act==="inbox") loadInbox(null);
+  if(act==="inbox-open") loadInbox(b.dataset.v);
   if(act==="toggle") document.querySelectorAll(`tr.mem[data-g="${b.dataset.v}"]`).forEach(r=>r.hidden=!r.hidden);
 });
 let msg="";
