@@ -1195,6 +1195,18 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 @media (prefers-reduced-motion:reduce){.talk-spin{animation:none}}
 .talk .audio-card{margin:0 0 10px}
 .talk-note{padding:10px 12px;border-radius:12px;background:var(--surface)}
+/* 📝 손글씨 일기 사진으로 쓰기 · 첨부파일 */
+.talk.hand{border-color:var(--sky);background:var(--sky-soft)}
+.hand-files{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px}
+.hand-file{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line)}
+.hand-a{flex:1;min-width:0;display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;border:0;background:none;padding:0;font:inherit;text-align:left;cursor:pointer}
+.hand-a img{flex:none;width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.hand-a span{display:flex;flex-direction:column;min-width:0}
+.hand-a b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hand-a small{font-size:12px;color:var(--ink3)}
+.hand-a:hover b{text-decoration:underline}
+.hand-att{margin:14px 0}
+.hand-att h3{margin:0 0 8px;font-size:14px;color:var(--ink2);font-weight:650}
 .talk-log{margin:0 0 10px}
 .talk-log summary{cursor:pointer;font-weight:650;font-size:14px}
 .talk-lines{display:flex;flex-direction:column;gap:6px;margin:10px 0 0;padding:0;list-style:none}
@@ -4473,6 +4485,7 @@ function viewDiaryDetail(){
     ${d.prompt?`<p class="kw-qshow">💡 ${esc(d.prompt)}</p>`:""}<div class="paper-lines">${tagify(d.text)}</div>
     ${d.audio?`<div class="audio-card">${ic("mic")}<audio controls preload="none" src="${esc(d.audio.url)}"></audio></div>`:""}
     ${d.talk?.dialog?.length?`<details class="talk-log"><summary>🎙 엄마 · 아빠와 나눈 이야기로 쓴 일기예요 · 이야기 보기</summary>${talkLines(d.talk.dialog)}</details>`:""}
+    ${(d.hand||[]).length?`<section class="hand-att" aria-label="첨부파일"><h3>📝 종이 일기장에 손으로 쓴 일기예요 · 첨부파일 ${d.hand.length}개</h3>${handFiles(d.hand,false)}</section>`:""}
     ${viewReact(d,mine)}
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
@@ -4503,8 +4516,9 @@ function loadDraft(date){
   const d=findDiary(S.me.id,date);
   S.locEdit=false; S.penFailed=false;
   S.draft = d ? {id:d.id,date,mood:d.mood||"",weather:d.weather||"",prompt:d.prompt||"",title:d.title||"",text:d.text||"",status:d.status,aiChecked:!!d.aiChecked,aiResult:d.aiResult||null,pen:penFromResult(d.aiResult),
-                 photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[],talk:d.talk?{...d.talk}:null}
-              : {id:null,date,mood:"",weather:"",prompt:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null};
+                 photos:(d.photos||[]).map(x=>({...x})),audio:d.audio?{...d.audio}:null,location:d.location||null,tags:[...(d.tags||[])],removed:[],talk:d.talk?{...d.talk}:null,hand:(d.hand||[]).map(x=>({...x})),handReads:d.handReads||0}
+              : {id:null,date,mood:"",weather:"",prompt:"",title:"",text:"",status:"new",aiChecked:false,aiResult:null,pen:null,photos:[],audio:null,location:null,tags:[],removed:[],talk:null,hand:[],handReads:0};
+  S.handBusy=null;
   S.talkBusy=null; S.kwQ=null;
   restoreWip();   // 📱 인터넷이 끊기거나 앱이 꺼져서 저장 못 한 글이 있으면 이어서 쓰게
 }
@@ -4564,8 +4578,9 @@ function viewWrite(){
       <fieldset class="wm-row"><legend>기분</legend><div class="wm-opts">${MOODS.map(([k,l,,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-mood">${MOODS.find(m=>m[0]===d.mood)?.[1]||""}</em></fieldset>
     </div>`}
     ${child&&talkOK(S.me)?viewTalk(d):""}
+    ${handOK()?viewHand(d):""}
     ${kid?kwQuestion(d):""}
-    ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} ${talkOK(S.me)?"직접 쓰거나, 위의 '이야기로 일기 쓰기'로 엄마 · 아빠와 함께 만들어요. 붙여넣기는 안 돼요.":"아이 일기는 직접 손으로 써요. 말로 쓰기와 붙여넣기는 안 돼요."}</p>`:""}
+    ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} ${talkOK(S.me)?"직접 쓰거나, 위의 '이야기로 일기 쓰기'로 엄마 · 아빠와 함께 만들어요. 붙여넣기는 안 돼요.":"아이 일기는 직접 손으로 써요. 종이 일기장에 쓴 건 위의 '손글씨 일기 사진으로 쓰기'로 옮겨요. 말로 쓰기와 붙여넣기는 안 돼요."}</p>`:""}
 
     <label class="sr" for="w-text">일기</label>${child?`<div class="w-ed">`:""}<textarea id="w-text" class="w-text" placeholder="오늘 있었던 일을 적어 보세요." spellcheck="false" ${child?'autocomplete="off" autocorrect="off"':""}>${esc(d.text)}</textarea>${child?`<div class="w-hl" id="w-hl" aria-hidden="true"></div></div>`:""}
     ${viewEmoBar()}
@@ -4662,6 +4677,70 @@ async function talkMake(textOnly){
     render(); toast(r.diary?"일기를 만들었어요. 읽어 보고 고쳐 주세요":"이번 이야기로는 일기를 만들지 못했어요");
     document.getElementById("w-text")?.scrollIntoView({behavior:"smooth",block:"center"});
   }catch(e){ if(gone()) return; S.talkBusy=null; render(); toast(e.message||"문제가 생겼어요. 다시 눌러 주세요"); }
+}
+/* ---------- 📝 손글씨 일기 사진으로 쓰기 (2026-10-07, 웹 · 앱 공통) ----------
+   종이 일기장을 찍거나 고르면 → AI 선생님(다홍펜 워커 mode "ocr")이 쓴 그대로 글자로 옮겨 일기 칸에 넣어요 (맞춤법은 안 고쳐요 → 다홍펜이 검사)
+   원본 사진은 일기에 📎 첨부파일(d.hand)로 남아요: groups/{gid}/diaries/{id}/hand_{id}.jpg · 한 일기에 HAND_MAX 장, 읽기는 HAND_MAX_READ 번까지 */
+const HAND_MAX = 3, HAND_MAX_READ = 5, HAND_IMG = [1600,.8];
+const handOK = () => MEDIA_READY || DEMO;
+const handName = (i,n) => `손글씨 원본${n>1?` ${i+1}쪽`:""}.jpg`;
+function handFiles(list, edit){
+  // 누르면 크게 보기(사진 보기 창) · 저장된 사진은 ⬇ 로 원본 파일 받기
+  return `<ul class="hand-files">${list.map((h,i)=>`<li class="hand-file"><button type="button" class="hand-a" data-act="hand-lb" data-i="${i}" data-own="${edit?"draft":esc(S.sub?.id||"")}"><img src="${esc(h.url)}" alt="" loading="lazy"><span><b>📎 ${handName(i,list.length)}</b><small>${h.size?Math.max(1,Math.round(h.size/1024))+"KB · ":""}누르면 크게 봐요</small></span></button>${h.blob?"":`<a class="icon-btn" href="${esc(h.url)}" target="_blank" rel="noopener" download="${handName(i,list.length)}" aria-label="${handName(i,list.length)} 원본 받기" title="원본 받기">${ic("download")}</a>`}${edit?`<button type="button" class="icon-btn" data-act="hand-del" data-id="${esc(h.id)}" aria-label="${handName(i,list.length)} 빼기">${ic("x")}</button>`:""}</li>`).join("")}</ul>`;
+}
+function viewHand(d){
+  const hs=d.hand||[], reads=d.handReads||0, cam=IS_APP?`<label class="btn btn-ghost sm file-btn">${ic("camera")}일기장 찍기<input type="file" id="w-hand-cam" accept="image/*" capture="environment"></label>`:"";
+  const pick=hs.length<HAND_MAX?`<label class="btn btn-accent sm file-btn">${ic("image")}${hs.length?"쪽 더하기":"일기장 사진 고르기"}<input type="file" id="w-hand" accept="image/*" multiple></label>${cam}`:"";
+  let body;
+  if(S.handBusy) body=`<p class="talk-busy" role="status"><span class="talk-spin" aria-hidden="true"></span>${esc(S.handBusy)}</p>`;
+  else if(!hs.length) body=`<p>종이 일기장에 쓴 일기를 찍으면 AI 선생님이 <b>쓴 그대로</b> 글자로 옮겨 아래 일기 칸에 넣어 줘요. 사진은 일기에 <b>📎 원본 파일</b>로 남아요.</p><div class="row">${pick}</div>`;
+  else body=`${handFiles(hs,true)}
+    ${d.handNote?`<p class="talk-note">👩‍🏫 ${esc(d.handNote)}</p>`:""}
+    <p>${d.handText?"아래 일기 칸에 옮겨 적었어요. 틀린 글자도 쓴 그대로라, 읽어 보고 고치거나 다홍펜 선생님께 검사를 받아요.":"사진을 넣었어요. 글자로 옮겨 볼까요?"}</p>
+    <div class="row">${reads<HAND_MAX_READ && hs.some(h=>h.blob)?`<button class="btn ${d.handText?"btn-ghost":"btn-accent"} sm" data-act="hand-read">✨ ${d.handText?`다시 읽기 (${HAND_MAX_READ-reads}번 남음)`:"글자로 옮기기"}</button>`:""}${pick}</div>`;
+  return `<section class="talk hand" aria-label="손글씨 일기 사진으로 쓰기"><h3>📝 손글씨 일기 사진으로 쓰기</h3>${body}</section>`;
+}
+async function addHand(files){
+  const d=S.draft; if(!d) return;
+  const room=HAND_MAX-(d.hand||[]).length;
+  if(room<=0){ toast(`손글씨 사진은 일기 하나에 ${HAND_MAX}장까지예요`); return; }
+  const pick=files.filter(f=>f.type.startsWith("image/") || /\.(hei[cf])$/i.test(f.name||"")).slice(0,room);
+  if(files.length>room) toast(`손글씨 사진은 ${HAND_MAX}장까지라 앞의 ${room}장만 넣을게요`);
+  if(!pick.length) return;
+  await guard(async()=>{ try{ for(let i=0;i<pick.length;i++){
+    upProg("🖼 사진 줄이는 중",i,pick.length);
+    const b=await compressImage(pick[i],...HAND_IMG); if(!b.blob) throw new Error("사진을 불러올 수 없어요");
+    (d.hand=d.hand||[]).push({id:rid(),blob:b.blob,url:URL.createObjectURL(b.blob),w:b.w,h:b.h,size:b.blob.size}); } }finally{ upProg(); } });
+  render();
+  if(S.draft===d && d.hand?.length) handRead();
+}
+async function handRead(){
+  const d=S.draft; if(!d || S.handBusy || !(d.hand||[]).length) return;
+  if((d.handReads||0)>=HAND_MAX_READ){ toast(`글자로 옮기기는 일기 하나에 ${HAND_MAX_READ}번까지예요`); return; }
+  const gone=()=>S.draft!==d;
+  S.handBusy="👀 AI 선생님이 손글씨를 읽고 있어요…"; render();
+  try{
+    let r;
+    if(DEMO){ await wait(1000); r={text:"오늘은 할머니 댁에 갔다. 할머니가 맛있는 김치찌개를 해 주셨다. 나는 두 그릇이나 먹어다. 집에 올때 할머니가 손을 흔들어 주셨다.",date:"",weather:"맑음",legible:true,note:"체험 모드 예시예요. '먹어다'처럼 쓴 그대로 옮겼어요."}; }
+    else {
+      // 이번에 넣은 사진(blob)만 보내요 (저장된 사진은 저장소 규칙상 다시 받아 오기 어려워요 → 다시 읽으려면 사진을 새로 넣어요)
+      const images=await Promise.all(d.hand.filter(h=>h.blob).map(h=>blobToDataURL(h.blob)));
+      if(!images.length) throw new Error("저장된 사진은 다시 읽을 수 없어요. 사진을 빼고 새로 넣어 주세요");
+      r=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"ocr",images,level:S.me.type==="child"?gradeLevel(S.me.grade):"adult",name:S.me.name})});
+    }
+    if(gone()) return;
+    S.handBusy=null; d.handReads=(d.handReads||0)+1;
+    const text=String(r.text||"").trim();
+    d.handNote=String(r.note||"");
+    if(!text || r.legible===false){ render(); toast(r.note||"글씨를 잘 읽지 못했어요. 밝은 곳에서 일기장이 화면에 꽉 차게 다시 찍어 볼까요?"); return; }
+    const typed=d.text.trim() && d.text!==d.handText;
+    if(!typed || confirm("지금 일기 칸에 쓴 글을 손글씨 사진에서 옮긴 글로 바꿀까요?\n(취소를 누르면 쓴 글 뒤에 이어 붙여요)")) d.text=text;
+    else d.text=d.text.replace(/\s*$/,"\n\n")+text;
+    d.handText=d.text;
+    if(d.pen && S.me.type==="child") d.pen=null;   // 글이 바뀌었으니 다홍펜은 새로 검사
+    render(); saveWip?.(); toast("손글씨를 글자로 옮겼어요. 읽어 보고 고쳐 주세요");
+    document.getElementById("w-text")?.scrollIntoView({behavior:"smooth",block:"center"});
+  }catch(e){ if(gone()) return; S.handBusy=null; render(); toast(e.message||"문제가 생겼어요. 다시 눌러 주세요"); }
 }
 /* 일기 칸 아래 이모지 줄: 누르면 커서 자리에 쏙. 이 기기에서 자주 쓴 이모지가 앞으로 와요 */
 const EMOJIS = ["😊","😀","😆","😄","🥰","😍","😘","🤗","😋","😎","🤩","🥳","😇","🙂","😉","🤭","😴","🤔","❤️","🧡","💛","💚","💙","💜","💕","💖","✨"];   // 표정(웃는 얼굴 위주) · 하트
@@ -5326,6 +5405,10 @@ const acts = {
   "photo-fav": el => { const ps=S.draft.photos, p=ps.find(x=>x.id===el.dataset.id); if(!p) return;
     if(p.fav){ delete p.fav; } else { const on=ps.filter(x=>x.fav).sort((a,b)=>a.fav-b.fav); if(on.length>=2) delete on[0].fav; p.fav=Date.now(); }
     render(); },
+  "hand-read": () => handRead(),
+  "hand-lb": el => { const own=el.dataset.own, L=own==="draft"?S.draft?.hand:S.diaries.find(x=>x.id===own)?.hand; if(!L?.length) return;
+    S.lb={photos:L.map(h=>({url:h.url})),caps:L.map((h,i)=>({t:"📎 "+handName(i,L.length)})),i:+el.dataset.i||0}; render(); document.querySelector(".lb-x")?.focus(); },
+  "hand-del": el => { const d=S.draft, h=(d.hand||[]).find(x=>x.id===el.dataset.id); if(!h) return; if(!confirm("이 손글씨 사진을 뺄까요? (일기 칸의 글은 그대로 있어요)")) return; if(h.path) d.removed.push(h.path); d.hand=d.hand.filter(x=>x.id!==h.id); render(); },
   "photo-del": el => { const d=S.draft, p=d.photos.find(x=>x.id===el.dataset.id); if(p?.path) d.removed.push(p.path); if(p?.thumbPath) d.removed.push(p.thumbPath); d.photos=d.photos.filter(x=>x.id!==el.dataset.id); render(); },
   "loc-here": () => guard(async()=>{
     if(!navigator.geolocation){ toast("이 기기에서는 위치를 찾을 수 없어요. 직접 써 주세요"); return; }
@@ -5466,6 +5549,11 @@ async function uploadPending(d){
   if(d.audio?.blob){ const t=d.audio.blob.type||""; const ext=t.includes("mp4")||t.includes("m4a")?"m4a":t.includes("mpeg")?"mp3":t.includes("wav")?"wav":"webm";
     const r=await B.uploadMedia(`${base}/${d.audio.id}.${ext}`,d.audio.blob);
     d.audio={id:d.audio.id,url:r.url,path:r.path,duration:d.audio.duration||0,type:t}; }
+  // 📝 손글씨 원본 사진: 첨부파일처럼 일기에 남겨요
+  d.hand=await Promise.all((d.hand||[]).map(async h=>{
+    if(!h.blob) return {id:h.id,url:h.url,path:h.path||"",w:h.w||0,h:h.h||0,size:h.size||0};
+    const r=await B.uploadMedia(`${base}/hand_${h.id}.jpg`,h.blob);
+    return {id:h.id,url:r.url,path:r.path,w:h.w||0,h:h.h||0,size:h.size||0}; }));
   for(const path of d.removed) await B.deleteMedia(path);
   d.removed=[];
 }
@@ -5480,6 +5568,7 @@ function enterAs(p){
 async function removeDiary(gid,d,comments){
   for(const ph of d.photos||[]){ if(ph.path) await B.deleteMedia(ph.path); if(ph.thumbPath) await B.deleteMedia(ph.thumbPath); }
   if(d.audio?.path) await B.deleteMedia(d.audio.path);
+  for(const h of d.hand||[]){ if(h.path) await B.deleteMedia(h.path); }   // 📝 손글씨 원본 사진
   await Promise.all(comments.filter(c=>c.diaryId===d.id).map(c=>B.remove(gid,"comments",c.id)));
   await B.remove(gid,"diaries",d.id);
 }
@@ -5693,9 +5782,9 @@ async function saveDiary(status){
   if(d.pen){ data.aiChecked=true; data.aiResult=penResult(d); }
   else if(d.aiChecked){ data.aiChecked=true; data.aiResult=d.aiResult; }
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
-  if(d.photos.some(p=>p.blob) || d.audio?.blob) toast("사진과 소리를 올리고 있어요");
+  if(d.photos.some(p=>p.blob) || d.audio?.blob || (d.hand||[]).some(h=>h.blob)) toast("사진과 소리를 올리고 있어요");
   await uploadPending(d);
-  Object.assign(data,{ photos:d.photos, audio:d.audio||null, location:d.location||null, talk:d.talk||null,
+  Object.assign(data,{ photos:d.photos, audio:d.audio||null, location:d.location||null, talk:d.talk||null, hand:d.hand||[], handReads:d.handReads||0,
     tags:[...new Set([...d.tags,...extractTags(d.title+" "+d.text)])].slice(0,20) });
   const before = child ? new Set(stickersOf(S.me)) : null;   // 새 스티커를 받았는지 보려고
   await B.update(S.gid,"diaries",d.id,data);
@@ -5841,6 +5930,7 @@ document.addEventListener("change", e => {
   if(t.dataset?.alf==="place"){ const key=t.closest("[data-alrow]")?.dataset.alrow, st=alState(key); if(st){ st.place=t.value; findArea(st,key); } return; }
   if(t.id==="w-date" && t.value){ changeDraftDate(t); return; }
   if((t.id==="w-photos" || t.id==="w-camera") && t.files?.length){ addPhotos([...t.files]); return; }
+  if((t.id==="w-hand" || t.id==="w-hand-cam") && t.files?.length){ const fs=[...t.files]; t.value=""; addHand(fs); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
   if(t.name==="mood" && S.draft){ S.draft.mood=t.value; const n=document.getElementById("wm-mood"); if(n) n.textContent=MOODS.find(m=>m[0]===t.value)?.[1]||""; return; }
   if(t.dataset.kwq!=null && S.draft){ S.draft.prompt=t.checked?t.dataset.kwq:""; render(); return; }
