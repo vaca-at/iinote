@@ -1013,6 +1013,9 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .w-hl{position:absolute;inset:0;border:1.5px solid transparent;border-radius:16px;padding:6px 16px;font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal;color:transparent;pointer-events:none;overflow:hidden}
 .w-hl mark{color:transparent;background:rgba(255,214,51,.55);border-radius:4px}
 .w-hl mark.pen-ok{background:rgba(80,200,120,.35)}
+.w-hl mark.pen-ref{background:rgba(90,160,230,.18);border-bottom:2px dotted rgba(60,130,210,.7);border-radius:0}   /* 📘 참고: 안 고쳐도 되는 곳 */
+.pen-chip.ref{background:var(--sky-soft);color:var(--sky)}
+.pen-list li.pen-refi{opacity:.9}
 .pen{margin-top:18px;border:2.5px solid var(--coral);border-radius:18px;padding:16px 18px;background:var(--surface)}
 .pen-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 .pen h3{margin:0;color:var(--coral-ink);font-size:18px}
@@ -2580,7 +2583,7 @@ function penTrim(er,text){
 }
 const countChars = s => String(s||"").replace(/\s/g,"").length;
 const PEN_ENDS = /[.?!…~。)"'”’\]]$|\p{Extended_Pictographic}[️‍]*$/u;   // ❤️ 처럼 뒤에 모양 글자(FE0F)가 붙은 이모지도 문장 끝으로 봐요
-const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"AI 다홍펜 선생님이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요"};
+const PEN_HOW = {self:"스스로 고쳤어요", hint:"정답 보고 고쳤어요", ai:"AI 다홍펜 선생님이 고쳐 줬어요", other:"다른 말로 고쳤어요", kept:"그대로 두었어요", left:"그대로예요", ref:"참고만 했어요"};
 const PRAISE_SELF = ["👍 스스로 찾아서 고쳤어요! 정말 대단해요!","🦸 혼자 고치다니, 맞춤법 영웅이에요!","🧠 똑똑해요! AI 선생님 도움 없이 고쳤어요!"];
 // 틀린 말이 글 어디에 있는지 (고친 말 안에 틀린 말이 들어 있는 경우는 건너뛰어요)
 function penAt(er,text){
@@ -2588,7 +2591,9 @@ function penAt(er,text){
   while(i>=0){ if(off<0 || !text.startsWith(er.right,i-off)) return i; i=text.indexOf(er.wrong,i+1); }
   return -1;
 }
-const penLeft = (er,text) => !er.kept && penAt(er,text)>=0;
+const penLeft = (er,text) => !er.kept && !er.soft && penAt(er,text)>=0;   // 📘 참고는 안 고쳐도 제출할 수 있어요
+const PEN_KEEP_MAX = 2;   // 🙆 이대로 두기는 일기 하나에 두 번까지 (2026-10-07)
+const penKeeps = p => (p?.errors||[]).filter(er=>er.kept && !er.soft).length;
 // 줄 끝(문장 끝)에 마침표가 없는 곳: 다홍펜이 놓쳐도 꼭 잡혀요
 function penPeriod(text,known){
   const out=[]; let pos=0;
@@ -2622,20 +2627,20 @@ function penSpace(text,known){
 }
 // 어떻게 고쳤는지: ai(다홍펜이 고쳐 줌) · hint(정답 보고) · self(스스로) · other(다른 말로) · kept(그대로 두기) · left(아직)
 function penHow(er,text){
-  if(penAt(er,text)>=0) return er.kept?"kept":"left";
+  if(penAt(er,text)>=0) return er.kept?"kept":er.soft?"ref":"left";
   return er.applied ? (er.auto?"ai":"hint") : !text.includes(er.right) ? "other" : er.shown ? "hint" : "self";
 }
 // 일기에 저장하는 모양(aiResult): 부모 화면 · 받아쓰기 퀴즈 · 예전 일기 가져오기와 같은 모양
 function penResult(d){
   const p=d.pen;
   return {praise:p.praise||"", feedback:p.cheer||"", checks:p.checks||1, original:p.original||"", auto:!!p.auto, checkedAt:Date.now(),
-    corrections:p.errors.map(er=>({wrong:er.wrong,right:er.right,explain:er.why||"",hint:er.hint||"",kind:er.kind||"",how:penHow(er,d.text)}))};
+    corrections:p.errors.map(er=>({wrong:er.wrong,right:er.right,explain:er.why||"",hint:er.hint||"",kind:er.kind||"",how:penHow(er,d.text),...(er.soft?{soft:true}:{})}))};
 }
 function penFromResult(r){
   if(!r) return null;
   return {praise:r.praise||"", cheer:r.feedback||"", checks:r.checks||1, original:r.original||"", auto:!!r.auto,
     errors:(r.corrections||[]).map(c=>({wrong:c.wrong,right:c.right,why:c.explain||"",hint:c.hint||"",kind:c.kind||"",
-      shown:c.how==="hint"||c.how==="kept", applied:c.how==="ai"||c.how==="hint", auto:c.how==="ai", kept:c.how==="kept"}))};
+      shown:c.how==="hint"||c.how==="kept", applied:c.how==="ai"||c.how==="hint", auto:c.how==="ai", kept:c.how==="kept", ...(c.soft||c.how==="ref"?{soft:true}:{})}))};
 }
 async function callPen(text){
   if(DEMO){
@@ -4344,7 +4349,7 @@ function viewDayOpen(){
   return nav+`<div class="day-cols">${list.map(({p,x})=>dayCard(p,x)).join("")}</div>`;
 }
 // 하루 펼쳐보기 카드 (가족일기장처럼): 도장은 본문 위에 쾅, 아이 일기는 다홍펜 고친 곳 · 칭찬, 댓글 · 답글 다 보이고 바로 쓰기
-const DAY_HOW = {self:"👍 스스로", hint:"💡 힌트 보고", ai:"🖍 AI가 고쳐 줌", other:"✏️ 다른 말로", kept:"🙆 이대로 둠", left:"⏳ 아직"};
+const DAY_HOW = {self:"👍 스스로", hint:"💡 힌트 보고", ai:"🖍 AI가 고쳐 줌", other:"✏️ 다른 말로", kept:"🙆 이대로 둠", left:"⏳ 아직", ref:"📘 참고"};
 // 본문에서 찾은 낱말에 표시 (겹치지 않게 앞에서부터)
 function markWords(text, words, cls){
   const spans=[];
@@ -4359,7 +4364,7 @@ function dayCard(p,x,mode){
   const c=p.color||"#1F2A44", mine=x.profileId===S.me.id, hsIds=heartsOf(x), hs=hsIds.map(id=>prof(id)?.name).filter(Boolean), on=hsIds.includes(S.me.id);
   const cs=S.comments.filter(k=>k.diaryId===x.id), sub=x.status==="submitted";
   const r=p.type==="child" && x.aiResult && (mine||isParent()) ? x.aiResult : null;
-  const fx=(r?.corrections||[]).filter(k=>k.wrong&&k.right), done=fx.filter(k=>!["kept","left"].includes(k.how));
+  const fx=(r?.corrections||[]).filter(k=>k.wrong&&k.right), done=fx.filter(k=>!["kept","left","ref"].includes(k.how));
   const cnt=h=>fx.filter(k=>k.how===h).length;
   const pen=r?`<div class="day-pen">
       <p class="day-pen-h">✏️ ${countChars(x.text)}자 · 🖍 ${fx.length?`고친 곳 ${done.length}군데${Object.keys(DAY_HOW).some(cnt)?` <small>(${Object.keys(DAY_HOW).filter(cnt).map(h=>`${DAY_HOW[h].split(" ").slice(1).join(" ")} ${cnt(h)}`).join(" · ")})</small>`:""}`:"틀린 곳 없이 잘 썼어요"}</p>
@@ -4404,7 +4409,7 @@ function repStats(p,per){
   const list=S.diaries.filter(x=>x.profileId===p.id && x.status==="submitted" && x.date>=per.start && x.date<=per.end).sort((a,b)=>a.date.localeCompare(b.date));
   const lens=list.map(x=>countChars(x.text)), sum=lens.reduce((a,b)=>a+b,0);
   const passed=per.days.filter(d=>d<=t).length;
-  const cs=list.flatMap(x=>(x.aiResult?.corrections||[]).map(c=>({...c, fixed:!(x.text||"").includes(c.wrong)})));
+  const cs=list.flatMap(x=>(x.aiResult?.corrections||[]).filter(c=>!c.soft && c.how!=="ref").map(c=>({...c, fixed:!(x.text||"").includes(c.wrong)})));   // 📘 참고는 리포트에서 빼요
   const tally={}; cs.forEach(c=>{ const k=`${c.wrong} → ${c.right}`; tally[k]=(tally[k]||0)+1; });
   const top=Object.entries(tally).sort((a,b)=>b[1]-a[1]).slice(0,5);
   // 막대: 주간은 날마다, 월간은 주마다 평균
@@ -4831,19 +4836,23 @@ function viewPen(d){
   if(!p) return `<section class="pen" id="pen"><div class="pen-h"><h3>🖍 AI 다홍펜 선생님</h3>${call("🖍 다홍펜 검사")}</div>
     <p>${n>=goal?"다 썼으면 AI 다홍펜 선생님을 불러 보세요. 틀린 곳을 형광펜으로 칠해 주고, 칭찬과 응원도 해 줘요.":`${goal}자를 다 쓰면 AI 다홍펜 선생님을 부를 수 있어요.`}</p>
     <div class="pen-gauge ${n>=goal?"full":""}"><i style="width:${Math.min(100,n/goal*100)}%"></i></div><p class="pen-cnt">${n>=goal?`${n}자 👍`:`${n} / ${goal}자`}</p>${rest}</section>`;
-  const errs=p.errors, left=errs.filter(er=>penLeft(er,text));
+  const errs=p.errors, left=errs.filter(er=>penLeft(er,text)), hard=errs.filter(er=>!er.soft), keepsLeft=PEN_KEEP_MAX-penKeeps(p);
   const fb=p.praise||p.cheer?`<div class="pen-fb">${p.praise?`<b>👏 AI 선생님의 칭찬</b><p>${esc(p.praise)}</p>`:""}${p.cheer?`<b>💪 응원 한마디</b><p>${esc(p.cheer)}</p>`:""}</div>`:"";
   let head, sub="";
-  if(!errs.length) head="💯 틀린 곳이 하나도 없어요!";
-  else if(p.auto){ head=`🖍 AI 다홍펜 선생님이 ${errs.length}군데를 고쳐 줬어요`; sub=`<p><mark class="pen-ok">초록색</mark>으로 칠한 곳이 고친 곳이에요. 어떻게 바뀌었는지 소리 내어 읽어 봐요!</p>`; }
+  if(!hard.length) head=errs.length?"💯 꼭 고칠 곳은 하나도 없어요!":"💯 틀린 곳이 하나도 없어요!";
+  else if(p.auto){ head=`🖍 AI 다홍펜 선생님이 ${hard.length}군데를 고쳐 줬어요`; sub=`<p><mark class="pen-ok">초록색</mark>으로 칠한 곳이 고친 곳이에요. 어떻게 바뀌었는지 소리 내어 읽어 봐요!</p>`; }
   else if(left.length){ head=`🖍 형광펜으로 칠한 곳이 ${left.length}군데 있어요`; sub=`<p>틀려도 괜찮아요! 고치면서 실력이 쑥쑥 자라요 🌱 일기 칸에 <mark class="pen-x">노란색</mark>으로 칠한 곳을 찾아 스스로 고쳐 보세요. 잘 모르겠으면 💡 정답 보기를 눌러요. 다 고쳐야 제출할 수 있어요!</p>`; }
   else { head="🎉 모두 고쳤어요!"; sub=`<p class="pen-good">정말 멋져요! 이제 제출해요.</p>`; }
   const pair=er=>`<span class="pen-w">${esc(er.wrong)}</span> → <span class="pen-r">${esc(er.right)}</span>`;
   const items=errs.map((er,i)=>{ const how=penHow(er,text);
+    // 📘 참고: 정답과 까닭을 바로 보여 주고, 고치고 싶으면 고쳐요 (안 고쳐도 제출할 수 있어요)
+    if(how==="ref") return `<li class="pen-refi"><span class="pen-chip ref">📘 참고</span>${pair(er)}${er.why?`<br><small>${esc(er.why)}</small>`:""}<br><small class="pen-soft">안 고쳐도 괜찮아요.</small> <button class="pen-mini" data-act="pen-apply" data-i="${i}">✏️ 이렇게 고칠래요</button></li>`;
     return `<li class="${how==="left"?"":"done"}">${er.kind?`<span class="pen-chip">${esc(er.kind)}</span>`:""}${
       how==="left" ? `<mark class="pen-x">${esc(er.wrong)}</mark> ${esc(er.hint||"어떻게 고치면 좋을까요?")}
         <div><button class="pen-mini" data-act="pen-find" data-i="${i}">👀 찾기</button>${er.shown
-          ? `<div class="pen-ans">${pair(er)}${er.why?`<br><small>${esc(er.why)}</small>`:""}<br><button class="pen-mini" data-act="pen-apply" data-i="${i}">✏️ 이렇게 고칠래요</button><button class="pen-mini" data-act="pen-keep" data-i="${i}">🙆 이대로 둘래요</button></div>`
+          ? `<div class="pen-ans">${pair(er)}${er.why?`<br><small>${esc(er.why)}</small>`:""}<br><button class="pen-mini" data-act="pen-apply" data-i="${i}">✏️ 이렇게 고칠래요</button>${keepsLeft>0
+              ? `<button class="pen-mini" data-act="pen-keep" data-i="${i}">🙆 이대로 둘래요 <small>(${keepsLeft}번 남음)</small></button>`
+              : `<br><small class="pen-soft">🙆 이대로 두기는 일기 하나에 ${PEN_KEEP_MAX}번까지 썼어요. 정답대로 고쳐 볼까요?</small>`}</div>`
           : `<button class="pen-mini" data-act="pen-reveal" data-i="${i}">💡 정답 보기</button>`}</div>`
       : how==="kept" ? `<span class="pen-soft">🙆 그대로 두었어요 · ${pair(er)}</span>`
       : `<span class="pen-good">${how==="self"?"👍 스스로 고쳤어요!":how==="other"?"✏️ 다른 말로 바꿨어요":"✅ 고쳤어요"}</span> <span class="pen-soft">${pair(er)}</span>${p.auto&&er.why?`<br><small class="pen-soft">${esc(er.why)}</small>`:""}`}</li>`; }).join("");
@@ -4855,7 +4864,7 @@ function penHL(){
   const hl=document.getElementById("w-hl"), ta=document.getElementById("w-text"); if(!hl||!ta||!S.draft) return;
   const text=S.draft.text, spans=[];
   (S.draft.pen?.errors||[]).forEach(er=>{
-    let i=penAt(er,text), len=er.wrong.length, cls="pen-x";
+    let i=penAt(er,text), len=er.wrong.length, cls=er.soft?"pen-ref":"pen-x";   // 📘 참고는 노란색 대신 하늘색 점선
     if(i>=0 && er.kept) return;
     if(i<0 && er.applied){ i=er.at!=null&&text.startsWith(er.right,er.at)?er.at:text.indexOf(er.right); len=er.right.length; cls="pen-ok"; }
     if(i>=0 && !spans.some(s=>i<s.e && i+len>s.i)) spans.push({i,e:i+len,cls});
@@ -4883,7 +4892,7 @@ function penSyncText(){ const ta=document.getElementById("w-text"); if(ta) ta.va
 // 맞춤법 요약: 찾은 곳 몇 개 중 몇 개를 스스로 고쳤는지
 const aiSummary = d => { const cs=d.aiResult?.corrections||[]; return {n:cs.length, fixed:cs.filter(c=>!(d.text||"").includes(c.wrong)).length}; };
 // 일기 아래 AI 다홍펜 기록: 예전 가족일기장처럼 요약 한 줄 + 고친 곳을 일기 글씨로 한 줄씩 (칸 배경 없이 카드 하나)
-const PEN_HOW_SHORT = {self:"👍 스스로", hint:"💡 정답 보고", ai:"🖍 다홍펜이", other:"✏️ 다르게", kept:"🙆 그대로 둠", left:"그대로예요"};
+const PEN_HOW_SHORT = {self:"👍 스스로", hint:"💡 정답 보고", ai:"🖍 다홍펜이", other:"✏️ 다르게", kept:"🙆 그대로 둠", left:"그대로예요", ref:"📘 참고"};
 function viewAIResult(r,text,live){
   const cs=r.corrections||[];
   const how=c=>c.how || (text.includes(c.wrong)?"left":"self");
@@ -5345,7 +5354,9 @@ const acts = {
   "pen-check": () => penCheck(),
   "pen-reveal": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ er.shown=true; refreshPen(); } },
   "pen-apply": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ penApplyOne(er); penSyncText(); refreshPen(); } },
-  "pen-keep": el => { const er=S.draft?.pen?.errors[+el.dataset.i]; if(er){ er.kept=true; refreshPen(); } },
+  "pen-keep": el => { const p=S.draft?.pen, er=p?.errors[+el.dataset.i]; if(!er) return;
+    if(!er.soft && penKeeps(p)>=PEN_KEEP_MAX){ toast(`이대로 두기는 일기 하나에 ${PEN_KEEP_MAX}번까지예요. 정답대로 고쳐 볼까요?`); return; }
+    er.kept=true; refreshPen(); },
   "pen-find": el => { const er=S.draft?.pen?.errors[+el.dataset.i], ta=document.getElementById("w-text"); if(!er||!ta) return;
     const i=penAt(er,S.draft.text); if(i<0) return;
     ta.focus({preventScroll:true}); ta.setSelectionRange(i,i+er.wrong.length);
@@ -5828,8 +5839,8 @@ async function penCheck(){
   try{
     const data=await callPen(d.text), prev=d.pen, text=d.text;
     let errors=(data.errors||[]).filter(e=>e && e.wrong && e.right && e.wrong!==e.right)
-      .map(e=>({wrong:String(e.wrong),right:String(e.right),kind:String(e.kind||""),hint:String(e.hint||""),why:String(e.why||"").replace(/([.!?])\s*[、，,]\s*/g,"$1 ").trim()}));
-    const found=errors.filter(e=>!/^[.?!]{1,2}$/.test(e.right.slice(e.wrong.length)) || !e.right.startsWith(e.wrong));   // 받아쓰기 퀴즈에 넣을 것 (마침표만 붙인 것은 빼고)
+      .map(e=>({wrong:String(e.wrong),right:String(e.right),kind:String(e.kind||""),hint:String(e.hint||""),why:String(e.why||"").replace(/([.!?])\s*[、，,]\s*/g,"$1 ").trim(),...(e.sure===false?{soft:true}:{})}));   // soft = 📘 참고 (외래어 이름 표기처럼 안 고쳐도 되는 것)
+    const found=errors.filter(e=>!e.soft && (!/^[.?!]{1,2}$/.test(e.right.slice(e.wrong.length)) || !e.right.startsWith(e.wrong)));   // 받아쓰기 퀴즈에 넣을 것 (마침표만 붙인 것 · 참고는 빼고. 🙆 그대로 둔 것은 들어가요)
     errors.push(...penSpace(text,errors)); errors.push(...penPeriod(text,errors));
     errors=errors.map(er=>penTrim(er,text));
     // 앞 검사에서 고친 기록은 그대로 남겨요 (같은 것은 한 번만)
@@ -5837,7 +5848,7 @@ async function penCheck(){
     errors=[...kept.filter(e=>!seen.has(e.wrong+"→"+e.right)), ...errors];
     errors.forEach(er=>{ er._left=penLeft(er,text); });
     d.pen={praise:data.praise||"", cheer:data.cheer||"", errors, checks:(prev?.checks||0)+1, original:prev?.original||text, auto:penAutoOf(S.me)};
-    if(d.pen.auto){ for(const er of errors) if(penAt(er,d.text)>=0){ penApplyOne(er); er.auto=true; er._left=false; } }
+    if(d.pen.auto){ for(const er of errors) if(!er.soft && penAt(er,d.text)>=0){ penApplyOne(er); er.auto=true; er._left=false; } }
     // 검사 결과를 일기에 바로 붙여 둬요 (나갔다 와도 그대로)
     const base={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",prompt:d.prompt||"",title:d.title.trim(),text:d.text,status:d.status==="submitted"?"submitted":"draft",updatedAt:Date.now(),aiChecked:true,aiResult:penResult(d)};
     if(d.id) await B.update(S.gid,"diaries",d.id,base);
