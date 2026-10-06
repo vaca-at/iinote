@@ -3385,10 +3385,11 @@ function viewHome(){
   return viewHomeDiary();
 }
 function viewHomeDiary(){
-  const t=todayStr(), ps=sortedProfiles(), week=[...Array(7)].map((_,i)=>addDays(t,i-3)), mine=findDiary(S.me.id,t);   // 사흘 전 ~ 오늘 ~ 사흘 뒤 (어제 쓴 일기도 보이게)
-  const rows = ps.map(p=>{ const d=findDiary(p.id,t); const st=d?(d.status==="submitted"?["done","썼어요"]:["draft","쓰는 중"]):["none","아직이에요"];
+  // 위 날짜(‹ ›)로 고른 날 기준: 그날 누가 썼는지 · 그날 앞뒤 사흘 (예전엔 날짜를 넘겨도 늘 오늘 기준이라 지난 날이 '아직이에요'로 보였어요)
+  const t=todayStr(), hd=homeDay(), isT=hd===t, ps=sortedProfiles(), week=[...Array(7)].map((_,i)=>addDays(hd,i-3));   // 사흘 전 ~ 고른 날 ~ 사흘 뒤
+  const rows = ps.map(p=>{ const d=findDiary(p.id,hd); const st=d?(d.status==="submitted"?["done","썼어요"]:["draft","쓰는 중"]):["none","아직이에요"];
     return `<li class="st-row">${av(p)}<span class="st-name">${esc(p.name)}</span><span class="pill ${st[0]}">${st[1]}</span></li>`; }).join("");
-  const head = week.map(d=>`<span class="wk-h ${d===t?"today":""}">${DAYS[toDate(d).getDay()]}<b>${+d.slice(8)}</b></span>`).join("");
+  const head = week.map(d=>`<span class="wk-h ${d===hd?"today":""}">${DAYS[toDate(d).getDay()]}<b>${+d.slice(8)}</b></span>`).join("");
   const wrows = ps.map(p=>`<div class="wk-row"><span class="wk-name">${esc(p.name)}</span>${week.map(d=>{ const x=findDiary(p.id,d); const c=x?(x.status==="submitted"?"on":"half"):""; const tip=`${fmtShort(d)} ${x?(x.status==="submitted"?"썼어요":"쓰는 중"):"안 썼어요"}`;
     // 내 줄의 오늘까지 동그라미는 눌러서 그날 일기를 쓰거나 볼 수 있어요
     if(p.id===S.me.id && d<=t) return x&&x.status==="submitted"
@@ -3398,7 +3399,7 @@ function viewHomeDiary(){
   return `${heroDate()}
   <div class="home-grid">
     <div class="col">
-      <section class="block" aria-labelledby="h-st"><div class="block-h"><h2 id="h-st">오늘의 일기</h2><span class="muted">${ps.filter(p=>findDiary(p.id,t)?.status==="submitted").length}/${ps.length}명 썼어요</span></div>
+      <section class="block" aria-labelledby="h-st"><div class="block-h"><h2 id="h-st">${isT?"오늘의 일기":fmtShort(hd)+" 일기"}</h2><span class="muted">${ps.filter(p=>findDiary(p.id,hd)?.status==="submitted").length}/${ps.length}명 썼어요</span></div>
         <ul class="st-list" style="--n:${Math.min(ps.length,4)}">${rows}</ul>
         <div class="week"><div class="wk-row wk-head"><span></span>${head}</div>${wrows}
           <div class="legend"><span><i class="wk-dot on"></i>썼어요</span><span><i class="wk-dot half"></i>쓰는 중</span><span>내 줄 동그라미를 누르면 그날 일기를 써요</span></div></div>
