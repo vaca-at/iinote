@@ -1248,6 +1248,24 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 
 .loading{min-height:100dvh;display:grid;place-items:center;color:var(--ink3)}
 /* 앱이 뜨기 전 잠깐 보이는 소개 (검색 로봇 · 링크 미리보기도 이 글을 읽어요) */
+/* 앱 · 로그인해 둔 웹에서는 검색용 소개 글을 안 보여요 (불러오는 동안 글이 잔뜩 보이던 것) */
+html.is-app .seo-intro, html.has-login .seo-intro{display:none}
+.consent-l{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--ink2)}
+.consent-l input{margin-top:3px;flex:none;width:18px;height:18px}
+.consent-ban{border:2px solid var(--coral);background:var(--coral-soft)}
+.notice-bar{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:var(--sky-soft);border:1.5px solid var(--sky);font-size:14px}
+.notice-bar.warn{background:var(--butter-soft);border-color:var(--butter)}
+.notice-bar.new{background:var(--sage-soft);border-color:var(--sage)}
+.notice-bar p{flex:1;margin:0;line-height:1.5}
+.notice-bar > span{font-size:18px}
+.consent-ban p{margin:6px 0 10px;font-size:14px;color:var(--ink2)}
+#webload{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg,#FFFBF7);color:var(--ink,#2E2433);transition:opacity .25s}
+#webload img{border-radius:20px;box-shadow:0 8px 24px -12px rgba(0,0,0,.35)}
+#webload b{font-size:18px;letter-spacing:-.01em}
+#webload i{width:36px;height:4px;border-radius:99px;background:linear-gradient(90deg,var(--coral,#EF6F53) 40%,transparent 40%);background-size:200% 100%;animation:wl 1s linear infinite}
+#webload.out{opacity:0}
+@keyframes wl{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){#webload i{animation:none}}
 .seo-intro{max-width:640px;margin:0 auto;padding:12vh 20px 40px;text-align:center;color:var(--ink2)}
 .seo-intro img{border-radius:16px}
 .seo-intro h1{font-size:24px;margin:12px 0 8px;color:var(--ink)}
@@ -1935,7 +1953,14 @@ span.pf-av{cursor:default}
    웹(브라우저)에서는 아무것도 하지 않아요 */
 (function(){
   var C=window.Capacitor;
-  if(!(C && C.isNativePlatform && C.isNativePlatform())){ window.bootTo=window.bootDone=function(){}; return; }
+  if(!(C && C.isNativePlatform && C.isNativePlatform())){
+    // 🌐 웹: 로그인해 둔 사람에게는 검색용 소개 글(.seo-intro) 대신 로고만 잠깐 보여요 (2026-10-07). 처음 온 사람 · 검색 로봇은 소개 글 그대로
+    var on=false; try{ on=!!localStorage.getItem("iinote-login"); }catch(e){}
+    if(on){ document.documentElement.classList.add("has-login");
+      var w=document.createElement("div"); w.id="webload"; w.setAttribute("role","status"); w.setAttribute("aria-label","아이아이노트를 여는 중");
+      w.innerHTML='<img src="icon.png" alt="" width="72" height="72"><b>아이아이노트</b><i></i>'; document.body.appendChild(w); }
+    window.bootTo=function(){}; window.bootDone=function(){ var x=document.getElementById("webload"); if(x){ x.classList.add("out"); setTimeout(function(){ x.remove(); },250); } };
+    return; }
   document.documentElement.classList.add("is-app");
   var V="ABCDE".charAt(Math.floor(Math.random()*5));
   var STEP=["앱을 준비하고 있어요","로그인을 확인하고 있어요","내 정보를 불러오고 있어요","가족 일기장을 펼치고 있어요","다 됐어요"];
@@ -2547,6 +2572,17 @@ function contextOf(text, wrong){
    목표 글자 수를 채우면 부를 수 있어요 → 틀린 곳을 노란 형광펜으로 칠해요 → 스스로 고치거나 정답을 보고 고쳐요.
    1 · 2학년은 다홍펜이 바로 고쳐 줘요(초록 형광펜). 다 고쳐야 제출할 수 있어요. 칭찬 · 응원 한마디(AI 피드백)도 함께.
    워커: { text, level:"grade4", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer } */
+/* 👨‍👩‍👧 보호자 동의 (2026-10-07): 만 14세 미만 아이 개인정보는 법정대리인(보호자) 동의가 필요해요 (개인정보 보호법 제22조의2)
+   profiles.guardianConsent = {by:보호자 프로필 id, uid, at, ver} · 아이가 스스로 들어오면 {how:"join"} → 보호자가 첫 화면 띠에서 한 번 더 확인 */
+const CONSENT_VER = "2026-10-07";
+const consentRec = () => ({by:S.me?.id||"", uid:S.user?.uid||"", at:Date.now(), ver:CONSENT_VER});
+const needConsent = () => isParent() && !DEMO ? sortedProfiles().filter(p=>p.type==="child" && !p.guardianConsent?.by) : [];
+function consentBanner(){
+  const ks=needConsent(); if(!ks.length) return "";
+  return `<section class="block consent-ban" role="note"><b>👨‍👩‍👧 보호자 동의를 한 번 확인해 주세요</b>
+    <p>${ks.map(p=>esc(p.name)).join(" · ")}의 이름 · 학년 · 일기 · 사진 · 목소리를 아이아이노트에 저장하려면 보호자 동의가 필요해요 (만 14세 미만 아이). <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침 보기</a></p>
+    <button class="btn btn-primary sm" data-act="consent-kids">보호자로서 동의해요</button></section>`;
+}
 const PEN_MAX_CHECK = 1;   // 다홍펜 검사는 아이마다 하루 한 번 (2026-10-07, 워커도 같이 세요)
 // 🔒 AI 선생님(다홍펜 워커) 부르기: 로그인 토큰 + 누구 것인지(pid)를 함께 보내요. 하루 횟수가 넘으면 워커가 알려 준 말을 그대로 보여 줘요
 async function aiFetch(url,opt){
@@ -2888,8 +2924,13 @@ async function sendChat(file, ta){
   finally{ S.chatBusy=false; document.querySelectorAll(".chat-send").forEach(b=>{ b.disabled=false; b.textContent="보내기"; }); if(ta?.isConnected) ta.focus(); }
 }
 
+/* 📢 전체 공지 띠 (2026-10-07): 운영자가 운영 현황판에서 쓴 공지 (서버 함수 noticeGet). 닫으면 그 공지는 이 기기에서 다시 안 보여요 */
+function loadNotice(){ if(DEMO || S.noticeAt>Date.now()-10*60e3) return; S.noticeAt=Date.now();
+  B.callFn?.("noticeGet")?.then(r=>{ const n=r?.notice||null; if(JSON.stringify(n)!==JSON.stringify(S.notice)){ S.notice=n; render(); } }).catch(()=>{}); }
+function noticeBar(){ const n=S.notice; if(!n || ls.get("iinote-notice-x","")===n.id) return "";
+  return `<div class="notice-bar ${esc(n.tone||"info")}" role="status"><span>${n.tone==="warn"?"⚠️":n.tone==="new"?"✨":"📢"}</span><p>${esc(n.text)}${n.link?` <a href="${esc(n.link)}" target="_blank" rel="noopener">자세히</a>`:""}</p><button class="icon-btn" data-act="notice-x" aria-label="공지 닫기">${ic("x")}</button></div>`; }
 async function enterGroup(gid){
-  S.gid=gid; S.group=await B.getGroup(gid); S.album=[]; S.albumReady=false; S.alUp=null; S.alEdit=null;
+  S.gid=gid; S.group=await B.getGroup(gid); S.album=[]; S.albumReady=false; S.alUp=null; S.alEdit=null; loadNotice();
   if(!S.group){ S.phase="onboard"; render(); return; }
   await reloadAll();
   startChat();
@@ -3100,6 +3141,7 @@ function viewOnboard(){
         </fieldset>
         <label>나를 부르는 이름<input name="me" required maxlength="10" placeholder="예: 아빠, 이모, 하랑"></label>
         <label class="child-only">학년 · 나이<select name="grade">${gradeOptions(1)}</select></label>
+        <label class="child-only consent-l"><input type="checkbox" name="guardian" value="1"><span>엄마 · 아빠(보호자)와 함께 보고 있어요. 보호자가 <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>을 읽고 동의했어요. <small>(만 14세 미만 아이는 보호자 동의가 필요해요)</small></span></label>
         <button class="btn btn-accent wide">가족에 들어가기</button>
       </form>
     </div>
@@ -3218,7 +3260,7 @@ function viewAppShell(){
     </div>
     ${S.me.type==="child"?kidBar():""}
     ${S.newsOpen?viewNews():""}
-    <main class="a-main ${home?"is-home":""}" id="main">${dupBanner()}${body}</main>
+    <main class="a-main ${home?"is-home":""}" id="main">${noticeBar()}${dupBanner()}${body}</main>
     ${home?`<button class="a-help" data-act="help-open" aria-label="도움 · 문의">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
     ${bare?"":`<nav class="a-nav" aria-label="메뉴">
       ${nb("home","홈","home")}${nb("mine","내 일기","lay-diary")}
@@ -3253,7 +3295,7 @@ function viewMore(){
 function viewHomePages(){
   const k=hpage();
   const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="news" ? hpNews() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"?awardBanner()+penAskBanner():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
+  return `<div class="hp" data-hp="${k}">${k==="diary"?consentBanner()+awardBanner()+penAskBanner():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -3372,7 +3414,7 @@ function viewShell(){
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       ${S.newsOpen?viewNews():""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
-      <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
+      <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${noticeBar()}${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
     </div>
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}</div>
@@ -3388,7 +3430,7 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return awardBanner()+penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  if(!S.tab || S.tab==="home") return consentBanner()+awardBanner()+penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings}[S.tab]||viewHome)();
 }
 
@@ -5077,6 +5119,7 @@ function viewFamily(){
             <label>이름<input name="name" required maxlength="10" placeholder="예: 하랑"></label>
             <label>학년 · 나이<select name="grade">${gradeOptions(1)}</select></label>
             <label class="span2">비밀번호 네 자리 (선택)<input name="pin" class="pin-in" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="비워 두면 바로 들어가요"></label>
+            <label class="span2 consent-l"><input type="checkbox" name="consent" value="1" required><span>보호자로서 이 아이의 이름 · 학년 · 일기 · 사진 · 목소리를 아이아이노트에 저장하는 데 동의해요. <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a> <small>(만 14세 미만 아이는 보호자 동의가 꼭 필요해요)</small></span></label>
             <p class="muted span2" style="margin:0;font-size:13px">아이는 구글 계정 없이 이 프로필로 써요. 엄마 · 아빠 휴대폰에서 '프로필 바꾸기'로 쓰거나, 추가한 뒤 '초대 문자 복사'로 아이 휴대폰에 보내 주세요.</p>
             <button class="btn btn-primary span2">아이 프로필 추가</button>
           </form></details>`:""}
@@ -5249,7 +5292,24 @@ document.addEventListener("pointerdown",e=>{
 });
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2400); }
 
-async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catch(e){ console.error(e); toast(e.message||"문제가 생겼어요. 다시 시도해 주세요."); }finally{ S.busy=false; } }
+async function guard(fn){ if(S.busy) return; S.busy=true; try{ await fn(); }catch(e){ console.error(e); if(e?.code && !/network|unavailable|cancel|popup/i.test(e.code)) reportError(`${e.code} ${e.message||""}`,"guard"); toast(e.message||"문제가 생겼어요. 다시 시도해 주세요."); }finally{ S.busy=false; } }
+
+/* 🐞 오류 기록 (2026-10-07): 화면에서 생긴 오류를 운영자 문의함 '🐞 오류 기록'으로 보내요 (서버 함수 errorReport)
+   이름 · 일기 내용은 보내지 않고 오류 글 · 위치 · 기기 종류만. 같은 오류는 한 번, 한 번 켤 때 5개까지 · 서버는 하루 300줄까지 */
+const ERR_VER = "2026-10-07";
+const errSent=new Set(); let errN=0;
+function reportError(msg,where){
+  try{ msg=String(msg||"").slice(0,300); where=String(where||"").slice(0,200);
+    if(DEMO || !msg || /ResizeObserver|^Script error\.?$|chrome-extension|AbortError|Failed to fetch|Load failed|NetworkError|network-request-failed/i.test(msg)) return;
+    const k=msg+"|"+where; if(errSent.has(k) || errN>=5) return; errSent.add(k); errN++;
+    const os=(navigator.userAgent.match(/Android [\d.]+|iPhone OS [\d_]+|iPad; CPU OS [\d_]+|Windows NT [\d.]+|Mac OS X [\d_.]+/)||[""])[0];
+    const env=`${IS_APP?"앱":"웹"} ${ERR_VER} · ${os} · ${S?.phase||""}${S?.tab?"/"+S.tab:""}${S?.sub?.type?"/"+S.sub.type:""}`;
+    const go=()=>B.callFn?.("errorReport",{msg,where,env});
+    try{ go()?.catch?.(()=>{}); }catch(e){ setTimeout(()=>{ try{ go()?.catch?.(()=>{}); }catch(x){} },4000); }   // 아직 준비 전이면 조금 뒤에 한 번 더
+  }catch(e){}
+}
+addEventListener("error", e=>reportError(e.message, `${String(e.filename||"").split("/").pop()}:${e.lineno||""}:${e.colno||""}`));
+addEventListener("unhandledrejection", e=>reportError(e.reason?.message||String(e.reason||""), "promise"+(e.reason?.code?" "+e.reason.code:"")));
 
 /* =========================================================
    9. 버튼 동작
@@ -5437,6 +5497,11 @@ const acts = {
   "photo-fav": el => { const ps=S.draft.photos, p=ps.find(x=>x.id===el.dataset.id); if(!p) return;
     if(p.fav){ delete p.fav; } else { const on=ps.filter(x=>x.fav).sort((a,b)=>a.fav-b.fav); if(on.length>=2) delete on[0].fav; p.fav=Date.now(); }
     render(); },
+  "notice-x": () => { if(S.notice) ls.set("iinote-notice-x",S.notice.id); render(); },
+  "consent-kids": () => guard(async()=>{ const ks=needConsent(); if(!ks.length) return;
+    if(!confirm(`${ks.map(p=>p.name).join(", ")}의 보호자로서, 아이의 이름 · 학년 · 일기 · 사진 · 목소리를 아이아이노트에 저장하고 가족끼리 함께 보는 데 동의하나요?\n(개인정보처리방침에 적힌 대로만 쓰고, 언제든 우리 가족 설정에서 아이 기록을 지울 수 있어요)`)) return;
+    for(const p of ks) await B.update(S.gid,"profiles",p.id,{guardianConsent:consentRec()});
+    await reload("profiles"); render(); toast("고마워요! 보호자 동의를 남겼어요"); }),
   "hand-read": () => handRead(),
   "hand-lb": el => { const own=el.dataset.own, L=own==="draft"?S.draft?.hand:S.diaries.find(x=>x.id===own)?.hand; if(!L?.length) return;
     S.lb={photos:L.map(h=>({url:h.url})),caps:L.map((h,i)=>({t:"📎 "+handName(i,L.length)})),i:+el.dataset.i||0}; render(); document.querySelector(".lb-x")?.focus(); },
@@ -5445,8 +5510,14 @@ const acts = {
   "loc-here": () => guard(async()=>{
     if(!navigator.geolocation){ toast("이 기기에서는 위치를 찾을 수 없어요. 직접 써 주세요"); return; }
     toast("지금 있는 곳을 찾고 있어요");
-    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:false,timeout:10000,maximumAge:60000})).catch(()=>null);
-    if(!pos){ toast("위치를 가져오지 못했어요. 위치 권한을 확인하거나 직접 써 주세요"); return; }
+    let why=null;
+    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:false,timeout:10000,maximumAge:60000})).catch(e=>{ why=e; return null; });
+    // 📍 위치 권한이 꺼져 있으면: 앱은 '설정 열기'로 이 앱의 설정 화면을, 웹은 브라우저에서 켜는 방법을 알려 줘요 (2026-10-07)
+    if(!pos && why?.code===1){
+      if(IS_APP && plug("Iinote")?.openAppSettings){ if(confirm("위치 권한이 꺼져 있어요.\n설정 → 권한 → 위치에서 '앱 사용 중에만 허용'을 눌러 주세요.\n\n지금 설정을 열까요?")) plug("Iinote").openAppSettings().catch(()=>{}); }
+      else toast("위치 권한이 꺼져 있어요. 주소창 왼쪽 자물쇠(ⓘ) → 위치 → 허용으로 바꾼 뒤 다시 눌러 주세요");
+      return; }
+    if(!pos){ toast("위치를 가져오지 못했어요. 휴대폰의 위치(GPS)가 켜져 있는지 확인하거나 직접 써 주세요"); return; }
     const lat=+pos.coords.latitude.toFixed(3), lng=+pos.coords.longitude.toFixed(3);
     S.draft.location={name:await reverseGeocode(lat,lng),lat,lng}; S.locEdit=false; render(); }),
   "loc-edit": () => { S.locEdit=true; render(); document.getElementById("w-loc")?.focus(); },
@@ -5900,7 +5971,8 @@ const forms = {
   }),
   "old-import": fd => guard(()=>importOld(fd)),
   "create-group": fd => guard(async()=>{ const gid=await B.createGroup(fd.name.trim(),S.user,fd.me.trim()); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid); toast("가족을 만들었어요. 초대 코드는 '우리 가족'에 있어요"); }),
-  "join-group": fd => guard(async()=>{ const role = fd.role==="child" ? {type:"child",grade:Number(fd.grade),pin:""} : {type:"parent"};
+  "join-group": fd => guard(async()=>{ if(fd.role==="child" && !fd.guardian){ toast("엄마 · 아빠(보호자)와 함께 동의 칸에 표시해 주세요"); return; }
+    const role = fd.role==="child" ? {type:"child",grade:Number(fd.grade),pin:"",guardianConsent:{how:"join",uid:S.user?.uid||"",at:Date.now(),ver:CONSENT_VER}} : {type:"parent"};
     const gid=await B.joinGroup(fd.code.trim().toUpperCase(),S.user,fd.me.trim(),role); S.userDoc=await B.getUser(S.user.uid); S.joinCode=""; history.replaceState(null,"",location.pathname); await enterGroup(gid);
     const mine=S.profiles.find(isMine); if(mine && S.phase==="picker") enterAs(mine); toast("가족에 들어왔어요"); }),
   "parent-pin": (fd,f) => guard(async()=>{ const v=String(fd.pin||"").trim();
@@ -5930,7 +6002,8 @@ const forms = {
   "edit-comment": (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
     await B.update(S.gid,"comments",f.dataset.id,{text,edited:true,updatedAt:Date.now()}); S.editing=null; await reload("comments"); render(); toast("댓글을 수정했어요"); }),
   child: (fd,f) => guard(async()=>{ if(fd.pin && !/^\d{4}$/.test(fd.pin)){ toast("비밀번호는 숫자 네 자리로 넣어 주세요"); return; }
-    await B.add(S.gid,"profiles",{name:fd.name.trim(),type:"child",grade:Number(fd.grade),pin:fd.pin||"",color:COLORS[S.profiles.length%COLORS.length],createdAt:Date.now()});
+    if(!fd.consent){ toast("보호자 동의 칸에 표시해 주세요"); return; }
+    await B.add(S.gid,"profiles",{name:fd.name.trim(),type:"child",grade:Number(fd.grade),pin:fd.pin||"",color:COLORS[S.profiles.length%COLORS.length],createdAt:Date.now(),guardianConsent:consentRec()});
     await reload("profiles"); render(); toast("아이 프로필을 추가했어요"); })
 };
 
@@ -6271,6 +6344,8 @@ function openAppUrl(url){
   if(url==="help"){ if(S.phase==="app" && S.me) acts["help-open"](); else S.wantHelp=true; return; }   // 운영자 답장 알림
   if(url==="admin"){ openExternal("https://iinote.co.kr/admin.html"); return; }                          // (운영자) 새 문의 알림
   const p=appPath(url);
+  // 🔗 카톡 · 문자로 받은 초대 링크(https://iinote.co.kr/?join=… · ?k=…)가 앱으로 열리면: 그 주소로 앱 화면을 한 번 새로 열어 초대를 받아요 (2026-10-07)
+  if(/[?&](join|k)=/.test(p) && !location.search.includes(p.split("?")[1]||"\u0000")){ location.replace(p); return; }
   if(S.phase==="app" && S.me && S.routed){
     if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")) return;
     try{ history.pushState({iinote:1},"",p); }catch(e){} applyUrl(); render(); window.scrollTo(0,0); }
@@ -6432,6 +6507,7 @@ if(IS_APP){
 B.onAuth(async u => {
   S.isOperator = await isOperatorUser(u);
   S.user=u;
+  plug("FirebaseCrashlytics")?.setUserId({userId:u?u.uid.slice(0,6):""}).catch(()=>{});   // 📱 앱 충돌 기록에는 계정 번호 앞 6자리만 (개인정보처리방침)
   if(!u){ S.chatUnsub?.(); S.chatUnsub=null; S.chats=[]; S.chatReady=false; ls.del("iinote-login"); useSavedKidLink(); S.phase="landing"; S.me=null; render(); return; }
   if(!u.isAnonymous && !(S.joinCode && S.kidId)) ls.del("iinote-kidlink");   // 어른이 구글 · 카카오로 들어오면 기억한 아이 링크는 지워요
   if(await autoLogoutCheck()) return;

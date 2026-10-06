@@ -45,6 +45,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sp.op span{background:#5A2E45;color:#fff}
 .sp small{font-size:12px;opacity:.7}
 #sp-form{display:flex;flex-direction:column;gap:8px}
+.nt-form{display:flex;flex-direction:column;gap:8px}
+.nt-form textarea,.nt-form input,.nt-form select{font:inherit;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line)}
+.nt-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end}
+.nt-row label{display:flex;flex-direction:column;gap:4px;font-size:13px}
 #sp-form textarea{font:inherit;padding:10px;border-radius:12px;border:1.5px solid var(--line)}
 /* 숫자 칸: 무리마다 위쪽 색 띠 (방문 = 하늘, 가족 · 사람 = 초록, 일기 = 코랄, AI = 버터) */
 .group-h{font-size:18px;color:var(--sub);margin:4px 2px 8px;display:flex;align-items:center;gap:8px}
@@ -304,6 +308,7 @@ function render(fams,users,idx,usage,stats,kinds){
   $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="when">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
       <button class="pill" data-act="reload">🔄 새로고침</button><button class="pill" data-act="logout">로그아웃</button></header>
     <div class="card" id="inbox"><h2>💌 문의함</h2><p class="sub">불러오는 중…</p></div>
+    <div class="card" id="notice"><h2>📢 전체 공지 띠</h2><p class="sub">불러오는 중…</p></div>
     <div class="group-h">👨‍👩‍👧 사람 · 가족</div>
     <div class="tiles people">
       ${stats?tile("t-visit","🚪",(stats.find(x=>x.day===dayStr(new Date()))||{}).visitors||0,"오늘 방문자"):""}
@@ -329,8 +334,29 @@ function render(fams,users,idx,usage,stats,kinds){
     </table></div>
     <p class="note">일기 수는 쓰는 중(임시 저장)을 포함해요. 사람별 ‘전체’는 제출한 일기 수예요. 이 화면은 이름과 일기 내용을 보여 주지 않고 숫자만 세요.</p>
     ${idx.length?`<p class="alert">사람별 최근 7일(?)을 세려면 파이어베이스 색인이 한 번 필요해요. <a href="${esc(idx[0])}" target="_blank" rel="noopener">여기를 눌러 색인 만들기</a> → 몇 분 뒤 새로고침.</p>`:""}</div>`;
-  loadInbox(inboxUid);
+  loadInbox(inboxUid); loadNotice();
 }
+/* ---------- 📢 전체 공지 띠 (2026-10-07) ----------
+   여기서 쓰면 모든 가족의 웹 · 앱 화면 위에 띠로 보여요 (서버 함수 noticeSet · noticeGet). 비우고 저장하면 내려가요.
+   가족이 ✕ 로 닫으면 그 기기에서는 그 공지가 다시 안 보여요 (새로 쓰면 다시 보여요) */
+async function callFn(name,data){ const FN=await import(`https://www.gstatic.com/firebasejs/${V}/firebase-functions.js`); return (await FN.httpsCallable(FN.getFunctions(app,"asia-northeast3"),name)(data||{})).data; }
+async function loadNotice(set){
+  const el=document.getElementById("notice"); if(!el) return;
+  try{
+    const r=set?await callFn("noticeSet",set):await callFn("noticeGet"), n=r.notice;
+    const ds=n?.until?new Date(n.until+9*36e5).toISOString().slice(0,10):"";
+    el.innerHTML=`<h2>📢 전체 공지 띠 ${n?'<span class="sp-new">지금 보이는 중</span>':'<span class="sub">지금은 없음</span>'}</h2>
+      <form id="nt-form" class="nt-form">
+        <label class="sub" for="nt-t">공지 (200자까지 · 비우고 저장하면 내려가요)</label><textarea id="nt-t" name="text" rows="2" maxlength="200" placeholder="예: 10월 10일 밤 10시에 잠깐 점검해요">${esc(n?.text||"")}</textarea>
+        <div class="nt-row"><label>모양 <select name="tone">${[["info","📢 알림"],["new","✨ 새 기능"],["warn","⚠️ 주의"]].map(([k,l])=>`<option value="${k}" ${n?.tone===k?"selected":""}>${l}</option>`).join("")}</select></label>
+          <label>링크(선택) <input name="link" type="url" value="${esc(n?.link||"")}" placeholder="https://"></label>
+          <label>내리는 날(선택) <input name="until" type="date" value="${ds}"></label>
+          <button class="pill">저장</button></div></form>`;
+  }catch(e){ el.innerHTML=`<h2>📢 전체 공지 띠</h2><p class="alert">불러오지 못했어요 (${esc(e.message||e.code||"")})</p>`; }
+}
+document.addEventListener("submit", e=>{ if(e.target.id!=="nt-form") return; e.preventDefault(); const f=e.target;
+  const until=f.until.value?new Date(f.until.value+"T23:59:59+09:00").getTime():0;
+  f.querySelector("button").disabled=true; loadNotice({text:f.text.value.trim(),tone:f.tone.value,link:f.link.value.trim(),until}); });
 
 /* ---------- 💌 문의함 (2026-10-05) ----------
    앱의 '도움 · 문의' 채팅으로 온 문의를 보고 답장해요. 서버 함수 supportAdmin(운영자만)으로만 읽고 써요 (iinote-app/firebase/functions).
