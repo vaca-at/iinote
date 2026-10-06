@@ -2544,7 +2544,13 @@ function contextOf(text, wrong){
    목표 글자 수를 채우면 부를 수 있어요 → 틀린 곳을 노란 형광펜으로 칠해요 → 스스로 고치거나 정답을 보고 고쳐요.
    1 · 2학년은 다홍펜이 바로 고쳐 줘요(초록 형광펜). 다 고쳐야 제출할 수 있어요. 칭찬 · 응원 한마디(AI 피드백)도 함께.
    워커: { text, level:"grade4", name } → { errors:[{wrong,right,kind,hint,why}], praise, cheer } */
-const PEN_MAX_CHECK = 3;   // 일기 하나에 다홍펜 검사는 세 번까지
+const PEN_MAX_CHECK = 1;   // 다홍펜 검사는 아이마다 하루 한 번 (2026-10-07, 워커도 같이 세요)
+// 🔒 AI 선생님(다홍펜 워커) 부르기: 로그인 토큰 + 누구 것인지(pid)를 함께 보내요. 하루 횟수가 넘으면 워커가 알려 준 말을 그대로 보여 줘요
+async function aiFetch(url,opt){
+  const tk=await B.getIdToken().catch(()=>"");
+  return fetch(url,{...opt,headers:{...(opt.headers||{}),...(tk?{Authorization:"Bearer "+tk}:{})}});
+}
+async function aiLimit(r){ if(r.status!==403 && r.status!==401) return null; const d=await r.clone().json().catch(()=>({})); return (d.error==="limit"||d.error==="login") ? Object.assign(new Error(d.msg||"지금은 AI 선생님을 부를 수 없어요"),{limit:true}) : null; }
 // 학년(profiles.grade): 숫자 하나로 -2~0 = 5~7세, 1~6 = 초1~초6, 7~9 = 중1~중3, 10~12 = 고1~고3 (예전 1~6학년 값은 그대로 초1~초6)
 const GRADES = [[-2,"5세"],[-1,"6세"],[0,"7세"],[1,"초1"],[2,"초2"],[3,"초3"],[4,"초4"],[5,"초5"],[6,"초6"],[7,"중1"],[8,"중2"],[9,"중3"],[10,"고1"],[11,"고2"],[12,"고3"]];
 const hasGrade = g => g!==undefined && g!==null && g!=="" && !Number.isNaN(Number(g));
@@ -2640,10 +2646,11 @@ async function callPen(text){
   let last;
   for(let i=0;i<2;i++){   // 선생님이 가끔 바빠서 못 받을 때가 있어요: 한 번 더 불러요
     try{
-      const r=await fetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,level:gradeLevel(S.me.grade),name:S.me.name})});
+      const r=await aiFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,level:gradeLevel(S.me.grade),name:S.me.name,pid:S.me.id})});
       if(r.ok) return await r.json();
+      const lim=await aiLimit(r); if(lim) throw lim;
       last=new Error("다홍펜 "+r.status);
-    }catch(e){ last=e; }
+    }catch(e){ if(e.limit) throw e; last=e; }   // 하루 횟수 · 로그인 문제는 다시 부르지 않아요
   }
   throw last;
 }
@@ -4433,7 +4440,8 @@ function viewReport(){
       <div class="rep-ai"><h3>👩‍🏫 AI 선생님 총평</h3>
         ${saved?`<p>${esc(saved.summary)}</p>${saved.highlight?`<p>🌟 ${esc(saved.highlight)}</p>`:""}${saved.tip?`<p>💡 ${esc(saved.tip)}</p>`:""}<p class="muted" style="font-size:12px">${new Date(saved.at).toLocaleDateString("ko-KR")}에 만든 총평</p>`
           :`<p class="muted" style="margin:0 0 8px">${s.n?"일기를 읽고 칭찬과 성장 이야기를 담은 총평을 써 줘요.":"이 기간에 쓴 일기가 없어서 총평을 만들 수 없어요."}</p>`}
-        ${s.n?`<button class="btn ${saved?"btn-ghost":"btn-primary"} sm" data-act="rep-ai" data-id="${esc(p.id)}" ${busy?"disabled":""}>${busy?"AI 선생님이 읽는 중…":saved?"🔄 총평 다시 만들기":"✨ AI 총평 만들기"}</button>`:""}
+        ${!s.n?"":new Date().getDay()!==0?`<p class="muted" style="margin:0;font-size:13px">🗓 AI 총평은 <b>일요일</b>에 아이마다 한 번 만들 수 있어요.</p>`   /* 2026-10-07: 일요일에만 (워커도 같이 막아요) */
+          :`<button class="btn ${saved?"btn-ghost":"btn-primary"} sm" data-act="rep-ai" data-id="${esc(p.id)}" ${busy?"disabled":""}>${busy?"AI 선생님이 읽는 중…":saved?"🔄 총평 다시 만들기":"✨ AI 총평 만들기"}</button>`}
       </div></section>`; }).join("");
 }
 async function repMakeAI(pid){
@@ -4444,9 +4452,10 @@ async function repMakeAI(pid){
     if(DEMO){ await new Promise(r=>setTimeout(r,800));
       data={summary:`${p.name}은(는) 이번 기간에 ${s.n}편의 일기를 썼어요. 하루의 일을 차근차근 적는 힘이 자라고 있어요.`, highlight:`${fmtShort(s.list[s.list.length-1].date)} 일기가 특히 생생했어요.`, tip:"다음엔 그날 느낀 마음을 한 문장 더 적어 보자고 격려해 주세요."}; }
     else {
-      const r=await fetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"report",name:p.name,level:gradeLevel(p.grade),period:`${per.mode==="week"?"한 주":"한 달"} (${per.label})`,
+      const r=await aiFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"report",pid:p.id,name:p.name,level:gradeLevel(p.grade),period:`${per.mode==="week"?"한 주":"한 달"} (${per.label})`,
         stats:{일기쓴날:s.n,기간일수:s.passed,평균글자:s.avg,최고글자:s.max,목표글자:s.goal,목표달성:s.met,고친곳:s.fixes,스스로고침:s.self,자주고친말:s.top.map(t=>t[0])},
         entries:s.list.map(x=>({date:x.date,title:"",content:x.text||""}))})});
+      const lim=await aiLimit(r); if(lim) throw lim;
       data=await r.json().catch(()=>null);
       if(!r.ok || !data?.summary) throw new Error(`AI 총평을 만들지 못했어요 (${data?.error||r.status})`);
     }
@@ -4638,12 +4647,13 @@ async function toWav16k(blob){
 async function talkFetch(url,opt){
   let last;
   for(let i=0;i<2;i++){   // 잠깐 바쁘면 한 번 더
-    try{ const r=await fetch(url,opt); const data=await r.json().catch(()=>({}));
+    try{ const r=await aiFetch(url,opt); const data=await r.json().catch(()=>({}));
       if(r.ok && !data.error) return data;
-      if(data.error==="no-ai") throw new Error("음성 인식을 준비하고 있어요. 조금 뒤에 다시 해 주세요.");
+      if(data.error==="limit"||data.error==="login") throw Object.assign(new Error(data.msg||"지금은 AI 선생님을 부를 수 없어요"),{limit:true});   // 하루 횟수 · 로그인 → 다시 부르지 않아요
+      if(data.error==="no-ai") throw Object.assign(new Error("음성 인식을 준비하고 있어요. 조금 뒤에 다시 해 주세요."),{limit:true});
       last=new Error(data.error==="too long"?"녹음이 너무 길어요. 3분 안으로 다시 녹음해 주세요.":"AI 선생님이 잠깐 바빠요. 조금 뒤에 다시 눌러 주세요.");
       if(r.status<500 && r.status!==429) break;
-    }catch(e){ last=e.message?.includes("준비")?e:new Error("인터넷 연결을 확인하고 다시 눌러 주세요."); if(e.message?.includes("준비")) break; }
+    }catch(e){ last=e.limit?e:new Error("인터넷 연결을 확인하고 다시 눌러 주세요."); if(e.limit) break; }
   }
   throw last;
 }
@@ -4657,14 +4667,14 @@ async function talkMake(textOnly){
       if(!d.audio?.blob){ toast("새로 녹음해 주세요"); return; }
       S.talkBusy="🎧 목소리를 글자로 바꾸고 있어요…"; render();
       if(demo){ await wait(900); transcript="오늘 뭐가 제일 재미있었어? 놀이터에서 미끄럼틀 탔어. 누구랑 탔어? 지우랑. 엄청 빨랐어. 기분이 어땠어? 신났어! 또 가고 싶어."; }
-      else transcript=String((await talkFetch(SPELL_API+"/transcribe",{method:"POST",headers:{"Content-Type":"audio/wav"},body:await toWav16k(d.audio.blob)})).text||"").trim();
+      else transcript=String((await talkFetch(SPELL_API+"/transcribe?pid="+encodeURIComponent(S.me.id),{method:"POST",headers:{"Content-Type":"audio/wav"},body:await toWav16k(d.audio.blob)})).text||"").trim();
       if(gone()) return;
       if(countChars(transcript)<4) throw new Error("말소리를 잘 알아듣지 못했어요. 휴대폰을 조금 더 가까이 두고 또박또박 다시 녹음해 볼까요?");
     }
     S.talkBusy="✏️ AI 선생님이 아이가 한 말로 일기를 쓰고 있어요…"; render();
     const r = demo ? (await wait(900), {dialog:[{who:"어른",text:"오늘 뭐가 제일 재미있었어?"},{who:"아이",text:"놀이터에서 미끄럼틀 탔어."},{who:"어른",text:"누구랑 탔어?"},{who:"아이",text:"지우랑. 엄청 빨랐어."},{who:"어른",text:"기분이 어땠어?"},{who:"아이",text:"신났어! 또 가고 싶어."}],
         diary:"나는 오늘 놀이터에서 지우랑 미끄럼틀을 탔다. 미끄럼틀이 엄청 빨랐다. 정말 신났다. 또 가고 싶다.", mood:"great", note:"아이가 말한 놀이터 이야기로 네 문장을 썼어요. (체험 모드 예시)"})
-      : await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"talk",transcript,level:gradeLevel(S.me.grade),name:S.me.name})});
+      : await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"talk",pid:S.me.id,transcript,level:gradeLevel(S.me.grade),name:S.me.name})});
     if(gone()) return;
     S.talkBusy=null;
     const prevAI=d.talk?.diary||"", made=(d.talk?.made||0)+1;
@@ -4681,7 +4691,7 @@ async function talkMake(textOnly){
 /* ---------- 📝 손글씨 일기 사진으로 쓰기 (2026-10-07, 웹 · 앱 공통) ----------
    종이 일기장을 찍거나 고르면 → AI 선생님(다홍펜 워커 mode "ocr")이 쓴 그대로 글자로 옮겨 일기 칸에 넣어요 (맞춤법은 안 고쳐요 → 다홍펜이 검사)
    원본 사진은 일기에 📎 첨부파일(d.hand)로 남아요: groups/{gid}/diaries/{id}/hand_{id}.jpg · 한 일기에 HAND_MAX 장, 읽기는 HAND_MAX_READ 번까지 */
-const HAND_MAX = 3, HAND_MAX_READ = 5, HAND_IMG = [1600,.8];
+const HAND_MAX = 3, HAND_MAX_READ = 3, HAND_IMG = [1600,.8];   // 글자로 옮기기는 아이마다 하루 3번 (밀린 일기도 올릴 수 있게 · 워커가 하루로 세요)
 const handOK = () => MEDIA_READY || DEMO;
 const handName = (i,n) => `손글씨 원본${n>1?` ${i+1}쪽`:""}.jpg`;
 function handFiles(list, edit){
@@ -4712,7 +4722,7 @@ async function addHand(files){
     const b=await compressImage(pick[i],...HAND_IMG); if(!b.blob) throw new Error("사진을 불러올 수 없어요");
     (d.hand=d.hand||[]).push({id:rid(),blob:b.blob,url:URL.createObjectURL(b.blob),w:b.w,h:b.h,size:b.blob.size}); } }finally{ upProg(); } });
   render();
-  if(S.draft===d && d.hand?.length) handRead();
+  if(S.draft===d && d.hand?.length && !d.handText) handRead();   // 처음 넣을 때만 바로 읽어요 (쪽을 더하면 '다시 읽기'로 모든 쪽을 한 번에)
 }
 async function handRead(){
   const d=S.draft; if(!d || S.handBusy || !(d.hand||[]).length) return;
@@ -4726,7 +4736,7 @@ async function handRead(){
       // 이번에 넣은 사진(blob)만 보내요 (저장된 사진은 저장소 규칙상 다시 받아 오기 어려워요 → 다시 읽으려면 사진을 새로 넣어요)
       const images=await Promise.all(d.hand.filter(h=>h.blob).map(h=>blobToDataURL(h.blob)));
       if(!images.length) throw new Error("저장된 사진은 다시 읽을 수 없어요. 사진을 빼고 새로 넣어 주세요");
-      r=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"ocr",images,level:S.me.type==="child"?gradeLevel(S.me.grade):"adult",name:S.me.name})});
+      r=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"ocr",pid:S.me.id,images,level:S.me.type==="child"?gradeLevel(S.me.grade):"adult",name:S.me.name})});
     }
     if(gone()) return;
     S.handBusy=null; d.handReads=(d.handReads||0)+1;
@@ -5802,7 +5812,7 @@ async function penCheck(){
   const d=S.draft, g=S.me.grade, goal=penGoalOf(S.me), n=countChars(d.text);
   if(S.penBusy) return;
   if(n<goal){ toast(`${goal}자를 다 쓰면 AI 다홍펜 선생님을 부를 수 있어요! (지금 ${n}자)`); return; }
-  if(d.pen && d.pen.checks>=PEN_MAX_CHECK){ toast(`다홍펜 검사는 일기 하나에 ${PEN_MAX_CHECK}번까지예요`); return; }
+  if(d.pen && d.pen.checks>=PEN_MAX_CHECK){ toast("AI 다홍펜 검사는 하루에 한 번이에요. 칠해 준 곳을 고치고 제출해요!"); return; }
   S.penBusy=true; S.penFailed=false; refreshPen();
   try{
     const data=await callPen(d.text), prev=d.pen, text=d.text;
@@ -5828,7 +5838,7 @@ async function penCheck(){
       else await B.add(S.gid,"quizWords",{profileId:S.me.id,wrong:c.wrong,right:c.right,explain:c.why,distractors:[],context:ctx,wrongCount:1,correctStreak:0,createdAt:Date.now()});
     }
     await Promise.all([reload("diaries"),reload("quizWords")]);
-  }catch(e){ console.error(e); S.penFailed=true; }   // 선생님이 쉬는 중이어도 제출은 막지 않아요
+  }catch(e){ console.error(e); if(e.limit) toast(e.message); else S.penFailed=true; }   // 선생님이 쉬는 중이어도 · 오늘 횟수를 다 써도 제출은 막지 않아요
   finally{ S.penBusy=false; }
   render();
   document.getElementById("pen")?.scrollIntoView({behavior:"smooth",block:"nearest"});
