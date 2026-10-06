@@ -4440,19 +4440,30 @@ function viewReport(){
       <div class="rep-ai"><h3>👩‍🏫 AI 선생님 총평</h3>
         ${saved?`<p>${esc(saved.summary)}</p>${saved.highlight?`<p>🌟 ${esc(saved.highlight)}</p>`:""}${saved.tip?`<p>💡 ${esc(saved.tip)}</p>`:""}<p class="muted" style="font-size:12px">${new Date(saved.at).toLocaleDateString("ko-KR")}에 만든 총평</p>`
           :`<p class="muted" style="margin:0 0 8px">${s.n?"일기를 읽고 칭찬과 성장 이야기를 담은 총평을 써 줘요.":"이 기간에 쓴 일기가 없어서 총평을 만들 수 없어요."}</p>`}
-        ${!s.n?"":new Date().getDay()!==0?`<p class="muted" style="margin:0;font-size:13px">🗓 AI 총평은 <b>일요일</b>에 아이마다 한 번 만들 수 있어요.</p>`   /* 2026-10-07: 일요일에만 (워커도 같이 막아요) */
-          :`<button class="btn ${saved?"btn-ghost":"btn-primary"} sm" data-act="rep-ai" data-id="${esc(p.id)}" ${busy?"disabled":""}>${busy?"AI 선생님이 읽는 중…":saved?"🔄 총평 다시 만들기":"✨ AI 총평 만들기"}</button>`}
+        ${!s.n||saved?"":(()=>{ const why=repLock(p,per); return why?`<p class="muted" style="margin:0;font-size:13px">${why}</p>`
+          :`<button class="btn btn-primary sm" data-act="rep-ai" data-id="${esc(p.id)}" ${busy?"disabled":""}>${busy?"AI 선생님이 읽는 중…":"✨ AI 총평 만들기"}</button><p class="muted" style="margin:6px 0 0;font-size:12px">이 ${per.mode==="week"?"주":"달"}의 총평은 아이마다 한 번 만들 수 있어요.</p>`; })()}
       </div></section>`; }).join("");
+}
+/* 🗓 AI 총평 여는 때 (2026-10-07): 주(월~일)는 그 주 일요일부터, 달은 그달 마지막 날부터 열리고 그 뒤로는 아무 때나.
+   아이가 그 기간 중간에 일기를 처음 썼으면(예: 금요일 시작) 그 기간은 건너뛰고 다음 기간부터. 기간마다 아이마다 한 번 (워커도 같이 세요) */
+function repLock(p,per){
+  const t=todayStr(), first=S.diaries.filter(x=>x.profileId===p.id && x.status==="submitted").map(x=>x.date).sort()[0];
+  const unit=per.mode==="week"?"주":"달", endD=toDate(per.end), endTxt=`${endD.getMonth()+1}월 ${endD.getDate()}일(${DAYS[endD.getDay()]})`;
+  if(first && first>per.start){ const nx=per.mode==="week"?addDays(per.end,7):null, nd=nx&&toDate(nx);
+    return `✏️ ${esc(p.name)}${hasBatchim(p.name)?"이는":"는"} 이 ${unit} 중간(${fmtShort(first)})부터 일기를 시작해서, 첫 총평은 ${nd?`다음 주 일요일(${nd.getMonth()+1}월 ${nd.getDate()}일)`:"다음 달 말"}에 열려요.`; }
+  if(per.end>t) return `🗓 이 ${unit}의 AI 총평은 ${endTxt}부터 열려요. 그 뒤로는 언제든 만들 수 있어요.`;
+  return "";
 }
 async function repMakeAI(pid){
   const p=prof(pid), per=repPeriod(), s=repStats(p,per); if(!p || !s.n || S.repBusy) return;
+  const lock=repLock(p,per); if(lock){ toast(lock.replace(/<[^>]+>/g,"")); return; }
   S.repBusy=pid; render();
   try{
     let data;
     if(DEMO){ await new Promise(r=>setTimeout(r,800));
       data={summary:`${p.name}은(는) 이번 기간에 ${s.n}편의 일기를 썼어요. 하루의 일을 차근차근 적는 힘이 자라고 있어요.`, highlight:`${fmtShort(s.list[s.list.length-1].date)} 일기가 특히 생생했어요.`, tip:"다음엔 그날 느낀 마음을 한 문장 더 적어 보자고 격려해 주세요."}; }
     else {
-      const r=await aiFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"report",pid:p.id,name:p.name,level:gradeLevel(p.grade),period:`${per.mode==="week"?"한 주":"한 달"} (${per.label})`,
+      const r=await aiFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"report",pid:p.id,pkey:per.key,pend:per.end,name:p.name,level:gradeLevel(p.grade),period:`${per.mode==="week"?"한 주":"한 달"} (${per.label})`,
         stats:{일기쓴날:s.n,기간일수:s.passed,평균글자:s.avg,최고글자:s.max,목표글자:s.goal,목표달성:s.met,고친곳:s.fixes,스스로고침:s.self,자주고친말:s.top.map(t=>t[0])},
         entries:s.list.map(x=>({date:x.date,title:"",content:x.text||""}))})});
       const lim=await aiLimit(r); if(lim) throw lim;
