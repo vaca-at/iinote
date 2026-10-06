@@ -2894,6 +2894,7 @@ const ICONS = {
   "lay-album":'<rect x="3" y="3" width="11" height="11" rx="1.5"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="16" y="10" width="5" height="4" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><rect x="10" y="16" width="11" height="5" rx="1"/>',
   book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5"/>',
   quiz:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><path d="M12 17h.01"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
   people:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.3-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.6c2.6.2 4.4 2 5 4.9"/>',
   plus:'<path d="M12 5v14M5 12h14"/>', back:'<path d="M15 5l-7 7 7 7"/>', arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
   pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>', reply:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v4"/>',
@@ -3025,7 +3026,7 @@ function viewLanding(){
       </div>
       ${S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:""}
       ${keepBox()}
-      <p class="demo-note one">구글 · 카카오는 따로 가입돼요. 둘 다 쓰려면 로그인 뒤 ‘우리 가족 설정 → 계정’에서 연결해 주세요.</p>
+      <p class="demo-note one">구글 · 카카오는 따로 가입돼요. 둘 다 쓰려면 로그인 뒤 ‘설정 → 계정’에서 연결해 주세요.</p>
       ${kakaoBtn()}
       <p class="demo-note"><a href="terms.html">이용약관</a> · <a href="privacy.html">개인정보처리방침</a></p>
       ${S.a2hs?a2hsBox():""}
@@ -3102,7 +3103,7 @@ function viewPicker(){
 }
 
 // 폴더 탭 색: [바탕색, 선 색]
-const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],album:["var(--sage-soft)","var(--sage)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"]};
+const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],album:["var(--sage-soft)","var(--sage)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"],settings:["var(--lilac-soft)","var(--lilac)"]};
 // 일기 글씨 4가지
 const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
@@ -3164,7 +3165,7 @@ function kidBar(){
   if(!pp) return "";
   return `<div class="kid-bar kid-now"><b>${esc(S.me.name)}${hasBatchim(S.me.name)?"이가":"가"} 쓰는 중</b><button class="kq back" data-act="back-parent">${av(pp,26)}<span>${esc(pp.name)}${ro(pp.name)} 돌아가기</span></button></div>`;
 }
-const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", album:"사진", report:"리포트", quiz:"퀴즈", family:"설정"};   // 휴대폰 아래 메뉴 이름
+const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", album:"사진", report:"리포트", quiz:"퀴즈", family:"가족", settings:"설정"};   // 휴대폰 아래 메뉴 이름
 const tourAsk = () => `<div class="tour-ask" role="dialog" aria-modal="true" aria-labelledby="ta-h"><div class="tour-ask-box"><h2 id="ta-h">👀 둘러보기</h2><p>지금 <b>${esc(S.me?.name||"내")}</b> 계정으로 로그인되어 있어요.<br>로그아웃하고 예시 가족 둘러보기 화면으로 갈까요?</p><p class="muted">내 일기장의 기록은 그대로 있어요. 둘러보기를 마치고 다시 로그인하면 돼요.</p><div class="row"><button class="btn btn-primary" data-act="tour-logout">로그아웃하고 둘러보기</button><button class="btn btn-ghost" data-act="tour-no">아니요, 내 일기장으로</button></div></div></div>`;
 const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? `<div class="tour-bar" role="note">👀 <b>데모 버전 둘러보기 중</b><span>예시 가족 일기장이에요. 마음껏 눌러 보세요 (이 기기에만 저장돼요)</span><button class="btn btn-primary sm" data-act="tour-exit">진짜로 시작하기</button></div>` : "");
 /* ---------- 📱 앱 화면 뼈대 (2026-10-05, 앱에서만 · 웹은 아래 viewShell 그대로) ----------
@@ -3181,7 +3182,7 @@ function viewAppShell(){
   // 다른 화면: 제목 앞 큰 이모지는 빼고(아이콘을 선 모양 하나로), 하루 펼쳐보기 · 우리 가족 설정은 휴대폰 배치로
   let body = home ? viewHomePages() : viewMain().replace(/(<div class="page-h"><h1>)\s*(?:\p{Extended_Pictographic}️?\s*)+/u,"$1");
   if(!S.sub && S.tab==="day") body=`<div class="app-day">${body}</div>`;
-  if(!S.sub && S.tab==="family") body=`<div class="fam-menu">${body}</div>`;
+  if(!S.sub && (S.tab==="family" || S.tab==="settings")) body=`<div class="fam-menu">${body}</div>`;
   return `${tourBar()}<div class="ashell ${writing?"writing":""} ${chatting?"chatting":""}">
     <div class="a-top ${home?"band":""}" style="--band:${home?pg[3]:"transparent"}">
       <header class="ah">
@@ -3209,10 +3210,12 @@ function viewAppShell(){
 }
 // 더보기 판: 아래 메뉴에 없는 화면들 · 화면 꾸미기(디자인 · 글씨) · 도움
 function viewMore(){
-  const it=[["day","하루 펼쳐보기","cal"],["album","사진첩","image"],["shelf","책장 · PDF","book"]];
+  // 사진첩은 홈 네 쪽(일기장 · 달력 · 사진첩 · 소식)에 있어서 여기엔 두지 않아요 (같은 사진첩이 두 군데 보이지 않게)
+  const it=[["day","하루 펼쳐보기","cal"],["shelf","책장 · PDF","book"]];
   if(isParent()) it.push(["kids","아이들 현황","spark"],["report","AI 리포트","chart"]);
   if(S.me.type==="child") it.push(["quiz","받아쓰기 퀴즈","quiz"]);
-  it.push(["family","우리 가족 설정","people"]);
+  // 우리 가족 설정 = 가족 모두에게 같이 적용 (초대 · 구성원 · 아이 설정 · 백업) / 설정 = 이 기기 · 내 계정 (알림 · 잠금 · 화면 · 로그인)
+  it.push(["family","우리 가족 설정","people"],["settings","설정","gear"]);
   return `<div class="more-bg" data-act="app-more" aria-hidden="true"></div>
   <section class="more" role="dialog" aria-modal="true" aria-labelledby="more-h"><i class="more-grip" aria-hidden="true"></i>
     <div class="more-head"><h2 id="more-h">더보기</h2><button class="link-btn" data-act="app-more">닫기</button></div>
@@ -3303,9 +3306,9 @@ function hpNews(){
 const FAQ = [
   ["아이 휴대폰 연결하기","우리 가족 설정에서 아이 프로필의 '휴대폰 연결 링크'를 아이 휴대폰으로 보내 주세요. 아이는 그 링크를 한 번만 누르면 계정 없이 바로 들어와요."],
   ["PDF 일기책 만들기","더보기 › 책장 · PDF에서 기간과 사람을 고르고 'PDF 만들기'를 누르세요. 미리 보기에서 'PDF 저장'이나 '보내기'(카카오톡 · 드라이브 · 문자)를 고르면 돼요."],
-  ["알림이 안 와요","휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림이 켜져 있는지 봐 주세요. 우리 가족 설정 › 앱 설정의 '가족 소식 알림'도 함께 확인해 주세요."],
+  ["알림이 안 와요","휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림이 켜져 있는지 봐 주세요. 설정 › 앱 설정의 '가족 소식 알림'도 함께 확인해 주세요."],
   ["가족 초대하기","우리 가족 설정에서 초대 코드나 초대 링크를 가족에게 보내 주세요. 받은 가족이 링크를 누르고 로그인하면 같은 일기장에 들어와요."],
-  ["로그인이 안 돼요","처음 가입한 방법(구글 또는 카카오)으로 로그인해 주세요. 둘 다 쓰려면 로그인한 뒤 우리 가족 설정 › 계정에서 연결할 수 있어요."]
+  ["로그인이 안 돼요","처음 가입한 방법(구글 또는 카카오)으로 로그인해 주세요. 둘 다 쓰려면 로그인한 뒤 설정 › 계정에서 연결할 수 있어요."]
 ];
 function viewHelp(){
   const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! 무엇을 도와드릴까요? 아래에서 고르거나 운영자에게 직접 적어 보내 주세요.`};
@@ -3328,7 +3331,7 @@ function viewShell(){
   tabs.push(["day","하루 펼쳐보기","cal"],["shelf","책장","book"],["album","사진첩","image"]);
   if(isParent()) tabs.push(["report","AI 리포트","chart"]);
   if(S.me.type==="child") tabs.push(["quiz","받아쓰기 퀴즈","quiz"]);
-  tabs.push(["family","우리 가족 설정","people"]);
+  tabs.push(["family","우리 가족 설정","people"],["settings","설정","gear"]);
   const tone=TAB_TONE[S.tab]||TAB_TONE.home;
   return `${tourBar()}<div class="shell">
     <div class="frame">
@@ -3362,7 +3365,7 @@ function viewMain(){
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
   if(!S.tab || S.tab==="home") return awardBanner()+penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
-  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily}[S.tab]||viewHome)();
+  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -4971,18 +4974,32 @@ function viewFamily(){
       </section>
     </div>
     <div class="col">
-      <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
-        <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. 휴대폰에서는 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들 수 있어요. (안드로이드 앱은 10월 중 출시 예정)</p>${addrBox()}${kakaoBtn(true)}
-      </section>
-      <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
-        <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
-        <p class="muted" style="font-size:13px;margin:10px 0 0">첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요.</p>
-      </section>
       ${isParent()?`<section class="block" aria-labelledby="h-bak"><div class="block-h"><h2 id="h-bak">백업 (엑셀 파일)</h2></div>
         <p style="margin:0 0 12px;color:var(--ink2)">우리 가족의 일기와 댓글을 엑셀에서 열 수 있는 CSV 파일로 이 기기에 저장해요. 사진 · 소리는 파일 안에 주소(링크)로 들어가요. 가끔 받아 두면 안심이에요.</p>
         <div class="row"><button class="btn btn-ghost sm" data-act="backup" data-v="diaries">${ic("download")}일기 받기 (${S.diaries.length}편)</button><button class="btn btn-ghost sm" data-act="backup" data-v="comments">${ic("download")}댓글 받기 (${S.comments.length}개)</button></div>
       </section>`:""}
+      <p class="muted" style="font-size:13px;margin:4px 2px">알림 · 앱 잠금 · 화면 밝기 · 로그인 같은 <b>나만의 설정</b>은 <button class="link-btn" data-act="tab" data-v="settings">${ic("gear")}설정</button>에 있어요.</p>
+    </div>
+  </div>`;
+}
+
+/* ⚙️ 설정 (2026-10-06): 이 기기 · 내 계정에만 적용되는 것 (가족 모두에게 같이 적용되는 건 '우리 가족 설정')
+   앱 설정(알림 · 잠금) · 화면 설정 · 어디서든 접속하기 · 계정(프로필 바꾸기 · 로그아웃 · 로그인 연결 · 비밀번호 · 계정 지우기) */
+function viewSettings(){
+  const g=S.group, groups=(S.userDoc?.groupIds||[]);
+  return `<div class="page-h"><h1>설정</h1></div>
+  <div class="fam-grid">
+    <div class="col">
       ${IS_APP?appSettings():""}
+      <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
+        <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
+        <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 더보기 › 화면 꾸미기에서 고를 수 있어요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
+      </section>
+      <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
+        <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. 휴대폰에서는 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들 수 있어요. (안드로이드 앱은 10월 중 출시 예정)</p>${addrBox()}${kakaoBtn(true)}
+      </section>
+    </div>
+    <div class="col">
       <section class="block" aria-labelledby="h-acc"><div class="block-h"><h2 id="h-acc">계정</h2></div>
         <div class="row">
           <button class="btn btn-ghost sm" data-act="switch-profile">프로필 바꾸기</button>
@@ -5046,7 +5063,7 @@ function go(fn){ fn(); render(); window.scrollTo(0,0); }
 /* ---------- 주소와 뒤로 가기 ----------
    / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /album 사진첩 · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
    화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
-const ROUTE_TABS = ["mine","chat","kids","day","shelf","album","report","quiz","family"];
+const ROUTE_TABS = ["mine","chat","kids","day","shelf","album","report","quiz","family","settings"];
 function urlOf(){
   let u = ROUTE_TABS.includes(S.tab) ? "/"+S.tab : "/";
   if(S.sub?.type==="diary") return u+"?d="+encodeURIComponent(S.sub.id);
@@ -5159,7 +5176,7 @@ const acts = {
   "signin-kid": () => guard(()=>B.signInKid()),
   "not-kid": () => { ls.del("iinote-kidlink"); S.joinCode=""; S.kidId=""; S.kidName=""; history.replaceState(null,"",location.pathname); render(); },
   "signin-kakao": () => TOUR ? acts["tour-exit"]() : INAPP ? inappHelp() : guard(async()=>{ try{ await B.signInKakao(); }catch(e){
-    if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '우리 가족 설정 → 계정'에서 카카오를 연결해 주세요.");
+    if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '설정 → 계정'에서 카카오를 연결해 주세요.");
     if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
     throw e; } }),
   "link-login": el => guard(async()=>{
@@ -5180,7 +5197,7 @@ const acts = {
   "merge-dup": el => guard(()=>mergeSameName(el.dataset.v)),
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => TOUR ? acts["tour-exit"]() : guard(async()=>{ S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
-  "pen-set": () => { go(()=>{ S.tab="family"; S.sub=null; S.draft=null; S.penOpen=true; }); setTimeout(()=>document.getElementById("pen-mode")?.scrollIntoView({behavior:"smooth",block:"center"}),80); },
+  "pen-set": () => { go(()=>{ S.tab="family"; S.sub=null; S.draft=null; S.penOpen=true; S.famOpen="h-mem"; /* 앱에서는 '가족 구성원' 칸을 펼쳐서 보여 줘요 */ }); setTimeout(()=>document.getElementById("pen-mode")?.scrollIntoView({behavior:"smooth",block:"center"}),80); },
   tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); if(el.dataset.v==="chat") S.chatJump=true; S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
