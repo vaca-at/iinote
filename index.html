@@ -1259,13 +1259,40 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .notice-bar p{flex:1;margin:0;line-height:1.5}
 .notice-bar > span{font-size:18px}
 .consent-ban p{margin:6px 0 10px;font-size:14px;color:var(--ink2)}
-#webload{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg,#FFFBF7);color:var(--ink,#2E2433);transition:opacity .25s}
-#webload img{border-radius:20px;box-shadow:0 8px 24px -12px rgba(0,0,0,.35)}
-#webload b{font-size:18px;letter-spacing:-.01em}
-#webload i{width:36px;height:4px;border-radius:99px;background:linear-gradient(90deg,var(--coral,#EF6F53) 40%,transparent 40%);background-size:200% 100%;animation:wl 1s linear infinite}
+/* 🌐 웹 로딩 (로그인해 둔 사람, 2026-10-07): 가로 화면용 네 가지 A~D 무작위. 앱 시작 화면(#boot)과 같은 i 두 개 그림 */
+#webload{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:#FBF6EE;color:#1F2A44;font-family:"Gowun Dodum",sans-serif;transition:opacity .25s;overflow:hidden}
 #webload.out{opacity:0}
-@keyframes wl{to{background-position:-200% 0}}
-@media (prefers-reduced-motion:reduce){#webload i{animation:none}}
+#webload.wl-A{background-image:linear-gradient(#F1E9DC 1.5px,transparent 1.5px),linear-gradient(90deg,#F1E9DC 1.5px,transparent 1.5px);background-size:36px 36px}
+#webload.wl-C{background:#FFFDF9 repeating-linear-gradient(transparent 0,transparent 43px,#E9DCC8 43px,#E9DCC8 44px)}
+.wl-A::before,.wl-C::before{content:"";position:absolute;top:0;bottom:0;left:clamp(28px,7vw,96px);width:2px;background:#F2B5A4}
+#webload.wl-D{background:#1F2A44 radial-gradient(1.5px 1.5px at 12% 22%,#F4BE45,transparent) no-repeat;color:#FBF6EE}
+.wl-D::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(1.2px 1.2px at 78% 18%,#FBF6EE,transparent),radial-gradient(1.5px 1.5px at 88% 70%,#F4BE45,transparent),radial-gradient(1px 1px at 26% 80%,#FBF6EE,transparent),radial-gradient(1.2px 1.2px at 60% 12%,#FBF6EE,transparent)}
+.wl-bl{--d:clamp(26px,3.2vw,40px);--w:clamp(22px,2.7vw,34px);--h:clamp(66px,8.4vw,104px);--h2:clamp(48px,6vw,75px);--bar:#1F2A44;--track:#E7DDCD;display:flex;align-items:flex-end;gap:clamp(12px,1.5vw,18px);flex:none}
+.wl-bl span{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1vw,12px)}
+.wl-bl .d{width:var(--d);height:var(--d);border-radius:50%;background:#EF6F53}
+.wl-bl .r .d{background:#F4BE45;transform:scale(.4);animation:wlpop 1.8s infinite}
+.wl-bl .b{width:var(--w);height:var(--h);border-radius:99px;background:var(--bar);position:relative;overflow:hidden}
+.wl-bl .r .b{height:var(--h2);background:var(--track)}
+.wl-bl .r .b b{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--bar);animation:wlfill 1.8s cubic-bezier(.45,.05,.4,1) infinite}
+.wl-D .wl-bl{--bar:#FBF6EE;--track:rgba(251,246,238,.15)}
+@keyframes wlfill{0%{height:0}70%,100%{height:100%}}
+@keyframes wlpop{0%,62%{transform:scale(.4)}72%,100%{transform:scale(1)}}
+.wl-in{display:flex;align-items:flex-end;gap:clamp(20px,3vw,40px);padding:0 24px}
+.wl-col{display:flex;flex-direction:column;align-items:center;gap:clamp(16px,2.2vw,26px)}
+.wl-name{font-family:UnzS,"Gowun Dodum",sans-serif;font-size:clamp(32px,4.4vw,56px);line-height:1}
+.wl-step{font-size:clamp(14px,1.3vw,17px);color:#4E5870;margin-top:10px}
+.wl-D .wl-step{color:#C6C0B4}
+.wl-C .wl-step{font-family:YuntaengS,"Gowun Dodum",sans-serif;font-size:clamp(20px,1.9vw,26px);color:#1F2A44}
+.wl-line{display:block;width:clamp(100px,14vw,170px);height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#EF6F53,transparent);background-size:200% 100%;animation:wlrun 1.6s linear infinite}
+@keyframes wlrun{to{background-position:-200% 0}}
+.wl-split{width:min(1000px,100%);display:flex;align-items:center;justify-content:space-between;gap:6vw;padding:0 8vw 0 clamp(60px,12vw,170px)}
+.wl-C .wl-bl{--d:clamp(32px,4.4vw,56px);--w:clamp(27px,3.7vw,47px);--h:clamp(80px,11vw,142px);--h2:clamp(58px,8vw,103px)}
+.wl-head{font-family:UnzS,"Gowun Dodum",sans-serif;font-size:clamp(34px,4.4vw,58px);line-height:1.18;margin-bottom:14px}
+@media (max-width:700px){   /* 휴대폰 브라우저: 세로로 쌓아요 */
+  .wl-in{flex-direction:column;align-items:center;text-align:center}
+  .wl-split{flex-direction:column-reverse;align-items:flex-start;gap:32px;padding:0 24px 0 56px}
+}
+@media (prefers-reduced-motion:reduce){.wl-bl .r .b b{animation:none;height:62%}.wl-bl .r .d{animation:none}.wl-line{animation:none}}
 .seo-intro{max-width:640px;margin:0 auto;padding:12vh 20px 40px;text-align:center;color:var(--ink2)}
 .seo-intro img{border-radius:16px}
 .seo-intro h1{font-size:24px;margin:12px 0 8px;color:var(--ink)}
@@ -1957,8 +1984,15 @@ span.pf-av{cursor:default}
     // 🌐 웹: 로그인해 둔 사람에게는 검색용 소개 글(.seo-intro) 대신 로고만 잠깐 보여요 (2026-10-07). 처음 온 사람 · 검색 로봇은 소개 글 그대로
     var on=false; try{ on=!!localStorage.getItem("iinote-login"); }catch(e){}
     if(on){ document.documentElement.classList.add("has-login");
-      var w=document.createElement("div"); w.id="webload"; w.setAttribute("role","status"); w.setAttribute("aria-label","아이아이노트를 여는 중");
-      w.innerHTML='<img src="icon.png" alt="" width="72" height="72"><b>아이아이노트</b><i></i>'; document.body.appendChild(w); }
+      // 가로 화면용 로딩 네 가지(A 모눈 공책 · B 아이보리 가운데 · C 줄 공책 인사 · D 밤 남색) 중 하나가 무작위로 (2026-10-07). 오른쪽 i 가 차오르기만 하고 숫자는 없어요
+      var WV="ABCD".charAt(Math.floor(Math.random()*4));
+      var lg='<div class="wl-bl"><span><i class="d"></i><i class="b"></i></span><span class="r"><i class="d"></i><i class="b"><b></b></i></span></div>';
+      var nm='<div class="wl-name">아이아이노트</div>', st='<div class="wl-step">가족 일기장을 펼치고 있어요</div>';
+      var w=document.createElement("div"); w.id="webload"; w.className="wl-"+WV; w.setAttribute("role","status"); w.setAttribute("aria-label","아이아이노트를 여는 중");
+      w.innerHTML = WV==="B" ? '<div class="wl-col">'+lg+nm+'<i class="wl-line"></i></div>'
+        : WV==="C" ? '<div class="wl-split"><div><div class="wl-head">오늘도<br>우리 가족 일기장</div>'+st+'</div>'+lg+'</div>'
+        : '<div class="wl-in">'+lg+'<div>'+nm+st+'</div></div>';
+      document.body.appendChild(w); }
     window.bootTo=function(){}; window.bootDone=function(){ var x=document.getElementById("webload"); if(x){ x.classList.add("out"); setTimeout(function(){ x.remove(); },250); } };
     return; }
   document.documentElement.classList.add("is-app");
