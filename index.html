@@ -876,6 +876,58 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .news-panel .ni{font-size:18px}
 .news-panel .nt{flex:1;min-width:0;font-size:14px}
 .news-panel small{color:var(--ink3);font-size:12px;white-space:nowrap}
+/* ✏️ 일기 쓰기 설정 (우리 가족 설정): 한 줄씩 아이콘 · 제목 · 짧은 설명 · 스위치 */
+.ws-list{list-style:none;margin:0;padding:0;border-radius:16px;background:var(--paper);overflow:hidden}
+.ws-row{border-bottom:1px solid var(--line)}
+.ws-row:last-child{border-bottom:0}
+.ws-lab,.ws-pen{display:flex;align-items:center;gap:12px;padding:13px 14px}
+.ws-lab{cursor:pointer}
+.ws-pen{align-items:flex-start}
+.ws-e{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:12px;background:var(--surface);font-size:20px}
+.ws-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ws-t b{font-size:15.5px}
+.ws-t small{font-size:12.5px;color:var(--ink3);line-height:1.45}
+.ws-kid{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.ws-kid > span{font-size:14.5px;font-weight:600}
+.ws-new{font-style:normal;font-size:11.5px;font-weight:600;color:var(--coral)}
+.ws-seg{display:inline-flex;flex:none;padding:3px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line)}
+.ws-seg label{position:relative;cursor:pointer}
+.ws-seg input{position:absolute;opacity:0;width:1px!important;height:1px}
+.ws-seg span{display:block;padding:6px 11px;border-radius:9px;font-size:13.5px;white-space:nowrap;color:var(--ink2)}
+.ws-seg input:checked + span{background:var(--ink);color:var(--surface);font-weight:700}
+.ws-seg input:focus-visible + span{outline:2px solid var(--coral);outline-offset:1px}
+.feat-sw{appearance:none;-webkit-appearance:none;flex:none;width:48px!important;height:28px;margin:0;border-radius:14px;background:var(--line);position:relative;cursor:pointer;transition:background .15s}
+.feat-sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
+.feat-sw:checked{background:var(--coral)}
+.feat-sw:checked::after{transform:translateX(20px)}
+.feat-sw:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.feat-ask .link-btn{flex:none}
+/* 내 일기 머리 카드: 🔥 연속 기록 강조 */
+.my-hero{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 14px;margin:0 0 18px;padding:18px 18px 16px;border-radius:22px;background:linear-gradient(135deg,#FFE7C2 0%,#FFD0B5 55%,#FFC1C8 100%);color:#5A2A12;box-shadow:0 6px 18px rgba(239,111,83,.18)}
+.my-hero.zero{background:linear-gradient(135deg,#FFF3D6,#FFE3D8);box-shadow:none}
+.mh-streak{display:flex;align-items:center;gap:10px;min-width:0}
+.mh-fire{font-size:44px;line-height:1;filter:drop-shadow(0 3px 6px rgba(239,111,83,.35));animation:mhFlame 1.8s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes mhFlame{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.08) rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){ .mh-fire{animation:none} }
+.mh-streak b{font-size:46px;line-height:1;font-weight:800;color:#D9481F;letter-spacing:-1px}
+.mh-streak span{margin-left:4px;font-size:17px;font-weight:700}
+.mh-side{display:flex;flex-direction:column;align-items:center;padding:8px 14px;border-radius:16px;background:rgba(255,255,255,.62)}
+.mh-side span{font-size:12.5px;color:#8A5A3A}
+.mh-side b{font-size:26px;line-height:1.15;color:#5A2A12}
+.mh-side small{margin-left:2px;font-size:14px}
+.mh-msg{grid-column:1/-1;margin:0;font-size:14px;color:#8A4A2A}
+.mh-write{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border:0;border-radius:16px;background:#2E2433;color:#fff;font:inherit;font-size:16.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(46,36,51,.22)}
+.mh-write .ic{width:20px;height:20px}
+.mh-write.done{background:rgba(255,255,255,.75);color:#2F7A56;box-shadow:none}
+/* 앱: 가족 소식 전체를 팝업에 (예전 홈 '소식' 쪽) */
+.news-panel.fam{padding:12px 12px 6px}
+.news-panel.fam .nw-list{box-shadow:none;border:0;padding:0;background:none}
+.news-panel.fam .nw-list li button.nw{align-items:flex-start;gap:12px;padding:12px 10px 12px 14px;border-radius:0;border-bottom:1px solid var(--line)}
+.news-panel.fam .nw-list li:last-child button.nw{border-bottom:0}
+.news-panel.fam .nw.new{background:var(--butter-soft)}
+.news-panel.fam .empty{margin:10px 4px;font-size:14px}
+.news-panel.fam .nw-list{overflow:hidden}
+.news-panel.fam .nw-t{min-width:0;overflow:hidden}
 /* 🏅 스티커판 */
 .stk{margin:0 0 18px;padding:14px 16px;border-radius:18px;border:2px solid var(--butter);background:var(--butter-soft)}
 .stk.small{margin:12px 0 0;padding:10px 12px;border-width:1.5px}
@@ -1823,21 +1875,36 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .hc-f .ic{width:16px;height:16px}
 .hc-stamp{position:absolute;right:14px;top:12px;padding:3px 10px;border:2px solid #E4507F;border-radius:48% 52% 45% 55%/55% 45% 55% 45%;color:#B8306A;font-size:13px;transform:rotate(-8deg);background:var(--surface)}
 /* 홈 2쪽 달력 */
-.hp-cal{padding:14px 12px!important}
+.hp-cal{padding:14px 8px!important}
 .hc-top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
 .hc-top h2{flex:1;margin:0;text-align:center;font-family:'OngleipUnz',var(--diary);font-size:22px;font-weight:400}
 .hp-cal .hp-arw{background:#FFF6DC;color:#8A6300}
-.hc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.hc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
 .hc-w{font-size:12px;color:var(--ink3);padding-bottom:2px}
 .hc-w.red,.hc-d.red span{color:#D9534F}
 .hc-w.blue,.hc-d.blue span{color:#3F73D1}
-.hc-d{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;height:52px;padding:6px 0 0;border:0;border-radius:12px;background:none;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+.hc-d{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:3px;min-width:0;min-height:74px;padding:5px 2px 4px;border:0;border-radius:10px;background:none;font:inherit;font-size:15px;color:var(--ink);cursor:pointer;overflow:hidden}
+.hc-d > span{text-align:center;line-height:1.1}
 .hc-d.has{background:#FFF8E3}
 .hc-d.today{background:#FFD966;font-weight:700}
-.hc-d.fut{opacity:.55;cursor:default}
-.hc-d em{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:36px}
+.hc-d.fut{cursor:default}
+.hc-d.fut > span,.hc-d.fut em{opacity:.55}
+.hc-d em{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;min-height:6px}
 .hc-d em u{width:6px;height:6px;border-radius:50%}
-.hc-sc{position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:#C98A00}
+/* 날짜 칸 안 일정 제목 (두 개까지 + 더 있으면 +n) */
+.hc-evs{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hc-ev{display:block;min-width:0;padding:1px 3px;border-radius:5px;background:#FFE9B0;color:#6B4A00;font-size:10.5px;font-weight:600;line-height:1.35;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-d.today .hc-ev{background:#FFF6DC}
+.hc-ev.more{background:none;padding:0 3px;color:var(--ink3)}
+/* 다가오는 일정: 휴대폰은 화면 1/4 높이 안에서 스크롤, 넓은 화면은 달력 3 : 일정 1 로 나란히 */
+.hp-calwrap .sc-scroll{max-height:25vh;overflow-y:auto}
+@media (min-width:760px){
+  .hp-calwrap{display:grid;grid-template-columns:3fr 1fr;gap:12px;align-items:start}
+  .hp-calwrap > .block + .block{margin-top:0}
+  .hp-calwrap .sc-scroll{max-height:none}
+  .hc-d{min-height:96px}
+  .hc-ev{font-size:12px}
+}
 .hc-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin:12px 4px 0;font-size:12.5px;color:var(--ink2)}
 .hc-legend span{display:flex;align-items:center;gap:4px}
 .hc-legend i{width:8px;height:8px;border-radius:50%}
@@ -1866,6 +1933,30 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .more-it > span{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--surface)}
 .more-it.on{background:var(--ink);color:var(--surface)}
 .more-it.on > span{color:var(--ink)}
+/* 더보기 (2026-10-07): 상자마다 색 · 아래 작은 줄들 */
+.more-it[style*="--mb"]{background:var(--mb);color:var(--ink);font-weight:600}
+.more-it[style*="--mb"] > span{color:var(--mf);background:rgba(255,255,255,.75)}
+.more-row{display:flex;align-items:center;gap:10px;width:100%;margin-top:14px;padding:12px 14px;border:0;border-radius:14px;background:var(--surface2);color:var(--ink);font:inherit;font-size:15px;cursor:pointer;text-align:left}
+.more-row .ic{width:20px;height:20px}
+.more-row span{font-weight:600}
+.more-row small{flex:1;font-size:12.5px;color:var(--ink3)}
+.more-row i{font-style:normal;font-size:20px;color:var(--ink3);transition:transform .15s}
+.more-row.on i{transform:rotate(90deg)}
+.more-foot{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.more-share{display:flex;gap:8px}
+.more-share button{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 13px;border:0;border-radius:17px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.more-share .ic{width:16px;height:16px}
+.mf-kakao{background:#FEE500;color:#3A1D1D}
+.mf-link{background:var(--surface2);color:var(--ink2)}
+.more-legal{display:flex;gap:8px;margin:0;font-size:12px;color:var(--ink3)}
+.more-legal a{color:var(--ink3);text-decoration:underline;text-underline-offset:2px}
+/* 📈 우리 아이 그래프 */
+.grow-page{display:grid;gap:14px}
+@media (min-width:760px){ .grow-page{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.grow-page .qg-kid{padding:16px;gap:10px;background:var(--surface);box-shadow:0 2px 10px rgba(46,36,51,.06)}
+.grow-page .qg-chart{min-height:150px;padding:8px 10px}
+.grow-page .qg-chart svg{min-height:110px}
+.grow-page .qg-words{flex-wrap:wrap;white-space:normal}
 .more-prefs{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding:12px;border-radius:18px;background:var(--surface2)}
 /* 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통) */
 .hq.rep{border-color:var(--coral);color:var(--coral);font-weight:600}
@@ -1943,9 +2034,11 @@ span.pf-av{cursor:default}
 .hide-help .a-help{transform:translateY(160%);opacity:0;pointer-events:none}
 .ah .bell .ic{width:24px;height:24px}
 /* 1. 일기 쓰기: 아래 메뉴 없이, 임시 저장 · 올리기 막대를 맨 아래에 고정 */
-.ashell.writing{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
-.writing .w-acts{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:var(--surface);box-shadow:0 -2px 12px rgba(46,36,51,.1);flex-wrap:nowrap}
+/* 일기 쓰기: 아래 메뉴는 그대로, 저장 단추들은 글 아래(제자리) + 가운데 단추가 저장 (2026-10-07) */
+.writing .w-acts{flex-wrap:nowrap}
 .writing .w-acts .btn{flex:1;justify-content:center;min-height:50px}
+.a-fab.save{position:relative;background:var(--coral,#EF6F53)}
+.a-fab.save b{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:5px;font-size:11.5px;font-weight:700;white-space:nowrap;color:var(--ink)}
 .w-top{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
 .w-top input[type=date]{flex:1;min-width:0;width:auto;padding:8px 10px;font-size:15px}
 .w-top .muted{flex:none;font-size:13px}
@@ -1962,10 +2055,10 @@ span.pf-av{cursor:default}
 /* 4. 채팅: 상자 없이 화면 가득, 입력 칸은 맨 아래 */
 .ashell.chatting{padding-bottom:0}
 .chatting .a-main{padding:0}
-.chatting .chat{display:flex;flex-direction:column;height:calc(100dvh - 64px - env(safe-area-inset-top))}
+.chatting .chat{display:flex;flex-direction:column;height:calc(100dvh - 64px - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
 .chatting .chat .page-h{display:none}
 .chatting .chat-list{flex:1;height:auto;min-height:0;margin:0;border:0;border-radius:0;background:transparent;padding:12px 14px}
-.chatting .chat-in{margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--surface);box-shadow:0 -2px 12px rgba(46,36,51,.08)}
+.chatting .chat-in{margin:0;padding:10px 12px;background:var(--surface);box-shadow:0 -2px 12px rgba(46,36,51,.08)}
 /* 5. 하루 펼쳐보기: 가로로 나란히, 누르면 그 칸만 넓게 */
 .app-day .day-nav{margin-bottom:4px}
 .day-tip{margin:0 0 8px;text-align:center;font-size:12.5px;color:var(--ink3)}
@@ -2883,9 +2976,12 @@ function newsItems(){
   }
   return out.sort((a,b)=>b.at-a.at).slice(0,30);
 }
+function famNewsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return famNews().filter(x=>x.at>seen).length; }
 function newsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return newsItems().filter(x=>x.at>seen).length; }
-const newsBell = () => { const n=newsUnread(); return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">${IS_APP?ic("bell"):"🔔"}${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
+const newsBell = () => { const n=IS_APP ? famNewsUnread() : newsUnread(); return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">${IS_APP?ic("bell"):"🔔"}${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
 function viewNews(){
+  // 앱: 가족 소식 전체(famNews · hpNews)를 팝업으로 — 예전 홈 '소식' 쪽 (2026-10-07)
+  if(IS_APP) return `<div class="news-bg" data-act="news-open" aria-hidden="true"></div><div class="news-panel fam" role="dialog" aria-label="새 소식"><div class="news-h"><b>새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>${hpNews().replace(/data-act="open-diary"/g,'data-act="news-go"')}</div>`;
   const seen=Number(ls.get(newsSeenKey(),"0")), items=newsItems();
   return `<div class="news-bg" data-act="news-open" aria-hidden="true"></div><div class="news-panel" role="dialog" aria-label="새 소식"><div class="news-h"><b>🔔 새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>
     ${items.length?`<ul>${items.map(x=>`<li class="${x.at>S.newsSeenBefore?"new":""}"><button data-act="news-go" data-id="${esc(x.id)}"><span class="ni">${x.ic}</span><span class="nt">${esc(x.text)}</span><small>${relTime(x.at)}</small></button></li>`).join("")}</ul>`
@@ -3295,14 +3391,17 @@ const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? 
 /* ---------- 📱 앱 화면 뼈대 (2026-10-05, 앱에서만 · 웹은 아래 viewShell 그대로) ----------
    머리 한 줄(로고 · 가족 이름 · 🔔 · 내 얼굴) · 아래 메뉴 5칸(홈 · 내 일기 · ✏️ 쓰기 · 채팅 · 더보기) · 더보기 판 · 도움 단추
    홈은 칩을 누르거나 옆으로 밀어 넘기는 네 쪽: 일기장 · 달력 · 사진첩 · 소식 (쪽마다 색) */
-const HPAGES = [["diary","일기장","#D63E70","#FFE1EA"],["cal","달력","#C98A00","#FFF0C2"],["album","사진첩","#3F73D1","#DCE9FF"],["news","소식","#2F8C6B","#DAF2E5"]];
-const hpage = () => HPAGES.some(x=>x[0]===S.hpage) ? S.hpage : "diary";
+const HPAGES = [["diary","일기장","#D63E70","#FFE1EA"],["cal","달력","#C98A00","#FFF0C2"],["album","사진첩","#3F73D1","#DCE9FF"]];   // 소식은 2026-10-07부터 위쪽 🔔 팝업으로 (viewNews)
+// 네 번째 쪽 (2026-10-07): 보호자는 AI 리포트, 아이는 받아쓰기 퀴즈
+const hpages = () => [...HPAGES, ...(isParent()?[["report","AI 리포트","#2F8C6B","#DAF2E5"]]:S.me?.type==="child"?[["quiz","받아쓰기","#2F8C6B","#DAF2E5"]]:[])];
+const hpage = () => hpages().some(x=>x[0]===S.hpage) ? S.hpage : "diary";
 function viewAppShell(){
-  const home=(!S.tab || S.tab==="home") && !S.sub, pg=HPAGES.find(x=>x[0]===hpage());
-  const seen=Number(ls.get(newsSeenKey(),"0")), nn=famNews().filter(x=>x.at>seen).length;
+  const home=(!S.tab || S.tab==="home") && !S.sub, pg=hpages().find(x=>x[0]===hpage());
   const nb=(k,l,i)=>`<button class="an-it ${S.tab===k||(k==="home"&&!S.tab)?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`;
   // 일기 쓰기 · 채팅은 아래 메뉴 없이 화면을 다 써요 (저장 막대 · 입력 칸이 맨 아래)
-  const writing=S.sub?.type==="write", chatting=S.tab==="chat" && !S.sub, bare=writing||chatting;
+  // 일기 쓰기 · 채팅에서도 아래 메뉴는 그대로 보여요 (2026-10-07). 쓰는 중엔 가운데 ✏️ 가 저장 단추로 바뀌어요
+  const writing=S.sub?.type==="write", chatting=S.tab==="chat" && !S.sub;
+  const saveLabel = !writing||!S.draft ? "" : S.draft.status==="submitted" ? "고친 내용 저장" : kidUI() ? "다 썼어요" : S.me.type==="child" ? "제출하기" : "올리기";
   // 다른 화면: 제목 앞 큰 이모지는 빼고(아이콘을 선 모양 하나로), 하루 펼쳐보기 · 우리 가족 설정은 휴대폰 배치로
   let body = home ? viewHomePages() : viewMain().replace(/(<div class="page-h"><h1>)\s*(?:\p{Extended_Pictographic}️?\s*)+/u,"$1");
   if(!S.sub && S.tab==="day") body=`<div class="app-day">${body}</div>`;
@@ -3314,15 +3413,16 @@ function viewAppShell(){
         ${newsBell()}
         <button class="ah-me" data-act="prof-open" data-v="${esc(S.me.id)}" aria-label="내 프로필 · ${esc(S.me.name)}">${av(S.me,36)}</button>
       </header>
-      ${home?`<nav class="hp-chips" aria-label="홈 쪽">${HPAGES.map(([k,l,c])=>`<button class="hp-chip ${k===pg[0]?"on":""}" style="--c:${c}" data-act="hpage" data-v="${k}" ${k===pg[0]?'aria-current="page"':""}><u></u>${l}${k==="news"&&nn?`<b>${nn>9?"9+":nn}</b>`:""}</button>`).join("")}</nav>`:""}
+      ${home?`<nav class="hp-chips" aria-label="홈 쪽">${hpages().map(([k,l,c])=>`<button class="hp-chip ${k===pg[0]?"on":""}" style="--c:${c}" data-act="hpage" data-v="${k}" ${k===pg[0]?'aria-current="page"':""}><u></u>${l}</button>`).join("")}</nav>`:""}
     </div>
     ${S.me.type==="child"?kidBar():""}
     ${S.newsOpen?viewNews():""}
     <main class="a-main ${home?"is-home":""}" id="main">${noticeBar()}${dupBanner()}${body}</main>
     ${home?`<button class="a-help" data-act="help-open" aria-label="챗봇 상담">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
-    ${bare?"":`<nav class="a-nav" aria-label="메뉴">
+    ${`<nav class="a-nav" aria-label="메뉴">
       ${nb("home","홈","home")}${nb("mine","내 일기","lay-diary")}
-      <button class="a-fab" data-act="write" aria-label="오늘 일기 쓰기">${ic("pen")}</button>
+      ${writing && S.draft ? `<button class="a-fab save" data-act="save-diary" data-v="submitted" aria-label="${esc(saveLabel)}">${ic("check")}<b>${esc(saveLabel)}</b></button>`   // 쓰는 중에는 가운데 단추가 저장 (2026-10-07)
+        : `<button class="a-fab" data-act="write" aria-label="오늘 일기 쓰기">${ic("pen")}</button>`}
       ${nb("chat","채팅","talk")}
       <button class="an-it ${S.moreOpen?"on":""}" data-act="app-more" aria-expanded="${!!S.moreOpen}">${ic("lay-quad")}<span>더보기</span></button>
     </nav>`}
@@ -3334,26 +3434,36 @@ function viewAppShell(){
 }
 // 더보기 판: 아래 메뉴에 없는 화면들 · 화면 꾸미기(디자인 · 글씨) · 도움
 function viewMore(){
-  // 사진첩은 홈 네 쪽(일기장 · 달력 · 사진첩 · 소식)에 있어서 여기엔 두지 않아요 (같은 사진첩이 두 군데 보이지 않게)
-  const it=[["day","하루 펼쳐보기","cal"],["shelf","책장 · PDF","book"]];
-  if(isParent()) it.push(["kids","아이들 현황","spark"],["report","AI 리포트","chart"]);
-  if(S.me.type==="child") it.push(["quiz","받아쓰기 퀴즈","quiz"]);
-  // 우리 가족 설정 = 가족 모두에게 같이 적용 (초대 · 구성원 · 아이 설정 · 백업) / 설정 = 이 기기 · 내 계정 (알림 · 잠금 · 화면 · 로그인)
-  it.push(["family","우리 가족 설정","people"],["settings","설정","gear"]);
+  // (2026-10-07) 더보기 = 상자 6개(1줄: 우리 가족 설정 · 앱 설정 · 챗봇 상담 / 2줄: 아이들 현황 · 책장 PDF · 우리 아이 그래프)
+  //  + 아래에 작게: 화면 꾸미기 · 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침
+  // 사진첩 · AI 리포트(아이는 받아쓰기)는 홈 쪽에, 하루 펼쳐보기는 홈 일기장 쪽과 겹쳐서 뺐어요
+  const kid=S.me.type==="child";
+  const it=[["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["settings","앱 설정","gear","#E5ECFF","#3F5FB8"],["help","챗봇 상담","help","#E3F4EC","#2F7A56"],
+    ...(isParent()?[["kids","아이들 현황","spark","#FFF0C2","#8A6300"]]:[]),["shelf","책장 · PDF","book","#F0E6FF","#6B47B8"],["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"]];
+  const box=([k,l,i,bg,fg])=>`<button class="more-it" ${k==="help"?'data-act="help-open"':`data-act="more-go" data-v="${k}"`} style="--mb:${bg};--mf:${fg}"><span>${ic(i)}</span>${l}</button>`;
   return `<div class="more-bg" data-act="app-more" aria-hidden="true"></div>
   <section class="more" role="dialog" aria-modal="true" aria-labelledby="more-h"><i class="more-grip" aria-hidden="true"></i>
     <div class="more-head"><h2 id="more-h">더보기</h2><button class="link-btn" data-act="app-more">닫기</button></div>
-    <div class="more-grid">${it.map(([k,l,i])=>`<button class="more-it" data-act="more-go" data-v="${k}"><span>${ic(i)}</span>${l}</button>`).join("")}
-      <button class="more-it ${S.morePrefs?"on":""}" data-act="more-prefs" aria-expanded="${!!S.morePrefs}"><span>${ic("palette")}</span>화면 꾸미기</button>
-      <button class="more-it" data-act="help-open"><span>${ic("help")}</span>챗봇 상담</button></div>
+    <div class="more-grid">${it.map(box).join("")}</div>
+    <button class="more-row ${S.morePrefs?"on":""}" data-act="more-prefs" aria-expanded="${!!S.morePrefs}">${ic("palette")}<span>화면 꾸미기</span><small>디자인 · 글씨</small><i aria-hidden="true">›</i></button>
     ${S.morePrefs?`<div class="more-prefs">${prefGroups(false)}</div>`:""}
+    <div class="more-foot">
+      <div class="more-share"><button class="mf-kakao" data-act="kakao-share">${ic("talk")}카카오톡 공유</button><button class="mf-link" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button></div>
+      <p class="more-legal"><a href="terms.html" target="_blank" rel="noopener">이용약관</a><span aria-hidden="true">·</span><a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></p>
+    </div>
   </section>`;
+}
+// 📈 우리 아이 그래프 (2026-10-07, 탭 grow · 주소 /grow): 아이마다 이번 달 편수 · 평균 글자 · 익힌 낱말 · 연속, 최근 일기 글 길이 그래프, 자주 틀린 낱말 (growBlock)
+function viewGrow(){
+  const kids=S.me.type==="child" ? [S.me] : sortedProfiles().filter(p=>p.type==="child");
+  return `<div class="page-h"><h1>${S.me.type==="child"?"내 그래프":"우리 아이 그래프"}</h1></div>
+    ${kids.length?`<div class="grow-page">${kids.map(growBlock).join("")}</div>`:`<p class="empty">아이 프로필이 있으면 아이마다 글솜씨가 자라는 그래프를 보여 줘요.</p>`}`;
 }
 // 홈 네 쪽
 function viewHomePages(){
   const k=hpage();
-  const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="news" ? hpNews() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+penAskBanner():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
+  const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="report" ? viewReport() : k==="quiz" ? viewQuizHome() : hpDiary();
+  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+penAskBanner()+featAskBanner():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -3393,15 +3503,17 @@ function hpCal(){
   const t=todayStr(), ps=sortedProfiles(), month=S.calMonth||t.slice(0,7), [yy,mm]=month.split("-").map(Number);
   const lead=toDate(`${month}-01`).getDay(), days=new Date(yy,mm,0).getDate(), sch=mySchedules();
   const dates=[...Array(days)].map((_,i)=>`${month}-${pad(i+1)}`);
-  const cells=dates.map((d,i)=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], n=sch.filter(s=>s.date===d).length, who=d<=t?ps.filter(x=>submittedOn(x.id,d)):[];
+  // 날짜 칸 안에 그날 일정 제목을 두 개까지 (더 있으면 +n) — 점만 보이던 것을 글로 (2026-10-07)
+  const cells=dates.map((d,i)=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], ev=sch.filter(s=>s.date===d).sort(bySch), n=ev.length, who=d<=t?ps.filter(x=>submittedOn(x.id,d)):[];
     const cls=["hc-d", d===t?"today":"", d>t?"fut":"", (dow===0||hol)?"red":dow===6?"blue":"", who.length?"has":""].join(" ");
-    return `<button class="${cls}" data-act="hp-cal-day" data-v="${d}" ${d>t?"disabled":""} aria-label="${fmtLong(d)}${hol?" "+hol:""}, ${who.length}명 씀${n?`, 일정 ${n}개`:""}"><span>${i+1}</span><em>${who.map(x=>`<u style="background:${x.color||"var(--ink)"}"></u>`).join("")}</em>${n?'<i class="hc-sc"></i>':""}</button>`; }).join("");
-  return `<section class="block hp-cal" aria-labelledby="hc-h">
+    const evs=n?`<span class="hc-evs">${ev.slice(0,2).map(s=>`<b class="hc-ev">${esc(s.title)}</b>`).join("")}${n>2?`<b class="hc-ev more">+${n-2}</b>`:""}</span>`:"";
+    return `<button class="${cls}" data-act="hp-cal-day" data-v="${d}" ${d>t?"disabled":""} aria-label="${fmtLong(d)}${hol?" "+hol:""}, ${who.length}명 씀${n?`, 일정 ${n}개: ${esc(ev.map(s=>s.title).join(", "))}`:""}"><span>${i+1}</span><em>${who.map(x=>`<u style="background:${x.color||"var(--ink)"}"></u>`).join("")}</em>${evs}</button>`; }).join("");
+  return `<div class="hp-calwrap"><section class="block hp-cal" aria-labelledby="hc-h">
     <div class="hc-top"><button class="hp-arw" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("left")}</button><h2 id="hc-h">${yy}년 ${mm}월</h2><button class="hp-arw" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("right")}</button></div>
     <div class="hc-grid">${DAYS.map((w,i)=>`<span class="hc-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
     <div class="hc-legend">${ps.map(p=>`<span><i style="background:${p.color||"var(--ink)"}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("")}</div>
     ${month!==t.slice(0,7)?`<button class="btn btn-ghost sm" data-act="cal-move" data-v="0">이번 달로</button>`:""}
-  </section>${viewSchedules()}`;
+  </section>${viewSchedules()}</div>`;
 }
 // 4쪽 소식: 가족의 새 일기 · 댓글 · 답글, 내 일기에 온 하트 · 도장 (최근 2주)
 function famNews(){
@@ -3501,8 +3613,8 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
-  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings}[S.tab]||viewHome)();
+  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+penAskBanner()+featAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -3513,6 +3625,12 @@ const homeCta = mine => mine && mine.status==="submitted"
   ? `<button class="btn btn-ghost" data-act="open-diary" data-id="${mine.id}">${ic("book")}오늘 내 일기 보기</button>`
   : `<button class="btn btn-primary" data-act="write">${ic("pen")}${mine?"오늘 일기 이어 쓰기":"오늘 일기 쓰기"}</button>`;
 // 보호자 홈: 7세 이하 · 초1 · 초2 아이의 다홍펜 고치는 방법을 아직 안 골랐으면 알려 줘요
+// 꺼 둔 기능 알려 주기: 보호자 홈에 한 번 (닫으면 이 기기에서 다시 안 보여요). 둘 다 켰으면 안 보여요
+const featAskKey = () => `iinote-featask-${S.gid}`;
+function featAskBanner(){
+  if(!isParent() || ls.get(featAskKey(),"") || (S.group?.handOn && S.group?.audioOn)) return "";
+  return `<div class="pen-ask feat-ask" role="note"><span class="pen-ask-i" aria-hidden="true">🧩</span><p><b>더 쓸 수 있는 기능이 있어요</b><br><small>📝 종이 일기장 사진으로 쓰기 · 🎙 목소리 · 소리 넣기는 꺼 두었어요. 우리 가족 설정에서 켤 수 있어요.</small></p><button class="btn btn-primary sm" data-act="feat-go">설정 보기</button><button class="link-btn" data-act="feat-x">닫기</button></div>`;
+}
 function penAskBanner(){
   const ks=penUnset(); if(!ks.length) return "";
   return `<div class="pen-ask" role="note"><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b>의 AI 다홍펜, 어떻게 고칠까요?<br><small>지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요.</small></p><button class="btn btn-primary sm" data-act="pen-set">고르기</button></div>`;
@@ -3574,7 +3692,7 @@ function heroDate(){
     ? `<button class="btn btn-ghost" data-act="open-diary" data-id="${mine.id}">${ic("book")}이날 내 일기 보기</button>`
     : `<button class="btn btn-primary" data-act="write" data-date="${hd}">${ic("pen")}${mine?"이날 일기 이어 쓰기":"이날 일기 쓰기"}</button>`;
   return `<section class="hero-date"><div><p class="muted">${hd===t?"오늘":hd===addDays(t,-1)?"어제":"지난 날"}</p>
-    <div class="hero-nav"><button class="icon-btn" data-act="home-day" data-v="-1" aria-label="전날">${ic("back")}</button><h2 class="today-date">${fmtLong(hd)}</h2><button class="icon-btn flip" data-act="home-day" data-v="1" aria-label="다음 날" ${hd>=t?"disabled":""}>${ic("back")}</button>${hd!==t?`<button class="btn btn-ghost sm" data-act="home-day" data-v="0">오늘</button>`:""}</div></div>${cta}</section>`;
+    <div class="hero-nav"><button class="icon-btn" data-act="home-day" data-v="-1" aria-label="전날">${ic("back")}</button><h2 class="today-date">${fmtLong(hd)}</h2><button class="icon-btn flip" data-act="home-day" data-v="1" aria-label="다음 날" ${hd>=t?"disabled":""}>${ic("back")}</button>${hd!==t?`<button class="btn btn-ghost sm" data-act="home-day" data-v="0">오늘로 이동 ›</button>`:""}</div></div>${cta}</section>`;
 }
 function viewHomeCalendar(){
   const t=todayStr(), ps=sortedProfiles(), mine=findDiary(S.me.id,t);
@@ -3602,7 +3720,7 @@ function viewHomeCalendar(){
   <section class="block cal" aria-labelledby="h-cal">
     <div class="cal-h"><button class="icon-btn" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("back")}</button>
       <h2 id="h-cal">${yy}년 ${mm}월</h2><button class="icon-btn flip" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("back")}</button>
-      ${month!==t.slice(0,7)?`<button class="btn btn-ghost sm" data-act="cal-move" data-v="0">오늘</button>`:""}</div>
+      ${month!==t.slice(0,7)?`<button class="btn btn-ghost sm" data-act="cal-move" data-v="0">이번 달로 ›</button>`:""}</div>
     <div class="cal-legend">${legend}</div>
     <div class="cal-grid">${DAYS.map((w,i)=>`<span class="cal-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}
       ${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
@@ -4420,8 +4538,16 @@ h1{font-size:46pt;letter-spacing:18pt;margin:2mm 0 8mm;padding-left:18pt;color:$
 function viewMyDiary(){
   const list=S.diaries.filter(d=>d.profileId===S.me.id).sort((a,b)=>b.date.localeCompare(a.date));
   const month=todayStr().slice(0,7), n=list.filter(d=>d.status==="submitted" && d.date.startsWith(month)).length;
-  return `<div class="page-h"><h1>내 일기</h1><button class="btn btn-primary" data-act="write">${ic("pen")}오늘 일기 쓰기</button></div>
-    <p class="muted" style="margin:-6px 0 16px">이번 달 ${n}편 · 🔥 ${streakOf(S.me.id)}일 연속</p>
+  // 머리 카드 (2026-10-07): 🔥 연속 기록을 크게 · 이번 달 편수 · 아래에 넓은 '오늘 일기 쓰기' (오늘 냈으면 '다 썼어요')
+  const st=streakOf(S.me.id), td=findDiary(S.me.id,todayStr()), done=td?.status==="submitted";
+  return `<div class="page-h"><h1>내 일기</h1></div>
+    <section class="my-hero ${st?"":"zero"}" aria-label="내 일기 기록">
+      <div class="mh-streak"><span class="mh-fire" aria-hidden="true">🔥</span><div><b>${st}</b><span>일 연속</span></div></div>
+      <div class="mh-side"><span>이번 달</span><b>${n}<small>편</small></b></div>
+      <p class="mh-msg">${st>=7?"멋져요! 이 기록을 이어 가요 ✨":st?"오늘도 이어서 써 볼까요?":"오늘부터 연속 기록을 시작해 봐요"}</p>
+      ${done?`<button class="mh-write done" data-act="open-diary" data-id="${td.id}">✓ 오늘 일기 다 썼어요</button>`
+        :`<button class="mh-write" data-act="write">${ic("pen")}${td?"오늘 일기 이어 쓰기":"오늘 일기 쓰기"}</button>`}
+    </section>
     ${S.me.type==="child"?viewStickers(S.me)+awardList(S.me):""}
     ${list.length?`${feedHTML(list)}`:`<p class="empty">아직 쓴 일기가 없어요. 오늘 첫 일기를 써 보세요.</p>`}`;
 }
@@ -4450,7 +4576,7 @@ function viewKidsStatus(){
 function viewDayOpen(){
   const t=todayStr(), d=S.dayView||t;
   const list=sortedProfiles().map(p=>({p, x:S.diaries.find(y=>y.profileId===p.id && y.date===d && (y.status==="submitted" || y.profileId===S.me.id))})).filter(o=>o.x);
-  const nav=`<div class="day-nav"><button class="icon-btn" data-act="day-move" data-v="-1" aria-label="전날">${ic("back")}</button><h1>${fmtLong(d)}</h1><button class="icon-btn flip" data-act="day-move" data-v="1" aria-label="다음 날" ${d>=t?"disabled":""}>${ic("back")}</button>${d!==t?`<button class="btn btn-ghost sm" data-act="day-move" data-v="0">오늘</button>`:""}</div>`;
+  const nav=`<div class="day-nav"><button class="icon-btn" data-act="day-move" data-v="-1" aria-label="전날">${ic("back")}</button><h1>${fmtLong(d)}</h1><button class="icon-btn flip" data-act="day-move" data-v="1" aria-label="다음 날" ${d>=t?"disabled":""}>${ic("back")}</button>${d!==t?`<button class="btn btn-ghost sm" data-act="day-move" data-v="0">오늘로 이동 ›</button>`:""}</div>`;
   if(!list.length) return nav+`<p class="empty">${d===t?"오늘은 아직 아무도 일기를 쓰지 않았어요.":"이날은 가족이 쓴 일기가 없어요."}</p>`;
   // 📱 앱: 가족 일기를 가로로 나란히(엄마 | 아이 | 아이). 칸을 누르면 그 칸이 넓어지고 나머지는 좁게 접혀요 (다시 '나란히 보기')
   if(IS_APP && list.length>1){
@@ -4719,7 +4845,7 @@ function viewWrite(){
       <fieldset class="wm-row"><legend>기분</legend><div class="wm-opts">${MOODS.map(([k,l,,e])=>`<label class="wm-o" title="${l}"><input type="radio" name="mood" value="${k}" ${d.mood===k?"checked":""} aria-label="${l}"><span>${e}</span></label>`).join("")}</div><em class="wm-now" id="wm-mood">${MOODS.find(m=>m[0]===d.mood)?.[1]||""}</em></fieldset>
     </div>`}
     ${child&&talkOK(S.me)?viewTalk(d):""}
-    ${handOK()?viewHand(d):""}
+    ${handOK()||(d.hand||[]).length?viewHand(d):""}
     ${kid?kwQuestion(d):""}
     ${child?`<p class="muted" style="font-size:13px;margin:0 0 8px">${ic("pen")} ${talkOK(S.me)?"직접 쓰거나, 위의 '이야기로 일기 쓰기'로 엄마 · 아빠와 함께 만들어요. 붙여넣기는 안 돼요.":"아이 일기는 직접 손으로 써요. 종이 일기장에 쓴 건 위의 '손글씨 일기 사진으로 쓰기'로 옮겨요. 말로 쓰기와 붙여넣기는 안 돼요."}</p>`:""}
 
@@ -4824,7 +4950,9 @@ async function talkMake(textOnly){
    종이 일기장을 찍거나 고르면 → AI 선생님(다홍펜 워커 mode "ocr")이 쓴 그대로 글자로 옮겨 일기 칸에 넣어요 (맞춤법은 안 고쳐요 → 다홍펜이 검사)
    원본 사진은 일기에 📎 첨부파일(d.hand)로 남아요: groups/{gid}/diaries/{id}/hand_{id}.jpg · 한 일기에 HAND_MAX 장, 읽기는 HAND_MAX_READ 번까지 */
 const HAND_MAX = 3, HAND_MAX_READ = 3, HAND_IMG = [1600,.8];   // 글자로 옮기기는 아이마다 하루 3번 (밀린 일기도 올릴 수 있게 · 워커가 하루로 세요)
-const handOK = () => MEDIA_READY || DEMO;
+// 손글씨 일기 사진으로 쓰기 · 목소리 · 소리 넣기는 가족 설정에서 켠 가족만 (2026-10-07, groups.handOn · audioOn, 기본 꺼짐)
+const featOn = k => !!S.group?.[k];
+const handOK = () => (MEDIA_READY || DEMO) && featOn("handOn");
 const handName = (i,n) => `손글씨 원본${n>1?` ${i+1}쪽`:""}.jpg`;
 function handFiles(list, edit){
   // 누르면 크게 보기(사진 보기 창) · 저장된 사진은 ⬇ 로 원본 파일 받기
@@ -4928,7 +5056,7 @@ function viewMedia(d){
       ${l?`<div class="row"><span class="loc">${ic("pin")}${esc(l.name)}</span>${S.locEdit?"":`<button class="link-btn" data-act="loc-edit">${ic("pen")}이름 바꾸기</button>`}<button class="link-btn" data-act="loc-clear">${ic("x")}빼기</button></div>`:""}
       ${S.locEdit?`<div class="row" style="margin-top:${l?"10px":"0"}"><label class="sr" for="w-loc">장소 이름</label><input id="w-loc" maxlength="30" placeholder="예: 할머니 댁, 한강공원" value="${esc(l?.name||"")}" style="flex:1;min-width:12em"><button class="btn btn-primary sm" data-act="loc-set">확인</button></div>`
         :(l?"":`<div class="row"><button class="btn btn-ghost sm" data-act="loc-here">${ic("pin")}지금 있는 곳</button><button class="btn btn-ghost sm" data-act="loc-edit">${ic("pen")}직접 쓰기</button></div>`)}</section>`); }
-  if(allow("audio")){ const a=d.audio;
+  if(allow("audio") && (featOn("audioOn") || d.audio || S.rec)){ const a=d.audio;
     secs.push(`<section class="media-sec" aria-label="소리"><div class="media-h">목소리 · 소리<span>최대 ${MAX_AUDIO_SEC/60}분</span></div>
       ${S.rec?.talk?`<p class="muted" style="margin:0;font-size:14px">위의 '이야기로 일기 쓰기'에서 녹음하고 있어요.</p>`
       :S.rec?`<div class="rec" role="status"><span class="rec-dot" aria-hidden="true"></span><strong id="rec-t">0:00</strong><span class="muted">녹음하고 있어요</span><button class="btn btn-primary sm" data-act="rec-stop">${ic("stop")}멈추기</button></div>`
@@ -5149,6 +5277,18 @@ async function mergeSameName(name){
   S.me=prof(S.me?.id)||prof(keep.id)||S.me; render();
   toast(`'${name}' 프로필을 하나로 합쳤어요`);
 }
+// 🧩 켜서 쓰는 기능 (2026-10-07): 가족 모두에게 같이 적용, 보호자만 바꿔요 (groups.handOn · audioOn, 기본 꺼짐)
+const FEATS = [["audioOn","🎙","목소리 · 녹음 넣기","일기에 목소리 · 소리 파일 (최대 3분, 아이는 7세 이하)"],["handOn","📝","손글씨 일기 촬영","종이 일기장을 찍으면 AI가 글자로 옮겨 줘요"]];
+// ✏️ 일기 쓰기 설정 (2026-10-07): 다홍펜 고치는 방법 · 목소리 녹음 · 손글씨 촬영을 한곳에, 바꾸면 바로 저장
+function viewFeatToggles(){
+  const young=sortedProfiles().filter(penYoung);
+  const kidRow=p=>{ const on=penAutoOf(p), nm=`pen-${esc(p.id)}`;
+    return `<div class="ws-kid"><span>${esc(p.name)}${typeof p.penAuto!=="boolean"?' <i class="ws-new">골라 주세요</i>':""}</span><div class="ws-seg" role="radiogroup" aria-label="${esc(p.name)} 다홍펜 고치는 방법"><label><input type="radio" class="pen-sw" name="${nm}" data-id="${esc(p.id)}" value="auto" ${on?"checked":""}><span>🤖 바로</span></label><label><input type="radio" class="pen-sw" name="${nm}" data-id="${esc(p.id)}" value="self" ${on?"":"checked"}><span>✏️ 스스로</span></label></div></div>`; };
+  const pen = young.length ? `<li class="ws-row ws-pen" id="pen-mode"><span class="ws-e" aria-hidden="true">🖍</span><div class="ws-t"><b>AI 다홍펜 고치는 방법</b><small>🤖 바로 고쳐 주기 · ✏️ 힌트 보고 스스로 (초3부터는 늘 스스로)</small>${young.map(kidRow).join("")}</div></li>` : "";
+  const sw=([k,e,t,d])=>`<li class="ws-row"><label class="ws-lab"><span class="ws-e" aria-hidden="true">${e}</span><span class="ws-t"><b>${t}</b><small>${d}</small></span><input type="checkbox" class="feat-sw" data-feat="${k}" ${S.group?.[k]?"checked":""} aria-label="${t} 켜기"></label></li>`;
+  return `<section class="block ws-block" aria-labelledby="h-feat"><div class="block-h"><h2 id="h-feat">✏️ 일기 쓰기 설정</h2><span class="muted">가족 모두에게 적용</span></div>
+    <ul class="ws-list">${pen}${FEATS.map(sw).join("")}</ul></section>`;
+}
 function viewFamily(){
   const g=S.group, ps=sortedProfiles(), link=`https://${SITE_ADDRESS}/?join=${g.inviteCode}`;
   const groups=(S.userDoc?.groupIds||[]);
@@ -5166,22 +5306,11 @@ function viewFamily(){
             <button class="btn btn-primary span2">저장</button>
           </form></details>`:""}
       </section>
+      ${isParent()?viewFeatToggles():""}
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
         <ul class="mem-list">${ps.map(p=>`<li class="mem"><button class="av-btn" data-act="prof-open" data-v="${esc(p.id)}" aria-label="${esc(p.name)} 프로필">${av(p)}</button><span>${esc(p.name)}</span>${p.phone?`<small class="muted">${esc(p.phone)}</small>`:""}<small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`https://${SITE_ADDRESS}/?k=${g.inviteCode}-${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="link-btn" data-act="kid-pin-open" data-id="${p.id}" aria-expanded="${S.pinEdit===p.id}">🔑 비밀번호</button><button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>
           ${p.type==="child"&&isParent()&&S.pinEdit===p.id?`<li class="mem-pin">${pinForm("kid-pin",p,false)}</li>`:""}`).join("")}</ul>
         ${isParent()&&ps.some(p=>p.type==="child"&&!p.uid)?`<p class="muted" style="margin:0 0 8px;font-size:13px">초대 문자를 복사해 아이 휴대폰에 문자로 보내면, 구글 계정 없이 크롬에서 바로 일기를 써요. 이 링크가 있으면 누구나 가족 일기장에 들어올 수 있으니 아이에게만 보내고, 걱정되면 비밀번호를 걸어 주세요.</p>`:""}
-        ${isParent()&&ps.some(penYoung)?`<details class="add" id="pen-mode" ${S.penOpen||penUnset().length?"open":""}><summary>${ic("pen")}AI 다홍펜 고치는 방법 <small class="muted">(7세 이하 · 초1 · 초2)</small></summary>
-          <form class="form-grid" data-form="kid-pen">
-            <p class="muted span2" style="margin:0;font-size:13px">어린 아이는 틀린 곳이 많으면 금방 지칠 수 있어요. 아이에게 맞는 방법을 골라 주세요. 언제든 바꿀 수 있고, 초3부터는 늘 스스로 고쳐요.</p>
-            <ul class="pen-how span2">
-              <li><b>🤖 바로 고쳐 줘요</b> · 다홍펜이 틀린 곳을 바로 고쳐서 초록 형광펜으로 보여 줘요. 아이는 바뀐 곳을 소리 내어 읽어 봐요. 쓰는 재미를 먼저 붙일 때 좋아요.</li>
-              <li><b>✏️ 스스로 고쳐요</b> · 틀린 곳을 노란 형광펜으로 칠하고 힌트를 줘요. 아이가 직접 고치거나 ‘정답 보기’를 눌러요. 다 고쳐야 제출할 수 있어요.</li>
-            </ul>
-            ${ps.filter(penYoung).map(p=>{ const on=penAutoOf(p); return `<fieldset class="span2 pen-pick"><legend>${esc(p.name)} <small class="muted">${esc(gradeName(p.grade)||"어린이")}${typeof p.penAuto!=="boolean"?" · 아직 안 골랐어요":""}</small></legend>
-              <label><input type="radio" name="${esc(p.id)}" value="auto" ${on?"checked":""}> 🤖 바로 고쳐 줘요</label>
-              <label><input type="radio" name="${esc(p.id)}" value="self" ${on?"":"checked"}> ✏️ 스스로 고쳐요</label></fieldset>`; }).join("")}
-            <button class="btn btn-primary span2">저장</button>
-          </form></details>`:""}
         ${isParent()&&ps.some(p=>p.type==="child")?`<details class="add"><summary>${ic("pen")}아이 일기 최소 글자 수</summary>
           <form class="form-grid" data-form="kid-goal">
             <p class="muted span2" style="margin:0;font-size:13px">이만큼 써야 AI 다홍펜 선생님을 부르고 제출할 수 있어요. 비워 두면 학년 기본값을 써요 (5세 10 · 6세 20 · 7세 30 · 초1 40 · 초2 60 · 초3 100 · 초4 150 · 초5 200 · 초6 250 · 중학생 300 · 고등학생 400자, 띄어쓰기 빼고).</p>
@@ -5292,7 +5421,7 @@ function go(fn){ const was=S.sub?.type==="write" && leaveDraft(); fn(); if(was &
 /* ---------- 주소와 뒤로 가기 ----------
    / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /album 사진첩 · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
    화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
-const ROUTE_TABS = ["mine","chat","kids","day","shelf","album","report","quiz","family","settings"];
+const ROUTE_TABS = ["mine","chat","kids","day","shelf","album","report","quiz","family","settings","grow"];
 function urlOf(){
   let u = ROUTE_TABS.includes(S.tab) ? "/"+S.tab : "/";
   if(S.sub?.type==="diary") return u+"?d="+encodeURIComponent(S.sub.id);
@@ -5443,7 +5572,7 @@ const acts = {
   "merge-dup": el => guard(()=>mergeSameName(el.dataset.v)),
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => TOUR ? acts["tour-exit"]() : guard(async()=>{ S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
-  "pen-set": () => { go(()=>{ S.tab="family"; S.sub=null; S.draft=null; S.penOpen=true; S.famOpen="h-mem"; /* 앱에서는 '가족 구성원' 칸을 펼쳐서 보여 줘요 */ }); setTimeout(()=>document.getElementById("pen-mode")?.scrollIntoView({behavior:"smooth",block:"center"}),80); },
+  "pen-set": () => { go(()=>{ S.tab="family"; S.sub=null; S.draft=null; S.penOpen=true; S.famOpen="h-feat"; /* 앱에서는 '가족 구성원' 칸을 펼쳐서 보여 줘요 */ }); setTimeout(()=>document.getElementById("pen-mode")?.scrollIntoView({behavior:"smooth",block:"center"}),80); },
   tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); if(el.dataset.v==="chat") S.chatJump=true; S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
@@ -6301,6 +6430,18 @@ document.addEventListener("change", e=>{ if(e.target.classList?.contains("pf-fil
 // 프로필 창 안의 다른 단추(아이로 쓰기 · 프로필 바꾸기)를 누르면 창을 닫고 그 일을 해요
 document.addEventListener("click", e=>{ const el=e.target.closest?.(".pf [data-act]"); if(el && !/^prof-/.test(el.dataset.act)){ S.prof=null; S.profEdit=false; } }, true);
 
+// 🧩 켜서 쓰는 기능: 가족 설정 스위치 · 홈 안내 띠
+document.addEventListener("change", e=>{ const t=e.target; if(!t.classList?.contains("feat-sw") || !isParent()) return;
+  const k=t.dataset.feat, on=t.checked, name=FEATS.find(x=>x[0]===k)?.[2]||"기능";
+  guard(async()=>{ await B.updateGroup(S.gid,{[k]:on}); S.group[k]=on; if(on) ls.set(featAskKey(),"1"); render(); toast(on?`'${name}'을 켰어요. 일기 쓰기 화면에 보여요`:`'${name}'을 껐어요`); }); });
+// 다홍펜 고치는 방법: 누르면 바로 저장 (profiles.penAuto)
+document.addEventListener("change", e=>{ const t=e.target; if(!t.classList?.contains("pen-sw") || !isParent()) return;
+  const p=prof(t.dataset.id), v=t.value==="auto"; if(!p) return;
+  guard(async()=>{ await B.update(S.gid,"profiles",p.id,{penAuto:v}); await reload("profiles"); S.me=prof(S.me.id)||S.me; render(); toast(`${p.name}: ${v?"🤖 다홍펜이 바로 고쳐 줘요":"✏️ 힌트 보고 스스로 고쳐요"}`); }); });
+Object.assign(acts,{
+  "feat-go": () => { ls.set(featAskKey(),"1"); go(()=>{ S.tab="family"; S.sub=null; S.famOpen="h-feat"; }); },
+  "feat-x": () => { ls.set(featAskKey(),"1"); render(); },
+});
 // 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통)
 const helpSay = (...m) => { S.helpLocal=[...(S.helpLocal||[]),...m]; };
 const helpScroll = () => requestAnimationFrame(()=>{ const l=document.getElementById("help-list"); if(l) l.scrollTop=l.scrollHeight; });
@@ -6527,8 +6668,8 @@ function appAfterRender(){
   famMenu();
   syncWidget(); }
 // 우리 가족 설정 칸들: 열어 둔 칸(S.famOpen)만 펼치고 나머지는 제목만
-function famMenu(){ document.querySelectorAll(".fam-menu .block[aria-labelledby]").forEach(s=>{ const on=s.getAttribute("aria-labelledby")===S.famOpen;
-  s.classList.add("acc"); s.classList.toggle("open",on); s.querySelector(".block-h")?.setAttribute("aria-expanded",on); }); }
+// (2026-10-07) 접고 펼치기는 없앴어요 — 모든 칸을 다 보여 줘요. 열어 달라고 한 칸(S.famOpen)이 있으면 그 칸으로 스크롤만
+function famMenu(){ if(!S.famOpen) return; const id=S.famOpen; S.famOpen=null; requestAnimationFrame(()=>document.getElementById(id)?.closest(".block")?.scrollIntoView({block:"start",behavior:"smooth"})); }
 
 if(IS_APP){
   const AP=plug("App");
@@ -6624,9 +6765,7 @@ if(IS_APP){
   });
   // 날씨 · 기분을 고르면 펼친 줄을 닫아요 (고른 값은 위쪽 기존 처리에서 S.draft 에 들어가요)
   document.addEventListener("change", e=>{ if(S.wmOpen && (e.target.name==="weather"||e.target.name==="mood") && e.target.closest?.(".wm-pop")){ S.wmOpen=null; render(); } });
-  // 우리 가족 설정: 휴대폰 설정 앱처럼 제목 목록 → 누르면 그 칸만 펼쳐요
-  document.addEventListener("click", e=>{ const h=e.target.closest?.(".fam-menu .block > .block-h"); if(!h || e.target.closest("button,a,input,select,label")) return;
-    const sec=h.parentElement, id=sec.getAttribute("aria-labelledby")||""; S.famOpen = S.famOpen===id ? null : id; famMenu(); if(S.famOpen) sec.scrollIntoView({block:"start",behavior:"smooth"}); });
+  // 우리 가족 설정: (2026-10-07) 접고 펼치기 없이 모든 칸을 다 보여 줘요
   // 아래로 내릴 때는 도움 단추를 숨겨서 마지막 칸을 가리지 않게
   let lastY=0; addEventListener("scroll", ()=>{ const y=window.scrollY; document.documentElement.classList.toggle("hide-help", y>lastY+4 && y>60); if(y<lastY-4) document.documentElement.classList.remove("hide-help"); lastY=y; }, {passive:true});
   // 홈 네 쪽: 옆으로 밀어서 넘기기 (가로로 움직이는 칸 · 입력 칸 안에서는 하지 않아요)
@@ -6634,8 +6773,8 @@ if(IS_APP){
   document.addEventListener("touchstart", e=>{ const h=e.target.closest?.(".a-main.is-home"); sx = h && e.touches.length===1 && !e.target.closest(".hp-who,.al-strip,input,textarea,select,.lb") ? e.touches[0].clientX : null; sy=e.touches[0]?.clientY||0; }, {passive:true});
   document.addEventListener("touchend", e=>{ if(sx===null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null;
     if(Math.abs(dx)<70 || Math.abs(dy)>Math.abs(dx)*.6) return;
-    const i=HPAGES.findIndex(x=>x[0]===hpage()), j=i+(dx<0?1:-1); if(j<0 || j>=HPAGES.length) return;
-    buzz("light"); acts.hpage({dataset:{v:HPAGES[j][0]}}); }, {passive:true});
+    const P=hpages(), i=P.findIndex(x=>x[0]===hpage()), j=i+(dx<0?1:-1); if(j<0 || j>=P.length) return;
+    buzz("light"); acts.hpage({dataset:{v:P[j][0]}}); }, {passive:true});
   // 운영자 답장 알림이 앱을 보고 있을 때 오면: 도움 단추에 표시
   plug("PushNotifications")?.addListener("pushNotificationReceived", n=>{ if(n?.data?.url==="help"){ S.helpNew=true; if(S.helpOpen) acts["help-open"](); else render(); } });
   // 인터넷이 끊겼을 때 올리기를 누르면: 기다리지 않고 안내 (글은 휴대폰에 보관돼 있어요)
