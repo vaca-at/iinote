@@ -901,7 +901,6 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .feat-sw:checked{background:var(--coral)}
 .feat-sw:checked::after{transform:translateX(20px)}
 .feat-sw:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.feat-ask .link-btn{flex:none}
 /* 내 일기 머리 카드: 🔥 연속 기록 강조 */
 .my-hero{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 14px;margin:0 0 18px;padding:18px 18px 16px;border-radius:22px;background:linear-gradient(135deg,#FFE7C2 0%,#FFD0B5 55%,#FFC1C8 100%);color:#5A2A12;box-shadow:0 6px 18px rgba(239,111,83,.18)}
 .my-hero.zero{background:linear-gradient(135deg,#FFF3D6,#FFE3D8);box-shadow:none}
@@ -1100,10 +1099,12 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .pen mark{color:inherit;border-radius:4px;padding:0 3px}
 .pen mark.pen-x{background:rgba(255,214,51,.6)}
 .pen mark.pen-ok{background:rgba(80,200,120,.35)}
-.pen-ask{display:flex;align-items:center;gap:12px;background:var(--sage-soft);border-radius:14px;padding:12px 14px;margin:0 0 14px}
-.pen-ask p{margin:0;flex:1;min-width:0;color:var(--ink)}
-.pen-ask small{color:var(--ink2)}
-.pen-ask-i{font-size:22px}
+/* 보호자 안내 띠: 일기장 칸을 가리지 않게 한 줄로 작게 (자세한 설명은 눌러서 가는 설정 화면에) */
+#app .pen-ask{display:flex;align-items:center;gap:6px;background:var(--sage-soft);border-radius:10px;padding:4px 6px 4px 10px;margin:0 0 6px;min-height:0;font-size:13px;line-height:1.3}
+#app .pen-ask p{margin:0;flex:1;min-width:0;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+#app .pen-ask-i{font-size:15px;flex:none}
+#app .pen-ask .btn{flex:none;min-height:0;height:auto;padding:4px 10px;font-size:12.5px;line-height:1.3;border-radius:8px;box-shadow:none}
+#app .pen-ask .pen-ask-x{flex:none;padding:2px 6px;font-size:13px;color:var(--ink2);text-decoration:none}
 .pen-how{margin:0;padding-left:1.2em;display:grid;gap:6px;font-size:14px;color:var(--ink2)}
 .pen-how b{color:var(--ink)}
 .pen-pick{border:1px solid var(--line);border-radius:12px;padding:8px 12px 10px;margin:0;display:flex;flex-wrap:wrap;gap:6px 18px}
@@ -3629,11 +3630,11 @@ const homeCta = mine => mine && mine.status==="submitted"
 const featAskKey = () => `iinote-featask-${S.gid}`;
 function featAskBanner(){
   if(!isParent() || ls.get(featAskKey(),"") || (S.group?.handOn && S.group?.audioOn)) return "";
-  return `<div class="pen-ask feat-ask" role="note"><span class="pen-ask-i" aria-hidden="true">🧩</span><p><b>더 쓸 수 있는 기능이 있어요</b><br><small>📝 종이 일기장 사진으로 쓰기 · 🎙 목소리 · 소리 넣기는 꺼 두었어요. 우리 가족 설정에서 켤 수 있어요.</small></p><button class="btn btn-primary sm" data-act="feat-go">설정 보기</button><button class="link-btn" data-act="feat-x">닫기</button></div>`;
+  return `<div class="pen-ask feat-ask" role="note" title="종이 일기장 사진으로 쓰기 · 목소리 녹음은 꺼 두었어요. 우리 가족 설정에서 켤 수 있어요."><span class="pen-ask-i" aria-hidden="true">🧩</span><p><b>꺼 둔 기능</b> 📝 사진으로 쓰기 · 🎙 녹음</p><button class="btn btn-primary sm" data-act="feat-go">켜기</button><button class="link-btn pen-ask-x" data-act="feat-x" aria-label="닫기">✕</button></div>`;
 }
 function penAskBanner(){
   const ks=penUnset(); if(!ks.length) return "";
-  return `<div class="pen-ask" role="note"><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b>의 AI 다홍펜, 어떻게 고칠까요?<br><small>지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요.</small></p><button class="btn btn-primary sm" data-act="pen-set">고르기</button></div>`;
+  return `<div class="pen-ask" role="note" title="지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요."><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b> 다홍펜 고치는 방법</p><button class="btn btn-primary sm" data-act="pen-set">고르기</button></div>`;
 }
 function viewHome(){
   const st=homeStyle();
