@@ -1253,6 +1253,10 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .consent-l{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--ink2)}
 .consent-l input{margin-top:3px;flex:none;width:18px;height:18px}
 .consent-ban{border:2px solid var(--coral);background:var(--coral-soft)}
+.wip-ban{display:flex;align-items:center;gap:12px;border:2px dashed var(--butter);background:var(--butter-soft)}
+.wip-ban > span{font-size:24px}
+.wip-ban p{flex:1;margin:0;display:flex;flex-direction:column;min-width:0}
+.wip-ban small{color:var(--ink2);font-size:13px}
 .notice-bar{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:var(--sky-soft);border:1.5px solid var(--sky);font-size:14px}
 .notice-bar.warn{background:var(--butter-soft);border-color:var(--butter)}
 .notice-bar.new{background:var(--sage-soft);border-color:var(--sage)}
@@ -3329,7 +3333,7 @@ function viewMore(){
 function viewHomePages(){
   const k=hpage();
   const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="news" ? hpNews() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"?consentBanner()+awardBanner()+penAskBanner():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
+  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+penAskBanner():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -3464,7 +3468,7 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return consentBanner()+awardBanner()+penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+penAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings}[S.tab]||viewHome)();
 }
 
@@ -5245,7 +5249,10 @@ function render(){
   document.body.style.overflow = S.lb || document.querySelector(".docv") ? "hidden" : "";
   if(IS_APP && window.appReady) appAfterRender();   // 📱 위젯 글 · 처음 들어왔을 때 할 일 (아래 '앱 전용 기능')
 }
-function go(fn){ fn(); render(); window.scrollTo(0,0); }
+// 쓰던 일기에서 다른 화면으로 가면: 묻지 않고 이 기기에 보관한 뒤 알려 줘요 (아이가 실수로 눌러도 날아가지 않게, 2026-10-07)
+const LEFT_MSG = "쓰던 일기는 이 기기에 보관해 두었어요. 첫 화면에서 이어 쓸 수 있어요 ✏️";
+function leaveDraft(){ if(draftDirty()){ wipNow(); return true; } return false; }
+function go(fn){ const was=S.sub?.type==="write" && leaveDraft(); fn(); if(was && S.sub?.type!=="write") toast(LEFT_MSG); render(); window.scrollTo(0,0); }
 /* ---------- 주소와 뒤로 가기 ----------
    / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /album 사진첩 · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
    화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
@@ -5281,7 +5288,7 @@ function syncUrl(){
 const draftDirty = () => { const d=S.draft; if(!d || S.sub?.type!=="write") return false; const o=d.id&&S.diaries.find(x=>x.id===d.id); return (d.text||"").trim()!==((o?.text)||"").trim(); };
 addEventListener("popstate",()=>{
   if(S.phase!=="app" || !S.me) return;
-  if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")){ try{ history.pushState({iinote:1},"",urlOf()+(TOUR?(urlOf().includes("?")?"&":"?")+"demo":"")); }catch(e){} return; }
+  if(leaveDraft()) toast(LEFT_MSG);   // 뒤로 가기로 나가도 쓰던 일기는 보관돼요
   if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop();
   applyUrl(); routeFromPop=true; render(); routeFromPop=false; window.scrollTo(0,0);
 });
@@ -6071,9 +6078,9 @@ document.addEventListener("change", e => {
   if((t.id==="w-photos" || t.id==="w-camera") && t.files?.length){ addPhotos([...t.files]); return; }
   if((t.id==="w-hand" || t.id==="w-hand-cam") && t.files?.length){ const fs=[...t.files]; t.value=""; addHand(fs); return; }
   if(t.id==="w-audio" && t.files?.[0]){ addAudioFile(t.files[0]); return; }
-  if(t.name==="mood" && S.draft){ S.draft.mood=t.value; const n=document.getElementById("wm-mood"); if(n) n.textContent=MOODS.find(m=>m[0]===t.value)?.[1]||""; return; }
+  if(t.name==="mood" && S.draft){ S.draft.mood=t.value; saveWip(); const n=document.getElementById("wm-mood"); if(n) n.textContent=MOODS.find(m=>m[0]===t.value)?.[1]||""; return; }
   if(t.dataset.kwq!=null && S.draft){ S.draft.prompt=t.checked?t.dataset.kwq:""; render(); return; }
-  if(t.name==="weather" && S.draft){ S.draft.weather=t.value; const n=document.getElementById("wm-weather"); if(n) n.textContent=weatherOf(t.value)?.[1]||""; return; }
+  if(t.name==="weather" && S.draft){ S.draft.weather=t.value; saveWip(); const n=document.getElementById("wm-weather"); if(n) n.textContent=weatherOf(t.value)?.[1]||""; return; }
   if(t.dataset.pref==="keep"){ ls.set("iinote-keep",t.checked?"1":""); if(S.user) ls.set("iinote-login",JSON.stringify({uid:S.user.uid,at:Date.now()})); markActive(true); toast(t.checked?`이 기기에서 ${KEEP_DAYS}일 동안 로그인을 유지해요`:`${IDLE_MIN}분 동안 안 쓰면 로그아웃해요`); }
   if(t.dataset.pref==="theme"){ S.theme=t.value; ls.set("iinote-theme",t.value); applyPrefs(); }
   if(t.dataset.pref==="dfont"){ S.dfont=t.value; ls.set("iinote-dfont",t.value); applyPrefs(); }
@@ -6271,19 +6278,34 @@ function buzz(kind){ const H=plug("Haptics"); if(!H) return;
   try{ kind==="ok" ? H.notification({type:"SUCCESS"}) : H.impact({style:kind==="mid"?"MEDIUM":"LIGHT"}); }catch(e){} }
 const BUZZ = { heart:"light", stamp:"mid", tab:"light", "chat-react":"light", "save-diary":"light" };
 
-// 쓰던 일기 지키기: 쓰는 동안 이 휴대폰에 글을 계속 보관 → 인터넷이 끊기거나 앱이 꺼져도 다시 열면 이어서 써요
+// 쓰던 일기 지키기: 쓰는 동안 이 기기에 글을 계속 보관 → 인터넷이 끊기거나 앱이 꺼져도, 웹에서 다른 메뉴 · 다른 창을 눌러 나가도 다시 열면 그 자리에 (2026-10-07 웹에서도)
 function wipKey(d){ return `iinote-wip-${S.gid}-${S.me?.id}-${d?.date}`; }
 let wipT=0;
-function saveWip(){ if(!IS_APP || !S.draft || !S.me) return; clearTimeout(wipT);
-  wipT=setTimeout(()=>{ const d=S.draft; if(d) ls.set(wipKey(d), JSON.stringify({text:d.text,title:d.title,mood:d.mood,weather:d.weather,at:Date.now()})); },400); }
-function restoreWip(){ if(!IS_APP || !S.draft || !S.me) return;
+function wipNow(){ clearTimeout(wipT); const d=S.draft; if(!d || !S.me || !S.gid) return;
+  if(!(d.text||"").trim()){ ls.del(wipKey(d)); return; }   // 다 지웠으면 보관한 것도 지워요 (예전 글이 되살아나지 않게)
+  const o=d.id && S.diaries.find(x=>x.id===d.id); if(o && o.text===d.text && (o.title||"")===(d.title||"")){ ls.del(wipKey(d)); return; }   // 저장된 것과 같으면 보관할 필요 없어요
+  ls.set(wipKey(d), JSON.stringify({text:d.text,title:d.title,mood:d.mood,weather:d.weather,prompt:d.prompt||"",date:d.date,at:Date.now()})); }
+function saveWip(){ if(!S.draft || !S.me) return; clearTimeout(wipT); wipT=setTimeout(wipNow,300); }
+// 창을 닫거나 · 다른 탭 · 다른 앱으로 가는 순간에도 한 번 더 보관해요
+addEventListener("pagehide", ()=>{ if(S.sub?.type==="write") wipNow(); });
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden && S.sub?.type==="write") wipNow(); });
+// 첫 화면 띠: 이 기기에 보관된 쓰다 만 일기 (가장 최근 것 하나)
+function wipList(){ const out=[]; if(!S.me || !S.gid) return out; const pre=`iinote-wip-${S.gid}-${S.me.id}-`;
+  try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(!k?.startsWith(pre)) continue; let w=null; try{ w=JSON.parse(localStorage.getItem(k)); }catch(e){}
+    const date=k.slice(pre.length); if(!w || !(w.text||"").trim()) continue;
+    const o=findDiary(S.me.id,date); if(o && ((o.updatedAt||0)>w.at || o.text===w.text)){ localStorage.removeItem(k); continue; }   // 이미 저장됐으면 지워요
+    out.push({date,at:w.at,n:countChars(w.text)}); } }catch(e){}
+  return out.sort((a,b)=>b.at-a.at); }
+function wipBanner(){ if(S.sub) return ""; const w=wipList()[0]; if(!w) return "";
+  return `<section class="block wip-ban" role="note"><span aria-hidden="true">✏️</span><p><b>쓰다 만 일기가 있어요</b><small>${fmtShort(w.date)} · ${w.n}자 · 이 기기에 보관해 두었어요</small></p><button class="btn btn-primary sm" data-act="write" data-date="${w.date}">이어 쓰기</button></section>`; }
+function restoreWip(){ if(!S.draft || !S.me) return;
   let w=null; try{ w=JSON.parse(ls.get(wipKey(S.draft),"null")); }catch(e){}
   if(!w || !(w.text||"").trim() || w.text===S.draft.text) return;
   const o=S.draft.id && S.diaries.find(x=>x.id===S.draft.id);
   if(o && (o.updatedAt||0)>w.at){ ls.del(wipKey(S.draft)); return; }   // 그 뒤에 다른 기기에서 고쳤으면 그쪽이 최신
-  Object.assign(S.draft,{text:w.text, title:w.title||S.draft.title, mood:w.mood||S.draft.mood, weather:w.weather||S.draft.weather});
-  setTimeout(()=>toast("저장하지 못한 일기가 있어서 이어서 쓸 수 있게 불러왔어요"),500); }
-function dropWip(d){ if(IS_APP && d) ls.del(wipKey(d)); }
+  Object.assign(S.draft,{text:w.text, title:w.title||S.draft.title, mood:w.mood||S.draft.mood, weather:w.weather||S.draft.weather, prompt:w.prompt||S.draft.prompt||""});
+  setTimeout(()=>toast("쓰던 일기를 그대로 불러왔어요. 이어서 써요 ✏️"),500); }
+function dropWip(d){ if(d) ls.del(wipKey(d)); }
 
 // 일기 쓰기 알림: 정한 시간에 앞으로 14일 동안 하루 한 번 (오늘 이미 썼으면 내일부터). 앱을 열 때마다 다시 맞춰요
 const REMIND_BASE=7000, REMIND_DAYS=14;
@@ -6419,7 +6441,7 @@ function openAppUrl(url){
   // 🔗 카톡 · 문자로 받은 초대 링크(https://iinote.co.kr/?join=… · ?k=…)가 앱으로 열리면: 그 주소로 앱 화면을 한 번 새로 열어 초대를 받아요 (2026-10-07)
   if(/[?&](join|k)=/.test(p) && !location.search.includes(p.split("?")[1]||"\u0000")){ location.replace(p); return; }
   if(S.phase==="app" && S.me && S.routed){
-    if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")) return;
+    if(leaveDraft()) toast(LEFT_MSG);
     try{ history.pushState({iinote:1},"",p); }catch(e){} applyUrl(); render(); window.scrollTo(0,0); }
   else { try{ history.replaceState(null,"",p); }catch(e){} }   // 아직 여는 중이면 주소만 바꿔 두면 들어간 뒤 그 화면으로 가요
 }
@@ -6462,7 +6484,7 @@ if(IS_APP){
     if(S.phase==="picker" && S.pinFor){ S.pinFor=null; render(); return; }
     if(S.phase==="app" && S.me && (S.sub || (S.tab && S.tab!=="home"))){
       if(canGoBack && history.state?.iinote) history.back();
-      else { if(draftDirty() && !confirm("쓰던 일기를 저장하지 않고 나갈까요?")) return; go(()=>{ S.sub=null; S.draft=null; S.tab="home"; }); }
+      else { if(leaveDraft()) toast(LEFT_MSG); go(()=>{ S.sub=null; S.draft=null; S.tab="home"; }); }
       return; }
     if(Date.now()-backAt<2000){ AP.minimizeApp(); return; }
     backAt=Date.now(); toast("한 번 더 누르면 앱을 닫아요");
