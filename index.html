@@ -1867,7 +1867,12 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .more-it.on{background:var(--ink);color:var(--surface)}
 .more-it.on > span{color:var(--ink)}
 .more-prefs{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding:12px;border-radius:18px;background:var(--surface2)}
-/* 도움 · 문의 채팅 */
+/* 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통) */
+.hq.rep{border-color:var(--coral);color:var(--coral);font-weight:600}
+.help-rep{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 12px 8px;padding:8px 12px;border-radius:14px;background:var(--coral-soft);color:var(--ink);font-size:14px}
+.help-fab{display:inline-flex;align-items:center;gap:4px}
+.cmt-acts .rep-btn,.rep-btn{color:var(--ink3)}
+@media (min-width:700px){ #app .help{inset:auto 24px 24px auto;width:400px;height:min(640px,calc(100dvh - 48px));border-radius:22px;overflow:hidden;box-shadow:0 12px 40px rgba(46,36,51,.28)} }
 .help{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:var(--paper);padding-top:env(safe-area-inset-top)}
 .help-top{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 6px;background:var(--surface);box-shadow:0 1px 8px rgba(46,36,51,.08)}
 .help-top h2{margin:0;font-family:'OngleipUnz',var(--diary);font-size:20px;font-weight:400}
@@ -2547,7 +2552,7 @@ async function makeFirebase(){
     async getUser(uid){ const s=await F.getDoc(F.doc(db,"users",uid)); return s.exists()?s.data():null; },
     // 📱 앱 푸시 알림: 이 휴대폰의 알림 주소(FCM 토큰)를 내 계정에 적어 두면, 가족 소식이 생길 때 서버(iinote-app/firebase)가 보내요
     async savePushToken(uid,token,on=true){ await F.setDoc(F.doc(db,"users",uid),{pushTokens:on?F.arrayUnion(token):F.arrayRemove(token)},{merge:true}); },
-    // 서버 함수 부르기 (도움 · 문의 채팅: supportSend · supportList · supportAdmin, iinote-app/firebase/functions)
+    // 서버 함수 부르기 (챗봇 상담 · 신고: supportSend · supportList · supportAdmin, iinote-app/firebase/functions)
     async callFn(name,data){ const FN=await import(`https://www.gstatic.com/firebasejs/${V}/firebase-functions.js`);
       const r=await FN.httpsCallable(FN.getFunctions(app,"asia-northeast3"),name)(data||{}); return r.data; },
     async addUserGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{groupIds:F.arrayUnion(gid),lastGroupId:gid,kind:kindOf()},{merge:true}); },
@@ -3314,7 +3319,7 @@ function viewAppShell(){
     ${S.me.type==="child"?kidBar():""}
     ${S.newsOpen?viewNews():""}
     <main class="a-main ${home?"is-home":""}" id="main">${noticeBar()}${dupBanner()}${body}</main>
-    ${home?`<button class="a-help" data-act="help-open" aria-label="도움 · 문의">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
+    ${home?`<button class="a-help" data-act="help-open" aria-label="챗봇 상담">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
     ${bare?"":`<nav class="a-nav" aria-label="메뉴">
       ${nb("home","홈","home")}${nb("mine","내 일기","lay-diary")}
       <button class="a-fab" data-act="write" aria-label="오늘 일기 쓰기">${ic("pen")}</button>
@@ -3340,7 +3345,7 @@ function viewMore(){
     <div class="more-head"><h2 id="more-h">더보기</h2><button class="link-btn" data-act="app-more">닫기</button></div>
     <div class="more-grid">${it.map(([k,l,i])=>`<button class="more-it" data-act="more-go" data-v="${k}"><span>${ic(i)}</span>${l}</button>`).join("")}
       <button class="more-it ${S.morePrefs?"on":""}" data-act="more-prefs" aria-expanded="${!!S.morePrefs}"><span>${ic("palette")}</span>화면 꾸미기</button>
-      <button class="more-it" data-act="help-open"><span>${ic("help")}</span>도움 · 문의</button></div>
+      <button class="more-it" data-act="help-open"><span>${ic("help")}</span>챗봇 상담</button></div>
     ${S.morePrefs?`<div class="more-prefs">${prefGroups(false)}</div>`:""}
   </section>`;
 }
@@ -3421,24 +3426,35 @@ function hpNews(){
   const body=groups.map(([h,f])=>{ const L=items.filter(f); return L.length?`<h3 class="nw-h">${h}</h3><ul class="nw-list block">${L.map(row).join("")}</ul>`:""; }).join("");
   return body || `<p class="empty">최근 2주 동안 새 소식이 없어요. 가족 일기에 먼저 댓글을 남겨 보세요.</p>`;
 }
-// 도움 · 문의 채팅: 자주 묻는 질문은 바로 답하고, 그 밖의 것은 운영자에게 (답장은 푸시로 와요)
+// 💬 챗봇 상담 (웹 · 앱 공통, 2026-10-07 '도움 · 문의'에서 이름 바꿈): 자주 묻는 질문은 바로 답하고, 그 밖의 것은 상담원에게 (앱은 답장이 푸시로 와요)
 const FAQ = [
   ["아이 휴대폰 연결하기","우리 가족 설정에서 아이 프로필의 '휴대폰 연결 링크'를 아이 휴대폰으로 보내 주세요. 아이는 그 링크를 한 번만 누르면 계정 없이 바로 들어와요."],
-  ["PDF 일기책 만들기","더보기 › 책장 · PDF에서 기간과 사람을 고르고 'PDF 만들기'를 누르세요. 미리 보기에서 'PDF 저장'이나 '보내기'(카카오톡 · 드라이브 · 문자)를 고르면 돼요."],
-  ["알림이 안 와요","휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림이 켜져 있는지 봐 주세요. 설정 › 앱 설정의 '가족 소식 알림'도 함께 확인해 주세요."],
+  ["PDF 일기책 만들기", IS_APP ? "더보기 › 책장 · PDF에서 기간과 사람을 고르고 'PDF 만들기'를 누르세요. 미리 보기에서 'PDF 저장'이나 '보내기'(카카오톡 · 드라이브 · 문자)를 고르면 돼요."
+    : "책장 탭 위의 '📄 PDF로 저장'에서 기간 · 사람 · 쪽 모양을 고르고 만들기를 누르세요. 새 창의 인쇄 화면에서 'PDF로 저장'을 고르면 돼요."],
+  ["알림이 안 와요", IS_APP ? "휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림이 켜져 있는지 봐 주세요. 설정 › 앱 설정의 '가족 소식 알림'도 함께 확인해 주세요."
+    : "알림은 휴대폰 앱에서 받을 수 있어요. 웹에서는 위쪽 🔔 새 소식에서 가족 소식을 모아 볼 수 있어요."],
   ["가족 초대하기","우리 가족 설정에서 초대 코드나 초대 링크를 가족에게 보내 주세요. 받은 가족이 링크를 누르고 로그인하면 같은 일기장에 들어와요."],
   ["로그인이 안 돼요","처음 가입한 방법(구글 또는 카카오)으로 로그인해 주세요. 둘 다 쓰려면 로그인한 뒤 설정 › 계정에서 연결할 수 있어요."]
 ];
+// 🚩 신고 (2026-10-07): 챗봇 상담 안에서 종류 고르기 → 내용 적기 → 상담원에게 (서버 함수 supportSend 의 report · ref)
+// 일기 · 댓글의 '신고'를 누르면 S.helpRep={cat,ref} 로 바로 이 단계부터. ref 는 "일기 10월 7일 · 지우" 같은 짧은 표시만 (내용은 보내지 않아요)
+const REPORT_CATS = ["불편한 글 · 댓글","이상한 AI 답변","사진 · 채팅","오류 · 고장","기타"];
 function viewHelp(){
-  const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! 무엇을 도와드릴까요? 아래에서 고르거나 운영자에게 직접 적어 보내 주세요.`};
+  const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! 챗봇 상담이에요. 무엇을 도와드릴까요?\n아래에서 고르거나 궁금한 것을 적어 보내 주세요. 불편한 글이나 고장은 🚩 신고하기로 알려 주세요.`};
   const msgs=[hello,...(S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":"me",text:m.text})),...(S.helpLocal||[])];
   const bubble=m=>m.from==="me" ? `<p class="hm me">${esc(m.text)}</p>`
-    : `<div class="hm-row"><span class="hm-av ${m.from}" aria-hidden="true">${m.from==="op"?"운":ic("help")}</span><p class="hm ${m.from}">${m.from==="op"?"<b>운영자</b>":""}${esc(m.text)}</p></div>`;
+    : `<div class="hm-row"><span class="hm-av ${m.from}" aria-hidden="true">${m.from==="op"?"상":ic("help")}</span><p class="hm ${m.from}">${m.from==="op"?"<b>상담원</b>":""}${esc(m.text)}</p></div>`;
+  const rep=S.helpRep;
+  const chips = rep && !rep.cat
+    ? `<div class="help-q" role="group" aria-label="신고 종류">${REPORT_CATS.map(c=>`<button type="button" class="hq rep" data-act="help-rep-cat" data-v="${esc(c)}">${esc(c)}</button>`).join("")}<button type="button" class="hq" data-act="help-rep-x">그만두기</button></div>`
+    : rep ? `<div class="help-rep"><span>🚩 ${esc(rep.cat)} 신고${rep.ref?` · ${esc(rep.ref)}`:""}</span><button type="button" class="link-btn" data-act="help-rep-x">그만두기</button></div>`
+    : `<div class="help-q" role="group" aria-label="자주 묻는 질문"><button type="button" class="hq rep" data-act="help-rep">🚩 신고하기</button>${FAQ.map(([q],i)=>`<button type="button" class="hq" data-act="help-faq" data-v="${i}">${esc(q)}</button>`).join("")}</div>`;
+  const ph = rep?.cat ? "어떤 일이 있었는지 적어 주세요" : "궁금한 것을 적어 주세요";
   return `<section class="help" role="dialog" aria-modal="true" aria-labelledby="help-h">
-    <header class="help-top"><button class="icon-btn" data-act="help-close" aria-label="닫기">${ic("left")}</button><span class="help-av" aria-hidden="true">${ic("help")}</span><div><h2 id="help-h">아이아이노트 도우미</h2><small>운영자가 보통 하루 안에 답해요 · 답장이 오면 알려 드려요</small></div></header>
+    <header class="help-top"><button class="icon-btn" data-act="help-close" aria-label="닫기">${ic("left")}</button><span class="help-av" aria-hidden="true">${ic("help")}</span><div><h2 id="help-h">챗봇 상담</h2><small>챗봇이 못 푼 건 상담원이 보통 하루 안에 답해요${IS_APP?" · 답장이 오면 알려 드려요":" · 답장은 여기에서 볼 수 있어요"}</small></div></header>
     <div class="help-list" id="help-list">${msgs.map(bubble).join("")}${S.helpBusy?`<p class="hm-wait">${S.helpBusy}</p>`:""}</div>
-    <div class="help-q" role="group" aria-label="자주 묻는 질문">${FAQ.map(([q],i)=>`<button type="button" class="hq" data-act="help-faq" data-v="${i}">${esc(q)}</button>`).join("")}</div>
-    <form class="help-form" data-form="help"><label class="sr" for="help-in">운영자에게 보낼 내용</label><textarea id="help-in" name="text" rows="1" maxlength="1000" placeholder="운영자에게 물어볼 내용을 적어 주세요" required></textarea><button class="help-send" aria-label="보내기">${ic("arrow")}</button></form>
+    ${chips}
+    <form class="help-form" data-form="help"><label class="sr" for="help-in">${ph}</label><textarea id="help-in" name="text" rows="1" maxlength="1000" placeholder="${ph}" required></textarea><button class="help-send" aria-label="보내기">${ic("arrow")}</button></form>
   </section>`;
 }
 function viewShell(){
@@ -3461,6 +3477,7 @@ function viewShell(){
       <div class="mast-sub">
         <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>${newsBell()}
         ${favRow()}
+        <button class="link-btn help-fab" data-act="help-open">${ic("help")}<span>챗봇 상담</span></button>
         ${isParent()?`<button class="link-btn out" data-act="signout" aria-label="로그아웃">${ic("out")}<span>로그아웃</span></button>`:""}
       </div>
       ${kidBar()}
@@ -3472,6 +3489,7 @@ function viewShell(){
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}</div>
     </nav>
+    ${S.helpOpen?viewHelp():""}
     ${S.prof?viewProfile():""}
     ${S.lb?viewLightbox():""}
   </div>`;
@@ -4607,12 +4625,15 @@ function viewDiaryDetail(){
     ${d.talk?.dialog?.length?`<details class="talk-log"><summary>🎙 엄마 · 아빠와 나눈 이야기로 쓴 일기예요 · 이야기 보기</summary>${talkLines(d.talk.dialog)}</details>`:""}
     ${(d.hand||[]).length?`<section class="hand-att" aria-label="첨부파일"><h3>📝 종이 일기장에 손으로 쓴 일기예요 · 첨부파일 ${d.hand.length}개</h3>${handFiles(d.hand,false)}</section>`:""}
     ${viewReact(d,mine)}
+    ${mine?"":`<p class="ai-report">${repBtn(`${p?.name||"가족"}의 ${fmtShort(d.date)} 일기`)}</p>`}
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
       <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
     </section></article>`;
 }
+// 🚩 신고 단추: 누르면 챗봇 상담이 '불편한 글 · 댓글' 신고로 열려요 (ref 는 누구의 언제 글인지만, 내용은 안 보내요)
+const repBtn = ref => `<button class="link-btn rep-btn" data-act="help-open" data-rep="불편한 글 · 댓글" data-ref="${esc(ref)}">${ic("flag")}신고</button>`;
 // 댓글 지우기: 쓴 사람, 그리고 아이가 쓴 댓글은 보호자(부모)도 (2026-10-04)
 const canDelCmt = c => !!S.me && (c.profileId===S.me.id || (isParent() && prof(c.profileId)?.type==="child"));
 const delCmtNote = c => c.delBy && c.delBy!==c.profileId ? "(보호자가 지운 댓글이에요)" : "(지운 댓글이에요)";
@@ -4625,7 +4646,7 @@ function renderThread(cs,parent,depth){
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
-        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}</div>`}
+        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":repBtn(`${p?.name||"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)}</div>`}
       ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
@@ -6280,6 +6301,32 @@ document.addEventListener("change", e=>{ if(e.target.classList?.contains("pf-fil
 // 프로필 창 안의 다른 단추(아이로 쓰기 · 프로필 바꾸기)를 누르면 창을 닫고 그 일을 해요
 document.addEventListener("click", e=>{ const el=e.target.closest?.(".pf [data-act]"); if(el && !/^prof-/.test(el.dataset.act)){ S.prof=null; S.profEdit=false; } }, true);
 
+// 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통)
+const helpSay = (...m) => { S.helpLocal=[...(S.helpLocal||[]),...m]; };
+const helpScroll = () => requestAnimationFrame(()=>{ const l=document.getElementById("help-list"); if(l) l.scrollTop=l.scrollHeight; });
+Object.assign(acts,{
+  "help-open": el => { S.helpOpen=true; S.moreOpen=false; S.newsOpen=false; S.helpNew=false; S.prof=null;
+    // 일기 · 댓글의 '신고'에서 열면 신고 종류를 미리 골라 둬요
+    if(el?.dataset?.rep){ S.helpRep={cat:el.dataset.rep, ref:el.dataset.ref||""}; helpSay({from:"bot",text:`🚩 ${el.dataset.ref?el.dataset.ref+"에 대해 ":""}신고할게요. 어떤 일이 있었는지 아래에 적어 주세요.`}); }
+    render(); helpScroll();
+    if(!DEMO) B.callFn?.("supportList").then(r=>{ S.helpMsgs=r.msgs||[]; if(S.helpOpen){ render(); helpScroll(); } }).catch(e=>console.warn("상담",e)); },
+  "help-close": () => { S.helpOpen=false; S.helpRep=null; render(); },
+  "help-faq": el => { const [q,a]=FAQ[+el.dataset.v]||[]; if(!q) return; helpSay({from:"me",text:q},{from:"bot",text:a+"\n\n더 궁금한 게 있으면 아래에 적어 보내 주세요. 상담원이 답해 드려요."}); render(); helpScroll(); },
+  "help-rep": () => { S.helpRep={cat:"",ref:""}; helpSay({from:"me",text:"🚩 신고하기"},{from:"bot",text:"무엇을 신고할까요? 아래에서 골라 주세요."}); render(); helpScroll(); },
+  "help-rep-cat": el => { S.helpRep={...S.helpRep, cat:el.dataset.v}; helpSay({from:"me",text:el.dataset.v},{from:"bot",text:"어떤 일이 있었는지 적어 주세요. 언제 · 어느 화면에서 보았는지 함께 적어 주시면 빨리 살펴볼 수 있어요."}); render(); helpScroll(); document.getElementById("help-in")?.focus(); },
+  "help-rep-x": () => { S.helpRep=null; helpSay({from:"bot",text:"신고를 그만뒀어요. 다른 궁금한 게 있으면 말씀해 주세요."}); render(); helpScroll(); },
+});
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.helpOpen && !S.lb && !S.prof) acts["help-close"](); });
+// 상담원에게 보내기 (신고면 종류 · 표시를 함께)
+forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return;
+  if(DEMO){ toast("둘러보기에서는 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
+  const rep=S.helpRep?.cat?S.helpRep:null;
+  S.helpBusy=rep?"신고를 보내는 중…":"상담원에게 보내는 중…"; render();
+  B.callFn("supportSend",{text,name:S.me.name,family:S.group?.name||"",...(rep?{report:rep.cat,ref:rep.ref}:{})}).then(r=>{ S.helpMsgs=r.msgs||[]; S.helpRep=null;
+    helpSay({from:"bot",text:rep?"신고를 받았어요. 알려 줘서 고마워요. 상담원이 살펴보고 답해 드릴게요.":`상담원에게 전달했어요. ${IS_APP?"답장이 오면 알림으로 알려 드릴게요.":"답장은 여기 챗봇 상담에서 볼 수 있어요."}`}); buzz("ok"); })
+    .catch(e=>{ console.warn("상담 보내기",e); toast("보내지 못했어요. 인터넷 연결을 확인하고 다시 보내 주세요"); document.getElementById("help-in")&&(document.getElementById("help-in").value=text); })
+    .finally(()=>{ S.helpBusy=""; render(); helpScroll(); }); };
+
 /* =========================================================
    📱 앱 전용 기능 (2026-10-05, 앱에서만 · 웹은 그대로)
    뒤로 가기 · 바깥 링크 · PDF 저장/보내기 · 공유 · 진동 · 쓰던 일기 지키기(인터넷 끊김)
@@ -6568,15 +6615,10 @@ if(IS_APP){
     "app-more": () => { S.moreOpen=!S.moreOpen; S.morePrefs=false; S.newsOpen=false; render(); },
     "more-go": el => { S.moreOpen=false; acts.tab(el); },
     "more-prefs": () => { S.morePrefs=!S.morePrefs; render(); },
-    // 도움 · 문의 채팅
-    "help-open": () => { S.helpOpen=true; S.moreOpen=false; S.newsOpen=false; S.helpNew=false; render();
-      if(!DEMO) B.callFn?.("supportList").then(r=>{ S.helpMsgs=r.msgs||[]; if(S.helpOpen) render(); }).catch(e=>console.warn("문의",e)); },
-    "help-close": () => { S.helpOpen=false; render(); },
     // 일기 쓰기 날씨 · 기분: 단추를 누르면 그 줄만 펼쳐요
     "wm-open": el => { S.wmOpen = S.wmOpen===el.dataset.v ? null : el.dataset.v; render(); },
     // 하루 펼쳐보기: 누른 사람 칸을 넓게 (빈 값이면 다시 나란히)
     "day-focus": el => { S.dayFocus = el.dataset.v || null; render(); },
-    "help-faq": el => { const [q,a]=FAQ[+el.dataset.v]||[]; if(!q) return; S.helpLocal=[...(S.helpLocal||[]),{from:"me",text:q},{from:"bot",text:a+"\n\n더 궁금한 게 있으면 아래에 적어 운영자에게 보내 주세요."}]; render(); },
     "app-push": ()=>guard(async()=>{ const r=await pushSetup(true); S.pushState=r; render();
       toast(r==="on"?"가족 소식이 오면 알려 줄게요":"알림이 꺼져 있어요. 휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림에서 켜 주세요"); }),
   });
@@ -6587,14 +6629,6 @@ if(IS_APP){
     const sec=h.parentElement, id=sec.getAttribute("aria-labelledby")||""; S.famOpen = S.famOpen===id ? null : id; famMenu(); if(S.famOpen) sec.scrollIntoView({block:"start",behavior:"smooth"}); });
   // 아래로 내릴 때는 도움 단추를 숨겨서 마지막 칸을 가리지 않게
   let lastY=0; addEventListener("scroll", ()=>{ const y=window.scrollY; document.documentElement.classList.toggle("hide-help", y>lastY+4 && y>60); if(y<lastY-4) document.documentElement.classList.remove("hide-help"); lastY=y; }, {passive:true});
-  // 운영자에게 문의 보내기
-  forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return;
-    if(DEMO){ toast("둘러보기에서는 문의를 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
-    S.helpBusy="운영자에게 보내는 중…"; render();
-    B.callFn("supportSend",{text,name:S.me.name,family:S.group?.name||""}).then(r=>{ S.helpMsgs=r.msgs||[];
-      S.helpLocal=[...(S.helpLocal||[]),{from:"bot",text:"운영자에게 전달했어요. 답장이 오면 알림으로 알려 드릴게요."}]; buzz("ok"); })
-      .catch(e=>{ console.warn("문의 보내기",e); toast("보내지 못했어요. 인터넷 연결을 확인하고 다시 보내 주세요"); document.getElementById("help-in")&&(document.getElementById("help-in").value=text); })
-      .finally(()=>{ S.helpBusy=""; render(); }); };
   // 홈 네 쪽: 옆으로 밀어서 넘기기 (가로로 움직이는 칸 · 입력 칸 안에서는 하지 않아요)
   let sx=null, sy=0;
   document.addEventListener("touchstart", e=>{ const h=e.target.closest?.(".a-main.is-home"); sx = h && e.touches.length===1 && !e.target.closest(".hp-who,.al-strip,input,textarea,select,.lb") ? e.touches[0].clientX : null; sy=e.touches[0]?.clientY||0; }, {passive:true});

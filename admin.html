@@ -43,6 +43,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sp span{padding:8px 12px;border-radius:14px;background:var(--line);white-space:pre-line}
 .sp.op{align-self:flex-end;text-align:right}
 .sp.op span{background:#5A2E45;color:#fff}
+.sp.rep span{background:#FFE1E1;border:1.5px solid #E4507F}
+.sp-rep{color:#C2366A;font-size:14px}
 .sp small{font-size:12px;opacity:.7}
 #sp-form{display:flex;flex-direction:column;gap:8px}
 .nt-form{display:flex;flex-direction:column;gap:8px}
@@ -359,7 +361,7 @@ document.addEventListener("submit", e=>{ if(e.target.id!=="nt-form") return; e.p
   f.querySelector("button").disabled=true; loadNotice({text:f.text.value.trim(),tone:f.tone.value,link:f.link.value.trim(),until}); });
 
 /* ---------- 💌 문의함 (2026-10-05) ----------
-   앱의 '도움 · 문의' 채팅으로 온 문의를 보고 답장해요. 서버 함수 supportAdmin(운영자만)으로만 읽고 써요 (iinote-app/firebase/functions).
+   웹 · 앱의 '챗봇 상담'(상담 · 🚩 신고)으로 온 문의를 보고 답장해요. 서버 함수 supportAdmin(운영자만)으로만 읽고 써요 (iinote-app/firebase/functions).
    답장을 보내면 그 사람 휴대폰으로 푸시가 가요 */
 let inboxUid=null, threads=[];
 const when=t=>t?new Date(t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
@@ -370,11 +372,11 @@ async function loadInbox(uid,reply){
     const r=await callAdmin(uid?(reply?{uid,text:reply}:{uid}):{});
     if(uid){ const t=threads.find(x=>x.uid===uid)||{};
       el.innerHTML=`<h2>💌 ${esc(t.name||"사용자")} <span class="sub">${esc(t.family||"")}</span> <button class="pill" data-act="inbox">← 문의함</button></h2>
-        <div class="sp-msgs">${(r.msgs||[]).map(m=>`<p class="sp ${m.from==="op"?"op":"user"}"><span>${esc(m.text)}</span><small>${m.from==="op"?"운영자 · ":""}${when(m.at)}</small></p>`).join("")}</div>
+        <div class="sp-msgs">${(r.msgs||[]).map(m=>`<p class="sp ${m.from==="op"?"op":"user"}${m.report?" rep":""}"><span>${esc(m.text)}</span><small>${m.from==="op"?"운영자 · ":""}${when(m.at)}</small></p>`).join("")}</div>
         <form id="sp-form"><label class="sub" for="sp-t">답장 (보내면 그 사람 휴대폰으로 알림이 가요)</label><textarea id="sp-t" name="t" rows="3" required></textarea><button class="pill">답장 보내기</button></form>`;
       const box=el.querySelector(".sp-msgs"); if(box) box.scrollTop=box.scrollHeight;
     } else { threads=r.threads||[]; const n=threads.reduce((s,x)=>s+(x.unreadOp||0),0);
-      el.innerHTML=`<h2>💌 문의함 ${n?`<span class="sp-new">새 문의 ${n}</span>`:""}</h2>${threads.length?`<ul class="sp-list">${threads.map(x=>`<li><button data-act="inbox-open" data-v="${esc(x.uid)}"><b>${esc(x.name||"사용자")}</b><span class="sub">${esc(x.family||"")}</span>${x.unreadOp?`<span class="sp-new">${x.unreadOp}</span>`:""}<em>${esc(x.last||"")}</em><small>${when(x.updatedAt)}</small></button></li>`).join("")}</ul>`:`<p class="sub">아직 문의가 없어요.</p>`}`;
+      el.innerHTML=`<h2>💌 문의함 ${n?`<span class="sp-new">새 문의 ${n}</span>`:""}</h2>${threads.length?`<ul class="sp-list">${threads.map(x=>`<li><button data-act="inbox-open" data-v="${esc(x.uid)}"><b>${x.reports?`<span class="sp-rep">🚩 ${x.reports}</span> `:""}${esc(x.name||"사용자")}</b><span class="sub">${esc(x.family||"")}</span>${x.unreadOp?`<span class="sp-new">${x.unreadOp}</span>`:""}<em>${esc(x.last||"")}</em><small>${when(x.updatedAt)}</small></button></li>`).join("")}</ul>`:`<p class="sub">아직 문의가 없어요.</p>`}`;
     }
   }catch(e){ console.warn("문의함",e); el.innerHTML=`<h2>💌 문의함</h2><p class="alert">문의함을 불러오지 못했어요 (${esc(e.message||e.code||"")})</p>`; }
 }
