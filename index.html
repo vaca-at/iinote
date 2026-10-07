@@ -566,31 +566,102 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .cmt-at{margin-left:auto}
 .chat .page-h{margin-bottom:0}
 /* 주간 · 월간 리포트 */
-.rep-mode span{min-height:36px;padding:0 16px}
-.rep-nav{display:flex;align-items:center;gap:10px;margin:0 0 16px}
-.rep-nav b{font-size:17px}
+.rep-mode span{min-height:34px;padding:0 15px}
+.rep-nav{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.rep-nav b{font-size:16px}
 .rep-nav .flip .ic{transform:scaleX(-1)}
-.rep-card{border-top:5px solid var(--pc);margin-bottom:18px}
-.rep-card .block-h h2{display:flex;align-items:center;gap:8px}
-.rep-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.rep-stats div{background:var(--paper);border-radius:14px;padding:12px 14px;display:grid;gap:2px}
-.rep-stats span{font-size:13px;color:var(--ink3)}
-.rep-stats b{font-size:21px}
-.rep-stats small{font-size:12px;color:var(--ink3)}
-.rep-two{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;margin-top:10px}
-.rep-box{background:var(--paper);border-radius:14px;padding:12px 14px}
-.rep-box h3,.rep-ai h3{font-size:15px;margin:0 0 10px}
+/* ---------- AI 리포트 (2026-10-08 새 디자인) ---------- */
+.rp-top{margin-bottom:14px}
+.rp-top p{margin:2px 0 0;color:var(--ink3);font-size:14px}
+/* 💌 부모님께 드리는 총평: 편지지 느낌 */
+.rh{position:relative;margin:0 0 22px;padding:18px;border-radius:var(--r-lg);background:linear-gradient(135deg,var(--lilac-soft) 0%,var(--coral-soft) 55%,var(--butter-soft) 100%);overflow:hidden}
+.rh::before{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:color-mix(in srgb,var(--surface) 35%,transparent)}
+.rh-hd{position:relative;display:flex;align-items:center;gap:12px;margin:0 0 14px}
+.rh-ic{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:15px;background:var(--surface);font-size:24px;box-shadow:0 4px 12px color-mix(in srgb,var(--ink) 10%,transparent);transform:rotate(-6deg)}
+.rh-hd h2{margin:0;font-size:19px;line-height:1.3}
+.rh-hd p{margin:2px 0 0;font-size:13px;color:var(--ink2);line-height:1.45}
+.rh-grid{position:relative;display:grid;gap:12px}
+@media (min-width:900px){ .rh-grid{grid-template-columns:1fr 1fr;align-items:start} }
+.rh-card{position:relative;background:var(--surface);border-radius:18px;padding:16px 16px 14px;box-shadow:0 6px 18px color-mix(in srgb,var(--ink) 8%,transparent);border-top:4px solid var(--coral)}
+.rh-card.rh-month{border-top-color:var(--lilac)}
+.rh-tabs{position:relative;display:flex;gap:6px;margin:0 0 10px}
+.rh-tabs button{flex:1;min-height:36px;border:0;border-radius:999px;background:color-mix(in srgb,var(--surface) 55%,transparent);color:var(--ink2);font:inherit;font-size:14px;font-weight:650;cursor:pointer}
+.rh-tabs button.on{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px color-mix(in srgb,var(--ink) 10%,transparent)}
+@media (max-width:899px){ .rh-grid .rh-card:not(.on){display:none} }
+@media (min-width:900px){ .rh-tabs{display:none} }
+.rh-card::after{content:"”";position:absolute;right:14px;top:4px;font:700 54px/1 Georgia,serif;color:color-mix(in srgb,var(--coral) 22%,transparent);pointer-events:none}
+.rh-ch{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 6px;padding-right:30px}
+.rh-unit{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;background:var(--coral-soft);color:var(--coral-ink);font-size:12.5px;font-weight:700}
+.rh-month .rh-unit{background:var(--lilac-soft);color:var(--ink)}
+.rh-ch b{font-size:14px;color:var(--ink2);font-weight:600}
+.rh-read{margin:0 0 10px;font-size:12.5px;color:var(--ink3)}
+.rh-kid+.rh-kid{margin-top:14px;padding-top:14px;border-top:1.5px dashed var(--line)}
+.rh-who{display:flex;align-items:center;gap:7px;margin:0 0 6px}
+.rh-who b{font-size:15px}
+.rh-who small{color:var(--ink3);font-size:12px}
+.rh-sum{margin:0 0 10px;font-family:var(--diary);font-size:min(var(--diary-size),18px);line-height:1.75;color:var(--ink)}
+.rh-pt{margin:0 0 8px;padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.6;color:var(--ink2)}
+.rh-pt span{display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:1px}
+.rh-hi{background:var(--butter-soft)}
+.rh-tip{background:var(--sage-soft)}
+.rh-skip,.rh-wait{margin:8px 0 0;font-size:13px;line-height:1.6;color:var(--ink3)}
+.rh-wait{margin:4px 0 2px}
+.rh-err{margin:0;font-size:14px;color:var(--coral-ink)}
+.rh-load{font-size:14px;color:var(--ink2)}
+.rh-dots{display:inline-flex;gap:4px;margin-right:8px;vertical-align:middle}
+.rh-dots i{width:7px;height:7px;border-radius:50%;background:var(--coral);animation:rhDot 1s infinite ease-in-out}
+.rh-dots i:nth-child(2){animation-delay:.15s;background:var(--butter)}
+.rh-dots i:nth-child(3){animation-delay:.3s;background:var(--lilac)}
+@keyframes rhDot{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
+.rh-sk{display:grid;gap:8px;margin-top:12px}
+.rh-sk i{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--surface2) 0%,var(--line) 50%,var(--surface2) 100%);background-size:200% 100%;animation:rhSk 1.3s infinite linear}
+.rh-sk i:nth-child(2){width:88%}
+.rh-sk i:nth-child(3){width:64%}
+@keyframes rhSk{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){ .rh-dots i,.rh-sk i{animation:none} }
+/* 📊 기간별 자세히 */
+.rp-dh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+.rp-dh h2{margin:0;font-size:18px}
+.rk{margin:0 0 16px;padding:16px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line);box-shadow:0 4px 14px color-mix(in srgb,var(--ink) 5%,transparent)}
+.rk-hd{display:flex;align-items:center;gap:12px;margin:-16px -16px 14px;padding:14px 16px;border-radius:var(--r-lg) var(--r-lg) 0 0;background:linear-gradient(120deg,color-mix(in srgb,var(--pc) 22%,var(--surface)) 0%,color-mix(in srgb,var(--pc) 6%,var(--surface)) 100%)}
+.rk-nm{flex:1;min-width:0;display:grid}
+.rk-nm b{font-size:18px;line-height:1.3}
+.rk-nm small{font-size:12.5px;color:var(--ink2)}
+.rk-ring{flex:none;position:relative;display:grid;place-items:center;align-content:center;width:62px;height:62px;border-radius:50%;background:conic-gradient(var(--pc) calc(var(--v) * 1%),color-mix(in srgb,var(--pc) 15%,var(--surface)) 0)}
+.rk-ring::before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--surface)}
+.rk-ring b,.rk-ring small{position:relative;line-height:1}
+.rk-ring b{font-size:19px}
+.rk-ring small{font-size:10.5px;color:var(--ink3);margin-top:2px}
+.rk-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rk-st{position:relative;display:grid;gap:1px;padding:12px 12px 10px;border-radius:14px;background:var(--surface2);min-width:0}
+.rk-st i{position:absolute;right:10px;top:9px;font-style:normal;font-size:18px;opacity:.85}
+.rk-st span{font-size:12.5px;color:var(--ink3)}
+.rk-st b{font-size:24px;line-height:1.25;color:var(--ink)}
+.rk-st b em{font-style:normal;font-size:14px;margin-left:1px;color:var(--ink2)}
+.rk-st small{font-size:11.5px;color:var(--ink3);line-height:1.4}
+.rk-two{display:grid;grid-template-columns:1.25fr 1fr;gap:8px;margin-top:8px}
+.rk-box{padding:12px 14px;border-radius:14px;background:var(--surface2);min-width:0}
+.rk-box h3{margin:0 0 8px;font-size:14px}
+.rk-note{margin:6px 0 0;font-size:11.5px;color:var(--ink3)}
+.rk-words{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.rk-words li{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-family:var(--diary);font-size:15px;max-width:100%}
+.rk-words s{color:var(--ink3);text-decoration-color:var(--coral)}
+.rk-words span{color:var(--ink3);font-family:var(--sans);font-size:12px}
+.rk-words b{color:var(--coral-ink);font-weight:600}
+.rk-words em{font-style:normal;font-family:var(--sans);font-size:11px;color:var(--ink3)}
+.rk-none{margin:0;font-size:13.5px;color:var(--ink2)}
+.rk-ai-note{margin:10px 0 0;font-size:13px;color:var(--ink3);text-align:center}
 .rep-bars{position:relative;display:flex;align-items:flex-end;gap:6px;height:130px;padding-top:18px}
-.rep-bars::after{content:"";position:absolute;left:0;right:0;bottom:calc(20px + (100% - 38px) * 0);border-top:1.5px dashed var(--coral);bottom:calc(20px + var(--goal) * .78)}
+.rep-bars::after{content:"";position:absolute;left:0;right:0;border-top:1.5px dashed var(--coral);bottom:calc(20px + var(--goal) * .78)}
 .rb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;min-width:0}
-.rb i{display:block;width:70%;max-width:34px;min-height:2px;border-radius:6px 6px 2px 2px;background:var(--pc)}
-.rb em{font-style:normal;font-size:11px;color:var(--ink3)}
+.rb i{display:block;width:72%;max-width:30px;min-height:3px;border-radius:8px 8px 3px 3px;background:color-mix(in srgb,var(--pc) 45%,var(--surface))}
+.rb.ok i{background:var(--pc)}
+.rb em{font-style:normal;font-size:11px;color:var(--ink3);min-height:14px}
 .rb span{font-size:12px;color:var(--ink2);height:16px}
-.rep-top{margin:0;padding-left:1.3em;display:grid;gap:4px;font-family:var(--diary)}
-.rep-top small{font-family:var(--sans);color:var(--ink3);font-size:12px}
-.rep-ai{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.rep-ai{margin-top:10px;background:var(--surface2);border-radius:14px;padding:14px 16px}
+.rep-ai h3{font-size:15px;margin:0 0 10px}
 .rep-ai p{margin:0 0 8px;line-height:1.7;color:var(--ink2)}
-@media (max-width:640px){ .rep-stats{grid-template-columns:1fr} .rep-two{grid-template-columns:1fr} }
+@media (max-width:640px){ .rh{padding:14px;margin-left:-2px;margin-right:-2px} .rh-card{padding:14px 14px 12px} .rk{padding:14px} .rk-hd{margin:-14px -14px 12px;padding:12px 14px} .rk-two{grid-template-columns:1fr} .rk-st{padding:10px 9px 8px} .rk-st b{font-size:20px} .rk-st i{display:none} .rk-st small{font-size:11px} }
 /* 달력 카드 안 일정 (한 줄 입력: "14시 태권도") */
 .cal-sch{margin-top:14px;border-top:1.5px dashed var(--line);padding-top:12px}
 .cal-sch .cd-h{margin:0 0 6px}
@@ -2476,8 +2547,9 @@ function seedDemo(){
   const K2 = ["놀이터에 갔다. 재미있었다.","엄마랑 빵을 만들었다. 맛있었다.","학교에서 그림을 그렸다. 우리 가족을 그렸다.","형아랑 레고를 했다. 탑이 무너졌다. 다시 쌓았다.","받아쓰기를 했다. 두 개 틀렸다. 다음에는 다 맞을 거다.","비가 와서 장화를 신었다. 물웅덩이에서 첨벙첨벙 뛰었다. 엄마가 웃었다.","학교에서 달팽이를 봤다. 달팽이는 아주 천천히 갔다. 나는 달팽이 이름을 느림보라고 지었다."];
   K1.forEach((txt,i)=>{ const dt=addDays(t,-(3+(K1.length-1-i)*1.6|0)); s.diaries["h1_"+i]=D("k1",dt,["good","great","calm","love"][i%4],["sunny","partly","rain","cloudy"][i%4],txt,{aiChecked:i>3,aiResult:i>3?ai("글이 점점 길고 자세해지고 있어요!","틀린 곳 없이 잘 썼어요."):null}); });
   K2.forEach((txt,i)=>{ const dt=addDays(t,-(3+(K2.length-1-i)*2)); s.diaries["h2_"+i]=D("k2",dt,["good","great","love","calm"][i%4],["sunny","partly","cloudy","rain"][i%4],txt,{aiChecked:i>2,aiResult:i>2?ai("하루를 차근차근 잘 적었어요!","틀린 곳 없이 잘 썼어요."):null}); });
-  // AI 선생님 총평 (이번 주 · 이번 달, 리포트 탭에서 바로 보여요)
-  const td=toDate(t), mon=addDays(t,-((td.getDay()+6)%7)), wk="report_w"+mon.replace(/-/g,"_"), mk="report_m"+td.getFullYear()+"_"+pad(td.getMonth()+1);
+  // AI 선생님 총평 (가장 최근에 끝난 주 · 달, 리포트 맨 위 💌 에 바로 보여요. 주는 일요일, 달은 말일에 끝나요)
+  const td=toDate(t), sun=td.getDay()===0?t:addDays(t,-td.getDay()), mon=addDays(sun,-6), wk="report_w"+mon.replace(/-/g,"_");
+  const lastDay=new Date(td.getFullYear(),td.getMonth()+1,0).getDate(), lm=new Date(td.getFullYear(),td.getMonth()+(td.getDate()===lastDay?0:-1),1), mk="report_m"+lm.getFullYear()+"_"+pad(lm.getMonth()+1);
   const R = (summary,highlight,tip) => ({summary,highlight,tip,at:now-2*H});
   Object.assign(s.profiles.k1, {
     [wk]:R("하랑이는 이번 주에 하루도 빠짐없이 일기를 썼어요. 처음엔 두세 문장이던 글이 이제는 다섯 문장이 넘을 만큼 길어졌고, 계주 연습처럼 그날 마음이 크게 움직인 장면을 골라 쓰는 힘이 생겼어요. 틀린 맞춤법도 스스로 찾아 고치는 일이 늘었어요. 꾸준히 쓰는 습관이 단단하게 자리 잡고 있어요.","\'바통을 넘겨받을 때 손이 미끄러질까 봐 조마조마했다\'는 문장은 그 순간의 긴장이 눈앞에 보이듯 생생했어요.","다음에는 사건 뒤에 \'그래서 나는 어떤 마음이 들었는지\'를 한 문장 더 적어 보자고 이야기해 주세요. 느낌을 쓰는 연습이 글을 한층 깊게 만들어요."),
@@ -4632,17 +4704,25 @@ function dayCard(p,x,mode){
 /* ---------- 주간 · 월간 리포트 (부모만) ----------
    아이마다: 일기 쓴 날 · 글자 수 · 목표 달성 · 다홍펜 고친 곳 · 글자 수 막대 · 자주 틀린 맞춤법 · AI 선생님 총평
    총평은 다홍펜 워커(mode:"report")로 만들고 아이 프로필에 저장해요 (report_기간키). 다시 만들 때만 AI 요금이 들어요 */
-function repPeriod(){
-  const r=S.rep||(S.rep={mode:"week",off:0}), t=todayStr(), d=toDate(t);
-  if(r.mode==="week"){
-    const mon=addDays(t, -((d.getDay()+6)%7) + r.off*7), sun=addDays(mon,6);
+function repPeriod(){ const r=S.rep||(S.rep={mode:"week",off:0}); return repPeriodOf(r.mode, r.off); }
+function repPeriodOf(mode, off){
+  const t=todayStr(), d=toDate(t);
+  if(mode==="week"){
+    const mon=addDays(t, -((d.getDay()+6)%7) + off*7), sun=addDays(mon,6);
     const a=toDate(mon), b=toDate(sun);
-    return {mode:"week", start:mon, end:sun, key:`w${mon.replace(/-/g,"_")}`, label:`${a.getMonth()+1}월 ${a.getDate()}일 ~ ${b.getMonth()+1}월 ${b.getDate()}일`,
+    return {mode:"week", off, start:mon, end:sun, key:`w${mon.replace(/-/g,"_")}`, label:`${a.getMonth()+1}월 ${a.getDate()}일 ~ ${b.getMonth()+1}월 ${b.getDate()}일`,
       days:[...Array(7)].map((_,i)=>addDays(mon,i))};
   }
-  const m=new Date(d.getFullYear(), d.getMonth()+r.off, 1), y=m.getFullYear(), mo=m.getMonth()+1, last=new Date(y,mo,0).getDate();
+  const m=new Date(d.getFullYear(), d.getMonth()+off, 1), y=m.getFullYear(), mo=m.getMonth()+1, last=new Date(y,mo,0).getDate();
   const start=`${y}-${pad(mo)}-01`, end=`${y}-${pad(mo)}-${pad(last)}`;
-  return {mode:"month", start, end, key:`m${y}_${pad(mo)}`, label:`${y}년 ${mo}월`, days:[...Array(last)].map((_,i)=>addDays(start,i))};
+  return {mode:"month", off, start, end, key:`m${y}_${pad(mo)}`, label:`${y}년 ${mo}월`, days:[...Array(last)].map((_,i)=>addDays(start,i))};
+}
+/* 💌 맨 위 총평이 보여 주는 '가장 최근에 끝난' 기간: 주는 일요일(오늘이 일요일이면 이번 주), 달은 말일(오늘이 말일이면 이번 달) */
+function repLatest(mode){
+  const d=toDate(todayStr());
+  if(mode==="week") return repPeriodOf("week", d.getDay()===0 ? 0 : -1);
+  const last=new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  return repPeriodOf("month", d.getDate()===last ? 0 : -1);
 }
 function repStats(p,per){
   const t=todayStr(), goal=penGoalOf(p);
@@ -4660,34 +4740,83 @@ function repStats(p,per){
   return {list, n:list.length, passed, avg:list.length?Math.round(sum/list.length):0, max:lens.length?Math.max(...lens):0, goal,
     met:lens.filter(v=>v>=goal).length, fixes:cs.filter(c=>c.fixed).length, self:cs.filter(c=>c.fixed && (c.how||"self")==="self").length, left:cs.filter(c=>!c.fixed).length, top, bars};
 }
+const repKey = (p,per) => `${S.gid}|${p.id}|${per.key}`;
+/* 💌 맨 위 총평 (2026-10-08): AI 리포트를 열면 가장 최근에 끝난 한 주 · 한 달의 총평을 부모님께 쓰는 편지처럼 한 장에 (아이가 여럿이면 한 장에 함께).
+   아직 안 만든 총평은 열자마자 저절로 만들어요(repAuto). 그 기간을 처음부터 쓴 아이만 (repLock 과 같은 기준) */
+function repHero(kids){
+  const pers=[repLatest("week"), repLatest("month")], tried=S.repTried||{}, errs=S.repErr||{};
+  const cards=pers.map(per=>{
+    const unit=per.mode==="week" ? (per.off===0?"이번 주":"지난주") : (per.off===0?"이번 달":"지난달");
+    const rows=kids.map(p=>{ const s=repStats(p,per), saved=p[`report_${per.key}`], k=repKey(p,per);
+      if(saved) return {p, s, saved};
+      if(!s.n) return {p, s, skip:"이 기간에 쓴 일기가 없어요."};
+      const lock=repLock(p,per); if(lock) return {p, s, skip:lock};
+      if(errs[k]) return {p, s, err:errs[k]};
+      return {p, s, busy:true}; });
+    const show=rows.filter(x=>!x.skip), many=kids.length>1;
+    const head=`<header class="rh-ch"><span class="rh-unit">${per.mode==="week"?"🗓":"📅"} ${unit} 총평</span><b>${per.label}</b></header>`;
+    const cls=`rh-card rh-${per.mode} ${(S.rhTab||"week")===per.mode?"on":""}`;
+    if(!show.length) return `<article class="${cls} is-wait">${head}<p class="rh-wait">${rows.map(x=>`${many?`<b>${esc(x.p.name)}</b> · `:""}${x.skip}`).join("<br>")}</p></article>`;
+    const read=show.reduce((a,x)=>a+x.s.n,0);
+    return `<article class="${cls}">${head}
+      <p class="rh-read">${show.map(x=>`${esc(x.p.name)} ${x.s.n}편`).join(" · ")}${many&&show.length>1?` — 모두 ${read}편`:""}을 읽고 썼어요</p>
+      ${show.map(x=>`<div class="rh-kid" style="--pc:${x.p.color||"var(--ink)"}">
+        ${many?`<div class="rh-who">${av(x.p,26)}<b>${esc(x.p.name)}</b><small>${esc(gradeName(x.p.grade))}</small></div>`:""}
+        ${x.saved?`<p class="rh-sum">${esc(x.saved.summary)}</p>
+          ${x.saved.highlight?`<p class="rh-pt rh-hi"><span>🌟 빛난 순간</span>${esc(x.saved.highlight)}</p>`:""}
+          ${x.saved.tip?`<p class="rh-pt rh-tip"><span>💡 함께 해 보세요</span>${esc(x.saved.tip)}</p>`:""}`
+        : x.err?`<p class="rh-err">총평을 만들지 못했어요. <button class="link-btn" data-act="rep-ai" data-id="${esc(x.p.id)}" data-v="${per.mode}">다시 만들기</button></p>`
+        : `<div class="rh-load" role="status"><span class="rh-dots" aria-hidden="true"><i></i><i></i><i></i></span>AI 선생님이 ${esc(x.p.name)}의 일기 ${x.s.n}편을 읽고 있어요…<div class="rh-sk" aria-hidden="true"><i></i><i></i><i></i></div></div>`}
+        </div>`).join("")}
+      ${rows.filter(x=>x.skip).map(x=>`<p class="rh-skip">${many?`<b>${esc(x.p.name)}</b> · `:""}${x.skip}</p>`).join("")}
+    </article>`; });
+  return `<section class="rh" aria-label="부모님께 드리는 AI 총평">
+    <div class="rh-hd"><span class="rh-ic" aria-hidden="true">💌</span><div><h2>부모님께 드리는 AI 총평</h2><p>AI 다홍펜 선생님이 가장 최근 한 주 · 한 달의 일기를 읽고 썼어요</p></div></div>
+    <div class="rh-tabs" role="tablist">${pers.map(per=>`<button role="tab" class="${(S.rhTab||"week")===per.mode?"on":""}" aria-selected="${(S.rhTab||"week")===per.mode}" data-act="rh-tab" data-v="${per.mode}">${per.mode==="week"?"🗓 주간 총평":"📅 월간 총평"}</button>`).join("")}</div>
+    <div class="rh-grid">${cards.join("")}</div></section>`;
+}
+function repAuto(){
+  if(!isParent() || S.repAutoRun || !S.gid) return;
+  const kids=sortedProfiles().filter(p=>p.type==="child"), tried=S.repTried=S.repTried||{}, jobs=[];
+  ["week","month"].forEach(m=>{ const per=repLatest(m);
+    kids.forEach(p=>{ const k=repKey(p,per); if(tried[k] || p[`report_${per.key}`] || (S.repErr||{})[k]) return;
+      if(!repStats(p,per).n || repLock(p,per)) return; jobs.push([p.id,per,k]); }); });
+  if(!jobs.length) return;
+  S.repAutoRun=true;
+  (async()=>{ try{ for(const [pid,per,k] of jobs){ tried[k]=1; await repMakeAI(pid,per,true); } } finally{ S.repAutoRun=false; } })();
+}
 function viewReport(){
   const per=repPeriod(), r=S.rep, kids=sortedProfiles().filter(p=>p.type==="child");
-  const head=`<div class="page-h"><h1>${r.mode==="week"?"주간":"월간"} 리포트</h1>
-    <div class="seg rep-mode" role="radiogroup" aria-label="리포트 기간"><label><input type="radio" name="repmode" value="week" ${r.mode==="week"?"checked":""} data-act="rep-mode"><span>주간</span></label><label><input type="radio" name="repmode" value="month" ${r.mode==="month"?"checked":""} data-act="rep-mode"><span>월간</span></label></div></div>
+  const top=`<div class="page-h rp-top"><div><h1>AI 리포트</h1><p>일기로 보는 우리 아이의 한 주 · 한 달</p></div></div>`;
+  if(!kids.length) return top+`<p class="empty">아이 프로필이 있으면 아이마다 리포트가 만들어져요. 우리 가족 탭에서 아이 프로필을 추가해 보세요.</p>`;
+  if(isParent()) setTimeout(repAuto,0);
+  const heroKeys=[repLatest("week").key, repLatest("month").key];
+  const ctl=`<div class="rp-dh"><h2>📊 기간별 자세히 보기</h2>
+      <div class="seg rep-mode" role="radiogroup" aria-label="리포트 기간"><label><input type="radio" name="repmode" value="week" ${r.mode==="week"?"checked":""} data-act="rep-mode"><span>주간</span></label><label><input type="radio" name="repmode" value="month" ${r.mode==="month"?"checked":""} data-act="rep-mode"><span>월간</span></label></div></div>
     <div class="rep-nav"><button class="icon-btn" data-act="rep-move" data-v="-1" aria-label="이전">${ic("back")}</button><b>${per.label}</b><button class="icon-btn flip" data-act="rep-move" data-v="1" aria-label="다음" ${r.off>=0?"disabled":""}>${ic("back")}</button>${r.off?`<button class="btn btn-ghost sm" data-act="rep-move" data-v="0">이번 ${r.mode==="week"?"주":"달"}</button>`:""}</div>`;
-  if(!kids.length) return head+`<p class="empty">아이 프로필이 있으면 아이마다 리포트가 만들어져요. 우리 가족 탭에서 아이 프로필을 추가해 보세요.</p>`;
-  return head+kids.map(p=>{ const s=repStats(p,per), c=p.color||"#1F2A44", mx=Math.max(1,s.goal,...s.bars.map(b=>b.v));
-    const saved=p[`report_${per.key}`], busy=S.repBusy===p.id;
-    return `<section class="block rep-card" style="--pc:${c}">
-      <div class="block-h"><h2>${av(p,30)} ${esc(p.name)} <small class="muted">${esc(gradeName(p.grade))}</small></h2><span class="muted">${per.label}</span></div>
-      <div class="rep-stats">
-        <div><span>📔 일기 쓴 날</span><b>${s.n}일</b><small>${s.passed}일 중 · 목표 달성 ${s.met}일</small></div>
-        <div><span>✏️ 평균 · 최고 글자</span><b>${s.avg}자 · ${s.max}자</b><small>목표 ${s.goal}자</small></div>
-        <div><span>👩‍🏫 AI 다홍펜 선생님</span><b>고친 곳 ${s.fixes}개</b><small>스스로 ${s.self}개${s.left?` · 남은 곳 ${s.left}개`:""}</small></div>
+  return top+repHero(kids)+`<section class="rp-detail">${ctl}`+kids.map(p=>{ const s=repStats(p,per), c=p.color||"var(--ink)", mx=Math.max(1,s.goal,...s.bars.map(b=>b.v));
+    const saved=p[`report_${per.key}`], busy=S.repBusy===repKey(p,per), pct=s.passed?Math.round(s.n/s.passed*100):0, inHero=heroKeys.includes(per.key);
+    return `<section class="rk" style="--pc:${c}">
+      <div class="rk-hd">${av(p,42)}<div class="rk-nm"><b>${esc(p.name)}</b><small>${esc(gradeName(p.grade))} · ${per.label}</small></div>
+        <div class="rk-ring" style="--v:${pct}" role="img" aria-label="${s.passed}일 중 ${s.n}일 썼어요"><b>${s.n}</b><small>/${s.passed}일</small></div></div>
+      <div class="rk-stats">
+        <div class="rk-st"><i aria-hidden="true">📔</i><span>일기 쓴 날</span><b>${s.n}<em>일</em></b><small>목표 달성 ${s.met}일</small></div>
+        <div class="rk-st"><i aria-hidden="true">✏️</i><span>평균 글자</span><b>${s.avg}<em>자</em></b><small>최고 ${s.max}자 · 목표 ${s.goal}자</small></div>
+        <div class="rk-st"><i aria-hidden="true">👩‍🏫</i><span>고친 맞춤법</span><b>${s.fixes}<em>곳</em></b><small>스스로 ${s.self}곳${s.left?` · 남은 곳 ${s.left}곳`:""}</small></div>
       </div>
-      <div class="rep-two">
-        <div class="rep-box"><h3>📊 ${per.mode==="week"?"날마다":"주별 평균"} 글자 수</h3>
-          <div class="rep-bars" style="--goal:${Math.round(s.goal/mx*100)}%">${s.bars.map(b=>`<div class="rb"><em>${b.v||"–"}</em><i style="height:${Math.round(b.v/mx*100)}%"></i><span>${b.lab}</span></div>`).join("")}</div>
-          <p class="muted" style="font-size:12px;margin:6px 0 0">점선은 목표 ${s.goal}자예요.</p></div>
-        <div class="rep-box"><h3>🖍 자주 고친 맞춤법 TOP 5</h3>
-          ${s.top.length?`<ol class="rep-top">${s.top.map(([k,n])=>`<li>${esc(k)} <small>${n}번</small></li>`).join("")}</ol>`:`<p class="muted" style="margin:0">이 기간에 고친 맞춤법이 없어요.</p>`}</div>
+      <div class="rk-two">
+        <div class="rk-box"><h3>${per.mode==="week"?"날마다":"주별 평균"} 글자 수</h3>
+          <div class="rep-bars" style="--goal:${Math.round(s.goal/mx*100)}%">${s.bars.map(b=>`<div class="rb ${b.v>=s.goal&&b.v?"ok":""}"><em>${b.v||""}</em><i style="height:${Math.round(b.v/mx*100)}%"></i><span>${b.lab}</span></div>`).join("")}</div>
+          <p class="rk-note">점선은 목표 ${s.goal}자예요.</p></div>
+        <div class="rk-box"><h3>자주 고친 맞춤법</h3>
+          ${s.top.length?`<ul class="rk-words">${s.top.map(([k,n])=>{ const [w,rt]=k.split(" → "); return `<li><s>${esc(w)}</s><span aria-hidden="true">→</span><b>${esc(rt)}</b>${n>1?`<em>×${n}</em>`:""}</li>`; }).join("")}</ul>`:`<p class="rk-none">✨ 이 기간에 고친 맞춤법이 없어요.</p>`}</div>
       </div>
-      <div class="rep-ai"><h3>👩‍🏫 AI 선생님 총평</h3>
+      ${inHero?`<p class="rk-ai-note">💌 이 기간의 AI 총평은 맨 위에 있어요.</p>`:`<div class="rep-ai"><h3>👩‍🏫 AI 선생님 총평</h3>
         ${saved?`<p>${esc(saved.summary)}</p>${saved.highlight?`<p>🌟 ${esc(saved.highlight)}</p>`:""}${saved.tip?`<p>💡 ${esc(saved.tip)}</p>`:""}<p class="muted" style="font-size:12px">${new Date(saved.at).toLocaleDateString("ko-KR")}에 만든 총평</p>`
           :`<p class="muted" style="margin:0 0 8px">${s.n?"일기를 읽고 칭찬과 성장 이야기를 담은 총평을 써 줘요.":"이 기간에 쓴 일기가 없어서 총평을 만들 수 없어요."}</p>`}
         ${!s.n||saved?"":(()=>{ const why=repLock(p,per); return why?`<p class="muted" style="margin:0;font-size:13px">${why}</p>`
           :`<button class="btn btn-primary sm" data-act="rep-ai" data-id="${esc(p.id)}" ${busy?"disabled":""}>${busy?"AI 선생님이 읽는 중…":"✨ AI 총평 만들기"}</button><p class="muted" style="margin:6px 0 0;font-size:12px">이 ${per.mode==="week"?"주":"달"}의 총평은 아이마다 한 번 만들 수 있어요.</p>`; })()}
-      </div></section>`; }).join("");
+      </div>`}</section>`; }).join("")+`</section>`;
 }
 /* 🗓 AI 총평 여는 때 (2026-10-07): 주(월~일)는 그 주 일요일부터, 달은 그달 마지막 날부터 열리고 그 뒤로는 아무 때나.
    아이가 그 기간 중간에 일기를 처음 썼으면(예: 금요일 시작) 그 기간은 건너뛰고 다음 기간부터. 기간마다 아이마다 한 번 (워커도 같이 세요) */
@@ -4699,13 +4828,14 @@ function repLock(p,per){
   if(per.end>t) return `🗓 이 ${unit}의 AI 총평은 ${endTxt}부터 열려요. 그 뒤로는 언제든 만들 수 있어요.`;
   return "";
 }
-async function repMakeAI(pid){
-  const p=prof(pid), per=repPeriod(), s=repStats(p,per); if(!p || !s.n || S.repBusy) return;
-  const lock=repLock(p,per); if(lock){ toast(lock.replace(/<[^>]+>/g,"")); return; }
-  S.repBusy=pid; render();
+async function repMakeAI(pid, per=repPeriod(), auto=false){
+  const p=prof(pid), s=p&&repStats(p,per), k=p&&repKey(p,per); if(!p || !s.n || (S.repBusy && !auto)) return;
+  const lock=repLock(p,per); if(lock){ if(!auto) toast(lock.replace(/<[^>]+>/g,"")); return; }
+  const redraw=()=>{ if(!auto || document.querySelector(".rh")) render(); };   // 저절로 만들 때는 리포트가 보일 때만 다시 그려요 (쓰던 일기 보호)
+  S.repBusy=k; if(S.repErr) delete S.repErr[k]; redraw();
   try{
     let data;
-    if(DEMO){ await new Promise(r=>setTimeout(r,800));
+    if(DEMO){ await new Promise(r=>setTimeout(r,1200));
       data={summary:`${p.name}은(는) 이번 기간에 ${s.n}편의 일기를 썼어요. 하루의 일을 차근차근 적는 힘이 자라고 있어요.`, highlight:`${fmtShort(s.list[s.list.length-1].date)} 일기가 특히 생생했어요.`, tip:"다음엔 그날 느낀 마음을 한 문장 더 적어 보자고 격려해 주세요."}; }
     else {
       const r=await aiFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"report",pid:p.id,pkey:per.key,pend:per.end,name:p.name,level:gradeLevel(p.grade),period:`${per.mode==="week"?"한 주":"한 달"} (${per.label})`,
@@ -4717,8 +4847,8 @@ async function repMakeAI(pid){
     }
     const rep={summary:data.summary, highlight:data.highlight||"", tip:data.tip||"", at:Date.now()};
     await B.update(S.gid,"profiles",pid,{[`report_${per.key}`]:rep}); p[`report_${per.key}`]=rep;
-  }catch(e){ console.error(e); toast(e.message||"AI 총평을 만들지 못했어요"); }
-  finally{ S.repBusy=null; render(); }
+  }catch(e){ console.error(e); (S.repErr=S.repErr||{})[k]=1; if(!auto) toast(e.message||"AI 총평을 만들지 못했어요"); }
+  finally{ S.repBusy=null; redraw(); }
 }
 /* ---------- 칭찬 도장 · 하트 ----------
    도장: 부모가 아이 일기에 하나 찍어요 (같은 도장을 다시 누르면 지워져요). 하트: 가족 누구나 (diaries.hearts = {프로필id:true}) */
@@ -5606,9 +5736,10 @@ const acts = {
   "album-shuffle": () => { S.albumSeed=1+Math.floor(Math.random()*1e9); render(); },
   "day-open": el => go(()=>{ S.tab="day"; S.dayView=el.dataset.v; }),
   "day-move": el => { const n=+el.dataset.v, t=todayStr(); S.dayView = n ? (()=>{ const d=addDays(S.dayView||t,n); return d>t?t:d; })() : t; render(); },
+  "rh-tab": el => { S.rhTab=el.dataset.v; render(); },
   "rep-mode": el => { S.rep={mode:el.value, off:0}; render(); },
   "rep-move": el => { const n=+el.dataset.v; S.rep=S.rep||{mode:"week",off:0}; S.rep.off = n ? Math.min(0, S.rep.off+n) : 0; render(); },
-  "rep-ai": el => repMakeAI(el.dataset.id),
+  "rep-ai": el => repMakeAI(el.dataset.id, el.dataset.v ? repLatest(el.dataset.v) : repPeriod()),
   pdf: () => go(()=>{ S.sub={type:"pdf"}; }),
   "pdf-range": el => pdfRange(el.dataset.v),
   heart: el => guard(async()=>{ const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
