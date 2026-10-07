@@ -6366,13 +6366,51 @@ function syncWidget(){ const I=plug("Iinote"); if(!I || S.phase!=="app" || !S.gr
   const names=[...new Set(today.map(d=>prof(d.profileId)?.name).filter(Boolean))], st=streakOf(S.me.id);
   const big = today.length ? `오늘 가족 일기 ${today.length}편` : "오늘 첫 일기를 써 볼까요?";
   const small = [names.length?`${names.slice(0,4).join(" · ")} 썼어요`:"", st?`${S.me.name} 🔥 ${st}일 연속`:""].filter(Boolean).join("  ·  ") || "오늘 있었던 일을 한 줄 남겨 봐요";
-  const k=[S.group.name,big,small].join("|"); if(k===widgetLast) return; widgetLast=k;
-  I.updateWidget({title:`${S.group.name||"우리 가족"} 일기장`, big, small}).catch(()=>{}); }
+  const k=[S.group.name,big,small].join("|"); if(k!==widgetLast){ widgetLast=k; I.updateWidget({title:`${S.group.name||"우리 가족"} 일기장`, big, small}).catch(()=>{}); }
+  syncWidgets(I); }
+
+/* 🧩 큰 위젯 다섯 가지 (2026-10-07): 사진첩 한 장 · ○○이의 이번 주 · 다가오는 일정 · 받아쓰기 한 문제 · 가족의 하트 · 댓글
+   필요한 내용을 JSON 하나로 앱에 보내면(Iinote.updateWidgets) 위젯들이 나눠 그려요. 바뀌었을 때만 보내요 */
+let widgetsLast="";
+const ijosa = (n,a,b) => { const c=String(n||"").slice(-1).charCodeAt(0)-0xAC00; return c>=0&&c<11172&&c%28 ? a : b; };   // 받침 있으면 a
+function widgetData(){
+  const t=todayStr(), ps=sortedProfiles(), mon=addDays(t,-((toDate(t).getDay()+6)%7)), week=[...Array(7)].map((_,i)=>addDays(mon,i));
+  const md=d=>{ const x=toDate(d); return `${x.getMonth()+1}/${x.getDate()}`; };
+  const ago=d=>{ const days=Math.round((toDate(t)-toDate(d))/864e5); return days>=330&&days<=400?"작년 이맘때":days>=28&&days<=33?"한 달 전":days===0?"오늘":days===1?"어제":md(d); };
+  // 사진: 가족 일기 사진 + (불러와 둔) 사진첩, 무작위 12장
+  const ph=[...S.diaries.filter(d=>d.status==="submitted").flatMap(d=>(d.photos||[]).filter(p=>p.url&&!p.blob).map(p=>({url:p.url,cap:`${ago(d.date)} · ${prof(d.profileId)?.name||""}`}))),
+    ...(S.album||[]).filter(a=>a.url).map(a=>({url:a.url,cap:[a.date?ago(a.date):"",a.place||"",prof(a.by||a.profileId)?.name||""].filter(Boolean).join(" · ")}))]
+    .filter(p=>/^https:/.test(p.url)).sort(()=>Math.random()-.5).slice(0,12);
+  const kids=ps.filter(p=>p.type==="child").map(p=>({id:p.id,name:p.name,streak:streakOf(p.id),
+    week:week.map(d=>{ const x=findDiary(p.id,d); return x?.status==="submitted"?(x.stamp?2:1):0; }), today:week.indexOf(t)}));
+  // 일정: 오늘부터 세 개. 어제 일정이 있었으면 "어제 ○○ 어땠어요?"
+  const sch=mySchedules(), up=sch.filter(s=>s.date>=t).sort((a,b)=>a.date.localeCompare(b.date)||bySch(a,b)).slice(0,3)
+    .map(s=>({when:s.date===t?"오늘":s.date===addDays(t,1)?"내일":md(s.date),title:s.title}));
+  const yd=sch.find(s=>s.date===addDays(t,-1));
+  const eventNote = yd ? `어제 ${yd.title}, 어땠어요? 일기로 남겨 봐요` : "일정이 있던 날은 일기 쓸 거리가 많아요!";
+  // 받아쓰기: 아직 익히지 못한 낱말 (보기 순서는 섞어요)
+  const quiz=S.quizWords.filter(w=>(w.correctStreak||0)<3 && w.wrong && w.right && prof(w.profileId)).sort(()=>Math.random()-.5).slice(0,5)
+    .map(w=>{ const sw=Math.random()<.5; return {kid:prof(w.profileId).name, a:sw?w.wrong:w.right, b:sw?w.right:w.wrong}; });
+  // 하트 · 댓글 · 도장: 최근 2주, 내 일기에 가족이 남긴 마음
+  const mine=S.diaries.filter(d=>d.profileId===S.me.id), since=Date.now()-14*864e5, ev=[];
+  const cut=(s,n)=>{ s=String(s||"").replace(/\s+/g," ").trim(); return s.length>n?s.slice(0,n)+"…":s; };
+  for(const d of mine){
+    S.comments.filter(c=>c.diaryId===d.id && !c.deleted && c.profileId!==S.me.id && (c.createdAt||0)>since).forEach(c=>{ const p=prof(c.profileId); if(p) ev.push({at:c.createdAt,who:p.name,color:p.color||"#1F2A44",text:`${md(d.date)} 일기에 댓글 · "${cut(c.text,30)}"`}); });
+    if(d.stamp && (d.stampAt||0)>since){ const p=prof(d.stampBy); if(p) ev.push({at:d.stampAt,who:p.name,color:p.color||"#1F2A44",text:`${md(d.date)} 일기에 도장 '${d.stamp}'`}); }
+    heartsOf(d).filter(id=>id!==S.me.id).forEach(id=>{ const p=prof(id); if(p && d.date>=addDays(t,-14)) ev.push({at:toDate(d.date).getTime(),who:p.name,color:p.color||"#1F2A44",text:`${md(d.date)} 일기에 ♥`}); });
+  }
+  const hearts=ev.sort((a,b)=>b.at-a.at).slice(0,3).map(({who,color,text})=>({who,color,text}));
+  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts};
+}
+function syncWidgets(I){ if(!I?.updateWidgets) return;
+  let data; try{ data=widgetData(); }catch(e){ reportError(e.message,"widgetData"); return; }
+  const k=JSON.stringify({...data,photos:data.photos.length,quiz:data.quiz.map(q=>q.a+q.b).sort().join()}); if(k===widgetsLast) return; widgetsLast=k;   // 무작위 순서만 바뀐 건 다시 안 보내요
+  I.updateWidgets({json:JSON.stringify({at:Date.now(),...data})}).catch(()=>{}); }
 
 // 바로가기 · 위젯 · 알림이 연 주소(iinote://write 같은)를 앱 화면 주소로
 function appPath(url){
   try{ const u=new URL(url);
-    if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase(); return ({write:"/write",chat:"/chat",album:"/album",home:"/"})[k]||"/"; }
+    if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase(); return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz"})[k]||"/"; }   // quiz: 받아쓰기 위젯 (2026-10-07)
     return u.pathname+u.search; }catch(e){ return /^\//.test(String(url||"")) ? String(url) : "/"; } }
 function openAppUrl(url){
   if(url==="help"){ if(S.phase==="app" && S.me) acts["help-open"](); else S.wantHelp=true; return; }   // 운영자 답장 알림
