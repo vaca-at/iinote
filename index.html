@@ -986,6 +986,21 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .w-title{font-family:var(--diary);font-size:26px;font-weight:700;border:0;border-bottom:2px solid var(--ink);border-radius:0;background:transparent;padding:10px 4px;margin-bottom:14px}
 .w-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);min-height:calc(var(--diary-lh) * 10);border:1.5px solid var(--line);border-radius:16px;padding:6px 16px;background-color:var(--surface);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh));background-position:0 6px;background-attachment:local}
 /* 댓글 칸 아래 하트 줄: 좁으면 여러 줄로 (스크롤 막대 없이) */.heart-bar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 2px 4px}.heart-bar .emo{width:34px;height:34px;font-size:18px;border-radius:9px}
+/* 📱 휴대폰 웹에서 일기 쓰기 (2026-10-07): 쓰는 칸이 빨리 보이게 위쪽 줄이기 · 날씨 · 기분 7개를 한 줄에 · 이모지는 옆으로 밀어 한 줄 · 빈 사진 칸 작게 */
+@media (max-width:640px){
+  .w-mode .fav-row, .w-mode .sheet-prefs{display:none!important}
+  .wm-row{gap:6px}
+  .wm-row legend{width:2.3em;font-size:13px}
+  .wm-opts{flex-wrap:nowrap;gap:2px;flex:1;min-width:0;justify-content:space-between}
+  .wm-o{flex:1 1 0;min-width:0;display:flex;justify-content:center}
+  .wm-o span{width:min(40px,100%);height:auto;aspect-ratio:1;font-size:clamp(18px,6vw,24px)}
+  #app .emo-bar{flex-wrap:nowrap;overflow-x:auto;padding:6px 2px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  #app .emo-bar::-webkit-scrollbar{display:none}
+  .thumbs{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}
+  .thumbs .thumb-add{max-width:96px}
+  .day-heart{min-width:32px;min-height:32px}
+  .rx{min-height:30px}
+}
 /* 일기 칸 아래 이모지 줄 */.emo-bar{display:flex;flex-wrap:wrap;gap:4px;padding:8px 2px 4px}.emo{flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-size:21px;line-height:1;padding:0}.emo:hover{border-color:var(--coral);background:var(--coral-soft)}.emo:active{transform:scale(.92)}
 .w-count{text-align:right;font-size:13px;margin-top:4px}
 .w-acts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
@@ -3437,7 +3452,7 @@ function viewShell(){
   if(S.me.type==="child") tabs.push(["quiz","받아쓰기 퀴즈","quiz"]);
   tabs.push(["family","우리 가족 설정","people"],["settings","설정","gear"]);
   const tone=TAB_TONE[S.tab]||TAB_TONE.home;
-  return `${tourBar()}<div class="shell">
+  return `${tourBar()}<div class="shell${S.sub?.type==="write"?" w-mode":""}">
     <div class="frame">
       <header class="mast">
         <button class="home-btn" data-act="tab" data-v="home" ${S.tab==="home"&&!S.sub?'aria-current="page"':""}>${ic("home")}<span>홈</span></button>
