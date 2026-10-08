@@ -2415,6 +2415,14 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+/* 💬 댓글 단추(남기기 · 댓글 달기 · 답글 달기 · 수정 완료)는 가벼운 밤하늘: 연한 라벤더 바탕 + 얇은 오로라 테두리 + 남색 글씨 + 작은 ✦ (2026-10-08) */
+.btn.btn-soft{border:1.5px solid transparent;color:#1F2A44;font-weight:650;
+  background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 88%,#B9A8F0)) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8) border-box;
+  box-shadow:0 2px 6px -3px rgba(91,141,239,.5);transition:transform .12s,box-shadow .12s}
+.btn.btn-soft::before{content:"✦";font-size:.72em;color:#9B7BE8;margin-right:-2px}
+.btn.btn-soft:hover{box-shadow:0 3px 10px -3px rgba(155,123,232,.6)}
+.btn.btn-soft:active{transform:translateY(1px)}
+:root[data-theme="dark"] .btn.btn-soft{color:#EDE6FF}
 /* 안내 띠 안의 두 칸 알약: 띠의 작은 단추 규칙보다 앞서게 (두 줄 단추 너비 · 자리 같게) */
 #app .pen-ask .btn.pill2,.btn.pill2{display:inline-flex;align-items:stretch;flex:none!important;width:auto!important;min-width:84px;height:30px!important;min-height:0!important;padding:0 12px 0 0!important;border-radius:15px!important;font-size:12.5px!important;line-height:1!important;box-shadow:0 2px 0 rgba(91,141,239,.35),0 5px 10px -5px rgba(91,141,239,.7)!important}
 .btn.pill2 > i{width:28px;height:auto;margin-right:8px;border-radius:13px 0 0 13px;font-size:12px}
@@ -5089,7 +5097,7 @@ function dayCard(p,x,mode){
       ${canStamp?`<div class="day-stamps" role="group" aria-label="칭찬 도장 찍기">${STAMPS.map(s=>`<button class="stamp-btn ${x.stamp===s?"on":""}" data-act="stamp" data-id="${x.id}" data-v="${esc(s)}" aria-pressed="${x.stamp===s}">${esc(s)}</button>`).join("")}</div>`:""}
       ${sub?`<div class="day-hearts"><button class="day-heart" data-act="heart" data-id="${x.id}" aria-pressed="${on}" aria-label="하트">${on?"❤️":"🤍"}</button>${hs.length?`<span>${hs.map(esc).join(" · ")}</span>`:""}</div>`:""}
       ${cs.length?`<ul class="day-cmts">${thread(null,0)}</ul>`:""}
-      ${sub?`<form class="day-cform" data-form="comment" data-parent="" data-diary="${x.id}"><label class="sr" for="dc-${x.id}">한마디</label><input id="dc-${x.id}" name="text" maxlength="500" required autocomplete="off" spellcheck="false" placeholder="${esc(p.name)}에게 한마디"><button class="btn btn-primary sm">남기기</button></form>`:""}
+      ${sub?`<form class="day-cform" data-form="comment" data-parent="" data-diary="${x.id}"><label class="sr" for="dc-${x.id}">한마디</label><input id="dc-${x.id}" name="text" maxlength="500" required autocomplete="off" spellcheck="false" placeholder="${esc(p.name)}에게 한마디"><button class="btn btn-soft sm">남기기</button></form>`:""}
       <button class="link-btn" data-act="open-diary" data-id="${x.id}">자세히 보기 · 답글 쓰기 →</button>
     </article>`;
 }
@@ -5278,7 +5286,7 @@ function viewDiaryDetail(){
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
-      <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-primary">댓글 달기</button></div></form>
+      <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-soft">댓글 달기</button></div></form>
     </section></article>`;
 }
 // 🚩 신고 단추: 누르면 챗봇 상담이 '불편한 글 · 댓글' 신고로 열려요 (ref 는 누구의 언제 글인지만, 내용은 안 보내요)
@@ -5293,10 +5301,10 @@ function renderThread(cs,parent,depth){
     return `<li class="cmt">${av(p,32)}<div class="cmt-body">
       <div class="cmt-meta"><strong>${esc(p?.name||"알 수 없음")}</strong><span class="muted">${relTime(c.createdAt)}${c.edited?" (수정됨)":""}</span><time class="cm-when cmt-at">${cmtFull(c.createdAt)}</time></div>
       ${editing
-        ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
+        ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
         : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":repBtn(`${p?.name||"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)}</div>`}
-      ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-primary sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
+      ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
 }
