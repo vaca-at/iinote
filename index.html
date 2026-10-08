@@ -5539,7 +5539,7 @@ function viewFamily(){
    앱 설정(알림 · 잠금) · 화면 설정 · 어디서든 접속하기 · 계정(프로필 바꾸기 · 로그아웃 · 로그인 연결 · 비밀번호 · 계정 지우기) */
 function viewSettings(){
   const g=S.group, groups=(S.userDoc?.groupIds||[]);
-  return `<div class="page-h"><h1>설정</h1></div>
+  return `<div class="page-h"><h1>${IS_APP?"앱 설정":"설정"}</h1></div>
   <div class="fam-grid">
     <div class="col">
       ${IS_APP?appSettings():""}
