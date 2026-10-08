@@ -2521,6 +2521,17 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 .anv-form select{width:auto}
 .dd-chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;white-space:nowrap}
 .dd-chk small{color:var(--ink2);font-size:11.5px;white-space:normal}
+/* 👧 4분할 아이들 현황 */
+.qk-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.qk-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.qk-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.qk-h{display:flex;align-items:center;gap:8px}.qk-h b{font-size:15px}
+.qk-w{display:flex;gap:4px}
+.qk-w i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-style:normal;font-size:10.5px;color:var(--ink2);box-shadow:inset 0 0 0 1.5px var(--line)}
+.qk-w i.on{color:#1F2A44;background:linear-gradient(160deg,#FFE7A3,#F4BE45);box-shadow:none}
+.qk-w i.t{outline:2px solid #2B3670;outline-offset:1px}
+.qk-n{display:flex;flex-direction:column;align-items:center;min-width:56px}
+.qk-n b{font-size:22px;line-height:1}.qk-n small{font-size:11px;color:var(--ink2)}.qk-n span{font-size:12px;margin-top:3px;white-space:nowrap}
 #app .tip-ask p{white-space:normal;overflow:visible;line-height:1.45}   /* 오늘의 기능은 긴 한 줄이라 줄 바꿈 허락 */
 /* 👆 손가락으로 누르기 쉽게 (2026-10-08 앱 점검): 작은 닫기 · ✕ · 약관 링크의 누르는 자리를 넓혀요 (보이는 크기는 그대로) */
 #app :is(.pen-ask-x,.news-h .link-btn,.more-head .link-btn){position:relative;min-width:32px;min-height:32px;display:inline-grid;place-items:center}
@@ -3949,7 +3960,7 @@ function viewPicker(){
 }
 
 // 폴더 탭 색: [바탕색, 선 색]
-const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],album:["var(--sage-soft)","var(--sage)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"],settings:["var(--lilac-soft)","var(--lilac)"]};
+const TAB_TONE = {cal:["var(--sky-soft)","var(--sky)"],chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],album:["var(--sage-soft)","var(--sage)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"],settings:["var(--lilac-soft)","var(--lilac)"]};
 // 일기 글씨 4가지
 // 글씨 네 가지 (2026-10-08): ① 언즈체 · ② 윤탱체 (화면 대부분 손글씨) / ③ 고딕 · ④ 동글 (또박또박 간결). 예전 '바탕체'를 고른 기기는 언즈체로
 const DFONTS = [["unz","언즈체","'OngleipUnz',cursive"],["pen","윤탱체","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
@@ -4013,7 +4024,7 @@ function kidBar(){
   if(!pp) return "";
   return `<div class="kid-bar kid-now"><b>${esc(S.me.name)}${hasBatchim(S.me.name)?"이가":"가"} 쓰는 중</b><button class="kq back" data-act="back-parent">${av(pp,26)}<span>${esc(pp.name)}${ro(pp.name)} 돌아가기</span></button></div>`;
 }
-const NAV_SHORT = {chat:"채팅", kids:"현황", day:"하루", album:"사진", report:"리포트", quiz:"퀴즈", family:"가족", settings:"설정"};   // 휴대폰 아래 메뉴 이름
+const NAV_SHORT = {chat:"채팅", kids:"현황", cal:"달력", day:"하루", album:"사진", report:"리포트", quiz:"퀴즈", family:"가족", settings:"설정"};   // 휴대폰 아래 메뉴 이름
 const tourAsk = () => `<div class="tour-ask" role="dialog" aria-modal="true" aria-labelledby="ta-h"><div class="tour-ask-box"><h2 id="ta-h">👀 둘러보기</h2><p>지금 <b>${esc(S.me?.name||"내")}</b> 계정으로 로그인되어 있어요.<br>로그아웃하고 예시 가족 둘러보기 화면으로 갈까요?</p><p class="muted">내 일기장의 기록은 그대로 있어요. 둘러보기를 마치고 다시 로그인하면 돼요.</p><div class="row"><button class="btn btn-primary" data-act="tour-logout">로그아웃하고 둘러보기</button><button class="btn btn-ghost" data-act="tour-no">아니요, 내 일기장으로</button></div></div></div>`;
 const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? `<div class="tour-bar" role="note">👀 <b>데모 버전 둘러보기 중</b><span>예시 가족 일기장이에요. 마음껏 눌러 보세요 (이 기기에만 저장돼요)</span><button class="btn btn-primary sm" data-act="tour-exit">진짜로 시작하기</button></div>` : "");
 /* ---------- 📱 앱 화면 뼈대 (2026-10-05, 앱에서만 · 웹은 아래 viewShell 그대로) ----------
@@ -4205,7 +4216,7 @@ function viewShell(){
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
   const tabs=[["home","홈","home"],["mine","내 일기","pen"],["chat","가족 채팅","talk"]];
-  if(isParent()) tabs.push(["kids","아이들 현황","spark"]);
+  tabs.push(["cal","달력","lay-calendar"]);   // (2026-10-09) 아이들 현황 자리에 달력, 아이들 현황은 4분할 홈 칸으로
   tabs.push(["day","하루 펼쳐보기","cal"],["shelf","책장","book"],["album","사진첩","image"]);
   if(isParent()) tabs.push(["report","AI 리포트","chart"]);
   if(S.me.type==="child") tabs.push(["quiz","받아쓰기 퀴즈","quiz"]);
@@ -4246,7 +4257,7 @@ function viewMain(){
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
   if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+greenBanners()+ddayRow()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
-  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow}[S.tab]||viewHome)();
+  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,cal:viewHomeCalendar,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -4412,7 +4423,7 @@ function viewHomeCalendar(){
 /* ---------- 첫 화면: 4분할형 (컴퓨터 · 아이패드 가로는 한 화면에 네 칸, 휴대폰은 세로로 한 칸씩) ----------
    1 달력 미니(칸 꽉 차게) · 2 일기 히스토리 · 3 성장 기록(아이마다 위아래로) · 4 앨범(가족 사진 정사각형 격자, 최신순) — 2026-10-03 */
 function viewHomeQuad(){
-  return `<div class="quad">${quadCal()}${quadNews()}${quadGrowth()}${quadAlbum()}</div>`;
+  return `<div class="quad">${quadCal()}${isParent()?quadKids():quadNews()}${quadGrowth()}${quadAlbum()}</div>`;   // (2026-10-09) 보호자는 2칸에 아이들 현황
 }
 // 1. 달력 미니: 한 달 칸에 가족 색 점(그날 쓴 사람) · 일정 점. 날짜를 누르면 그날 하루 펼쳐보기
 function quadCal(){
@@ -4429,6 +4440,19 @@ function quadCal(){
     <div class="qc-legend">${ps.map(x=>`<span><i style="background:${pdot(x)}"></i>${esc(x.name)}</span>`).join("")}<span><i class="sc"></i>일정</span></div></section>`;
 }
 // 2. 일기 히스토리: 가족의 새 일기와 나에게 온 댓글 · 답글 (최신순)
+// 👧 4분할 2칸: 아이들 현황 (2026-10-09, 웹 메뉴의 아이들 현황 자리는 달력으로). 아이마다 오늘 · 이번 주 · 이번 달 · 연속
+function quadKids(){
+  const t=todayStr(), month=t.slice(0,7), mon0=addDays(t,-((toDate(t).getDay()+6)%7)), week=[...Array(7)].map((_,i)=>addDays(mon0,i));
+  const kids=sortedProfiles().filter(p=>p.type==="child");
+  const rows=kids.map(p=>{ const td=findDiary(p.id,t), st=td?.status==="submitted"?["done","오늘 썼어요"]:td?["draft","쓰는 중"]:["none","아직이에요"];
+    const n=S.diaries.filter(d=>d.profileId===p.id && d.status==="submitted" && d.date.startsWith(month)).length;
+    const dots=week.map((d,i)=>{ const x=findDiary(p.id,d), on=x?.status==="submitted"; return `<i class="${on?"on":""} ${d===t?"t":""}">${"월화수목금토일"[i]}</i>`; }).join("");
+    return `<li class="qk-row"><button class="av-btn" data-act="prof-open" data-v="${esc(p.id)}" aria-label="${esc(p.name)} 프로필">${av(p,36)}</button>
+      <div class="qk-m"><div class="qk-h"><b>${esc(p.name)}</b><span class="pill ${st[0]}">${st[1]}</span></div><div class="qk-w">${dots}</div></div>
+      <div class="qk-n"><b>${n}</b><small>이번 달</small><span>${charHTML(p)} ${streakOf(p.id)}일</span></div></li>`; }).join("");
+  return `<section class="block q-cell" aria-labelledby="h-qk"><div class="block-h"><h2 id="h-qk">아이들 현황</h2><button class="link-btn" data-act="tab" data-v="kids">자세히 ›</button></div>
+    <div class="q-body">${rows?`<ul class="qk-list">${rows}</ul>`:`<p class="empty">우리 가족 설정에서 아이 프로필을 추가하면 여기에 아이들 일기 현황이 보여요.</p>`}</div></section>`;
+}
 function quadNews(){
   const vis=new Map(visibleDiaries().map(d=>[d.id,d]));
   const items=[];
@@ -6335,7 +6359,7 @@ document.addEventListener("input", e=>{ const f=e.target.closest?.('form[data-fo
 /* ---------- 주소와 뒤로 가기 ----------
    / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /album 사진첩 · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
    화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
-const ROUTE_TABS = ["mine","chat","kids","day","shelf","album","report","quiz","family","settings","grow"];
+const ROUTE_TABS = ["mine","chat","kids","cal","day","shelf","album","report","quiz","family","settings","grow"];
 function urlOf(){
   let u = ROUTE_TABS.includes(S.tab) ? "/"+S.tab : "/";
   if(S.sub?.type==="diary") return u+"?d="+encodeURIComponent(S.sub.id);
