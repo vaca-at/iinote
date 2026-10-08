@@ -2501,6 +2501,17 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
   .chat-side-open:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
   .body-row.side-closed{grid-template-columns:minmax(0,1fr) 50px}
 }
+/* ⏳ 디데이 줄 · 일정 표시 */
+.dd-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 0 10px;padding:2px}
+.dd-row::-webkit-scrollbar{display:none}
+.dd-chip{flex:none;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 6px;border-radius:18px;border:0;cursor:pointer;font:inherit;color:#fff;background:var(--nightbase);box-shadow:0 0 0 1.5px rgba(201,182,255,.5),0 6px 14px -8px rgba(31,42,68,.7)}
+.dd-chip b{display:inline-grid;place-items:center;min-width:52px;height:26px;padding:0 8px;border-radius:13px;font-size:13px;color:#1F2A44;background:linear-gradient(160deg,#E9E4FF,#C9B6FF)}
+.dd-chip.soon b{background:linear-gradient(160deg,#FFE7A3,#F4BE45)}
+.dd-chip.today b{background:linear-gradient(160deg,#FFB59E,#EF6F53);color:#fff}
+.dd-chip span{font-size:14px;white-space:nowrap;max-width:14em;overflow:hidden;text-overflow:ellipsis}
+.dd-tag{flex:none;font-size:11.5px;padding:1px 8px;border-radius:10px;background:#2B3670;color:#FFE7A3;margin-left:4px}
+.dd-chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;white-space:nowrap}
+.dd-chk small{color:var(--ink2);font-size:11.5px;white-space:normal}
 #app .tip-ask p{white-space:normal;overflow:visible;line-height:1.45}   /* 오늘의 기능은 긴 한 줄이라 줄 바꿈 허락 */
 /* 👆 손가락으로 누르기 쉽게 (2026-10-08 앱 점검): 작은 닫기 · ✕ · 약관 링크의 누르는 자리를 넓혀요 (보이는 크기는 그대로) */
 #app :is(.pen-ask-x,.news-h .link-btn,.more-head .link-btn){position:relative;min-width:32px;min-height:32px;display:inline-grid;place-items:center}
@@ -3065,9 +3076,10 @@ function seedDemo(){
     c4:{diaryId:"d3",parentId:null,profileId:"mom",text:"강아지 이름을 지어 본다면 뭐라고 할래?",createdAt:now-40*H}
   };
   s.schedules = {
-    s1:{date:addDays(t,2),time:"09:00",title:"하랑 운동회",scope:"family",profileId:"mom",createdAt:now},
+    s1:{date:addDays(t,2),time:"09:00",title:"하랑 운동회",scope:"family",profileId:"mom",createdAt:now,dday:true},
     s2:{date:addDays(t,5),time:"",title:"할머니 댁 방문",scope:"family",profileId:"dad",createdAt:now},
-    s3:{date:addDays(t,1),time:"16:00",title:"학부모 상담",scope:"personal",profileId:"mom",createdAt:now}
+    s3:{date:addDays(t,1),time:"16:00",title:"학부모 상담",scope:"personal",profileId:"mom",createdAt:now},
+    s4:{date:addDays(t,24),time:"",title:"제주 가족 여행",scope:"family",profileId:"mom",createdAt:now,dday:true}
   };
   // 예시 사진첩: 지난해 여름 제주 · 운동회 · 공원 · 김치찌개
   const alb=(k,date,people,place,by,i)=>({url:DEMO_IMG[k].url,path:"",thumb:"",thumbPath:"",w:DEMO_IMG[k].w,h:DEMO_IMG[k].h,date,people,place,by,createdAt:now-i*1000});
@@ -4073,7 +4085,7 @@ function viewGrow(){
 function viewHomePages(){
   const k=hpage();
   const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="report" ? viewReport() : k==="quiz" ? viewQuizHome() : k==="fav" ? viewFavPage() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+greenBanners():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
+  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+greenBanners()+ddayRow():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -4224,7 +4236,7 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+greenBanners()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+greenBanners()+ddayRow()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow}[S.tab]||viewHome)();
 }
 
@@ -4353,12 +4365,7 @@ function viewHomeCalendar(){
   const first=`${month}-01`, lead=toDate(first).getDay(), days=new Date(yy,mm,0).getDate();
   const dates=[...Array(days)].map((_,i)=>`${month}-${pad(i+1)}`);
   const hd=homeDay(), isT=hd===t;
-  const today = ps.map(p=>{ const d=findDiary(p.id,hd); const st=d?(d.status==="submitted"?["done","썼어요"]:["draft","쓰는 중"]):["none","아직이에요"];
-    const open = d && (d.status==="submitted" || p.id===S.me.id);
-    // 카드 모양 A '얼굴 고리' (2026-10-08): 왼쪽 색 띠 없이 얼굴 둘레 고리로 상태 (초록 = 썼어요 · 반쪽 = 쓰는 중 · 점선 = 아직)
-    return `<div class="ct-card ct-${st[0]}" style="--pc:${p.color||"var(--ink)"}"><div class="ct-top"><span class="ct-ring">${av(p,44)}</span><b>${esc(p.name)}</b><span class="ct-st">${st[0]==="done"?"✓ ":""}${st[1]}</span></div>
-      <div class="ct-body"><span class="ct-title">${d?esc((d.text||"").slice(0,30)||"쓴 일기"):`<span class="muted">${isT?"오늘 일기를 기다려요":"이날 쓴 일기가 없어요"}</span>`}</span>
-      ${open?(d.status==="submitted"?`<button class="btn btn-ghost sm" data-act="open-diary" data-id="${d.id}">읽기</button>`:`<button class="btn btn-ghost sm" data-act="write" data-date="${hd}">이어 쓰기</button>`):""}</div></div>`; }).join("");
+  // (2026-10-09) 달력 모양에서는 "오늘 ○/○명 썼어요" 카드를 빼고 바로 달력부터 (날짜마다 가족 점 · 아래 그날 일기로 충분)
   const legend = calStats(ps,dates);
   const sch = mySchedules();
   const cells = dates.map(d=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], list=sch.filter(s=>s.date===d).sort(bySch);
@@ -4369,8 +4376,6 @@ function viewHomeCalendar(){
       <span class="cal-sc">${list.slice(0,2).map(s=>`<em>${s.time?esc(s.time)+" ":""}${esc(s.title)}</em>`).join("")}${list.length>2?`<em class="more">+${list.length-2}</em>`:""}</span>
       <span class="cal-dots">${d<=t?ps.map(p=>`<i class="${submittedOn(p.id,d)?"on":""}" style="--c:${pdot(p)}"></i>`).join(""):""}</span></button>`; }).join("");
   return `${heroDate()}
-  <section class="block" aria-labelledby="h-ct"><div class="block-h"><h2 id="h-ct">${isT?"오늘":fmtShort(hd)}</h2><span class="muted">${ps.filter(p=>submittedOn(p.id,hd)).length}/${ps.length}명 썼어요</span></div>
-    <div class="ct-grid" style="--n:${Math.min(ps.length,5)}">${today}</div></section>
   <section class="block cal" aria-labelledby="h-cal">
     <div class="cal-h"><button class="icon-btn" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("back")}</button>
       <h2 id="h-cal">${yy}년 ${mm}월</h2><button class="icon-btn flip" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("back")}</button>
@@ -4500,6 +4505,15 @@ function parseSchedule(s){
     if(h<24 && mi<60) return {time:`${pad(h)}:${pad(mi)}`, title:m[5].trim()}; }
   return {time:"", title:s};
 }
+/* ⏳ 디데이 (2026-10-09): 일정에 디데이 표시(schedules.dday) → 홈 위 디데이 줄(ddayRow) · 일정 목록 D-n 표 · 디데이 위젯(widgetData.ddays) */
+const ddDays = d => Math.round((toDate(d)-toDate(todayStr()))/864e5);
+const ddLabel = d => { const n=ddDays(d); return n>0?`D-${n}`:n===0?"D-DAY":`D+${-n}`; };
+const ddayList = () => mySchedules().filter(s=>s.dday && s.date>=todayStr()).sort((a,b)=>a.date.localeCompare(b.date)||bySch(a,b));
+function ddayRow(){
+  const l=ddayList(); if(!l.length) return "";
+  return `<div class="dd-row" role="list" aria-label="디데이">${l.slice(0,6).map(s=>{ const n=ddDays(s.date);
+    return `<button class="dd-chip ${n===0?"today":n<=7?"soon":""}" role="listitem" data-act="dd-open" data-v="${s.date}" title="${esc(fmtLong(s.date))}"><b>${ddLabel(s.date)}</b><span>${esc(s.title)}</span></button>`; }).join("")}</div>`;
+}
 // 하루 일정 목록 (list 는 bySch 로 정렬된 것). 아래 '순서 · 고치기'를 누르면 그날(S.schEdit) 일정마다 ▲▼ · 고치기 · 지우기
 function schList(d,list){
   const edit=S.schEdit===d;
@@ -4507,8 +4521,9 @@ function schList(d,list){
     if(edit && own && S.schEditId===s.id) return `<li class="sc-item sc-editing"><form class="sch-line" data-form="sch-edit" data-id="${s.id}">
       <label class="sr" for="sce-${s.id}">일정 고치기</label><input id="sce-${s.id}" name="title" required maxlength="40" value="${esc((s.time?s.time+" ":"")+s.title)}" autocomplete="off">
       <div class="seg sch-scope" role="radiogroup" aria-label="누가 볼 일정인가요"><label><input type="radio" name="scope" value="family" ${s.scope==="family"?"checked":""}><span>가족</span></label><label><input type="radio" name="scope" value="personal" ${s.scope==="family"?"":"checked"}><span>나만</span></label></div>
+      <label class="dd-chk"><input type="checkbox" name="dday" value="1" ${s.dday?"checked":""}><span>⏳ 디데이</span></label>
       <button class="btn btn-primary sm">저장</button><button type="button" class="btn btn-ghost sm" data-act="sch-edit" data-id="">취소</button></form></li>`;
-    return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span><span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${edit?`<span class="sc-move"><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="-1" ${i?"":"disabled"} aria-label="${esc(s.title)} 위로">▲</button><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="1" ${i<list.length-1?"":"disabled"} aria-label="${esc(s.title)} 아래로">▼</button></span>${own?`<button class="icon-btn" data-act="sch-edit" data-id="${s.id}" aria-label="${esc(s.title)} 일정 고치기">${ic("pen")}</button>`:""}`:""}${own?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; };
+    return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span>${s.dday?`<span class="dd-tag">${ddLabel(s.date)}</span>`:""}<span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${edit?`<span class="sc-move"><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="-1" ${i?"":"disabled"} aria-label="${esc(s.title)} 위로">▲</button><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="1" ${i<list.length-1?"":"disabled"} aria-label="${esc(s.title)} 아래로">▼</button></span>${own?`<button class="icon-btn" data-act="sch-edit" data-id="${s.id}" aria-label="${esc(s.title)} 일정 고치기">${ic("pen")}</button>`:""}`:""}${own?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; };
   return `<ul class="sc-list">${list.map(item).join("")}</ul>
     <div class="sc-tools"><button class="link-btn" data-act="sch-edit-mode" data-v="${d}" aria-expanded="${edit}">${edit?"✓ 다 했어요":"↕ 순서 · 고치기"}</button></div>`;
 }
@@ -4522,6 +4537,7 @@ function viewCalSchedule(d){
       <input type="hidden" name="date" value="${d}">
       <label class="sr" for="sch-${d}">일정</label><input id="sch-${d}" name="title" required maxlength="40" placeholder="예: 14시 태권도" autocomplete="off">
       <div class="seg sch-scope" role="radiogroup" aria-label="누가 볼 일정인가요"><label><input type="radio" name="scope" value="family" checked><span>가족</span></label><label><input type="radio" name="scope" value="personal"><span>나만</span></label></div>
+      <label class="dd-chk" title="이 날까지 남은 날을 홈 · 위젯에 D-12 처럼 보여 줘요"><input type="checkbox" name="dday" value="1"><span>⏳ 디데이</span></label>
       <button class="btn btn-primary sm">${ic("plus")}추가</button>
     </form>
   </div>`;
@@ -4554,6 +4570,7 @@ function viewSchedules(){
         <fieldset class="seg span2"><legend>누구와 볼 일정인가요?</legend>
           <label><input type="radio" name="scope" value="family" checked><span>가족 모두</span></label>
           <label><input type="radio" name="scope" value="personal"><span>나만 보기</span></label></fieldset>
+        <label class="dd-chk span2"><input type="checkbox" name="dday" value="1"><span>⏳ 디데이로 세기 <small>홈 · 위젯에 D-12 처럼 남은 날을 보여 줘요</small></span></label>
         <button class="btn btn-primary span2">일정 추가</button>
       </form></details></section>`;
 }
@@ -7054,10 +7071,10 @@ const forms = {
   schedule: (fd,f) => guard(async()=>{ const p=parseSchedule(fd.title); if(fd.time) p.time=fd.time;
     // 저장이 조금 걸릴 때도 바로 알 수 있게: 단추를 잠그고 "저장 중…" → "저장되었어요!"
     const btn=f?.querySelector("button"); if(btn){ btn.disabled=true; btn.dataset.label=btn.innerHTML; btn.textContent="저장 중…"; } toast("💾 일정을 저장하는 중…");
-    await B.add(S.gid,"schedules",{date:fd.date,time:p.time,title:p.title,scope:fd.scope||"family",profileId:S.me.id,createdAt:Date.now()}); await reload("schedules"); render(); toast(`✅ 저장되었어요! ${p.time?p.time+" ":""}${p.title}`); }).finally(()=>{ const b=f?.querySelector("button"); if(b?.dataset.label){ b.disabled=false; b.innerHTML=b.dataset.label; } }),
+    await B.add(S.gid,"schedules",{date:fd.date,time:p.time,title:p.title,scope:fd.scope||"family",profileId:S.me.id,createdAt:Date.now(),...(fd.dday?{dday:true}:{})}); await reload("schedules"); render(); toast(`✅ 저장되었어요! ${p.time?p.time+" ":""}${p.title}`); }).finally(()=>{ const b=f?.querySelector("button"); if(b?.dataset.label){ b.disabled=false; b.innerHTML=b.dataset.label; } }),
   "sch-edit": (fd,f) => guard(async()=>{ const s=S.schedules.find(x=>x.id===f.dataset.id); if(!s) return;
     const p=parseSchedule(fd.title); if(!p.title){ toast("할 일을 적어 주세요"); return; }
-    await B.update(S.gid,"schedules",s.id,{time:p.time,title:p.title,scope:fd.scope||s.scope}); S.schEditId=null; await reload("schedules"); render(); toast("일정을 고쳤어요"); }),
+    await B.update(S.gid,"schedules",s.id,{time:p.time,title:p.title,scope:fd.scope||s.scope,dday:!!fd.dday}); S.schEditId=null; await reload("schedules"); render(); toast("일정을 고쳤어요"); }),
   link: fd => guard(async()=>{ let u=fd.url.trim(); if(!/^https?:\/\//i.test(u)) u="https://"+u; try{ new URL(u); }catch(e){ toast("주소를 다시 확인해 주세요"); return; }
     await B.add(S.gid,"links",{title:fd.title.trim(),url:u,createdBy:S.me.id,createdAt:Date.now()}); await reload("links"); render(); toast("즐겨찾기를 추가했어요"); }),
   comment: (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
@@ -7503,6 +7520,7 @@ Object.assign(acts,{
 // 💡 오늘의 기능 띠 단추
 Object.assign(acts,{
   "tip-x": () => { ls.set(tipKey(),"1"); render(); },
+  "dd-open": el => { const d=el.dataset.v, l=ddayList().filter(x=>x.date===d), n=ddDays(d); toast(`⏳ ${fmtLong(d)} · ${l.map(x=>x.title).join(" · ")} · ${n>0?n+"일 남았어요":"오늘이에요!"}`); },
   "tip-go": el => { const t=TIPS[+el.dataset.v]; if(!t) return; ls.set(tipKey(),"1"); const to=t[2];
     if(to==="prof"){ S.prof=S.me.id; S.profEdit=canEditProf(S.me); render(); return; }
     if(to==="tt"){ if(IS_APP) go(()=>{ S.tab="home"; S.sub=null; S.hpage="fav"; S.favTab="tt"; }); else { S.ttOpen=true; render(); } return; }
@@ -7703,7 +7721,8 @@ function widgetData(){
       rows:(g?.rows||[]).map(r=>({t:r.t||"", c:TT_DAYS.slice(0,g.days||5).map((_,i)=>{ const v=(r.c?.[i]||"").trim(); return v?[v,ttTone(v)]:[]; })}))}; });
   // 💬 4×2 가족 채팅 위젯 (2026-10-09): 최근 두 줄 · 안 읽은 수
   const chat={unread:chatUnread(), msgs:S.chats.filter(m=>!m.deleted).slice(-2).map(m=>{ const p=prof(m.profileId); return {who:p?.name||"가족", me:m.profileId===S.me.id, color:pcol(p), text:cut(m.text||(m.photo?"📷 사진":""),40)}; })};
-  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts, cal, tt, chat};
+  const ddays=ddayList().slice(0,5).map(x=>({title:x.title,date:x.date,d:ddDays(x.date),from:x.createdAt?new Date(x.createdAt).toISOString().slice(0,10):"",label:fmtShort(x.date)}));
+  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts, cal, tt, chat, ddays};
 }
 function syncWidgets(I){ if(!I?.updateWidgets) return;
   let data; try{ data=widgetData(); }catch(e){ reportError(e.message,"widgetData"); return; }
