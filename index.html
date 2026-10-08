@@ -2397,7 +2397,7 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
    ① 동그란 얼굴(.av) = 말랑 점토  ② 일반 단추(.btn-primary · .btn-accent) = 밤하늘 남색 + 흐르는 오로라 테두리 + 금빛 ✦ (밤에 쓰는 일기장, 시안 5번)  ③ 켜기 · 고르기 · 설정 단추(.pill2) = 두 칸 알약 */
 /* 🌌 얼굴 동그라미 = 10번 '일식 코로나' + B 별빛 파스텔 (2026-10-08): 남색 밤하늘 원 + 자기 색 빛무리 + 한쪽 반짝 */
 .av.corona{position:relative;background:radial-gradient(circle at 40% 34%,#2B3570,#10153A 80%)!important;color:#fff!important;
-  box-shadow:0 0 0 max(1.5px,.05em) var(--c),0 0 .5em .05em color-mix(in srgb,var(--c) 70%,transparent),0 3px 8px -3px rgba(16,21,58,.55);text-shadow:0 0 .35em color-mix(in srgb,var(--c) 90%,transparent)}
+  box-shadow:0 0 0 max(1.5px,.05em) var(--c),0 0 .5em .05em color-mix(in srgb,var(--c) 70%,transparent),0 3px 8px -3px rgba(16,21,58,.55);text-shadow:0 0 .14em color-mix(in srgb,var(--c) 55%,transparent)}
 .av.corona::after{content:"";position:absolute;right:2%;top:6%;width:24%;height:24%;border-radius:50%;background:radial-gradient(circle,#fff 0 18%,rgba(255,255,255,.75) 28%,transparent 62%);pointer-events:none}
 .av.corona.has-ph{background:none!important}
 .av.corona.has-ph::after{display:none}
@@ -2419,6 +2419,12 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+/* 🌙 가족 · 나만 고르기 = 밤 스위치 (2026-10-08 시안 2번): 한 판 안에서 별 박힌 남색 손잡이 */
+.seg:has(input[name="scope"]){width:fit-content;max-width:100%;justify-self:start;display:inline-flex!important;flex-wrap:nowrap;gap:0!important;padding:4px;border:0;border-radius:24px;background:color-mix(in srgb,#C9B6FF 22%,var(--surface));box-shadow:inset 0 1px 3px rgba(46,36,51,.14)}
+fieldset.seg:has(input[name="scope"]){margin-top:1.6em;position:relative}
+fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2px;font-size:13px;color:var(--ink2);white-space:nowrap}
+.seg:has(input[name="scope"]) span{min-height:36px!important;padding:0 18px!important;border:0!important;border-radius:18px!important;background:transparent!important;color:var(--ink2)!important;transition:background .15s,color .15s}
+.seg:has(input[name="scope"]) input:checked+span{color:#fff!important;background:radial-gradient(circle at 18% 30%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 82% 70%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 60% 22%,#fff 0 .8px,transparent 1.3px),linear-gradient(160deg,#33447A,#1F2A44)!important;box-shadow:0 3px 8px -3px rgba(31,42,68,.7)}
 /* ✍️ 한마디 칸 글씨 통일 (2026-10-08): 채팅 '가족에게 한마디'도 일기 카드의 '○○에게 한마디'와 같은 글씨 · 크기 · 두께 · 색 */
 :is(.day-cform input,.chat-in textarea,#app .chat-side .chat-in textarea){font-family:var(--diary);font-size:calc(var(--diary-size) * .8);font-weight:400;color:var(--ink)}
 :is(.day-cform input,.chat-in textarea)::placeholder{font-family:var(--diary);font-size:calc(var(--diary-size) * .8);font-weight:400;color:var(--ink3);opacity:1}
