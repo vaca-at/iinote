@@ -2415,6 +2415,9 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+/* ✍️ 한마디 칸 글씨 통일 (2026-10-08): 채팅 '가족에게 한마디'도 일기 카드의 '○○에게 한마디'와 같은 글씨 · 크기 · 두께 · 색 */
+:is(.day-cform input,.chat-in textarea,#app .chat-side .chat-in textarea){font-family:var(--diary);font-size:calc(var(--diary-size) * .8);font-weight:400;color:var(--ink)}
+:is(.day-cform input,.chat-in textarea)::placeholder{font-family:var(--diary);font-size:calc(var(--diary-size) * .8);font-weight:400;color:var(--ink3);opacity:1}
 /* 💬 댓글 단추(남기기 · 댓글 달기 · 답글 달기 · 수정 완료)는 가벼운 밤하늘: 연한 라벤더 바탕 + 얇은 오로라 테두리 + 남색 글씨 + 작은 ✦ (2026-10-08) */
 .btn.btn-soft{border:1.5px solid transparent;color:#1F2A44;font-weight:650;
   background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 88%,#B9A8F0)) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8) border-box;
@@ -3377,7 +3380,7 @@ const chatReplyBar = () => { const r=S.chatReply; if(!r) return ""; const p=prof
 const chatForm = () => `${chatReplyBar()}<form class="chat-in" data-form="chat">
       ${allow("photos") && S.me?.type==="parent"?`<label class="chat-ph" title="사진 보내기">${ic("image")}<span class="sr">사진 보내기</span><input type="file" class="chat-photo" accept="image/*"></label>`:""}
       <label class="chat-ta-l"><span class="sr">메시지</span><textarea class="chat-ta" name="text" rows="1" maxlength="1000" placeholder="가족에게 한마디" enterkeyhint="send">${esc(S.chatDraft||"")}</textarea></label>
-      <button class="btn btn-primary chat-send" ${S.chatBusy?"disabled":""}>${S.chatBusy?"보내는 중…":"보내기"}</button>
+      <button class="btn btn-soft chat-send" ${S.chatBusy?"disabled":""}>${S.chatBusy?"보내는 중…":"보내기"}</button>
     </form>`;
 async function cleanOldChats(){
   if(!isParent() || S.chatCleaned===S.gid) return; S.chatCleaned=S.gid;
