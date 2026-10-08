@@ -1956,10 +1956,10 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .tt-zoom .ic{width:14px;height:14px}
 /* 칸 시간표 */
 .tt-wrap{overflow-x:auto;margin:0 -4px;padding:0 4px 4px}
-.tt-grid{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed;min-width:calc(46px + var(--cols) * 52px)}
+.tt-grid{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed;min-width:calc(38px + var(--cols) * 44px)}
 .tt-grid th{font-size:12.5px;font-weight:700;color:var(--ink2);padding:4px 2px;text-align:center}
 .tt-grid thead th{padding:6px 2px;border-radius:10px}
-.tt-grid thead th:first-child{width:46px}
+.tt-grid thead th:first-child{width:38px}
 .tt-grid thead th.today{background:var(--k);color:var(--surface)}
 .tt-grid thead th small{display:block;font-size:9.5px;font-weight:600;opacity:.9}
 .tt-grid tbody th{font-size:11.5px;color:var(--ink3);font-weight:600}
@@ -1980,6 +1980,46 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .tt-ed-bar button{padding:5px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);font:inherit;font-size:12.5px;cursor:pointer}
 .tt-ed-bar button.on{border-color:var(--k);background:var(--ks);font-weight:700}
 .tt-ed-bar small{margin-left:auto;color:var(--ink3)}
+/* 시간표는 지금 화면 글씨체 그대로 */
+.tt-card,.tt-card :is(button,input,table,th,td){font-family:inherit}
+.tt-styles{display:flex;gap:5px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;scrollbar-width:none}
+.tt-styles::-webkit-scrollbar{display:none}
+.tt-styles button{flex:none;display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink2);font-size:12.5px;cursor:pointer}
+.tt-styles button.on{border-color:var(--k);background:var(--ks);color:var(--ink);font-weight:700}
+/* 📓 공책: 줄 공책 · 빨간 여백선 · 오늘 요일은 형광펜 */
+.tt-s-note{background:var(--surface);border-radius:14px;padding:6px 4px 8px 16px!important;margin:0!important;position:relative;background-image:linear-gradient(transparent calc(100% - 1px),color-mix(in srgb,var(--sky) 35%,transparent) 0);background-size:100% 46px;background-position:0 30px}
+.tt-s-note::before{content:"";position:absolute;top:0;bottom:0;left:9px;border-left:1.5px solid color-mix(in srgb,var(--coral) 55%,transparent)}
+.tt-s-note .tt-grid{border-spacing:0}
+.tt-s-note .tt-grid td{background:none;border-radius:0;height:46px}
+.tt-s-note .tt-grid td.today{background:color-mix(in srgb,var(--butter) 28%,transparent);box-shadow:none}
+.tt-s-note .tt-grid thead th.today{background:none;color:var(--coral-ink);text-decoration:underline wavy color-mix(in srgb,var(--coral) 60%,transparent);text-underline-offset:4px}
+.tt-s-note .tt-sub{background:none!important;color:var(--ink)!important;font-weight:600;font-size:14px}
+/* 🟩 칠판: 초록 칠판 · 분필 글씨 · 오늘 요일은 노란 분필 밑줄 */
+.tt-s-board{--board:#2F5D50;--frame:#8A5A3B;--chalk:#F4F1E8;--chalk-y:#FFE27A;--chalk-r:#FFB3B3;--chalk-b:#B8D8FF;--chalk-l:#E0CCFF;background:var(--board);border-radius:14px;padding:5px!important;margin:0!important;border:5px solid var(--frame);box-shadow:inset 0 0 26px rgba(0,0,0,.28)}
+.tt-s-board .tt-grid{border-spacing:2px}
+.tt-s-board .tt-grid th{color:color-mix(in srgb,var(--chalk) 75%,transparent)}
+.tt-s-board .tt-grid thead th.today{background:none;color:var(--chalk-y);box-shadow:inset 0 -2px 0 var(--chalk-y);border-radius:0}
+.tt-s-board .tt-grid td{background:rgba(255,255,255,.05);border-radius:6px}
+.tt-s-board .tt-grid td.today{background:color-mix(in srgb,var(--chalk-y) 10%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--chalk-y) 45%,transparent)}
+.tt-s-board .tt-sub{background:none!important;color:var(--chalk)!important;font-weight:600;font-size:14px;text-shadow:0 0 1px rgba(255,255,255,.4)}
+.tt-s-board .tt-sub.tone-coral{color:var(--chalk-r)!important}.tt-s-board .tt-sub.tone-butter{color:var(--chalk-y)!important}.tt-s-board .tt-sub.tone-sky{color:var(--chalk-b)!important}.tt-s-board .tt-sub.tone-lilac{color:var(--chalk-l)!important}
+/* ⭐ 스티커: 굵은 테두리 + 옆으로 밀린 그림자 */
+.tt-s-sticker .tt-grid{border-spacing:5px}
+.tt-s-sticker .tt-grid td{background:transparent;border:1.5px dashed color-mix(in srgb,var(--ink3) 30%,transparent)}
+.tt-s-sticker .tt-grid td.today{box-shadow:none;border-color:var(--k)}
+.tt-s-sticker .tt-sub{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);margin:-1.5px}
+.tt-s-sticker .tt-grid thead th.today{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+/* ▫️ 깔끔: 흰 바탕 · 가는 선 · 과목 앞 색 점 */
+.tt-s-mono{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px!important;margin:0!important}
+.tt-s-mono .tt-grid{border-spacing:0}
+.tt-s-mono .tt-grid th,.tt-s-mono .tt-grid td{border-bottom:1px solid var(--line);border-radius:0}
+.tt-s-mono .tt-grid tr:last-child :is(th,td){border-bottom:0}
+.tt-s-mono .tt-grid td{background:none}
+.tt-s-mono .tt-grid td.today{background:color-mix(in srgb,var(--k) 7%,transparent);box-shadow:none}
+.tt-s-mono .tt-grid thead th.today{background:none;color:var(--k);box-shadow:inset 0 -2px 0 var(--k);border-radius:0}
+.tt-s-mono .tt-sub{background:none!important;color:var(--ink)!important;font-weight:600;display:flex;gap:4px;justify-content:center;align-items:center}
+.tt-s-mono .tt-sub::before{content:"";width:6px;height:6px;border-radius:50%;flex:none;background:currentColor}
+.tt-s-mono .tone-coral::before{background:var(--coral)}.tt-s-mono .tone-butter::before{background:var(--butter)}.tt-s-mono .tone-sage::before{background:var(--sage)}.tt-s-mono .tone-sky::before{background:var(--sky)}.tt-s-mono .tone-lilac::before{background:var(--lilac)}
 .tt-ed-acts{display:flex;align-items:center;gap:6px;margin-top:10px}
 .tt-ed-acts span{flex:1}
 /* ⭐ 즐겨찾기 쪽: 보기 모양 네 가지 (2026-10-08 디자인: 그러데이션 바탕 · 칸마다 그 색이 물든 카드 · 입체 아이콘) */
@@ -4195,14 +4235,18 @@ function viewFavLinks(){
 const TT_KINDS = [["elem","초등학생","🎒",6],["mid","중학생","📚",7],["high","고등학생","🏫",7],["univ","대학생","🎓",9],["teacher","선생님","👩‍🏫",7],["etc","기타","🗂️",6]];
 const TT_DAYS = ["월","화","수","목","금","토"];
 const TT_TONES = ["coral","butter","sage","sky","lilac"];
+// 시간표 모양 (2026-10-08): 보는 사람 취향대로 이 기기에 기억 (ls iinote-tt-style-가족-주인 프로필). 글씨는 지금 화면 글씨체 그대로
+const TT_STYLES = [["pastel","파스텔","🎨"],["note","공책","📓"],["board","칠판","🟩"],["sticker","스티커","⭐"],["mono","깔끔","▫️"]];
+const ttStyleKey = pid => `iinote-tt-style-${S.gid}-${pid}`;
+const ttStyle = pid => { const v=ls.get(ttStyleKey(pid),"pastel"); return TT_STYLES.some(x=>x[0]===v)?v:"pastel"; };
 const ttKind = k => TT_KINDS.find(x=>x[0]===k) || TT_KINDS[0];
 const ttTone = sub => { let h=0; for(const ch of String(sub)) h=(h*31+ch.charCodeAt(0))>>>0; return TT_TONES[h%TT_TONES.length]; };
 function ttBlank(kind){ const [k,,,n]=ttKind(kind); return {days:5, rows:[...Array(n)].map((_,i)=>({t:k==="univ"?`${i+9}시`:`${i+1}교시`, c:["","","","","",""]}))}; }
 // 시간표를 올린 사람만 칩으로 보여요 (일기처럼 가족 모두가 나오지 않게). 새로 넣는 사람은 ＋ 시간표 넣기에서 골라요
 function ttWho(){ const ps=sortedProfiles(); return ps.find(p=>p.id===S.ttWho) || ps.find(p=>p.tt && p.id===S.me.id) || ps.find(p=>p.tt) || ps.find(p=>p.id===S.me.id) || ps[0]; }
-function ttGridHTML(g){
+function ttGridHTML(g,st="pastel"){
   const today=new Date().getDay(), tc=today>=1&&today<=g.days ? today-1 : -1;
-  return `<div class="tt-wrap"><table class="tt-grid" style="--cols:${g.days}"><thead><tr><th></th>${TT_DAYS.slice(0,g.days).map((d,i)=>`<th class="${i===tc?"today":""}">${d}${i===tc?"<small>오늘</small>":""}</th>`).join("")}</tr></thead>
+  return `<div class="tt-wrap tt-s-${st}"><table class="tt-grid" style="--cols:${g.days}"><thead><tr><th></th>${TT_DAYS.slice(0,g.days).map((d,i)=>`<th class="${i===tc?"today":""}">${d}${i===tc?"<small>오늘</small>":""}</th>`).join("")}</tr></thead>
     <tbody>${g.rows.map(r=>`<tr><th>${esc(r.t)}</th>${TT_DAYS.slice(0,g.days).map((_,i)=>{ const v=(r.c?.[i]||"").trim(); return `<td class="${i===tc?"today":""}">${v?`<span class="tt-sub tone-${ttTone(v)}">${esc(v)}</span>`:""}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 function ttEditor(p,tt){
@@ -4234,10 +4278,11 @@ function viewTimetable(){
   return chips+`<section class="tt-card tt-k-${kk}">
     <header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(p.name)}의 시간표</h3><span class="tt-today">오늘은 ${dn}요일</span></header>
     ${tt.grid&&tt.photo?`<div class="tt-view"><button class="${showPhoto?"":"on"}" data-act="tt-photo" data-v="">칸으로 보기</button><button class="${showPhoto?"on":""}" data-act="tt-photo" data-v="${esc(p.id)}">📷 원본 사진</button></div>`:""}
-    ${showPhoto?`<button class="tt-frame" data-act="tt-lb" data-v="${esc(p.id)}" aria-label="시간표 사진 크게 보기"><img src="${esc(tt.photo.url)}" alt="${esc(p.name)}의 시간표 사진" loading="lazy" ${tt.photo.w?`width="${tt.photo.w}" height="${tt.photo.h}"`:""}><span class="tt-zoom">${ic("search")}크게 보기</span></button>`:ttGridHTML(tt.grid)}
+    ${showPhoto?`<button class="tt-frame" data-act="tt-lb" data-v="${esc(p.id)}" aria-label="시간표 사진 크게 보기"><img src="${esc(tt.photo.url)}" alt="${esc(p.name)}의 시간표 사진" loading="lazy" ${tt.photo.w?`width="${tt.photo.w}" height="${tt.photo.h}"`:""}><span class="tt-zoom">${ic("search")}크게 보기</span></button>`:ttStylePick(p.id)+ttGridHTML(tt.grid,ttStyle(p.id))}
     ${ed?`<div class="tt-acts sm">${file(tt.photo?"사진 바꾸기":"사진 올리기","btn btn-ghost sm")}<button class="btn btn-ghost sm" data-act="tt-edit" data-v="${esc(p.id)}">✏️ ${tt.grid?"칸 고치기":"칸으로 만들기"}</button><button class="link-btn tt-del" data-act="tt-del" data-v="${esc(p.id)}">지우기</button></div>`:""}
   </section>`;
 }
+const ttStylePick = pid => `<div class="tt-styles" role="radiogroup" aria-label="시간표 모양">${TT_STYLES.map(([k,l,i])=>`<button role="radio" aria-checked="${ttStyle(pid)===k}" class="${ttStyle(pid)===k?"on":""}" data-act="tt-style" data-id="${esc(pid)}" data-v="${k}"><span aria-hidden="true">${i}</span>${l}</button>`).join("")}</div>`;
 async function ttSave(pid, patch){
   const p=prof(pid); if(!p) return;
   const tt={...(p.tt||{}), kind:p.tt?.kind||S.ttKind||"elem", ...patch, at:Date.now()};
@@ -6871,6 +6916,7 @@ Object.assign(acts,{
   "fav-tab": el => { S.favTab=el.dataset.v; S.favEdit=false; render(); },
   "tt-who": el => { S.ttWho=el.dataset.v; S.ttEdit=null; S.ttPhoto=null; S.ttAdd=false; render(); },
   "tt-add": () => { S.ttAdd=!S.ttAdd; render(); },
+  "tt-style": el => { ls.set(ttStyleKey(el.dataset.id),el.dataset.v); render(); },
   "tt-open": () => { S.ttOpen=!S.ttOpen; if(S.ttOpen) S.favEdit=false; render(); },
   "tt-kind": el => { const p=ttWho(); S.ttKind=el.dataset.v; if(p?.tt && S.ttEdit!==p.id) guard(async()=>{ await ttSave(p.id,{kind:el.dataset.v}); render(); }); else render(); },
   "tt-edit": el => { const p=prof(el.dataset.v); if(!p) return; S.ttEdit=p.id; const g=p.tt?.grid; S.ttDraft=g?JSON.parse(JSON.stringify(g)):ttBlank(p.tt?.kind||S.ttKind); render(); },
