@@ -83,6 +83,12 @@ a{color:var(--accent-ink)}
 .vsum b{display:block;font-size:26px;line-height:1.1}
 .vsum span{font-size:17px;color:var(--sub)}
 .vsum .hot{background:var(--sky-soft)}
+.vsum .src{grid-column:span 2}
+.vsum .src b{font-size:20px}
+.vsum i{font-style:normal;font-size:13px;padding:1px 7px;border-radius:999px;vertical-align:3px}
+i.src-w{background:var(--sky-soft);color:var(--ink)}
+i.src-a{background:var(--ok-soft);color:var(--ink)}
+td.src-w,td.src-a{color:var(--sub)}
 .visit td.num{font-variant-numeric:tabular-nums;width:18%}
 .visit .track{display:flex;align-items:center;gap:8px}
 .visit .track s{flex:1;max-width:260px;height:10px;border-radius:99px;background:var(--soft);text-decoration:none;overflow:hidden}
@@ -182,6 +188,18 @@ match /stats/{day} {
   allow update: if request.resource.data.keys().hasOnly(['views', 'visitors', 'members'])
     && statStep('views') && statStep('visitors') && statStep('members');
 }
+// 웹 · 앱 따로 센 접속 현황 (2026-10-08): 칸 이름 = 숫자종류_web 또는 _app
+match /statsSrc/{day} {
+  allow read: if isIinoteAdmin();
+  allow create: if day.matches('^20[0-9]{2}-[0-9]{2}-[0-9]{2}$')
+    && request.resource.data.keys().hasOnly(['views_web', 'views_app', 'visitors_web', 'visitors_app', 'members_web', 'members_app'])
+    && request.resource.data.get('views_web', 0) <= 1 && request.resource.data.get('views_app', 0) <= 1
+    && request.resource.data.get('visitors_web', 0) <= 1 && request.resource.data.get('visitors_app', 0) <= 1
+    && request.resource.data.get('members_web', 0) <= 1 && request.resource.data.get('members_app', 0) <= 1;
+  allow update: if request.resource.data.keys().hasOnly(['views_web', 'views_app', 'visitors_web', 'visitors_app', 'members_web', 'members_app'])
+    && statStep('views_web') && statStep('views_app') && statStep('visitors_web') && statStep('visitors_app')
+    && statStep('members_web') && statStep('members_app');
+}
 match /users/{uid} { allow list: if isIinoteAdmin(); }
 match /groups/{gid} {
   allow read: if isIinoteAdmin();
@@ -211,6 +229,10 @@ async function load(){
   // 날짜별 접속 현황 (접속 잔디 13주 + 표 30일): 규칙이 아직 없으면 null
   const from=[d30,grassDays()[0]].sort()[0];
   let stats=null; try{ stats=(await F.getDocs(F.query(F.collection(db,"stats"),F.where(F.documentId(),">=",from)))).docs.map(d=>({day:d.id,...d.data()})); }catch(e){ console.warn(e); }
+  // 웹 · 앱 따로 센 숫자 (규칙이 아직 없으면 srcOK=false 로 안내만)
+  let srcOK=true; try{ const src=(await F.getDocs(F.query(F.collection(db,"statsSrc"),F.where(F.documentId(),">=",from)))).docs; if(stats){ const by=Object.fromEntries(stats.map(x=>[x.day,x]));
+      src.forEach(d=>{ const x=by[d.id]||(by[d.id]={day:d.id}); if(!stats.includes(x)) stats.push(x); x.src=d.data(); }); } }catch(e){ console.warn(e); srcOK=false; }
+  if(stats) stats.srcOK=srcOK;
   const idxErrs=new Set();
   const fams=await Promise.all(groups.map(async g=>{
     const dcol=F.collection(db,"groups",g.id,"diaries");
@@ -267,14 +289,16 @@ function visitCard(stats){
   const n0=n=>n||'<span class="z">0</span>';
   const row=(d,i)=>{ const x=v(d), w=wd(d), n=x.visitors||0;
     return `<tr class="${i===0?"today":""}${!n&&!x.views?" empty":""}"><td class="l"><span class="${w===0?"d-sun":w===6?"d-sat":""}">${d.slice(5).replace("-","/")} (${"일월화수목금토"[w]})</span>${i===0?'<span class="tag-today">오늘</span>':""}</td>
-    <td class="l"><span class="track"><s><i style="width:${Math.round(n/max*100)}%"></i></s><em>${n0(n)}</em></span></td><td class="num">${n0(x.members)}</td><td class="num">${n0(x.views)}</td></tr>`; };
+    <td class="l"><span class="track"><s><i style="width:${Math.round(n/max*100)}%"></i></s><em>${n0(n)}</em></span></td><td class="num src-w">${n0(x.src?.visitors_web)}</td><td class="num src-a">${n0(x.src?.visitors_app)}</td><td class="num">${n0(x.members)}</td><td class="num">${n0(x.views)}</td></tr>`; };
+  const sumS=(n,k)=>days.slice(0,n).reduce((s,d)=>s+(v(d).src?.[k]||0),0);
   // 최근 7일만 보이고, 나머지 23일은 '펼쳐 보기'로 (같은 표 안이라 칸이 어긋나지 않아요)
   return `<div class="card visit"><h2>📈 대문 접속 현황</h2>
-    <div class="vsum"><div class="hot"><b>${v(days[0]).visitors||0}</b><span>오늘 방문자</span></div><div><b>${v(days[1]).visitors||0}</b><span>어제</span></div><div><b>${sum(7,"visitors")}</b><span>최근 7일</span></div><div><b>${sum(30,"visitors")}</b><span>최근 30일</span></div></div>
-    <div class="scroll"><table><thead><tr><th class="l">날짜</th><th class="l">방문자 (기기)</th><th>로그인해서 쓴 기기</th><th>페이지 열림</th></tr></thead>
+    <div class="vsum"><div class="hot"><b>${v(days[0]).visitors||0}</b><span>오늘 방문자</span></div><div><b>${v(days[1]).visitors||0}</b><span>어제</span></div><div><b>${sum(7,"visitors")}</b><span>최근 7일</span></div><div><b>${sum(30,"visitors")}</b><span>최근 30일</span></div><div class="src"><b><i class="src-w">웹</i> ${v(days[0]).src?.visitors_web||0} · <i class="src-a">앱</i> ${v(days[0]).src?.visitors_app||0}</b><span>오늘 웹 · 앱 방문자</span></div><div class="src"><b><i class="src-w">웹</i> ${sumS(7,"visitors_web")} · <i class="src-a">앱</i> ${sumS(7,"visitors_app")}</b><span>최근 7일 웹 · 앱</span></div></div>
+    ${stats.srcOK===false?`<p class="alert">웹 · 앱 방문자를 따로 보려면 Firestore 규칙에 <b>statsSrc</b> 부분을 한 번 추가해 주세요.</p><pre>${esc("match /statsSrc"+RULES.split("match /statsSrc")[1].split("match /users")[0])}</pre>`:""}
+    <div class="scroll"><table><thead><tr><th class="l">날짜</th><th class="l">방문자 (기기)</th><th>웹 방문</th><th>앱 방문</th><th>로그인해서 쓴 기기</th><th>페이지 열림</th></tr></thead>
       <tbody>${days.slice(0,7).map(row).join("")}</tbody><tbody id="visit-more" hidden>${days.slice(7).map((d,i)=>row(d,i+7)).join("")}</tbody></table></div>
     <button class="more" data-act="visit-more">▾ 이전 23일 펼쳐 보기</button>
-    <p class="note">방문자는 그날 처음 들어온 기기 수예요 (같은 기기는 하루 한 번만 세요). 페이지 열림은 새로고침을 포함한 횟수예요. 누가 들어왔는지는 남기지 않고 날짜별 숫자만 세요.</p></div>`;
+    <p class="note">방문자는 그날 처음 들어온 기기 수예요 (같은 기기는 하루 한 번만 세요). 웹 · 앱 방문은 웹 브라우저로 왔는지 안드로이드 앱으로 왔는지 나눠 센 숫자예요 (2026년 10월 8일부터). 페이지 열림은 새로고침을 포함한 횟수예요. 누가 들어왔는지는 남기지 않고 날짜별 숫자만 세요.</p></div>`;
 }
 // AI 사용 횟수와 예상 금액 (이번 달 + 지난 두 달)
 function aiCard(usage){

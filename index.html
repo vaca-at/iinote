@@ -2970,7 +2970,11 @@ async function makeFirebase(){
     },
     async list(gid,c){ const s=await F.getDocs(col(gid,c)); return s.docs.map(d=>({id:d.id,...d.data()})); },
     // 접속 현황: stats/{날짜} 에 숫자만 1씩 더해요 (누가 왔는지는 남기지 않아요)
-    async countVisit(day,inc){ const data={}; for(const [k,v] of Object.entries(inc)) if(v) data[k]=F.increment(v); if(Object.keys(data).length) await F.setDoc(F.doc(db,"stats",day),data,{merge:true}); },
+    async countVisit(day,inc,src){ const data={}, bySrc={}; for(const [k,v] of Object.entries(inc)) if(v){ data[k]=F.increment(v); bySrc[`${k}_${src}`]=F.increment(v); }
+      if(!Object.keys(data).length) return;
+      await F.setDoc(F.doc(db,"stats",day),data,{merge:true});
+      // 웹 · 앱 따로 (2026-10-08): 예전 집계는 그대로 두고 statsSrc/{날짜} 에 visitors_web · visitors_app 같은 칸으로 따로 세요 (규칙을 아직 안 넣었으면 이것만 조용히 실패)
+      await F.setDoc(F.doc(db,"statsSrc",day),bySrc,{merge:true}).catch(()=>{}); },
     // 가족 채팅: 최근 CHAT_LIMIT 개를 실시간으로 (새 메시지가 오면 cb 가 다시 불려요)
     watchChats(gid,cb){ return F.onSnapshot(F.query(col(gid,"chats"),F.orderBy("createdAt","desc"),F.limit(CHAT_LIMIT)),
       s=>cb(s.docs.map(d=>({id:d.id,...d.data()})).reverse()), e=>console.warn("채팅을 불러오지 못했어요",e)); },
@@ -6769,12 +6773,14 @@ document.addEventListener("touchend", e => { if(touchX===null) return; const dx=
    10. 시작
    ========================================================= */
 /* ---------- 접속 현황 (운영 현황판에서 날짜별 숫자로) ----------
-   views = 페이지를 연 횟수, visitors = 오늘 처음 온 기기 수, members = 오늘 로그인해서 쓴 기기 수. 이름 · 계정은 남기지 않아요 */
+   views = 페이지를 연 횟수, visitors = 오늘 처음 온 기기 수, members = 오늘 로그인해서 쓴 기기 수. 이름 · 계정은 남기지 않아요
+   웹에서 들어왔는지 앱에서 들어왔는지(source: "web" | "app")는 Capacitor.isNativePlatform() 으로 판별해 statsSrc 에 따로 세요 */
+const VISIT_SRC = window.Capacitor?.isNativePlatform?.() ? "app" : "web";
 function countVisit(member){
   if(DEMO) return; const day=todayStr(), inc={};
   if(!member){ inc.views=1; if(ls.get("iinote-v-day","")!==day){ ls.set("iinote-v-day",day); inc.visitors=1; } }
   else if(ls.get("iinote-m-day","")!==day){ ls.set("iinote-m-day",day); inc.members=1; }
-  B.countVisit(day,inc).catch(()=>{});
+  B.countVisit(day,inc,VISIT_SRC).catch(()=>{});
 }
 countVisit(false);
 
