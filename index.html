@@ -2419,6 +2419,54 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+/* 📅 시간표 (2026-10-08): 사진 올리기 · 칸으로 만들기 = 같은 가벼운 칩 둘, 종류 여섯 = 작은 칩 한 줄 */
+.tt-acts .btn.btn-soft{min-height:42px;padding:0 18px;font-size:15px}
+.tt-acts .btn.btn-soft .ic{width:18px;height:18px}
+.tt-acts .btn.btn-soft::before{content:none}
+#app .tt-kinds{display:flex!important;flex-wrap:wrap;justify-content:center;gap:6px!important;grid-template-columns:none!important;margin:10px 0 14px}
+#app .tt-kinds button{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:5px!important;min-height:34px!important;height:34px;padding:0 13px 0 9px!important;border-radius:17px!important;border:1.5px solid color-mix(in srgb,#9B7BE8 22%,var(--line))!important;background:var(--surface)!important;font-size:13.5px!important;color:var(--ink2)!important;box-shadow:none!important}
+#app .tt-kinds button span{font-size:16px!important;line-height:1}
+#app .tt-kinds button.on{color:#fff!important;border-color:transparent!important;background:radial-gradient(circle at 85% 30%,#FFE7A3 0 1.1px,transparent 1.7px),linear-gradient(160deg,#33447A,#1F2A44)!important;box-shadow:0 3px 8px -4px rgba(31,42,68,.7)!important}
+/* 🌙 켜기 · 끄기 스위치 (일기 쓰기 설정 등): 꺼짐 = 연보라 길 + 흰 달, 켜짐 = 별밤 길 + 금빛 달 (2026-10-08) */
+.feat-sw{position:relative;width:54px!important;height:30px!important;min-height:0!important;padding:0!important;border:0!important;border-radius:15px!important;background:color-mix(in srgb,#C9B6FF 30%,var(--surface))!important;box-shadow:inset 0 1px 3px rgba(46,36,51,.18)!important;cursor:pointer}
+.feat-sw::after{top:3px!important;left:3px!important;width:24px!important;height:24px!important;background:radial-gradient(circle at 35% 35%,#fff,#ECE7F7)!important;box-shadow:0 2px 4px rgba(46,36,51,.3)!important}
+.feat-sw:checked{background:radial-gradient(circle at 20% 35%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 42% 70%,#FFE7A3 0 1px,transparent 1.6px),linear-gradient(160deg,#33447A,#1F2A44)!important;box-shadow:0 0 0 2px rgba(244,190,69,.3),inset 0 1px 3px rgba(0,0,0,.3)!important}
+.feat-sw:checked::after{transform:translateX(24px)!important;background:radial-gradient(circle at 35% 35%,#FFF4CC,#F4BE45)!important;box-shadow:0 0 8px rgba(244,190,69,.8)!important}
+/* 글만 덩그러니 있던 곳: 설명 글은 연보라 메모 상자, 초대 코드는 별밤 상자, 설정 안내는 작은 남색 띠 */
+.set-page .block>p:not(.set-hint){padding:12px 14px 12px 38px;border-radius:14px;background:color-mix(in srgb,#C9B6FF 10%,var(--surface));border:1px solid color-mix(in srgb,#9B7BE8 18%,var(--line));position:relative;font-size:14.5px;line-height:1.65}
+.set-page .block>p:not(.set-hint)::before{content:"✦";position:absolute;left:14px;top:12px;color:#9B7BE8}
+.set-page .inv-code{position:relative;align-items:center;gap:10px;padding:14px 16px;border-radius:18px;color:#fff;background:radial-gradient(circle at 8% 25%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 46% 85%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 64% 15%,#fff 0 .8px,transparent 1.3px),radial-gradient(120% 120% at 100% 120%,rgba(155,123,232,.45),transparent 60%),linear-gradient(160deg,#2B3670,#161C3D);box-shadow:0 8px 18px -10px rgba(22,28,61,.8)}
+.set-page .inv-code .inv-k{position:absolute;left:16px;top:8px;font-size:12px;color:#D9CFFF}
+.set-page .inv-code .code{margin-top:10px;color:#fff;text-shadow:0 0 12px rgba(201,182,255,.7)}
+.set-page .inv-code .btn{background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;padding-left:14px}
+.set-page .inv-code .btn .ic{background:none!important;color:#fff;width:20px;height:20px;padding:0}
+.set-hint{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:4px 0;padding:10px 14px;border-radius:14px;font-size:13.5px;color:var(--ink2);background:linear-gradient(90deg,color-mix(in srgb,#C9B6FF 18%,var(--surface)),var(--surface));border:1px dashed color-mix(in srgb,#9B7BE8 40%,var(--line))}
+.set-hint::before{content:"☾";color:#9B7BE8;margin-right:4px}
+/* ⚙️ 설정 화면 밤하늘 정리 (2026-10-08): 두 기둥 높이 맞추기 · 작은 칸은 연보라 상자 · 단추는 남색 아이콘 동그라미 · 연결됨은 별밤 칩 · 주소 상자는 별밤 */
+.set-page{align-items:stretch}
+.set-page>.col{display:flex;flex-direction:column}
+.set-page>.col>.block:last-child{flex:1}
+.set-page .set-sub{padding:14px 16px;border-radius:16px;background:color-mix(in srgb,#C9B6FF 12%,var(--surface));border:1px solid color-mix(in srgb,#9B7BE8 22%,var(--line))}
+.set-page .set-sub .muted{color:var(--ink2)!important}
+.set-page .btn.btn-ghost{border:1.5px solid color-mix(in srgb,#1F2A44 16%,var(--line));background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 92%,#9B7BE8));color:var(--ink);box-shadow:0 2px 6px -3px rgba(31,42,68,.35);padding-left:6px}
+.set-page .btn.btn-ghost .ic{width:28px;height:28px;padding:6px;border-radius:50%;background:radial-gradient(circle at 22% 30%,#fff 0 .8px,transparent 1.3px),linear-gradient(160deg,#3A4C7E,#1F2A44);color:#fff;flex:none}
+.set-page .btn.btn-ghost.danger{padding-left:14px}
+.set-page .btn.btn-ghost.danger .ic{background:linear-gradient(160deg,#F27AA6,#C2366A)}
+.chip.conn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px 0 5px;border:0;border-radius:19px;color:#fff;font-weight:600;background:radial-gradient(circle at 85% 30%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 60% 75%,#fff 0 .9px,transparent 1.4px),linear-gradient(160deg,#33447A,#1F2A44);box-shadow:0 0 0 2px rgba(244,190,69,.3),0 4px 10px -5px rgba(31,42,68,.7)}
+.chip.conn i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;font-style:normal;font-size:14px;color:#1F2A44;background:linear-gradient(160deg,#FFE7A3,#F4BE45)}
+.set-page .addr{border:0!important;color:#fff;background:radial-gradient(circle at 8% 25%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 30% 80%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 70% 18%,#fff 0 .8px,transparent 1.3px),radial-gradient(circle at 92% 70%,#C9B6FF 0 1.2px,transparent 1.8px),radial-gradient(120% 120% at 100% 120%,rgba(155,123,232,.45),transparent 60%),linear-gradient(160deg,#2B3670,#161C3D);box-shadow:0 8px 18px -10px rgba(22,28,61,.8)}
+.set-page .addr small{color:#D9CFFF!important}
+.set-page .addr strong{color:#fff!important;text-shadow:0 0 10px rgba(201,182,255,.6)}
+.set-page .addr .btn{background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important}
+.set-page .addr .btn .ic{color:#fff}
+.set-page .set-row{padding:12px 14px;border-radius:16px;background:color-mix(in srgb,#C9B6FF 12%,var(--surface));border:1px solid color-mix(in srgb,#9B7BE8 22%,var(--line))}
+/* 화면 밝기: 밤 스위치 (가족 · 나만과 같은 모양) + ☀ · ☾ */
+.seg:has(input[name="theme"]){width:fit-content;display:inline-flex!important;flex-wrap:nowrap;gap:0!important;padding:4px;border-radius:24px;background:color-mix(in srgb,#C9B6FF 22%,var(--surface));box-shadow:inset 0 1px 3px rgba(46,36,51,.14)}
+.seg:has(input[name="theme"]) span{min-height:36px!important;padding:0 16px!important;border:0!important;border-radius:18px!important;background:transparent!important;color:var(--ink2)!important}
+.seg:has(input[name="theme"]) input[value="light"]+span::before{content:"☀";margin-right:5px;color:#E0A400}
+.seg:has(input[name="theme"]) input[value="dark"]+span::before{content:"☾";margin-right:5px;color:#8F79E0}
+.seg:has(input[name="theme"]) input:checked+span{color:#fff!important;background:radial-gradient(circle at 18% 30%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 82% 70%,#FFE7A3 0 1.2px,transparent 1.8px),linear-gradient(160deg,#33447A,#1F2A44)!important;box-shadow:0 3px 8px -3px rgba(31,42,68,.7)}
+.seg:has(input[name="theme"]) input:checked+span::before{color:#FFE7A3}
 .cst{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:4px 0 14px}
 .hp-cal .cst{margin:14px 2px 0}
 .cst-c{display:flex;align-items:center;gap:10px;min-width:0;padding:8px 12px 8px 8px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--d) 12%,var(--surface)),var(--surface) 70%);border:1px solid color-mix(in srgb,var(--d) 22%,var(--line))}
@@ -4356,13 +4404,13 @@ function viewTimetable(){
     ${addable.length?`<button class="hw tt-add ${S.ttAdd?"on":""}" data-act="tt-add" aria-expanded="${!!S.ttAdd}">＋ 시간표 넣기</button>`:""}</div>
     ${S.ttAdd&&addable.length?`<div class="tt-addlist"><span>누구 시간표를 넣을까요?</span>${addable.map(x=>`<button class="hw" data-act="tt-who" data-v="${esc(x.id)}">${av(x,24)}${esc(x.name)}</button>`).join("")}</div>`:""}`;
   const kinds=`<div class="tt-kinds" role="radiogroup" aria-label="시간표 종류">${TT_KINDS.map(([k,l,i])=>`<button type="button" role="radio" aria-checked="${kk===k}" class="${kk===k?"on":""}" data-act="tt-kind" data-v="${k}"><span aria-hidden="true">${i}</span>${l}</button>`).join("")}</div>`;
-  const file=(l,cls="btn btn-primary")=>`<label class="${cls} tt-up">${ic("camera")}${l}<input type="file" class="tt-file sr" accept="image/*" data-id="${esc(p.id)}"></label>`;
+  const file=(l,cls="btn btn-soft")=>`<label class="${cls} tt-up">${ic("camera")}${l}<input type="file" class="tt-file sr" accept="image/*" data-id="${esc(p.id)}"></label>`;
   if(S.ttEdit===p.id) return chips+`<section class="tt-card tt-k-${kk}"><header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(p.name)}의 시간표 만들기</h3></header>${kinds}${ttEditor(p,tt)}</section>`;
   if(!tt) return chips+`<section class="tt-card tt-empty tt-k-${kk}">
       <div class="tt-hero" aria-hidden="true">📅</div>
       <h3>${esc(p.name)}의 시간표가 아직 없어요</h3>
       ${ed?`<p>종류를 고르고, 가지고 있는 시간표를 사진으로 올리면 <b>AI가 읽어서 예쁜 표</b>로 만들어 드려요. 모양은 다섯 가지 중에서 고를 수 있고, 칸으로 직접 만들 수도 있어요.</p>${kinds}
-        <div class="tt-acts">${file("시간표 사진 올리기")}<button class="btn btn-ghost" data-act="tt-edit" data-v="${esc(p.id)}">✏️ 칸으로 만들기</button></div>`
+        <div class="tt-acts">${file("시간표 사진 올리기")}<button class="btn btn-soft" data-act="tt-edit" data-v="${esc(p.id)}">✏️ 칸으로 만들기</button></div>`
         :`<p>${esc(p.name)}${hasBatchim(p.name)?"이":""}가 직접 넣거나 보호자가 넣어 줄 수 있어요.</p>`}
     </section>`;
   const today=new Date(), dn=["일","월","화","수","목","금","토"][today.getDay()], showPhoto=tt.photo && (!tt.grid || S.ttPhoto===p.id);
@@ -5813,8 +5861,8 @@ function backup(kind){
 function loginLinkRow(){
   if(!isMine(S.me)) return "";
   const pv=B.providers(); if(!pv.length) return "";
-  const item=(id,name,kind)=>pv.includes(id)||(S.me.mergedKinds||[]).includes(kind)?`<span class="chip" style="padding:0 14px">${name} ✓ 연결됨</span>`:`<button class="btn ${kind==="kakao"?"btn-kakao":"btn-ghost"} sm" data-act="link-login" data-v="${kind}">${kind==="kakao"?ic("talk"):""}${name}도 연결하기</button>`;
-  return `<div class="login-link" style="margin-top:16px"><p class="muted" style="font-size:14px;margin:0 0 8px">로그인 방법 · 연결해 두면 구글이나 카카오 어느 쪽으로 들어와도 같은 일기장이 열려요.</p>
+  const item=(id,name,kind)=>pv.includes(id)||(S.me.mergedKinds||[]).includes(kind)?`<span class="chip conn"><i aria-hidden="true">✓</i>${name} 연결됨</span>`:`<button class="btn ${kind==="kakao"?"btn-kakao":"btn-ghost"} sm" data-act="link-login" data-v="${kind}">${kind==="kakao"?ic("talk"):""}${name}도 연결하기</button>`;
+  return `<div class="login-link set-sub" style="margin-top:16px"><p class="muted" style="font-size:14px;margin:0 0 8px">로그인 방법 · 연결해 두면 구글이나 카카오 어느 쪽으로 들어와도 같은 일기장이 열려요.</p>
     <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}</div>
     ${S.mergeKind?`<p style="margin:10px 0 0"><button class="btn btn-primary sm" data-act="merge-login" data-v="${S.mergeKind}">${loginName(S.mergeKind)}로 만든 프로필과 합치기</button></p>`:""}
     <p class="muted" style="font-size:13px;margin:8px 0 0">구글 · 카카오로 따로 들어와서 같은 사람이 둘로 보이면, 한쪽으로 로그인해 다른 쪽 '연결하기'를 눌러 하나로 합쳐 주세요.</p></div>`;
@@ -5859,11 +5907,11 @@ function viewFamily(){
   const g=S.group, ps=sortedProfiles(), link=`https://${SITE_ADDRESS}/?join=${g.inviteCode}`;
   const groups=(S.userDoc?.groupIds||[]);
   return `<div class="page-h"><h1>우리 가족 설정</h1></div>
-  <div class="fam-grid">
+  <div class="fam-grid set-page">
     <div class="col">
       <section class="block" aria-labelledby="h-inv"><div class="block-h"><h2 id="h-inv">${esc(g.name)} 초대하기</h2></div>
         <p style="margin:0 0 10px;color:var(--ink2)">가족에게 이 초대 코드를 알려 주세요. 앱이나 주소로 들어와 구글 계정으로 시작한 뒤 코드를 넣으면 돼요.</p>
-        <div class="row" style="justify-content:space-between"><span class="code">${esc(g.inviteCode)}</span><button class="btn btn-ghost sm" data-act="copy" data-v="${esc(g.inviteCode)}">${ic("copy")}코드 복사</button></div>
+        <div class="row inv-code" style="justify-content:space-between"><span class="inv-k">초대 코드</span><span class="code">${esc(g.inviteCode)}</span><button class="btn btn-ghost sm" data-act="copy" data-v="${esc(g.inviteCode)}">${ic("copy")}코드 복사</button></div>
         <div class="row" style="margin-top:12px"><button class="btn btn-ghost sm" data-act="copy" data-v="${esc(link)}">${ic("link")}초대 링크 복사</button></div>
         ${isParent()?`<details class="add" style="margin-top:14px"><summary>${ic("pen")}일기장 이름 바꾸기</summary>
           <form class="form-grid" data-form="group-name">
@@ -5899,7 +5947,7 @@ function viewFamily(){
         <p style="margin:0 0 12px;color:var(--ink2)">우리 가족의 일기와 댓글을 엑셀에서 열 수 있는 CSV 파일로 이 기기에 저장해요. 사진 · 소리는 파일 안에 주소(링크)로 들어가요. 가끔 받아 두면 안심이에요.</p>
         <div class="row"><button class="btn btn-ghost sm" data-act="backup" data-v="diaries">${ic("download")}일기 받기 (${S.diaries.length}편)</button><button class="btn btn-ghost sm" data-act="backup" data-v="comments">${ic("download")}댓글 받기 (${S.comments.length}개)</button></div>
       </section>`:""}
-      <p class="muted" style="font-size:13px;margin:4px 2px">알림 · 앱 잠금 · 화면 밝기 · 로그인 같은 <b>나만의 설정</b>은 <button class="link-btn" data-act="tab" data-v="settings">${ic("gear")}설정</button>에 있어요.</p>
+      <p class="set-hint">알림 · 앱 잠금 · 화면 밝기 · 로그인 같은 <b>나만의 설정</b>은 <button class="link-btn" data-act="tab" data-v="settings">${ic("gear")}설정</button>에 있어요.</p>
     </div>
   </div>`;
 }
@@ -5909,7 +5957,7 @@ function viewFamily(){
 function viewSettings(){
   const g=S.group, groups=(S.userDoc?.groupIds||[]);
   return `<div class="page-h"><h1>${IS_APP?"앱 설정":"설정"}</h1></div>
-  <div class="fam-grid">
+  <div class="fam-grid set-page">
     <div class="col">
       ${IS_APP?appSettings():""}
       <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
@@ -5923,17 +5971,17 @@ function viewSettings(){
     <div class="col">
       <section class="block" aria-labelledby="h-acc"><div class="block-h"><h2 id="h-acc">계정</h2></div>
         <div class="row">
-          <button class="btn btn-ghost sm" data-act="switch-profile">프로필 바꾸기</button>
-          ${isParent()?`<button class="btn btn-ghost sm" data-act="new-group">다른 가족 만들기 · 들어가기</button>`:""}
+          <button class="btn btn-ghost sm" data-act="switch-profile">${ic("people")}프로필 바꾸기</button>
+          ${isParent()?`<button class="btn btn-ghost sm" data-act="new-group">${ic("plus")}다른 가족 만들기 · 들어가기</button>`:""}
           <button class="btn btn-ghost sm" data-act="signout">${ic("out")}로그아웃</button>
         </div>
         ${loginLinkRow()}
-        ${isParent()&&isMine(S.me)?`<form class="parent-pin" data-form="parent-pin" style="margin-top:16px">
+        ${isParent()&&isMine(S.me)?`<form class="parent-pin set-sub" data-form="parent-pin" style="margin-top:16px">
           <p class="muted" style="font-size:14px;margin:0 0 8px">${S.me.pin?"🔒 부모 비밀번호가 걸려 있어요.":"부모 비밀번호"} · 내 폰으로 아이가 일기를 쓴 뒤 '${esc(S.me.name)}${ro(S.me.name)} 돌아가기'를 누르면 이 비밀번호를 물어요.</p>
           <div class="row"><label class="sr" for="pp-pin">부모 비밀번호 네 자리</label><input id="pp-pin" name="pin" class="pin-in" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="숫자 네 자리" style="width:9em;letter-spacing:4px">
           <button class="btn btn-primary sm">${S.me.pin?"바꾸기":"정하기"}</button>${S.me.pin?`<button type="button" class="btn btn-ghost sm" data-act="parent-pin-clear">비밀번호 없애기</button>`:""}</div></form>`:""}
         ${S.me.type==="child"?`<div class="my-pin" style="margin-top:16px">${pinForm("my-pin",S.me,true)}</div>`:""}
-        ${S.user&&!S.user.isAnonymous&&isMine(S.me)?`<div style="margin-top:14px">${keepBox()}</div>`:""}
+        ${S.user&&!S.user.isAnonymous&&isMine(S.me)&&keepBox()?`<div class="set-sub" style="margin-top:14px">${keepBox()}</div>`:""}
         ${groups.length>1&&isParent()?`<label style="margin-top:16px">내 가족 그룹<select data-pref="group">${groups.map(id=>`<option value="${esc(id)}" ${id===S.gid?"selected":""}>${id===S.gid?esc(g.name):"다른 가족 ("+esc(id.slice(0,6))+")"}</option>`).join("")}</select></label>`:""}
         <div class="acc-foot">
           ${isParent()||isMine(S.me)?`<button class="btn btn-ghost sm danger" data-act="delete-account">${ic("trash")}내 계정과 기록 지우기</button>`:""}
