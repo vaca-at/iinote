@@ -2419,6 +2419,16 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+.cst{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:4px 0 14px}
+.hp-cal .cst{margin:14px 2px 0}
+.cst-c{display:flex;align-items:center;gap:10px;min-width:0;padding:8px 12px 8px 8px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--d) 12%,var(--surface)),var(--surface) 70%);border:1px solid color-mix(in srgb,var(--d) 22%,var(--line))}
+.cst-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.cst-n{display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0}
+.cst-n b{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cst-n em{font-style:normal;font-size:19px;line-height:1;color:var(--d);font-variant-numeric:tabular-nums;font-weight:700}
+.cst-n em small{font-size:12px;margin-left:1px;color:var(--ink3);font-weight:400}
+.cst-bar{display:block;height:5px;border-radius:3px;background:color-mix(in srgb,var(--d) 14%,var(--line))}
+.cst-bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,color-mix(in srgb,var(--d) 55%,#fff),var(--d));min-width:3px}
 /* 🌙 가족 · 나만 고르기 = 밤 스위치 (2026-10-08 시안 2번): 한 판 안에서 별 박힌 남색 손잡이 */
 .seg:has(input[name="scope"]){width:fit-content;max-width:100%;justify-self:start;display:inline-flex!important;flex-wrap:nowrap;gap:0!important;padding:4px;border:0;border-radius:24px;background:color-mix(in srgb,#C9B6FF 22%,var(--surface));box-shadow:inset 0 1px 3px rgba(46,36,51,.14)}
 fieldset.seg:has(input[name="scope"]){margin-top:1.6em;position:relative}
@@ -3261,6 +3271,10 @@ const nightIdx = p => { if(!p) return 0; const i=sortedProfiles().findIndex(x=>x
 // 얼굴 동그라미 바탕 우주색: 남색 둘레의 여덟 가지 밤하늘 (빛무리 색과 짝: 복숭아 ↔ 자두빛 밤, 라벤더 ↔ 자정 보라 …)
 const NIGHT_BG = [["#4A2F5E","#1E1530"],["#3B2F7A","#17123A"],["#21477A","#0D1A3A"],["#3A3F72","#141838"],["#5A2C5A","#22102A"],["#1F4F5E","#0B1E28"],["#2C3A86","#10173F"],["#4B2D72","#1B1236"]];
 const pcol = p => NIGHT[nightIdx(p)], pdot = p => NIGHT_DOT[nightIdx(p)], pbg = p => NIGHT_BG[nightIdx(p)];
+// 📅 달력 아래 '누가 며칠 썼나' 카드 (2026-10-08): 얼굴 · 이름 · 큰 날 수 · 이번 달 채운 만큼 막대 (점 색과 같은 진한 색)
+function calStats(ps,dates){ const t=todayStr(), past=Math.max(1,dates.filter(d=>d<=t).length);
+  return `<div class="cst">${ps.map(p=>{ const n=dates.filter(d=>submittedOn(p.id,d)).length, pct=Math.min(100,Math.round(n/past*100));
+    return `<div class="cst-c" style="--d:${pdot(p)}">${av(p,28)}<div class="cst-t"><span class="cst-n"><b>${esc(p.name)}</b><em>${n}<small>일</small></em></span><span class="cst-bar" aria-hidden="true"><i style="width:${pct}%"></i></span></div></div>`; }).join("")}</div>`; }
 const sortedProfiles = () => [...S.profiles].sort((a,b)=>(a.type===b.type?0:a.type==="parent"?-1:1)||(a.createdAt||0)-(b.createdAt||0));
 const findDiary = (pid,date) => S.diaries.find(d=>d.profileId===pid && d.date===date);
 // 한 사람이 구글 · 카카오로 따로 가입했어도 같은 프로필: uid(처음 계정) + uids(합친 로그인들)
@@ -3884,7 +3898,7 @@ function hpCal(){
   return `<div class="hp-calwrap"><section class="block hp-cal" aria-labelledby="hc-h">
     <div class="hc-top"><button class="hp-arw" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("left")}</button><h2 id="hc-h">${yy}년 ${mm}월</h2><button class="hp-arw" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("right")}</button></div>
     <div class="hc-grid">${DAYS.map((w,i)=>`<span class="hc-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
-    <div class="hc-legend">${ps.map(p=>`<span><i style="background:${pdot(p)}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("")}</div>
+    ${calStats(ps,dates)}
     ${month!==t.slice(0,7)?`<button class="btn btn-ghost sm" data-act="cal-move" data-v="0">이번 달로</button>`:""}
   </section>${viewSchedules()}</div>`;
 }
@@ -4080,7 +4094,7 @@ function viewHomeCalendar(){
     return `<div class="ct-card ct-${st[0]}" style="--pc:${p.color||"var(--ink)"}"><div class="ct-top"><span class="ct-ring">${av(p,44)}</span><b>${esc(p.name)}</b><span class="ct-st">${st[0]==="done"?"✓ ":""}${st[1]}</span></div>
       <div class="ct-body"><span class="ct-title">${d?esc((d.text||"").slice(0,30)||"쓴 일기"):`<span class="muted">${isT?"오늘 일기를 기다려요":"이날 쓴 일기가 없어요"}</span>`}</span>
       ${open?(d.status==="submitted"?`<button class="btn btn-ghost sm" data-act="open-diary" data-id="${d.id}">읽기</button>`:`<button class="btn btn-ghost sm" data-act="write" data-date="${hd}">이어 쓰기</button>`):""}</div></div>`; }).join("");
-  const legend = ps.map(p=>`<span><i style="background:${pdot(p)}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("");
+  const legend = calStats(ps,dates);
   const sch = mySchedules();
   const cells = dates.map(d=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], list=sch.filter(s=>s.date===d).sort(bySch);
     const who=ps.filter(p=>submittedOn(p.id,d));
@@ -4096,7 +4110,7 @@ function viewHomeCalendar(){
     <div class="cal-h"><button class="icon-btn" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("back")}</button>
       <h2 id="h-cal">${yy}년 ${mm}월</h2><button class="icon-btn flip" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("back")}</button>
       ${month!==t.slice(0,7)?`<button class="btn btn-ghost sm" data-act="cal-move" data-v="0">이번 달로 ›</button>`:""}</div>
-    <div class="cal-legend">${legend}</div>
+    ${legend}
     <div class="cal-grid">${DAYS.map((w,i)=>`<span class="cal-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}
       ${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
     ${viewCalSchedule(S.calDay||t)}
