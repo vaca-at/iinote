@@ -7169,8 +7169,11 @@ function viewProfile(){
 /* 🐾 캡처한 캐릭터 그림 다듬기 (2026-10-09): 가장자리에서 이어진 바탕색(모서리 색과 비슷한 색)을 투명하게 지우고
    남은 캐릭터만 꼭 맞게 잘라 정사각형 PNG(320px)로 → 동그라미 · 연속 자리에 꽉 차게. 바탕이 복잡한 그림은 그대로 잘라만 둬요 */
 async function charCut(blob){
-  const bm=await createImageBitmap(blob), k=Math.min(1,640/Math.max(bm.width,bm.height));
-  const W=Math.max(1,Math.round(bm.width*k)), H=Math.max(1,Math.round(bm.height*k));
+  // 그림 열기: createImageBitmap 이 안 되는 기기(옛 사파리 · 일부 앱 웹 화면)는 <img> 로
+  const bm=await createImageBitmap(blob).catch(()=>new Promise((ok,no)=>{ const u=URL.createObjectURL(blob), im=new Image();
+    im.onload=()=>{ ok(im); setTimeout(()=>URL.revokeObjectURL(u),1000); }; im.onerror=()=>no(new Error("그림을 열 수 없어요")); im.src=u; }));
+  const bw=bm.naturalWidth||bm.width, bh=bm.naturalHeight||bm.height; if(!bw || !bh) throw new Error("그림 크기를 알 수 없어요");
+  const k=Math.min(1,640/Math.max(bw,bh)), W=Math.max(1,Math.round(bw*k)), H=Math.max(1,Math.round(bh*k));
   const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const g=cv.getContext("2d",{willReadFrequently:true});
   g.drawImage(bm,0,0,W,H); bm.close?.();
   const im=g.getImageData(0,0,W,H), d=im.data, px=(x,y)=>(y*W+x)*4;
@@ -7207,14 +7210,16 @@ async function charCut(blob){
 }
 async function profChar(blob){
   const p=prof(S.prof); if(!p || !blob || !canEditProf(p)) return;
-  if(!/^image\//.test(blob.type||"")){ toast("그림 파일만 넣을 수 있어요"); return; }
+  if(blob.type && !/^image\//.test(blob.type)){ toast("그림 파일만 넣을 수 있어요"); return; }   // 앱 · 일부 휴대폰은 종류(type)가 비어 와요
+  let step="그림 다듬기";
   try{
     upProg("🐾 캐릭터를 찾아서 다듬는 중…");
-    const png=await charCut(blob), r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png);
+    const png=await charCut(blob); step="올리기";
+    const r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png);
     const old=p.char?.img; await B.update(S.gid,"profiles",p.id,{char:{img:{url:r.url,path:r.path}}});
     if(old?.path) B.deleteMedia(old.path).catch(()=>{});
     await reload("profiles"); upProg(); buzz("ok"); render(); toast("캐릭터를 넣었어요");
-  }catch(e){ console.error(e); upProg(); toast("그림을 넣지 못했어요. 다시 해 주세요"); }
+  }catch(e){ console.error(e); upProg(); toast(`그림을 넣지 못했어요 (${step}: ${String(e?.code||e?.message||e).slice(0,60)})`); }
 }
 // 웹(컴퓨터): 프로필 편집 중에 Ctrl+V 로 캡처한 그림을 붙여 넣으면 캐릭터로
 document.addEventListener("paste", e=>{ if(!S.prof || !S.profEdit) return;
