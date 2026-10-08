@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-theme="light" data-dfont="batang">
+<html lang="ko" data-theme="light" data-dfont="pen">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -48,7 +48,8 @@
   --diary:"Gowun Batang","AppleMyungjo","Batang",serif;
   --diary-size:19px; --diary-lh:36px;
 }
-[data-dfont="pen"]{ --diary:"OwnglyphYuntaeng","Nanum Pen Script","Gowun Batang",serif; --diary-size:22px; --diary-lh:38px; --hand-ui:"OwnglyphYuntaeng","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OngleipUnz","OwnglyphYuntaeng","Pretendard Variable",sans-serif; }
+[data-dfont="pen"]{ --diary:"OwnglyphYuntaeng","Nanum Pen Script","Gowun Batang",serif; --diary-size:22px; --diary-lh:38px; --hand-ui:"OwnglyphYuntaeng","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OwnglyphYuntaeng","Pretendard Variable",sans-serif; }
+[data-dfont="unz"]{ --diary:"OngleipUnz","OwnglyphYuntaeng","Gowun Batang",serif; --diary-size:21px; --diary-lh:38px; --hand-ui:"OngleipUnz","Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; --hand-head:"OngleipUnz","Pretendard Variable",sans-serif; }
 [data-dfont="gothic"]{ --diary:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; --diary-size:18px; --diary-lh:34px; }
 [data-dfont="dodum"]{ --diary:"Gowun Dodum","Pretendard Variable",sans-serif; --diary-size:18px; --diary-lh:35px; }
 [data-theme="dark"]{
@@ -975,22 +976,15 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .feat-sw:checked::after{transform:translateX(20px)}
 .feat-sw:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 /* 내 일기 머리 카드: 🔥 연속 기록 강조 */
-.my-hero{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 14px;margin:0 0 18px;padding:18px 18px 16px;border-radius:22px;background:linear-gradient(135deg,#FFE7C2 0%,#FFD0B5 55%,#FFC1C8 100%);color:#5A2A12;box-shadow:0 6px 18px rgba(239,111,83,.18)}
-.my-hero.zero{background:linear-gradient(135deg,#FFF3D6,#FFE3D8);box-shadow:none}
-.mh-streak{display:flex;align-items:center;gap:10px;min-width:0}
-.mh-fire{font-size:44px;line-height:1;filter:drop-shadow(0 3px 6px rgba(239,111,83,.35));animation:mhFlame 1.8s ease-in-out infinite;transform-origin:50% 90%}
-@keyframes mhFlame{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.08) rotate(2deg)}}
-@media (prefers-reduced-motion:reduce){ .mh-fire{animation:none} }
-.mh-streak b{font-size:46px;line-height:1;font-weight:800;color:#D9481F;letter-spacing:-1px}
-.mh-streak span{margin-left:4px;font-size:17px;font-weight:700}
-.mh-side{display:flex;flex-direction:column;align-items:center;padding:8px 14px;border-radius:16px;background:rgba(255,255,255,.62)}
-.mh-side span{font-size:12.5px;color:#8A5A3A}
-.mh-side b{font-size:26px;line-height:1.15;color:#5A2A12}
-.mh-side small{margin-left:2px;font-size:14px}
-.mh-msg{grid-column:1/-1;margin:0;font-size:14px;color:#8A4A2A}
-.mh-write{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border:0;border-radius:16px;background:#2E2433;color:#fff;font:inherit;font-size:16.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(46,36,51,.22)}
-.mh-write .ic{width:20px;height:20px}
-.mh-write.done{background:rgba(255,255,255,.75);color:#2F7A56;box-shadow:none}
+.my-hero{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:10px 12px 10px 10px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line);box-shadow:0 2px 8px rgba(46,36,51,.05)}
+.mh-fire{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:14px;background:linear-gradient(140deg,#FFE7C2,#FFC9B5);font-size:24px;line-height:1}
+.my-hero.zero .mh-fire{filter:grayscale(.4);opacity:.8}
+.mh-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.mh-t b{font-size:18px;line-height:1.25;color:var(--coral-ink,#B5432B)}
+.mh-t small{font-size:12.5px;color:var(--ink3)}
+.mh-write{display:inline-flex;align-items:center;gap:5px;flex:none;height:38px;padding:0 14px;border:0;border-radius:19px;background:var(--ink);color:var(--surface);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.mh-write .ic{width:16px;height:16px}
+.mh-write.done{background:var(--sage-soft,#DCEFE4);color:var(--sage,#2F7A56)}
 /* 앱: 가족 소식 전체를 팝업에 (예전 홈 '소식' 쪽) */
 .news-panel.fam{padding:12px 12px 6px}
 .news-panel.fam .nw-list{box-shadow:none;border:0;padding:0;background:none}
@@ -1649,11 +1643,17 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 @font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'OngleipUnz';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2406-1@1.0/Ownglyph_UNZ-Rg.woff2') format('woff2');font-weight:normal;font-display:swap}
 @font-face{font-family:'Cafe24AnemoneAir';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202@1.0/Cafe24Ohsquareair.woff') format('woff');font-weight:normal;font-display:swap;unicode-range:U+0020-007E,U+2018-201D,U+2026,U+3131-318E,U+AC00-D7A3}
-:root[data-dfont="pen"] body,:root[data-dfont="pen"] :is(button,input,select,textarea,label,small,p,li,span,a,td,th,summary,legend){font-family:var(--hand-ui)}
-:root[data-dfont="pen"] :is(.mast-t,.page-h h1,.land h1,h2){font-family:var(--hand-head);font-weight:400}
-:root[data-dfont="pen"] :is(h3,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name){font-family:var(--hand-ui)}
-:root[data-dfont="pen"] :is(.w-text,.w-hl,.paper-lines,.today-date,.dcard-ex,.al.txt strong,.cmt-text,.fix-list,.ais-text,.ct-title,.qn-x){font-family:var(--diary)}
-:root[data-dfont="pen"] .hb-g span:not(.pen){font-family:var(--sans)}
+:root:is([data-dfont="pen"],[data-dfont="unz"]) body,:root:is([data-dfont="pen"],[data-dfont="unz"]) :is(button,input,select,textarea,label,small,p,li,span,a,td,th,summary,legend){font-family:var(--hand-ui)}
+:root:is([data-dfont="pen"],[data-dfont="unz"]) :is(.mast-t,.page-h h1,.land h1,h2){font-family:var(--hand-head);font-weight:400}
+:root:is([data-dfont="pen"],[data-dfont="unz"]) :is(h3,.ftab,.nav a,.btn,.chip,.fav,.me-chip,.pill,.tag,.ai-head b,.pen h3,.detail-h strong,.dcard-name){font-family:var(--hand-ui)}
+:root:is([data-dfont="pen"],[data-dfont="unz"]) :is(.w-text,.w-hl,.paper-lines,.today-date,.dcard-ex,.al.txt strong,.cmt-text,.fix-list,.ais-text,.ct-title,.qn-x){font-family:var(--diary)}
+:root:is([data-dfont="pen"],[data-dfont="unz"]) .hb-g span:not(.pen):not(.unz){font-family:var(--sans)}
+/* 글씨 네 가지 (2026-10-08): ① 언즈체 · ② 윤탱체 = 화면 대부분 손글씨 / ③ 고딕 · ④ 동글 = 제목까지 또박또박 (fresh 디자인의 언즈체 제목도 덮어요) */
+:root[data-dfont="gothic"] #app *:not(svg):not(svg *):not(.hb-g span){font-family:var(--sans)!important}
+:root[data-dfont="gothic"] #app :is(h1,h2,.mast-t,.ah-t,.page-h h1,.block-h h2,.today-date,.hp-dt p){font-weight:700!important;letter-spacing:-.3px}
+:root[data-dfont="dodum"] #app *:not(svg):not(svg *):not(.hb-g span){font-family:"Gowun Dodum",var(--sans)!important}
+/* 손글씨 두 가지: 언즈체로 박아 둔 제목들도 고른 글씨로 (② 윤탱체면 윤탱체) */
+:root:is([data-dfont="pen"],[data-dfont="unz"]) :is(.ah-t,.hp-dt p,.hc-top h2,.more-head h2,.help-top h2,.pf-name,.pf-stats b,.block-h h2,.day-nav h1){font-family:var(--hand-head)!important;font-weight:400}
 .inapp-note{margin:0 0 12px;padding:10px 14px;border-radius:12px;background:var(--butter-soft);border:1.5px dashed var(--butter);font-size:14px;line-height:1.6}
 /* 🎉 연속 일기 축하 · 🏆 상장 */
 .cele{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:rgba(20,26,40,.55);animation:celeIn .25s ease-out}
@@ -1916,7 +1916,10 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .tt-addlist{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-2px 0 12px;padding:10px;border-radius:16px;background:var(--surface2)}
 .tt-addlist span{width:100%;font-size:12.5px;color:var(--ink2);font-weight:600}
 .tt-panel{padding:14px;border-radius:var(--r-lg);background:var(--surface);border:1.5px solid var(--line);max-width:760px}
-.tt-panel-h{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
+/* 웹 시간표는 가운데 팝업 창으로 (2026-10-08) */
+.tt-modal-bg{position:fixed;inset:0;z-index:60;background:rgba(31,42,68,.35)}
+.tt-modal{position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 40px);overflow-y:auto;box-shadow:0 20px 50px rgba(31,42,68,.3)}
+.tt-panel-h{position:sticky;top:-14px;z-index:1;background:var(--surface);padding-top:4px;display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
 .tt-panel-h h2{margin:0;font-size:18px}
 .tt-fav span{font-size:16px}
 .tt-card{--k:var(--sky);--ks:var(--sky-soft);position:relative;padding:16px 14px;border-radius:22px;background:linear-gradient(160deg,var(--ks) 0%,var(--surface) 46%);border:1px solid color-mix(in srgb,var(--k) 22%,transparent);box-shadow:0 6px 18px color-mix(in srgb,var(--k) 14%,transparent)}
@@ -2212,7 +2215,12 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 /* 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통) */
 .hq.rep{border-color:var(--coral);color:var(--coral);font-weight:600}
 .help-rep{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 12px 8px;padding:8px 12px;border-radius:14px;background:var(--coral-soft);color:var(--ink);font-size:14px}
-.help-fab{display:inline-flex;align-items:center;gap:4px}
+/* 웹 챗봇 상담: 오른쪽 아래 동그란 단추 (2026-10-08, 투명하지 않게 · 휴대폰은 아래 메뉴 위로) */
+.web-help{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:35;display:grid;place-items:center;width:54px;height:54px;border:0;border-radius:50%;background:var(--ink);color:var(--surface);box-shadow:0 6px 18px rgba(31,42,68,.28);cursor:pointer}
+.web-help .ic{width:26px;height:26px}
+.web-help:hover{transform:translateY(-2px)}
+@media (max-width:640px){ .web-help{right:14px;bottom:calc(84px + env(safe-area-inset-bottom));width:50px;height:50px} }
+.w-mode .web-help{display:none}
 .cmt-acts .rep-btn,.rep-btn{color:var(--ink3)}
 @media (min-width:700px){ #app .help{inset:auto 24px 24px auto;width:400px;height:min(640px,calc(100dvh - 48px));border-radius:22px;overflow:hidden;box-shadow:0 12px 40px rgba(46,36,51,.28)} }
 .help{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:var(--paper);padding-top:env(safe-area-inset-top)}
@@ -3183,7 +3191,8 @@ const S = {
 // 아이 링크로 들어온 기기는 링크를 기억해 둬요: 나중에 로그인이 풀려도 '시작하기' 화면으로 다시 들어오게
 if(S.joinCode && S.kidId) ls.set("iinote-kidlink",JSON.stringify({join:S.joinCode,kid:S.kidId,n:S.kidName}));
 function useSavedKidLink(){ try{ const k=JSON.parse(ls.get("iinote-kidlink","null")); if(k?.join && k?.kid && !S.joinCode){ S.joinCode=k.join; S.kidId=k.kid; S.kidName=k.n||""; } }catch(e){} }
-if(!["batang","pen","gothic","dodum"].includes(S.dfont)) S.dfont="batang";
+if(S.dfont==="batang") S.dfont="unz";
+if(!["unz","pen","gothic","dodum"].includes(S.dfont)) S.dfont="pen";
 if(!["fresh","warm","clean","bright","wongoji"].includes(S.design)) S.design="fresh";   // 노트 디자인은 원고지와 겹쳐서 뺐어요 (2026-10-03) · 새 색이 기본 (2026-10-05)
 function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
   document.querySelector('meta[name="theme-color"]').content = S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7"})[S.design] || "#FBF6EE"; }
@@ -3622,7 +3631,8 @@ function viewPicker(){
 // 폴더 탭 색: [바탕색, 선 색]
 const TAB_TONE = {chat:["var(--coral-soft)","var(--coral)"],mine:["var(--butter-soft)","var(--butter)"],kids:["var(--coral-soft)","var(--coral)"],day:["var(--sage-soft)","var(--sage)"],shelf:["var(--sky-soft)","var(--sky)"],album:["var(--sage-soft)","var(--sage)"],report:["var(--lilac-soft)","var(--lilac)"],home:["var(--butter-soft)","var(--butter)"],diary:["var(--sage-soft)","var(--sage)"],quiz:["var(--coral-soft)","var(--coral)"],family:["var(--sky-soft)","var(--sky)"],settings:["var(--lilac-soft)","var(--lilac)"]};
 // 일기 글씨 4가지
-const DFONTS = [["batang","바탕체","'Gowun Batang',serif"],["pen","손글씨","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
+// 글씨 네 가지 (2026-10-08): ① 언즈체 · ② 윤탱체 (화면 대부분 손글씨) / ③ 고딕 · ④ 동글 (또박또박 간결). 예전 '바탕체'를 고른 기기는 언즈체로
+const DFONTS = [["unz","언즈체","'OngleipUnz',cursive"],["pen","윤탱체","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
 const DESIGNS = [["fresh","새 색"],["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
@@ -3890,12 +3900,11 @@ function viewShell(){
       <div class="mast-sub">
         <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>${newsBell()}
         ${favRow()}
-        <button class="link-btn help-fab" data-act="help-open">${ic("help")}<span>챗봇 상담</span></button>
         ${isParent()?`<button class="link-btn out" data-act="signout" aria-label="로그아웃">${ic("out")}<span>로그아웃</span></button>`:""}
       </div>
       ${kidBar()}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
-      ${S.ttOpen?`<div class="fav-panel tt-panel"><div class="tt-panel-h"><h2>📅 시간표</h2><button class="link-btn" data-act="tt-open">닫기</button></div>${viewTimetable()}</div>`:""}
+      ${S.ttOpen?`<div class="tt-modal-bg" data-act="tt-open" aria-hidden="true"></div><div class="fav-panel tt-panel tt-modal" role="dialog" aria-modal="true" aria-label="시간표"><div class="tt-panel-h"><h2>📅 시간표</h2><button class="link-btn" data-act="tt-open">닫기 ✕</button></div>${viewTimetable()}</div>`:""}
       ${S.newsOpen?viewNews():""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
       <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${noticeBar()}${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
@@ -3903,6 +3912,7 @@ function viewShell(){
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}</div>
     </nav>
+    ${S.helpOpen?"":`<button class="web-help" data-act="help-open" aria-label="챗봇 상담" title="챗봇 상담">${ic("help")}</button>`}
     ${S.helpOpen?viewHelp():""}
     ${S.prof?viewProfile():""}
     ${S.lb?viewLightbox():""}
@@ -4951,11 +4961,10 @@ function viewMyDiary(){
   const st=streakOf(S.me.id), td=findDiary(S.me.id,todayStr()), done=td?.status==="submitted";
   return `<div class="page-h"><h1>내 일기</h1></div>
     <section class="my-hero ${st?"":"zero"}" aria-label="내 일기 기록">
-      <div class="mh-streak"><span class="mh-fire" aria-hidden="true">🔥</span><div><b>${st}</b><span>일 연속</span></div></div>
-      <div class="mh-side"><span>이번 달</span><b>${n}<small>편</small></b></div>
-      <p class="mh-msg">${st>=7?"멋져요! 이 기록을 이어 가요 ✨":st?"오늘도 이어서 써 볼까요?":"오늘부터 연속 기록을 시작해 봐요"}</p>
-      ${done?`<button class="mh-write done" data-act="open-diary" data-id="${td.id}">✓ 오늘 일기 다 썼어요</button>`
-        :`<button class="mh-write" data-act="write">${ic("pen")}${td?"오늘 일기 이어 쓰기":"오늘 일기 쓰기"}</button>`}
+      <span class="mh-fire" aria-hidden="true">🔥</span>
+      <div class="mh-t"><b>${st?`${st}일 연속`:"연속 기록 시작!"}</b><small>이번 달 ${n}편${st>=7?" · 멋져요 ✨":""}</small></div>
+      ${done?`<button class="mh-write done" data-act="open-diary" data-id="${td.id}">✓ 오늘 썼어요</button>`
+        :`<button class="mh-write" data-act="write">${ic("pen")}${td?"이어 쓰기":"오늘 일기"}</button>`}
     </section>
     ${S.me.type==="child"?viewStickers(S.me)+awardList(S.me):""}
     ${list.length?`${feedHTML(list)}`:`<p class="empty">아직 쓴 일기가 없어요. 오늘 첫 일기를 써 보세요.</p>`}`;
@@ -6977,7 +6986,7 @@ Object.assign(acts,{
   "help-rep-cat": el => { S.helpRep={...S.helpRep, cat:el.dataset.v}; helpSay({from:"me",text:el.dataset.v},{from:"bot",text:"어떤 일이 있었는지 적어 주세요. 언제 · 어느 화면에서 보았는지 함께 적어 주시면 빨리 살펴볼 수 있어요."}); render(); helpScroll(); document.getElementById("help-in")?.focus(); },
   "help-rep-x": () => { S.helpRep=null; helpSay({from:"bot",text:"신고를 그만뒀어요. 다른 궁금한 게 있으면 말씀해 주세요."}); render(); helpScroll(); },
 });
-document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.helpOpen && !S.lb && !S.prof) acts["help-close"](); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.ttOpen && !S.lb){ S.ttOpen=false; render(); return; } if(e.key==="Escape" && S.helpOpen && !S.lb && !S.prof) acts["help-close"](); });
 // 상담원에게 보내기 (신고면 종류 · 표시를 함께)
 forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return;
   if(DEMO){ toast("둘러보기에서는 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
