@@ -2449,6 +2449,7 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+#app .tip-ask p{white-space:normal;overflow:visible;line-height:1.45}   /* 오늘의 기능은 긴 한 줄이라 줄 바꿈 허락 */
 /* 👆 손가락으로 누르기 쉽게 (2026-10-08 앱 점검): 작은 닫기 · ✕ · 약관 링크의 누르는 자리를 넓혀요 (보이는 크기는 그대로) */
 #app :is(.pen-ask-x,.news-h .link-btn,.more-head .link-btn){position:relative;min-width:32px;min-height:32px;display:inline-grid;place-items:center}
 #app :is(.pen-ask-x,.news-h .link-btn,.more-head .link-btn)::after{content:"";position:absolute;inset:-6px}
@@ -4020,7 +4021,7 @@ function viewGrow(){
 function viewHomePages(){
   const k=hpage();
   const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="report" ? viewReport() : k==="quiz" ? viewQuizHome() : k==="fav" ? viewFavPage() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+penAskBanner()+featAskBanner():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
+  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+greenBanners():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -4171,7 +4172,7 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+penAskBanner()+featAskBanner()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+greenBanners()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow}[S.tab]||viewHome)();
 }
 
@@ -4186,9 +4187,48 @@ const homeCta = mine => mine && mine.status==="submitted"
 // 꺼 둔 기능 알려 주기: 보호자 홈에 한 번 (닫으면 이 기기에서 다시 안 보여요). 둘 다 켰으면 안 보여요
 const featAskKey = () => `iinote-featask-${S.gid}`;
 function featAskBanner(){
-  if(!isParent() || ls.get(featAskKey(),"") || (S.group?.handOn && S.group?.audioOn)) return "";
+  // 사진으로 쓰기 · 녹음 중 하나라도 켜거나 끄는 걸 한 번 고르면 '설정 끝'으로 보고 안 보여요
+  if(!isParent() || ls.get(featAskKey(),"") || S.group?.handOn!=null || S.group?.audioOn!=null) return "";
   return `<div class="pen-ask feat-ask" role="note" title="종이 일기장 사진으로 쓰기 · 목소리 녹음은 꺼 두었어요. 우리 가족 설정에서 켤 수 있어요."><span class="pen-ask-i" aria-hidden="true">🧩</span><p><b>꺼 둔 기능</b> 📝 사진으로 쓰기 · 🎙 녹음</p><button class="btn pill2 sm" data-act="feat-go"><i aria-hidden="true">⏻</i><span>켜기</span></button><button class="link-btn pen-ask-x" data-act="feat-x" aria-label="닫기">✕</button></div>`;
 }
+/* 💡 오늘의 기능 소개 (2026-10-09): 홈 초록 띠에 하루 한 줄씩 우리 앱 기능을 차례로 소개해요. ✕ 를 누르면 그날은 안 보여요
+   [아이콘, 한 줄, 갈 곳(tab 이름 · "prof" 내 프로필 편집 · "tt" 시간표 · "" 없음), 누구(p 보호자만 · "" 모두), 어디(app · web · "" 둘 다)] */
+const TIPS = [
+  ["🐾","프로필을 꾸밀 수 있어요! 기본 캐릭터나 좋아하는 캐릭터로 얼굴을 바꿔 보세요","prof","",""],
+  ["📞","프로필에 전화번호를 넣으면 앱에서 가족에게 바로 전화 · 문자를 걸 수 있어요","prof","p",""],
+  ["📸","가족 사진첩에 올린 사진은 연도 · 사람 · 동네별로 저절로 모여요","album","",""],
+  ["📅","학교 시간표 사진을 올리면 AI가 예쁜 칸 시간표로 만들어 줘요","tt","",""],
+  ["💬","가족 채팅에서 '답장'과 반응 이모지로 대화를 이어 가 보세요","chat","",""],
+  ["📄","쓴 일기를 PDF 일기책으로 만들어 인쇄할 수 있어요 (쪽 모양 10가지)","shelf","p",""],
+  ["📊","AI 리포트에서 아이 일기의 이번 주 · 이번 달 총평을 받아 보세요","report","p",""],
+  ["📝","AI 다홍펜이 고쳐 준 낱말로 받아쓰기 퀴즈가 저절로 만들어져요","quiz","",""],
+  ["🏆","한 달 내내 쓰면 개근상, 20일 넘게 쓰면 성실상을 받아요","mine","",""],
+  ["🌙","하루 펼쳐보기에서 같은 날 가족 일기를 나란히 읽어 보세요","day","",""],
+  ["🗓","일정은 '가족 모두' 또는 '나만 보기'로 나눠 넣을 수 있어요","","",""],
+  ["🎨","화면 꾸미기에서 디자인 · 글씨체를 내 마음대로 골라 보세요","settings","",""],
+  ["💌","가족 일기에 하트와 댓글을 남겨 보세요. 보호자는 칭찬 도장도 찍어 줄 수 있어요","day","",""],
+  ["🔔","위쪽 종을 누르면 내 일기에 달린 댓글 · 하트 · 도장을 모아 볼 수 있어요","","",""],
+  ["🧩","홈 화면에 위젯을 놓으면 달력 · 사진 · 연속 기록을 앱을 안 열고도 봐요","","","app"],
+  ["✍️","종이 일기장을 사진으로 찍으면 AI가 글자로 옮겨 줘요 (우리 가족 설정에서 켜기)","family","p",""],
+  ["💾","우리 가족 설정에서 일기 · 댓글을 엑셀 파일로 받아 둘 수 있어요","family","p",""],
+  ["⭐","즐겨찾기에 학교 · 학원 누리집을 넣어 두면 한 번에 열 수 있어요","","p",""],
+  ["🔒","앱 잠금을 켜면 지문 · 얼굴로만 열 수 있어요 (설정 › 앱 설정)","settings","p","app"],
+  ["🎧","궁금한 점은 오른쪽 아래 챗봇 상담에 물어보세요. 못 푼 건 상담원이 답해요","","",""],
+];
+const tipKey = () => `iinote-tipx-${S.gid}-${todayStr()}`;
+function todayTip(){
+  const list=TIPS.map((t,i)=>[t,i]).filter(([t])=>(!t[3] || isParent()) && (!t[4] || (t[4]==="app")===IS_APP));
+  if(!list.length) return null;
+  const day=Math.floor(toDate(todayStr()).getTime()/864e5);
+  return list[day % list.length];
+}
+function tipBanner(){
+  if(ls.get(tipKey(),"")) return "";
+  const x=todayTip(); if(!x) return ""; const [[ic1,text,to],i]=x;
+  return `<div class="pen-ask tip-ask" role="note" title="${esc(text)}"><span class="pen-ask-i" aria-hidden="true">${ic1}</span><p><b>오늘의 기능</b> ${esc(text)}</p>${to?`<button class="btn pill2 sm" data-act="tip-go" data-v="${i}"><i aria-hidden="true">›</i><span>보기</span></button>`:""}<button class="link-btn pen-ask-x" data-act="tip-x" aria-label="오늘은 그만 보기">✕</button></div>`;
+}
+// 초록 띠는 많아야 두 줄: 해야 할 설정(다홍펜 · 꺼 둔 기능)이 먼저, 남는 자리에 오늘의 기능
+const greenBanners = () => [penAskBanner(), featAskBanner(), tipBanner()].filter(Boolean).slice(0,2).join("");
 function penAskBanner(){
   const ks=penUnset(); if(!ks.length) return "";
   return `<div class="pen-ask" role="note" title="지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요."><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b> 다홍펜 고치는 방법</p><button class="btn pill2 sm" data-act="pen-set"><i aria-hidden="true">✎</i><span>고르기</span></button><span class="link-btn pen-ask-x pen-ask-sp" aria-hidden="true">✕</span></div>`;
@@ -7306,6 +7346,14 @@ document.addEventListener("change", e=>{ const t=e.target; if(!t.classList?.cont
 Object.assign(acts,{
   "feat-go": () => { ls.set(featAskKey(),"1"); go(()=>{ S.tab="family"; S.sub=null; S.famOpen="h-feat"; }); },
   "feat-x": () => { ls.set(featAskKey(),"1"); render(); },
+});
+// 💡 오늘의 기능 띠 단추
+Object.assign(acts,{
+  "tip-x": () => { ls.set(tipKey(),"1"); render(); },
+  "tip-go": el => { const t=TIPS[+el.dataset.v]; if(!t) return; ls.set(tipKey(),"1"); const to=t[2];
+    if(to==="prof"){ S.prof=S.me.id; S.profEdit=canEditProf(S.me); render(); return; }
+    if(to==="tt"){ if(IS_APP) go(()=>{ S.tab="home"; S.sub=null; S.hpage="fav"; S.favTab="tt"; }); else { S.ttOpen=true; render(); } return; }
+    go(()=>{ S.tab=to; S.sub=null; }); },
 });
 // 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통)
 const helpSay = (...m) => { S.helpLocal=[...(S.helpLocal||[]),...m]; };
