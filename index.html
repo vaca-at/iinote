@@ -2394,15 +2394,16 @@ html.is-app:root .more-row{border-radius:16px;background:color-mix(in srgb,var(-
 html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 
 /* ===== 🎨 단추 · 얼굴 새 모양 (2026-10-08, 사용자가 고른 시안) =====
-   ① 동그란 얼굴(.av) = 말랑 점토  ② 일반 단추(.btn-primary · .btn-accent) = 오로라 + 살짝 입체  ③ 켜기 · 고르기 · 설정 단추(.pill2) = 두 칸 알약 */
+   ① 동그란 얼굴(.av) = 말랑 점토  ② 일반 단추(.btn-primary · .btn-accent) = 밤하늘 남색 + 흐르는 오로라 테두리 + 금빛 ✦ (밤에 쓰는 일기장, 시안 5번)  ③ 켜기 · 고르기 · 설정 단추(.pill2) = 두 칸 알약 */
 .av:not(.has-ph){background-image:radial-gradient(circle at 30% 24%,rgba(255,255,255,.6) 0 8%,rgba(255,255,255,0) 9%),linear-gradient(180deg,rgba(255,255,255,.26),rgba(0,0,0,.16))!important;box-shadow:inset 0 2px 1px rgba(255,255,255,.45),inset 0 -2px 2px rgba(0,0,0,.18),0 2px 0 rgba(0,0,0,.14),0 4px 7px -3px rgba(46,36,51,.35);text-shadow:0 1px 0 rgba(0,0,0,.2)}
 .av.has-ph{box-shadow:0 2px 0 rgba(0,0,0,.12),0 4px 7px -3px rgba(46,36,51,.35)}
-.btn.btn-primary,.btn.btn-accent{position:relative;border:2.5px solid transparent!important;color:var(--ink)!important;
-  background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 90%,#9B7BE8)) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box!important;
+.btn.btn-primary,.btn.btn-accent{position:relative;border:2.5px solid transparent!important;color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.25);
+  background:linear-gradient(160deg,#33447A,#1F2A44 70%) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box!important;
   background-size:100% 100%,300% 100%!important;
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.85),0 3px 0 color-mix(in srgb,#9B7BE8 55%,transparent),0 7px 14px -7px rgba(155,123,232,.7)!important;transition:transform .12s,box-shadow .12s}
-.btn.btn-primary:active,.btn.btn-accent:active{transform:translateY(2px);box-shadow:inset 0 2px 0 rgba(255,255,255,.85),0 1px 0 color-mix(in srgb,#9B7BE8 55%,transparent)!important}
-.btn.btn-primary::before,.btn.btn-accent::before{content:"✦";font-size:.7em;color:#E4507F;margin-right:-2px}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 0 rgba(31,42,68,.35),0 8px 14px -7px rgba(155,123,232,.65)!important;transition:transform .12s,box-shadow .12s}
+.btn.btn-primary .ic,.btn.btn-accent .ic{color:#fff}
+.btn.btn-primary:active,.btn.btn-accent:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 1px 0 rgba(31,42,68,.35)!important}
+.btn.btn-primary::before,.btn.btn-accent::before{content:"✦";font-size:.75em;color:#F4BE45;margin-right:-2px}
 .btn.btn-primary:has(> .ic)::before,.btn.btn-accent:has(> .ic)::before{content:none}
 @media (prefers-reduced-motion:no-preference){ .btn.btn-primary,.btn.btn-accent{animation:btnAurora 7s linear infinite} @keyframes btnAurora{to{background-position:0 0,300% 0}} }
 .btn.pill2{min-width:92px;min-height:34px;padding:0 14px 0 0;gap:0;overflow:hidden;font-weight:700;border:2px solid transparent;
@@ -5088,7 +5089,7 @@ function dayCard(p,x,mode){
       ${canStamp?`<div class="day-stamps" role="group" aria-label="칭찬 도장 찍기">${STAMPS.map(s=>`<button class="stamp-btn ${x.stamp===s?"on":""}" data-act="stamp" data-id="${x.id}" data-v="${esc(s)}" aria-pressed="${x.stamp===s}">${esc(s)}</button>`).join("")}</div>`:""}
       ${sub?`<div class="day-hearts"><button class="day-heart" data-act="heart" data-id="${x.id}" aria-pressed="${on}" aria-label="하트">${on?"❤️":"🤍"}</button>${hs.length?`<span>${hs.map(esc).join(" · ")}</span>`:""}</div>`:""}
       ${cs.length?`<ul class="day-cmts">${thread(null,0)}</ul>`:""}
-      ${sub?`<form class="day-cform" data-form="comment" data-parent="" data-diary="${x.id}"><label class="sr" for="dc-${x.id}">한마디</label><input id="dc-${x.id}" name="text" maxlength="500" required autocomplete="off" spellcheck="false" placeholder="${esc(p.name)}에게 한마디"><button class="btn btn-ghost sm">남기기</button></form>`:""}
+      ${sub?`<form class="day-cform" data-form="comment" data-parent="" data-diary="${x.id}"><label class="sr" for="dc-${x.id}">한마디</label><input id="dc-${x.id}" name="text" maxlength="500" required autocomplete="off" spellcheck="false" placeholder="${esc(p.name)}에게 한마디"><button class="btn btn-primary sm">남기기</button></form>`:""}
       <button class="link-btn" data-act="open-diary" data-id="${x.id}">자세히 보기 · 답글 쓰기 →</button>
     </article>`;
 }
