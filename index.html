@@ -2430,6 +2430,41 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pf-ch-grid .leg::before{content:"전설";position:absolute;top:-6px;right:-2px;font-size:9px;padding:0 5px;border-radius:99px;background:linear-gradient(90deg,#F4BE45,#EF6F53);color:#fff;line-height:15px}
 .pf-ch-up{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
 .pf-ch-up .ch-img{width:34px;height:34px}
+/* 🐾 캐릭터 다듬기 창 (charEdOpen) */
+.che-wrap{position:fixed;inset:0;z-index:400;display:grid;place-items:center;padding:16px}
+.che-bg{position:absolute;inset:0;background:rgba(20,24,52,.55);backdrop-filter:blur(3px)}
+.che{position:relative;width:min(560px,100%);max-height:calc(100dvh - 32px);overflow:auto;border-radius:24px;background:var(--surface);color:var(--ink);padding:16px 16px 14px;box-shadow:0 24px 60px -20px rgba(20,24,52,.6);display:flex;flex-direction:column;gap:12px}
+.che-h{display:flex;align-items:center;justify-content:space-between}
+.che-h b{font-size:18px}
+.che-x{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.che-in{position:relative;border-radius:18px;border:2px dashed color-mix(in srgb,#7B6BD6 55%,var(--line));background:color-mix(in srgb,#7B6BD6 7%,var(--surface));padding:14px;text-align:center}
+.che-paste{position:absolute;inset:0;border-radius:16px;color:transparent;caret-color:transparent;overflow:hidden;cursor:text;outline:none}
+.che-paste:focus{box-shadow:0 0 0 3px color-mix(in srgb,#7B6BD6 45%,transparent)}
+.che-ph{position:relative;margin:4px 0 10px;font-size:15px;line-height:1.5;pointer-events:none}
+.che-ph small{color:var(--ink2);font-size:12px}
+.che-in-btns{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.che-wrap.has .che-in{padding:8px 10px}
+.che-wrap.has .che-ph{display:none}
+.che-view,.che-ctl{display:none}
+.che-wrap.has .che-view{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.che-wrap.has .che-ctl{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;align-items:end}
+.che-view figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.che-view figcaption{font-size:12px;color:var(--ink2);text-align:center;line-height:1.3}
+.che-view figcaption small{display:block;font-size:11px}
+.che-src canvas{max-width:150px;max-height:150px;border-radius:10px;background:repeating-conic-gradient(#E8E3EF 0 25%,#fff 0 50%) 0 0/14px 14px;box-shadow:0 0 0 1px var(--line)}
+.che-arrow{font-size:22px;color:var(--ink3,#9A8FA0)}
+.che-ring{display:block;width:150px;height:150px;border-radius:50%;overflow:hidden;touch-action:none;cursor:grab;background:radial-gradient(circle at 40% 34%,#2B3570,#10153A 80%);box-shadow:0 0 0 3px #C9B6FF,0 0 18px -2px rgba(201,182,255,.8)}
+.che-ring:active{cursor:grabbing}
+.che-ring canvas{width:100%;height:100%;display:block;transform:scale(.86);transform-origin:center}
+.che-mini span{display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:radial-gradient(circle at 50% 60%,rgba(255,160,90,.45),rgba(255,160,90,0) 70%),var(--nightbase)}
+.che-mini canvas{width:38px;height:38px}
+.che-ctl label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700}
+.che-ctl label small{font-weight:400;color:var(--ink2);font-size:11px}
+.che-ctl input[type=range]{width:100%;accent-color:#5B4BC4}
+.che-ctl .link-btn{justify-self:start;font-size:13px}
+.che-note{margin:0;font-size:12px;color:var(--ink2)}
+.che-btns{display:grid;grid-template-columns:1fr 1.6fr;gap:10px}
+@media (max-width:420px){ .che-ring{width:128px;height:128px} .che-src canvas{max-width:110px;max-height:110px} .che-arrow{display:none} .che-wrap.has .che-ctl{grid-template-columns:1fr} }
 .pf-ch-up em{font-style:normal;font-size:12px;color:var(--muted);flex:1 1 100%}
 .btn.btn-primary,.btn.btn-accent{position:relative;border:2.5px solid transparent!important;color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.25);
   background:linear-gradient(160deg,#33447A,#1F2A44 70%) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box!important;
@@ -2449,6 +2484,21 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+/* 💬 채팅 기둥 접기 · 펼치기 (2026-10-09): 밤하늘 단추 · 접힌 기둥도 밤하늘 띠 */
+.cs-fold{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 4px 0 12px;border-radius:15px;border:0;cursor:pointer;color:#fff;font:inherit;font-size:13px;font-weight:700;background:var(--nightbase);box-shadow:0 0 0 1.5px rgba(201,182,255,.55),0 4px 10px -4px rgba(31,42,68,.6)}
+.cs-fold i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-style:normal;font-size:16px;line-height:1;background:rgba(255,255,255,.16);color:#FFE7A3;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.cs-fold:hover i{transform:translateX(2px)}.cs-fold i{transition:transform .2s}
+.cs-fold:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+@media (min-width:1100px){
+  .chat-side-open{gap:10px;width:50px;padding:16px 0 12px;border:0;border-radius:25px;color:#fff;background:var(--nightbase);box-shadow:0 0 0 1.5px rgba(201,182,255,.55),0 10px 22px -10px rgba(31,42,68,.7)}
+  .chat-side-open .cs-bub{font-style:normal;font-size:22px;filter:drop-shadow(0 0 6px rgba(201,182,255,.9))}
+  .chat-side-open span{color:#F3EEFF;letter-spacing:4px;text-shadow:0 0 8px rgba(201,182,255,.6)}
+  .chat-side-open .cs-unfold{display:grid;place-items:center;width:28px;height:28px;margin-top:4px;border-radius:50%;font-style:normal;font-size:18px;line-height:1;color:#1F2A44;background:linear-gradient(160deg,#FFE7A3,#F4BE45);box-shadow:0 0 10px rgba(255,231,163,.6);transition:transform .2s}
+  .chat-side-open small{font-size:10.5px;color:#D9CFFF}
+  .chat-side-open:hover .cs-unfold{transform:translateX(-2px)}
+  .chat-side-open:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+  .body-row.side-closed{grid-template-columns:minmax(0,1fr) 50px}
+}
 #app .tip-ask p{white-space:normal;overflow:visible;line-height:1.45}   /* 오늘의 기능은 긴 한 줄이라 줄 바꿈 허락 */
 /* 👆 손가락으로 누르기 쉽게 (2026-10-08 앱 점검): 작은 닫기 · ✕ · 약관 링크의 누르는 자리를 넓혀요 (보이는 크기는 그대로) */
 #app :is(.pen-ask-x,.news-h .link-btn,.more-head .link-btn){position:relative;min-width:32px;min-height:32px;display:inline-grid;place-items:center}
@@ -3549,9 +3599,9 @@ function refreshChatLists(){ document.querySelectorAll(".chat-list").forEach(b=>
 const chatSideOpen = () => ls.get("iinote-chat-side","open")!=="closed";
 function viewChatSide(){
   if(S.tab==="chat" && !S.sub) return "";   // 채팅 탭을 보고 있으면 기둥은 안 그려요 (같은 채팅이 두 번 안 보이게)
-  if(!chatSideOpen()) return `<aside class="chat-side closed" aria-label="가족 채팅"><button class="chat-side-open" data-act="chat-side" aria-label="가족 채팅 펼치기">💬<span>가족 채팅</span></button></aside>`;
+  if(!chatSideOpen()) return `<aside class="chat-side closed" aria-label="가족 채팅"><button class="chat-side-open" data-act="chat-side" aria-label="가족 채팅 펼치기"><em class="cs-bub" aria-hidden="true">💬</em><span>가족 채팅</span><i class="cs-unfold" aria-hidden="true">‹</i><small>펼치기</small></button></aside>`;
   return `<aside class="chat-side" aria-label="가족 채팅">
-    <div class="chat-side-h"><b>💬 가족 채팅</b><button class="link-btn" data-act="chat-side" aria-label="가족 채팅 접기">접기 ▸</button></div>
+    <div class="chat-side-h"><b>💬 가족 채팅</b><button class="cs-fold" data-act="chat-side" aria-label="가족 채팅 접기"><span>접기</span><i aria-hidden="true">›</i></button></div>
     <div class="chat-list" aria-live="polite">${chatItems()}</div>
     ${chatForm()}</aside>`;
 }
@@ -4194,12 +4244,11 @@ function featAskBanner(){
 /* 💡 오늘의 기능 소개 (2026-10-09): 홈 초록 띠에 하루 한 줄씩 우리 앱 기능을 차례로 소개해요. ✕ 를 누르면 그날은 안 보여요
    [아이콘, 한 줄, 갈 곳(tab 이름 · "prof" 내 프로필 편집 · "tt" 시간표 · "" 없음), 누구(p 보호자만 · "" 모두), 어디(app · web · "" 둘 다)] */
 const TIPS = [
-  ["🐾","프로필을 꾸밀 수 있어요! 기본 캐릭터나 좋아하는 캐릭터로 얼굴을 바꿔 보세요","prof","",""],
-  ["📞","프로필에 전화번호를 넣으면 앱에서 가족에게 바로 전화 · 문자를 걸 수 있어요","prof","p",""],
+  ["🐾","프로필을 꾸밀 수 있어요! 기본 캐릭터나 좋아하는 캐릭터로 바꿔 보세요","prof","",""],
+  ["📞","프로필에 전화번호를 넣으면 앱에서 가족에게 바로 전화 · 문자 등 연락을 할 수 있어요","prof","p",""],
   ["📸","가족 사진첩에 올린 사진은 연도 · 사람 · 동네별로 저절로 모여요","album","",""],
-  ["📅","학교 시간표 사진을 올리면 AI가 예쁜 칸 시간표로 만들어 줘요","tt","",""],
+  ["📅","학교 시간표 사진을 올리면 AI가 예쁜 칸 시간표로 만들어 줘요. 다양한 디자인 중 골라 보세요","tt","",""],
   ["💬","가족 채팅에서 '답장'과 반응 이모지로 대화를 이어 가 보세요","chat","",""],
-  ["📄","쓴 일기를 PDF 일기책으로 만들어 인쇄할 수 있어요 (쪽 모양 10가지)","shelf","p",""],
   ["📊","AI 리포트에서 아이 일기의 이번 주 · 이번 달 총평을 받아 보세요","report","p",""],
   ["📝","AI 다홍펜이 고쳐 준 낱말로 받아쓰기 퀴즈가 저절로 만들어져요","quiz","",""],
   ["🏆","한 달 내내 쓰면 개근상, 20일 넘게 쓰면 성실상을 받아요","mine","",""],
@@ -4208,11 +4257,12 @@ const TIPS = [
   ["🎨","화면 꾸미기에서 디자인 · 글씨체를 내 마음대로 골라 보세요","settings","",""],
   ["💌","가족 일기에 하트와 댓글을 남겨 보세요. 보호자는 칭찬 도장도 찍어 줄 수 있어요","day","",""],
   ["🔔","위쪽 종을 누르면 내 일기에 달린 댓글 · 하트 · 도장을 모아 볼 수 있어요","","",""],
-  ["🧩","홈 화면에 위젯을 놓으면 달력 · 사진 · 연속 기록을 앱을 안 열고도 봐요","","","app"],
+  ["🧩","홈 화면에 달력 · 사진 등 다양한 위젯을 두고 활용해 보세요","","","app"],
   ["✍️","종이 일기장을 사진으로 찍으면 AI가 글자로 옮겨 줘요 (우리 가족 설정에서 켜기)","family","p",""],
   ["💾","우리 가족 설정에서 일기 · 댓글을 엑셀 파일로 받아 둘 수 있어요","family","p",""],
-  ["⭐","즐겨찾기에 학교 · 학원 누리집을 넣어 두면 한 번에 열 수 있어요","","p",""],
+  ["⭐","즐겨찾기에 학교 · 학원 홈페이지를 넣어 두면 한 번에 열 수 있어요","","p",""],
   ["🔒","앱 잠금을 켜면 지문 · 얼굴로만 열 수 있어요 (설정 › 앱 설정)","settings","p","app"],
+  ["📄","쓴 일기를 PDF 일기책으로 만들어 인쇄할 수 있어요 (쪽 모양 10가지)","shelf","p",""],
   ["🎧","궁금한 점은 오른쪽 아래 챗봇 상담에 물어보세요. 못 푼 건 상담원이 답해요","","",""],
 ];
 const tipKey = () => `iinote-tipx-${S.gid}-${todayStr()}`;
@@ -7189,8 +7239,8 @@ function viewProfile(){
         ${p.char?.img?.url?`<label title="내가 넣은 그림"><input type="radio" name="char" value="img" checked><img class="ch-img" src="${esc(p.char.img.url)}" alt=""><small>넣은 그림</small></label>`:""}
         ${CHARS.map(([k,e,n,fx])=>`<label class="${fx?"leg":""}" title="${esc(n)}"><input type="radio" name="char" value="${k}" ${p.char?.id===k?"checked":""}><span class="ch-e ${fx?"chx-"+fx:""}">${e}</span><small>${esc(n)}</small></label>`).join("")}
       </div>
-      <div class="pf-ch-up"><label class="btn btn-soft">${ic("camera")}캡처한 그림 넣기<input type="file" class="pf-file sr" data-kind="char" accept="image/*"></label>
-        <em>좋아하는 캐릭터 그림을 캡처해서 넣으면 바탕을 지우고 캐릭터만 꽉 차게 넣어 줘요.${IS_APP?"":" 컴퓨터에서는 캡처한 뒤 이 창에서 Ctrl+V 로 붙여 넣어도 돼요."} 가족에게만 보여요.</em></div>
+      <div class="pf-ch-up"><button type="button" class="btn btn-soft" data-act="prof-char-ed">${ic("camera")}캡처한 그림 넣기</button>
+        <em>좋아하는 캐릭터 그림을 캡처해서 붙여 넣거나 골라 주세요. 바탕을 지우고 캐릭터만 꽉 차게 맞춰 주고, 넣기 전에 눈으로 보며 크기 · 자리를 고칠 수 있어요.</em></div>
     </fieldset>
     ${canEditPhone(p)?`<label class="pf-f"><span>전화번호 <small>(선택)</small></span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.phone||"")}" maxlength="20" placeholder="010-0000-0000"><em>같은 가족에게만 보여요. 비워 두면 전화 · 문자 단추가 안 보여요.${p.type==="child"?" 아이 번호는 보호자만 넣을 수 있어요.":""}</em></label>`
       : p.type==="child"?`<p class="pf-note">전화번호는 엄마 · 아빠가 넣어 줄 수 있어요</p>`:""}
@@ -7207,62 +7257,158 @@ function viewProfile(){
   </section>`;
 }
 /* 🐾 캡처한 캐릭터 그림 다듬기 (2026-10-09): 가장자리에서 이어진 바탕색(모서리 색과 비슷한 색)을 투명하게 지우고
-   남은 캐릭터만 꼭 맞게 잘라 정사각형 PNG(320px)로 → 동그라미 · 연속 자리에 꽉 차게. 바탕이 복잡한 그림은 그대로 잘라만 둬요 */
-async function charCut(blob){
+   남은 캐릭터만 꼭 맞게 잘라 정사각형 PNG(320px)로 → 동그라미 · 연속 자리에 꽉 차게.
+   '캐릭터 다듬기' 창(charEd)에서 원래 그림 · 동그라미 미리 보기를 나란히 보며 바탕 지우는 정도 · 크기 · 자리(끌기)를 맞춰요 */
+async function charLoad(blob){
   // 그림 열기: createImageBitmap 이 안 되는 기기(옛 사파리 · 일부 앱 웹 화면)는 <img> 로
   const bm=await createImageBitmap(blob).catch(()=>new Promise((ok,no)=>{ const u=URL.createObjectURL(blob), im=new Image();
     im.onload=()=>{ ok(im); setTimeout(()=>URL.revokeObjectURL(u),1000); }; im.onerror=()=>no(new Error("그림을 열 수 없어요")); im.src=u; }));
   const bw=bm.naturalWidth||bm.width, bh=bm.naturalHeight||bm.height; if(!bw || !bh) throw new Error("그림 크기를 알 수 없어요");
   const k=Math.min(1,640/Math.max(bw,bh)), W=Math.max(1,Math.round(bw*k)), H=Math.max(1,Math.round(bh*k));
-  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const g=cv.getContext("2d",{willReadFrequently:true});
-  g.drawImage(bm,0,0,W,H); bm.close?.();
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; cv.getContext("2d").drawImage(bm,0,0,W,H); bm.close?.();
+  return cv;
+}
+// 바탕 지우기(tol: 0 이면 안 지움) + 작은 부스러기 지우기 → {cv, box:[x0,y0,x1,y1]}
+function charProcess(base, tol){
+  const W=base.width, H=base.height, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const g=cv.getContext("2d",{willReadFrequently:true}); g.drawImage(base,0,0);
   const im=g.getImageData(0,0,W,H), d=im.data, px=(x,y)=>(y*W+x)*4;
-  // 바탕색 후보: 네 모서리 중 가장 흔한 색 (이미 투명하면 그대로)
-  const cs=[[0,0],[W-1,0],[0,H-1],[W-1,H-1]].map(([x,y])=>{ const i=px(x,y); return [d[i],d[i+1],d[i+2],d[i+3]]; });
   const near=(a,b,t)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])+Math.abs(a[2]-b[2])<=t;
-  const bg=cs.map(c=>[c,cs.filter(o=>near(c,o,60)).length]).sort((a,b)=>b[1]-a[1])[0][0];
-  if(bg[3]>200){
-    const T=70, seen=new Uint8Array(W*H), st=[];
-    for(let x=0;x<W;x++){ st.push(x, x+(H-1)*W); } for(let y=0;y<H;y++){ st.push(y*W, y*W+W-1); }
-    let cleared=0;
-    while(st.length){ const p=st.pop(); if(seen[p]) continue; seen[p]=1; const i=p*4;
-      if(d[i+3]<20 || near([d[i],d[i+1],d[i+2]],bg,T)){ d[i+3]=0; cleared++; const x=p%W, y=(p/W)|0;
-        if(x>0) st.push(p-1); if(x<W-1) st.push(p+1); if(y>0) st.push(p-W); if(y<H-1) st.push(p+W); } }
-    if(cleared >= W*H*0.08 && cleared <= W*H*0.97) g.putImageData(im,0,0);   // 거의 안 지워졌거나 다 지워지면 원래 그림 그대로
+  if(tol>0){
+    // 바탕색: 네 테두리 줄에서 가장 많이 나온 색 (비슷한 색은 묶어서 셈, 이미 투명하면 그대로)
+    const cnt=new Map(), edge=[]; for(let x=0;x<W;x+=2){ edge.push(px(x,0),px(x,H-1)); } for(let y=0;y<H;y+=2){ edge.push(px(0,y),px(W-1,y)); }
+    for(const i of edge){ const key=d[i+3]<128?"t":(d[i]>>4)+","+(d[i+1]>>4)+","+(d[i+2]>>4); const c=cnt.get(key)||{n:0,i}; c.n++; cnt.set(key,c); }
+    const top=[...cnt.values()].sort((a,b)=>b.n-a.n)[0], bg=[d[top.i],d[top.i+1],d[top.i+2],d[top.i+3]];
+    if(bg[3]>200){
+      const seen=new Uint8Array(W*H), st=[];
+      for(let x=0;x<W;x++){ st.push(x, x+(H-1)*W); } for(let y=0;y<H;y++){ st.push(y*W, y*W+W-1); }
+      while(st.length){ const p=st.pop(); if(seen[p]) continue; seen[p]=1; const i=p*4;
+        if(d[i+3]<20 || near([d[i],d[i+1],d[i+2]],bg,tol)){ d[i+3]=0; const x=p%W, y=(p/W)|0;
+          if(x>0) st.push(p-1); if(x<W-1) st.push(p+1); if(y>0) st.push(p-W); if(y<H-1) st.push(p+W); } }
+    }
   }
   // 남은 덩어리 중 가장 큰 것(= 캐릭터)과 그만큼 큰 덩어리만 남기고, 캡처 화면의 글씨 · 작은 부스러기는 지워요
-  const im2=g.getImageData(0,0,W,H), a=im2.data, lab=new Int32Array(W*H), sizes=[0], boxes=[null];
-  for(let p0=0;p0<W*H;p0++){ if(lab[p0] || a[p0*4+3]<=40) continue;
-    const L=sizes.length, st=[p0]; lab[p0]=L; let n=0, bx=[W,H,-1,-1];
+  const lab=new Int32Array(W*H), sizes=[0], boxes=[null];
+  for(let p0=0;p0<W*H;p0++){ if(lab[p0] || d[p0*4+3]<=40) continue;
+    const L=sizes.length, st=[p0]; lab[p0]=L; let n=0; const bx=[W,H,-1,-1];
     while(st.length){ const p=st.pop(), x=p%W, y=(p/W)|0; n++;
       if(x<bx[0])bx[0]=x; if(x>bx[2])bx[2]=x; if(y<bx[1])bx[1]=y; if(y>bx[3])bx[3]=y;
-      for(const q of [x>0?p-1:-1, x<W-1?p+1:-1, y>0?p-W:-1, y<H-1?p+W:-1]) if(q>=0 && !lab[q] && a[q*4+3]>40){ lab[q]=L; st.push(q); } }
+      if(x>0 && !lab[p-1] && d[(p-1)*4+3]>40){ lab[p-1]=L; st.push(p-1); }
+      if(x<W-1 && !lab[p+1] && d[(p+1)*4+3]>40){ lab[p+1]=L; st.push(p+1); }
+      if(y>0 && !lab[p-W] && d[(p-W)*4+3]>40){ lab[p-W]=L; st.push(p-W); }
+      if(y<H-1 && !lab[p+W] && d[(p+W)*4+3]>40){ lab[p+W]=L; st.push(p+W); } }
     sizes.push(n); boxes.push(bx); }
-  const big=Math.max(0,...sizes.slice(1)), keep=sizes.map((n,i)=>i>0 && n>=big*0.15);
+  // 가는 줄(캡처 화면의 테두리 · 밑줄)은 캐릭터가 아니라서 빼요
+  const thin=i=>{ const q=boxes[i]; return Math.min(q[2]-q[0],q[3]-q[1])<Math.max(6,Math.min(W,H)*0.03); };
+  const big=Math.max(0,...sizes.map((n,i)=>i>0 && !thin(i)?n:0)), keep=sizes.map((n,i)=>i>0 && !thin(i) && n>=big*0.15);
   let x0=W,y0=H,x1=-1,y1=-1;
   keep.forEach((k,i)=>{ if(!k) return; const b=boxes[i]; x0=Math.min(x0,b[0]); y0=Math.min(y0,b[1]); x1=Math.max(x1,b[2]); y1=Math.max(y1,b[3]); });
-  if(big && sizes.length>2){ for(let p=0;p<W*H;p++) if(lab[p] && !keep[lab[p]]) a[p*4+3]=0; g.putImageData(im2,0,0); }
+  if(big) for(let p=0;p<W*H;p++) if(lab[p] && !keep[lab[p]]) d[p*4+3]=0;
+  g.putImageData(im,0,0);
   if(x1<0){ x0=0;y0=0;x1=W-1;y1=H-1; }
-  const side=Math.max(x1-x0+1,y1-y0+1)*1.08, cx=(x0+x1+1)/2, cy=(y0+y1+1)/2;
-  const out=document.createElement("canvas"); out.width=out.height=320; const o=out.getContext("2d");
-  o.imageSmoothingQuality="high"; o.drawImage(cv, cx-side/2, cy-side/2, side, side, 0, 0, 320, 320);
-  return await new Promise((ok,no)=>out.toBlob(b=>b?ok(b):no(new Error("png")),"image/png"));
+  return {cv, box:[x0,y0,x1,y1]};
 }
-async function profChar(blob){
-  const p=prof(S.prof); if(!p || !blob || !canEditProf(p)) return;
-  if(blob.type && !/^image\//.test(blob.type)){ toast("그림 파일만 넣을 수 있어요"); return; }   // 앱 · 일부 휴대폰은 종류(type)가 비어 와요
-  let step="그림 다듬기";
+// 정사각형으로 담기: zoom 이 크면 더 크게, dx · dy 는 칸 너비에 대한 비율(끌어서 옮긴 만큼)
+function charCompose(r, zoom=1, dx=0, dy=0, size=320, out){
+  const [x0,y0,x1,y1]=r.box, side=Math.max(x1-x0+1,y1-y0+1)*1.08/zoom, cx=(x0+x1+1)/2-dx*side, cy=(y0+y1+1)/2-dy*side;
+  out=out||document.createElement("canvas"); out.width=out.height=size; const o=out.getContext("2d");
+  o.clearRect(0,0,size,size); o.imageSmoothingQuality="high"; o.drawImage(r.cv, cx-side/2, cy-side/2, side, side, 0, 0, size, size);
+  return out;
+}
+const canvasPng = cv => new Promise((ok,no)=>cv.toBlob(b=>b?ok(b):no(new Error("png")),"image/png"));
+async function charCut(blob){ return canvasPng(charCompose(charProcess(await charLoad(blob),70))); }
+
+// ── 캐릭터 다듬기 창: 화면 다시 그리기(render)와 따로 몸(body)에 붙여요 (끌기 · 막대를 움직여도 프로필 칸이 그대로)
+const CE = { el:null, base:null, res:null, tol:70, zoom:1, dx:0, dy:0, busy:false };
+function charEdClose(){ CE.el?.remove(); CE.el=null; CE.base=CE.res=null; document.removeEventListener("keydown",charEdKey); }
+function charEdKey(e){ if(e.key==="Escape"){ e.stopPropagation(); charEdClose(); } }
+function charEdDraw(){
+  if(!CE.el || !CE.res) return;
+  const big=CE.el.querySelector(".che-big canvas"), mini=CE.el.querySelector(".che-mini canvas"), src=CE.el.querySelector(".che-src canvas");
+  charCompose(CE.res,CE.zoom,CE.dx,CE.dy,320,big); charCompose(CE.res,CE.zoom,CE.dx,CE.dy,96,mini);
+  // 원래 그림: 바탕이 지워진 곳은 체크무늬로 보여요
+  const k=Math.min(1,240/Math.max(CE.res.cv.width,CE.res.cv.height)); src.width=Math.round(CE.res.cv.width*k); src.height=Math.round(CE.res.cv.height*k);
+  src.getContext("2d").drawImage(CE.res.cv,0,0,src.width,src.height);
+}
+function charEdRedo(){ if(!CE.base) return; CE.res=charProcess(CE.base,CE.tol); charEdDraw(); }
+async function charEdLoad(blob){
+  if(!blob) return; if(blob.type && !/^image\//.test(blob.type)){ toast("그림 파일만 넣을 수 있어요"); return; }
+  try{ CE.base=await charLoad(blob); CE.zoom=1; CE.dx=CE.dy=0;
+    if(!CE.el) charEdOpen(); CE.el.classList.add("has"); CE.el.querySelector(".che-zoom").value=1; charEdRedo(); }
+  catch(e){ console.error(e); toast("그림을 열 수 없어요. 다른 그림으로 해 볼까요?"); }
+}
+function charEdOpen(){
+  if(CE.el) return; const p=prof(S.prof); if(!p) return;
+  const el=document.createElement("div"); el.className="che-wrap"; el.innerHTML=`<div class="che-bg"></div>
+  <section class="che" role="dialog" aria-modal="true" aria-label="캐릭터 다듬기">
+    <header class="che-h"><b>🐾 캐릭터 다듬기</b><button type="button" class="che-x" aria-label="닫기">${ic("x")}</button></header>
+    <div class="che-in">
+      <div class="che-paste" contenteditable="true" role="textbox" aria-label="그림 붙여 넣는 칸" tabindex="0"></div>
+      <p class="che-ph">캡처한 그림을 <b>여기에 붙여 넣어</b> 주세요<br><small>컴퓨터: 이 칸을 누르고 Ctrl+V (맥은 ⌘+V) · 휴대폰: 이 칸을 길게 눌러 '붙여넣기'</small></p>
+      <div class="che-in-btns"><button type="button" class="btn btn-soft sm che-clip">📋 복사한 그림 가져오기</button><label class="btn btn-soft sm">${ic("camera")}그림 파일 고르기<input type="file" class="sr che-file" accept="image/*"></label></div>
+    </div>
+    <div class="che-view">
+      <figure class="che-src"><canvas></canvas><figcaption>원래 그림 <small>(체크무늬 = 지운 바탕)</small></figcaption></figure>
+      <span class="che-arrow" aria-hidden="true">→</span>
+      <figure class="che-big" title="끌어서 자리를 옮겨요"><span class="che-ring"><canvas></canvas></span><figcaption>얼굴 동그라미 <small>끌어서 옮기기</small></figcaption></figure>
+      <figure class="che-mini"><span><canvas></canvas></span><figcaption>연속 기록 자리</figcaption></figure>
+    </div>
+    <div class="che-ctl">
+      <label><span>바탕 지우기 <small>0이면 안 지워요</small></span><input type="range" class="che-tol" min="0" max="180" step="5" value="${CE.tol}"></label>
+      <label><span>크기</span><input type="range" class="che-zoom" min="0.5" max="3" step="0.05" value="1"></label>
+      <button type="button" class="link-btn che-reset">처음 자리로</button>
+      <button type="button" class="link-btn che-again">다른 그림 넣기</button>
+    </div>
+    <p class="che-note">좋아하는 캐릭터 그림은 우리 가족에게만 보여요.</p>
+    <div class="che-btns"><button type="button" class="btn btn-ghost che-cancel">취소</button><button type="button" class="btn btn-primary che-ok">이대로 넣기</button></div>
+  </section>`;
+  document.body.appendChild(el); CE.el=el; document.addEventListener("keydown",charEdKey);
+  const $=q=>el.querySelector(q);
+  $(".che-x").onclick=$(".che-cancel").onclick=$(".che-bg").onclick=charEdClose;
+  $(".che-again").onclick=()=>{ el.classList.remove("has"); $(".che-paste").focus(); };
+  $(".che-reset").onclick=()=>{ CE.zoom=1; CE.dx=CE.dy=0; $(".che-zoom").value=1; charEdDraw(); };
+  let tt; $(".che-tol").oninput=e=>{ CE.tol=+e.target.value; clearTimeout(tt); tt=setTimeout(charEdRedo,60); };
+  $(".che-zoom").oninput=e=>{ CE.zoom=+e.target.value; charEdDraw(); };
+  $(".che-file").onchange=e=>{ const f=e.target.files?.[0]; e.target.value=""; charEdLoad(f); };
+  $(".che-clip").onclick=async()=>{
+    try{ if(!navigator.clipboard?.read) throw 0; const items=await navigator.clipboard.read();
+      for(const it of items){ const t=it.types.find(x=>/^image\//.test(x)); if(t){ charEdLoad(await it.getType(t)); return; } }
+      toast("복사한 그림이 없어요. 그림을 먼저 복사(캡처)해 주세요"); }
+    catch(e){ toast("이 브라우저는 단추로 못 가져와요. 위 칸에 붙여 넣어 주세요"); $(".che-paste").focus(); } };
+  // 붙여 넣는 칸: 그림은 받아 가고, 글자 · 그림이 칸 안에 남지 않게 늘 비워요
+  const pb=$(".che-paste");
+  pb.addEventListener("paste",e=>{ const f=[...(e.clipboardData?.items||[])].find(i=>i.kind==="file" && /^image\//.test(i.type))?.getAsFile();
+    e.preventDefault(); e.stopPropagation(); if(f) charEdLoad(f); else toast("복사한 것이 그림이 아니에요. 그림을 캡처하거나 '이미지 복사'를 해 주세요"); });
+  pb.addEventListener("input",()=>{ const img=pb.querySelector("img"); pb.innerHTML="";   // 일부 휴대폰은 그림을 칸 안에 바로 넣어요 → 그 그림을 받아 가요
+    if(img?.src) fetch(img.src).then(r=>r.blob()).then(charEdLoad).catch(()=>toast("그림을 가져오지 못했어요. 파일로 골라 주세요")); });
+  pb.addEventListener("drop",e=>{ const f=e.dataTransfer?.files?.[0]; if(f){ e.preventDefault(); charEdLoad(f); } });
+  // 끌어서 자리 옮기기 (손가락 · 마우스)
+  const ring=$(".che-ring"); let drag=null;
+  ring.addEventListener("pointerdown",e=>{ if(!CE.res) return; drag={x:e.clientX,y:e.clientY,dx:CE.dx,dy:CE.dy,w:ring.clientWidth}; ring.setPointerCapture(e.pointerId); });
+  ring.addEventListener("pointermove",e=>{ if(!drag) return; CE.dx=drag.dx+(e.clientX-drag.x)/drag.w; CE.dy=drag.dy+(e.clientY-drag.y)/drag.w; charEdDraw(); });
+  ring.addEventListener("pointerup",()=>{ drag=null; }); ring.addEventListener("pointercancel",()=>{ drag=null; });
+  $(".che-ok").onclick=async()=>{ if(!CE.res){ toast("먼저 그림을 넣어 주세요"); pb.focus(); return; } if(CE.busy) return;
+    CE.busy=true; $(".che-ok").disabled=true;
+    try{ await profCharSave(await canvasPng(charCompose(CE.res,CE.zoom,CE.dx,CE.dy))); charEdClose(); }catch(e){}
+    finally{ CE.busy=false; const b=CE.el?.querySelector(".che-ok"); if(b) b.disabled=false; } };
+  setTimeout(()=>pb.focus({preventScroll:true}),50);
+}
+// 다듬은 그림 올리기 → profiles.char = {img:{url,path}}
+async function profCharSave(png){
+  const p=prof(S.prof); if(!p || !canEditProf(p)) return;
+  let step="올리기";
   try{
-    upProg("🐾 캐릭터를 찾아서 다듬는 중…");
-    const png=await charCut(blob); step="올리기";
-    const r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png);
+    upProg("🐾 캐릭터를 넣는 중…");
+    const r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png); step="저장";
     const old=p.char?.img; await B.update(S.gid,"profiles",p.id,{char:{img:{url:r.url,path:r.path}}});
     if(old?.path) B.deleteMedia(old.path).catch(()=>{});
     await reload("profiles"); upProg(); buzz("ok"); render(); toast("캐릭터를 넣었어요");
-  }catch(e){ console.error(e); upProg(); toast(`그림을 넣지 못했어요 (${step}: ${String(e?.code||e?.message||e).slice(0,60)})`); }
+  }catch(e){ console.error(e); upProg(); toast(`그림을 넣지 못했어요 (${step}: ${String(e?.code||e?.message||e).slice(0,60)})`); throw e; }
 }
-// 웹(컴퓨터): 프로필 편집 중에 Ctrl+V 로 캡처한 그림을 붙여 넣으면 캐릭터로
-document.addEventListener("paste", e=>{ if(!S.prof || !S.profEdit) return;
+// 파일로 고르면 다듬기 창을 열어 그 그림부터 보여 줘요
+function profChar(blob){ charEdOpen(); if(blob) charEdLoad(blob); }
+// 프로필 편집 중에 (창 밖에서) Ctrl+V 해도 다듬기 창으로
+document.addEventListener("paste", e=>{ if(!S.prof || !S.profEdit || CE.el) return;
   const f=[...(e.clipboardData?.items||[])].find(i=>i.kind==="file" && /^image\//.test(i.type))?.getAsFile(); if(!f) return;
   e.preventDefault(); profChar(f); });
 // 얼굴 · 배경 사진 올리기: 고르면 바로 올리고 바꿔요 (예전 사진 파일은 지워요)
@@ -7288,6 +7434,7 @@ Object.assign(acts,{
   "prof-close": () => { S.prof=null; S.profEdit=false; render(); },
   "prof-edit": () => { S.profEdit=true; render(); },
   "prof-edit-off": () => { S.profEdit=false; render(); },
+  "prof-char-ed": () => charEdOpen(),
   "prof-diary": el => { const id=el.dataset.v; S.prof=null; S.profEdit=false;
     if(IS_APP) go(()=>{ S.tab="home"; S.sub=null; S.hpage="diary"; S.hwho=id; }); else go(()=>{ S.tab="day"; S.sub=null; }); },
   "prof-rm": el => guard(async()=>{ const p=prof(S.prof), k=el.dataset.v; if(!canEditProf(p) || !p[k]) return;
