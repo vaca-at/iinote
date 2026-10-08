@@ -4291,14 +4291,21 @@ async function ttSave(pid, patch){
 async function ttPhoto(input){
   const p=prof(input.dataset.id), f=input.files?.[0]; input.value="";
   if(!p || !f || !canEditProf(p)) return;
+  let step="사진 읽기";   // 어디서 막혔는지 알림에 같이 보여 줘요
   try{
     upProg("📅 시간표 사진을 올리는 중…");
     const big=await compressImage(f,1800,.85); if(!big.blob) throw new Error("사진을 불러올 수 없어요");
-    const r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/tt_${rid()}.jpg`,big.blob), old=p.tt?.photo;
-    await ttSave(p.id,{photo:{url:r.url,path:r.path,w:big.w,h:big.h}}); S.ttPhoto=p.id;
-    if(old?.path) B.deleteMedia(old.path).catch(()=>{});
+    // 프로필 사진과 같은 곳 · 같은 이름 방식으로 올리고, 막히면 사진첩 저장소(사진첩 규칙)에 대신 올려요
+    step="사진 올리기"; let r, where="";
+    try{ r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/${rid()}.jpg`,big.blob); }
+    catch(e1){ console.warn("시간표 사진 기본 저장소 실패 → 사진첩 저장소",e1); where="album"; r=await B.uploadMedia(`groups/${S.gid}/album/tt_${p.id}_${rid()}.jpg`,big.blob,"album"); }
+    const old=p.tt?.photo;
+    step="저장"; await ttSave(p.id,{photo:{url:r.url,path:r.path,w:big.w,h:big.h,...(where?{where}:{})}}); S.ttPhoto=p.id;
+    if(old?.path) B.deleteMedia(old.path,old.where||undefined).catch(()=>{});
     upProg(); buzz("ok"); render(); toast("시간표 사진을 넣었어요");
-  }catch(e){ console.error(e); upProg(); toast("사진을 올리지 못했어요. 다시 해 주세요"); }
+  }catch(e){ console.error(e); upProg(); const why=(e?.code||e?.message||"").toString().slice(0,60);
+    try{ reportError(`시간표 사진 · ${step}: ${why}`,"ttPhoto"); }catch(_){}
+    toast(`사진을 올리지 못했어요 (${step} · ${why||"알 수 없는 이유"}). 다시 해 주세요`); }
 }
 function ttCollect(){ const f=document.querySelector('form[data-form="tt-grid"]'), g=S.ttDraft; if(!f||!g) return;
   g.rows.forEach((r,i)=>{ r.t=f.elements[`r${i}t`]?.value ?? r.t; r.c=r.c||[]; for(let j=0;j<g.days;j++){ const el=f.elements[`r${i}c${j}`]; if(el) r.c[j]=el.value; } }); }
@@ -6927,7 +6934,7 @@ Object.assign(acts,{
   "tt-photo": el => { S.ttPhoto=el.dataset.v||null; render(); },
   "tt-lb": el => { const p=prof(el.dataset.v); if(!p?.tt?.photo) return; S.lb={photos:[{url:p.tt.photo.url}],caps:[{t:`📅 ${p.name}의 시간표`}],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
   "tt-del": el => { const p=prof(el.dataset.v); if(!p?.tt || !confirm(`${p.name}의 시간표를 지울까요?`)) return;
-    guard(async()=>{ const old=p.tt.photo; await B.update(S.gid,"profiles",p.id,{tt:null}); p.tt=null; if(old?.path) B.deleteMedia(old.path).catch(()=>{}); render(); toast("시간표를 지웠어요"); }); }
+    guard(async()=>{ const old=p.tt.photo; await B.update(S.gid,"profiles",p.id,{tt:null}); p.tt=null; if(old?.path) B.deleteMedia(old.path,old.where||undefined).catch(()=>{}); render(); toast("시간표를 지웠어요"); }); }
 });
 forms["tt-grid"] = (fd,f) => guard(async()=>{ const g=S.ttDraft; if(!g) return; ttCollect();
   const rows=g.rows.map(r=>({t:String(r.t||"").trim().slice(0,8), c:TT_DAYS.slice(0,g.days).map((_,j)=>String(r.c?.[j]||"").trim().slice(0,10))})).filter(r=>r.t||r.c.some(Boolean));
