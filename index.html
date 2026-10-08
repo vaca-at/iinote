@@ -7433,9 +7433,13 @@ async function profCharSave(png){
   let step="올리기";
   try{
     upProg("🐾 캐릭터를 넣는 중…");
-    const r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png); step="저장";
-    const old=p.char?.img; await B.update(S.gid,"profiles",p.id,{char:{img:{url:r.url,path:r.path}}});
-    if(old?.path) B.deleteMedia(old.path).catch(()=>{});
+    // 기본 저장소가 막히면(storage/unauthorized) 시간표처럼 사진첩 저장소(미국 버킷)로 올려요
+    let r, where="";
+    try{ r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png); }
+    catch(e1){ console.warn("캐릭터 기본 저장소 실패 → 사진첩 저장소",e1); where="album"; r=await B.uploadMedia(`groups/${S.gid}/album/char_${p.id}_${rid()}.png`,png,"album"); }
+    step="저장";
+    const old=p.char?.img; await B.update(S.gid,"profiles",p.id,{char:{img:{url:r.url,path:r.path,...(where?{where}:{})}}});
+    if(old?.path) B.deleteMedia(old.path,old.where||undefined).catch(()=>{});
     await reload("profiles"); upProg(); buzz("ok"); render(); toast("캐릭터를 넣었어요");
   }catch(e){ console.error(e); upProg(); toast(`그림을 넣지 못했어요 (${step}: ${String(e?.code||e?.message||e).slice(0,60)})`); throw e; }
 }
@@ -7486,7 +7490,7 @@ forms.prof = (fd,f) => guard(async()=>{
   let oldImg=null;
   if("char" in fd && fd.char!=="img"){ const id=String(fd.char||""); data.char=CHARS.some(k=>k[0]===id)?{id}:null; oldImg=p.char?.img||null; }
   await B.update(S.gid,"profiles",p.id,data); await reload("profiles");
-  if(oldImg?.path) B.deleteMedia(oldImg.path).catch(()=>{});
+  if(oldImg?.path) B.deleteMedia(oldImg.path,oldImg.where||undefined).catch(()=>{});
   S.profEdit=false; render(); buzz("ok"); toast("프로필을 바꿨어요");
 });
 // 📅 시간표 단추 · 저장 (acts · forms 가 만들어진 뒤에 붙여요)
