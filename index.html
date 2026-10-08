@@ -1904,7 +1904,7 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .hp-chips.many{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
 .hp-chips.many::-webkit-scrollbar{display:none}
 .hp-chips.many .hp-chip{flex:1 0 auto;padding:0 10px;font-size:14px}
-@media (max-width:419px){ .hp-chips.many .hp-chip u{display:none} .hp-chips.many .hp-chip{padding:0 8px} }
+@media (max-width:419px){ .hp-chips.many{gap:4px} .hp-chips.many .hp-chip u{display:none} .hp-chips.many .hp-chip{padding:0 7px} }
 /* ⭐ 즐겨찾기 쪽: 보기 모양 네 가지 (2026-10-08 디자인: 그러데이션 바탕 · 칸마다 그 색이 물든 카드 · 입체 아이콘) */
 .fv{position:relative;margin:2px -2px 0;padding:16px 14px 18px;border-radius:24px;background:linear-gradient(160deg,color-mix(in srgb,var(--lilac) 26%,var(--surface)) 0%,color-mix(in srgb,var(--coral) 12%,var(--surface)) 55%,color-mix(in srgb,var(--butter) 18%,var(--surface)) 100%);overflow:hidden;isolation:isolate}
 .fv::before,.fv::after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(2px)}
@@ -1939,16 +1939,25 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .fvv-small .fv-t{font-size:12.5px;font-weight:600}
 .fvv-small .fv-d{display:none}
 .fvv-small .fv-del{top:-4px;right:4px;width:22px;height:22px}
+.fv-go{display:none}
 .fvv-list{display:grid;gap:8px}
 .fvv-list .fv-it{display:flex;align-items:center}
-.fvv-list .fv-a{flex:1;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:2px 12px;padding:10px 12px 10px 10px;border-radius:16px;border-left:4px solid var(--c)}
-.fvv-list .fv-mark{width:36px;height:36px;border-radius:11px;font-size:15px}
-.fvv-list .fv-d{max-width:34vw;padding:3px 8px;border-radius:999px;background:color-mix(in srgb,var(--c) 12%,var(--surface));color:color-mix(in srgb,var(--c) 70%,var(--ink))}
-.fvv-detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
-.fvv-detail .fv-a{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:12px;align-items:center;padding:14px;border-radius:18px}
-.fvv-detail .fv-mark{grid-row:1 / 4;width:50px;height:50px;border-radius:16px;font-size:21px}
-.fvv-detail .fv-t{font-size:16px}
-.fvv-detail .fv-m{color:color-mix(in srgb,var(--c) 65%,var(--ink));font-weight:600}
+.fvv-list .fv-a{flex:1;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:2px 12px;padding:10px 12px 10px 10px;border-radius:18px}
+.fvv-list .fv-mark{width:38px;height:38px;border-radius:12px;font-size:15px}
+.fvv-list .fv-d{grid-column:2;grid-row:2;font-size:11.5px}
+.fvv-list .fv-t{grid-column:2;grid-row:1}
+.fvv-list .fv-mark{grid-row:1 / 3}
+.fvv-list .fv-go{display:grid;grid-column:3;grid-row:1 / 3}
+.fv-go{place-items:center;width:32px;height:32px;border-radius:50%;background:color-mix(in srgb,var(--c) 14%,var(--surface));color:color-mix(in srgb,var(--c) 75%,var(--ink))}
+/* 자세히: 왼쪽 위에 그 색이 번지는 카드 · 주소 알약 · 누가 · 언제 작은 칩 · 오른쪽 ↗ */
+.fvv-detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.fvv-detail .fv-a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;row-gap:4px;align-items:center;padding:16px 14px 16px 16px;border-radius:22px;background:radial-gradient(circle at 0% 0%,color-mix(in srgb,var(--c) 24%,transparent) 0%,transparent 55%),var(--surface)}
+.fvv-detail .fv-mark{grid-row:1 / 4;width:54px;height:54px;border-radius:17px;font-size:22px}
+.fvv-detail .fv-t{grid-column:2;font-size:16px}
+.fvv-detail .fv-d{grid-column:2;justify-self:start;padding:2px 9px;border-radius:999px;background:color-mix(in srgb,var(--c) 10%,var(--surface2));color:color-mix(in srgb,var(--c) 60%,var(--ink));font-size:11.5px}
+.fvv-detail .fv-m{grid-column:2;display:flex;gap:6px;flex-wrap:wrap;overflow:visible;white-space:normal}
+.fvv-detail .fv-m i{font-style:normal;font-size:11px;color:var(--ink3);padding:1px 7px;border-radius:6px;background:var(--surface2)}
+.fvv-detail .fv-go{display:grid;grid-column:3;grid-row:1 / 4}
 .fv-add{margin-top:16px;padding:14px;border-radius:20px;background:color-mix(in srgb,var(--surface) 80%,transparent);border:2px dashed color-mix(in srgb,var(--lilac) 45%,transparent)}
 .fv-add::before{content:"＋ 새 즐겨찾기";grid-column:1 / -1;font-weight:800;color:var(--lilac);font-size:15px}
 
@@ -4083,7 +4092,7 @@ function viewFavPage(){
   const list=[...S.links].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
   const items=list.map((l,i)=>{ const c=COLORS[i%COLORS.length], ok=/^https?:\/\//.test(l.url), by=prof(l.createdBy)?.name;
     const d=l.createdAt>1e11 ? new Date(l.createdAt) : null;
-    return `<li class="fv-it" style="--c:${c}"><a class="fv-a fv-card" href="${ok?esc(l.url):"#"}" target="_blank" rel="noopener noreferrer"><span class="fv-mark" style="background:${c};color:${onColor(c)}">${esc((l.title||"?").slice(0,1))}</span><span class="fv-t">${esc(l.title)}</span><span class="fv-d">${esc(v==="detail"?l.url:host(l.url))}</span>${v==="detail"?`<span class="fv-m">${by?`${esc(by)} 추가`:""}${by&&d?" · ":""}${d?`${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`:""}</span>`:""}</a>${edit?`<button class="fv-del" data-act="del-link" data-id="${l.id}" aria-label="${esc(l.title)} 지우기">${ic("x")}</button>`:""}</li>`; }).join("");
+    return `<li class="fv-it" style="--c:${c}"><a class="fv-a fv-card" href="${ok?esc(l.url):"#"}" target="_blank" rel="noopener noreferrer"><span class="fv-mark" style="background:${c};color:${onColor(c)}">${esc((l.title||"?").slice(0,1))}</span><span class="fv-t">${esc(l.title)}</span><span class="fv-d">${esc(v==="detail"?l.url.replace(/^https?:\/\//,""):host(l.url))}</span>${v==="detail"?`<span class="fv-m">${by?`<i>${esc(by)}</i>`:""}${d?`<i>${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.</i>`:""}</span>`:""}<span class="fv-go" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span></a>${edit?`<button class="fv-del" data-act="del-link" data-id="${l.id}" aria-label="${esc(l.title)} 지우기">${ic("x")}</button>`:""}</li>`; }).join("");
   return `<section class="fv">
     <div class="fv-hd"><h2>⭐ 즐겨찾기 <small>${list.length}</small></h2>
       ${isParent()?`<button class="btn ${edit?"btn-primary":"btn-ghost"} sm" data-act="fav-edit" aria-pressed="${!!edit}">${edit?"다 했어요":"✏️ 편집"}</button>`:""}</div>
