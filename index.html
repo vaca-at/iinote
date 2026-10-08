@@ -1577,6 +1577,35 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 :root[data-design="wongoji"] .sheet .pill.none{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
 :root[data-design="wongoji"] .sheet::before{width:1px;box-shadow:4px 0 0 var(--margin)}
 .dsw.wongoji{border-color:#1E1E24;background:linear-gradient(#F4CFCA 1px,transparent 1px) 0 0/6px 6px,linear-gradient(90deg,#F4CFCA 1px,transparent 1px) 0 0/6px 6px,#FFFFFF;box-shadow:inset 3px 0 0 #D7263D}
+/* 🌌 밤하늘 디자인 (2026-10-09, 웹 · 앱): 남보라 밤하늘 바탕에 작은 별, 카드는 살짝 비치는 남색 + 연보라 테두리, 강조는 연보라 · 별빛 노랑.
+   어둡게 화면 위에 얹어요 (밤하늘을 고르면 화면 밝기는 늘 어둡게) */
+:root[data-design="night"]{
+  --paper:#12163A; --grid:transparent; --surface:#1C2252; --surface2:#242B60;
+  --ink:#F3EEFF; --ink2:#C9C0EA; --ink3:#9A93C4;
+  --line:#343C78; --rule:#2E356C; --margin:#6E5BB8;
+  --coral:#FF8FB1; --coral-ink:#FFB3CA; --coral-soft:#3A2752;
+  --butter:#FFD36E; --butter-soft:#3A3456;
+  --sage:#8EE0C3; --sage-soft:#1E3A4C;
+  --sky:#9FC2FF; --sky-soft:#22305E; --lilac:#C9B6FF; --lilac-soft:#2E2A64;
+  --accent:#C9B6FF; --accent-soft:#2E2A64; --focus:#FFD36E;
+  color-scheme:dark;
+}
+:root[data-design="night"] body{
+  background-color:var(--paper);
+  background-image:radial-gradient(circle at 12% 18%,rgba(255,255,255,.9) 0 1px,transparent 1.6px),radial-gradient(circle at 78% 9%,rgba(255,231,163,.95) 0 1.2px,transparent 1.9px),radial-gradient(circle at 42% 64%,rgba(255,255,255,.7) 0 .9px,transparent 1.5px),radial-gradient(circle at 90% 74%,rgba(201,182,255,.9) 0 1.1px,transparent 1.8px),radial-gradient(circle at 24% 88%,rgba(255,255,255,.6) 0 .8px,transparent 1.4px),radial-gradient(130% 80% at 100% 0%,rgba(123,92,214,.35),transparent 60%),radial-gradient(110% 70% at 0% 100%,rgba(63,115,209,.25),transparent 60%);
+  background-size:260px 260px,330px 330px,210px 210px,380px 380px,290px 290px,100% 100%,100% 100%;
+  background-attachment:fixed;
+}
+:root[data-design="night"] .block{border:1px solid rgba(201,182,255,.22);border-radius:20px;background:color-mix(in srgb,var(--surface) 88%,transparent);box-shadow:0 10px 30px -18px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05)}
+:root[data-design="night"] :is(.mast-t,.page-h h1,.block-h h2,.day-nav h1,.today-date){font-family:'OngleipUnz',var(--sans);font-weight:400;letter-spacing:0;color:#F3EEFF;text-shadow:0 0 14px rgba(201,182,255,.35)}
+:root[data-design="night"] :is(.fav,.me-chip){border:1px solid rgba(201,182,255,.25);background:var(--surface)}
+:root[data-design="night"] .sheet{background:transparent;border-color:rgba(201,182,255,.18)}
+:root[data-design="night"] .sheet::before{display:none}
+:root[data-design="night"] :is(.ftab,.a-nav){border-color:rgba(201,182,255,.2)}
+:root[data-design="night"] :is(input,textarea,select){background:var(--surface2);border-color:var(--line);color:var(--ink)}
+:root[data-design="night"] :is(input,textarea)::placeholder{color:var(--ink3)}
+:root[data-design="night"] .pen-ask{background:color-mix(in srgb,#8EE0C3 14%,var(--surface))}
+.dsw.night{border:0;border-radius:6px;background:radial-gradient(circle at 30% 30%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 70% 60%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 50% 85%,#fff 0 .8px,transparent 1.4px),linear-gradient(160deg,#3B3F8A,#151A40)}
 /* 새 색 (2026-10-05, 처음 쓰는 기기의 기본): 밝은 바탕 + 그림자 있는 흰 카드 + 진한 먹색 글씨, 색은 쪽마다(일기장 분홍 · 달력 노랑 · 사진첩 하늘 · 소식 초록)
    제목은 온글잎 언즈체 */
 [data-design="fresh"]:not([data-theme="dark"]){
@@ -2358,6 +2387,10 @@ span.pf-av{cursor:default}
    🎨 앱 공통 디자인 (2026-10-08): 화면 대표 색 --tc 로 배경 · 칩 · 카드 · 제목 · 메뉴를 한 벌로
    (앱에서만 · 디자인 설정보다 앞서요. 색 있는 안내 띠 · 4분할 칸은 그대로) */
 html.is-app:root .ashell{--tc:#7A5BC7;background:radial-gradient(120% 55% at 100% 0%,color-mix(in srgb,var(--tc) 16%,transparent) 0%,transparent 62%),radial-gradient(90% 45% at 0% 100%,color-mix(in srgb,var(--butter) 16%,transparent) 0%,transparent 65%),var(--paper);background-attachment:fixed}
+
+/* 🌌 밤하늘 디자인 · 앱: 화면 바탕에도 별 */
+html.is-app:root[data-design="night"] .ashell{background:radial-gradient(circle at 12% 18%,rgba(255,255,255,.9) 0 1px,transparent 1.6px) 0 0/260px 260px,radial-gradient(circle at 78% 9%,rgba(255,231,163,.95) 0 1.2px,transparent 1.9px) 0 0/330px 330px,radial-gradient(circle at 42% 64%,rgba(255,255,255,.7) 0 .9px,transparent 1.5px) 0 0/210px 210px,radial-gradient(circle at 90% 74%,rgba(201,182,255,.9) 0 1.1px,transparent 1.8px) 0 0/380px 380px,radial-gradient(120% 55% at 100% 0%,color-mix(in srgb,var(--tc) 22%,transparent) 0%,transparent 62%),radial-gradient(90% 45% at 0% 100%,rgba(63,115,209,.25) 0%,transparent 65%),var(--paper)}
+html.is-app:root[data-design="night"] .ashell :is(.bell,.ah-me){background:var(--surface2)}
 html.is-app:root .a-top{background:color-mix(in srgb,var(--paper) 82%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 html.is-app:root .a-top.band{background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 24%,var(--surface)) 0%,color-mix(in srgb,var(--tc) 10%,var(--surface)) 60%,color-mix(in srgb,var(--butter) 14%,var(--surface)) 100%);box-shadow:0 6px 18px color-mix(in srgb,var(--tc) 14%,transparent)}
 /* 칩 */
@@ -3496,9 +3529,10 @@ if(S.joinCode && S.kidId) ls.set("iinote-kidlink",JSON.stringify({join:S.joinCod
 function useSavedKidLink(){ try{ const k=JSON.parse(ls.get("iinote-kidlink","null")); if(k?.join && k?.kid && !S.joinCode){ S.joinCode=k.join; S.kidId=k.kid; S.kidName=k.n||""; } }catch(e){} }
 if(S.dfont==="batang") S.dfont="unz";
 if(!["unz","pen","gothic","dodum"].includes(S.dfont)) S.dfont="pen";
-if(!["fresh","warm","clean","bright","wongoji"].includes(S.design)) S.design="fresh";   // 노트 디자인은 원고지와 겹쳐서 뺐어요 (2026-10-03) · 새 색이 기본 (2026-10-05)
-function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
-  document.querySelector('meta[name="theme-color"]').content = S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7"})[S.design] || "#FBF6EE"; }
+if(!["fresh","warm","clean","bright","wongoji","night"].includes(S.design)) S.design="fresh";   // 노트 디자인은 원고지와 겹쳐서 뺐어요 (2026-10-03) · 새 색이 기본 (2026-10-05)
+function applyPrefs(){ document.documentElement.dataset.theme=S.design==="night"?"dark":S.theme;   // 🌌 밤하늘은 늘 어둡게
+  document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
+  document.querySelector('meta[name="theme-color"]').content = S.design==="night" ? "#12163A" : S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7"})[S.design] || "#FBF6EE"; }
 applyPrefs();
 
 const prof = id => S.profiles.find(p=>p.id===id);
@@ -3965,7 +3999,7 @@ const TAB_TONE = {cal:["var(--sky-soft)","var(--sky)"],chat:["var(--coral-soft)"
 // 글씨 네 가지 (2026-10-08): ① 언즈체 · ② 윤탱체 (화면 대부분 손글씨) / ③ 고딕 · ④ 동글 (또박또박 간결). 예전 '바탕체'를 고른 기기는 언즈체로
 const DFONTS = [["unz","언즈체","'OngleipUnz',cursive"],["pen","윤탱체","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
-const DESIGNS = [["fresh","새 색"],["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"]];
+const DESIGNS = [["fresh","새 색"],["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"],["night","밤하늘"]];
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
 // 레이아웃(첫 화면 모양)은 홈 화면에서만 보여요 (다른 탭에서는 바뀌는 게 없고, 누르면 홈으로 가 버려서)
 function prefBar(){
