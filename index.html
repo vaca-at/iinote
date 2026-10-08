@@ -2510,6 +2510,15 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 .dd-chip.today b{background:linear-gradient(160deg,#FFB59E,#EF6F53);color:#fff}
 .dd-chip span{font-size:14px;white-space:nowrap;max-width:14em;overflow:hidden;text-overflow:ellipsis}
 .dd-tag{flex:none;font-size:11.5px;padding:1px 8px;border-radius:10px;background:#2B3670;color:#FFE7A3;margin-left:4px}
+.pf-bd{display:flex;gap:8px}.pf-bd select{flex:1}
+.anv p{margin:0 0 10px;color:var(--ink2);font-size:13.5px}
+.anv-list{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:6px}
+.anv-list li{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:color-mix(in srgb,#C9B6FF 12%,var(--surface));box-shadow:inset 0 0 0 1px var(--line)}
+.anv-list li b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.anv-list .anv-i{font-size:20px}
+.anv-form{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.anv-form input{flex:1 1 120px;min-width:0}
+.anv-form select{width:auto}
 .dd-chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;white-space:nowrap}
 .dd-chk small{color:var(--ink2);font-size:11.5px;white-space:normal}
 #app .tip-ask p{white-space:normal;overflow:visible;line-height:1.45}   /* 오늘의 기능은 긴 한 줄이라 줄 바꿈 허락 */
@@ -4520,10 +4529,21 @@ function parseSchedule(s){
 const ddDays = d => Math.round((toDate(d)-toDate(todayStr()))/864e5);
 const ddLabel = d => { const n=ddDays(d); return n>0?`D-${n}`:n===0?"D-DAY":`D+${-n}`; };
 const ddayList = () => mySchedules().filter(s=>s.dday && s.date>=todayStr()).sort((a,b)=>a.date.localeCompare(b.date)||bySch(a,b));
+/* 🎂 가족 생일 · 기념일 (2026-10-09): 생일은 각자 프로필(profiles.birthday "MM-DD"), 결혼기념일 같은 날은 우리 가족 설정(groups.anniv=[{id,t,md,icon}])
+   해마다 돌아오는 다음 날짜로 세요 → 홈 디데이 줄(2주 안) · 생일 · 기념일 위젯(widgetData.bdays) */
+const mdNext = md => { const t=todayStr(), y=+t.slice(0,4); const ok=s=>{ const x=toDate(s); return !isNaN(x) && x.getMonth()+1===+md.slice(0,2); };
+  let d=`${y}-${md}`; if(!ok(d)) d=`${y}-02-28`; if(d<t){ d=`${y+1}-${md}`; if(!ok(d)) d=`${y+1}-02-28`; } return d; };   // 2월 29일 생일은 평년엔 28일로
+function familyDays(){
+  const out=[];
+  sortedProfiles().forEach(p=>{ if(/^\d\d-\d\d$/.test(p.birthday||"")) out.push({icon:"🎂", title:`${p.name} 생일`, date:mdNext(p.birthday), p}); });
+  (S.group?.anniv||[]).forEach(a=>{ if(/^\d\d-\d\d$/.test(a.md||"") && a.t) out.push({icon:a.icon||"💝", title:a.t, date:mdNext(a.md), id:a.id}); });
+  return out.sort((a,b)=>a.date.localeCompare(b.date));
+}
 function ddayRow(){
-  const l=ddayList(); if(!l.length) return "";
+  const l=[...ddayList().map(s=>({date:s.date,title:s.title,icon:""})), ...familyDays().filter(x=>ddDays(x.date)<=14)].sort((a,b)=>a.date.localeCompare(b.date));
+  if(!l.length) return "";
   return `<div class="dd-row" role="list" aria-label="디데이">${l.slice(0,6).map(s=>{ const n=ddDays(s.date);
-    return `<button class="dd-chip ${n===0?"today":n<=7?"soon":""}" role="listitem" data-act="dd-open" data-v="${s.date}" title="${esc(fmtLong(s.date))}"><b>${ddLabel(s.date)}</b><span>${esc(s.title)}</span></button>`; }).join("")}</div>`;
+    return `<button class="dd-chip ${n===0?"today":n<=7?"soon":""}" role="listitem" data-act="dd-open" data-v="${s.date}" title="${esc(fmtLong(s.date))}"><b>${s.icon?s.icon+" ":""}${ddLabel(s.date)}</b><span>${esc(s.title)}</span></button>`; }).join("")}</div>`;
 }
 // 하루 일정 목록 (list 는 bySch 로 정렬된 것). 아래 '순서 · 고치기'를 누르면 그날(S.schEdit) 일정마다 ▲▼ · 고치기 · 지우기
 function schList(d,list){
@@ -6140,6 +6160,17 @@ async function mergeSameName(name){
 // 🧩 켜서 쓰는 기능 (2026-10-07): 가족 모두에게 같이 적용, 보호자만 바꿔요 (groups.handOn · audioOn, 기본 꺼짐)
 const FEATS = [["audioOn","🎙","목소리 · 녹음 넣기","일기에 목소리 · 소리 파일 (최대 3분, 아이는 7세 이하)"],["handOn","📝","손글씨 일기 촬영","종이 일기장을 찍으면 AI가 글자로 옮겨 줘요"]];
 // ✏️ 일기 쓰기 설정 (2026-10-07): 다홍펜 고치는 방법 · 목소리 녹음 · 손글씨 촬영을 한곳에, 바꾸면 바로 저장
+// 🎂 우리 가족 기념일: 생일은 프로필에서, 그 밖의 날(결혼기념일 · 입양일 · 이사한 날…)은 여기. 보호자가 넣고 지워요
+const ANNIV_ICONS = ["💍","💝","🏡","🎓","🐶","🎉"];
+function viewAnniv(){
+  const fd=familyDays(), par=isParent();
+  const li=fd.map(x=>`<li><span class="anv-i" aria-hidden="true">${x.icon}</span><b>${esc(x.title)}</b><span class="muted">${+x.date.slice(5,7)}월 ${+x.date.slice(8)}일</span><span class="dd-tag">${ddLabel(x.date)}</span>${x.p?`<button class="link-btn" data-act="prof-open" data-v="${esc(x.p.id)}">프로필</button>`:par?`<button class="icon-btn" data-act="anniv-del" data-id="${esc(x.id)}" aria-label="${esc(x.title)} 지우기">${ic("x")}</button>`:""}</li>`).join("");
+  return `<section class="block anv" aria-labelledby="h-anv"><div class="block-h"><h2 id="h-anv">🎂 우리 가족 기념일</h2></div>
+    <p>생일은 각자 프로필 편집에서 넣어요. 결혼기념일처럼 해마다 돌아오는 날은 여기에 넣으면 홈 디데이 줄 · 위젯에 나와요.</p>
+    ${li?`<ul class="anv-list">${li}</ul>`:""}
+    ${par?`<form class="anv-form" data-form="anniv"><select name="icon" aria-label="그림">${ANNIV_ICONS.map(i=>`<option>${i}</option>`).join("")}</select><input name="t" required maxlength="20" placeholder="예: 결혼기념일" aria-label="이름"><select name="m" required aria-label="월"><option value="">월</option>${[...Array(12)].map((_,i)=>`<option value="${i+1}">${i+1}월</option>`).join("")}</select><select name="d" required aria-label="날"><option value="">일</option>${[...Array(31)].map((_,i)=>`<option value="${i+1}">${i+1}일</option>`).join("")}</select><button class="btn btn-primary sm">${ic("plus")}추가</button></form>`:""}
+  </section>`;
+}
 function viewFeatToggles(){
   const young=sortedProfiles().filter(penYoung);
   const kidRow=p=>{ const on=penAutoOf(p), nm=`pen-${esc(p.id)}`;
@@ -6167,6 +6198,7 @@ function viewFamily(){
           </form></details>`:""}
       </section>
       ${isParent()?viewFeatToggles():""}
+      ${viewAnniv()}
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
         <ul class="mem-list">${ps.map(p=>`<li class="mem"><button class="av-btn" data-act="prof-open" data-v="${esc(p.id)}" aria-label="${esc(p.name)} 프로필">${av(p)}</button><span>${esc(p.name)}</span>${p.phone?`<small class="muted">${esc(p.phone)}</small>`:""}<small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`https://${SITE_ADDRESS}/?k=${g.inviteCode}-${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="link-btn" data-act="kid-pin-open" data-id="${p.id}" aria-expanded="${S.pinEdit===p.id}">🔑 비밀번호</button><button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>
           ${p.type==="child"&&isParent()&&S.pinEdit===p.id?`<li class="mem-pin">${pinForm("kid-pin",p,false)}</li>`:""}`).join("")}</ul>
@@ -7055,6 +7087,9 @@ const forms = {
     S.penOpen=false; await reload("profiles"); S.me=prof(S.me.id)||S.me; render(); toast("다홍펜 고치는 방법을 저장했어요");
   }),
   // 가족 일기장 이름 바꾸기 (부모만, 가족 모두에게 같이 바뀜)
+  anniv: (fd,f) => guard(async()=>{ if(!isParent()) return; const t=String(fd.t||"").trim().slice(0,20); if(!t || !fd.m || !fd.d){ toast("이름과 날짜를 골라 주세요"); return; }
+    const list=[...(S.group?.anniv||[]), {id:rid(), t, md:`${pad(+fd.m)}-${pad(+fd.d)}`, icon:ANNIV_ICONS.includes(fd.icon)?fd.icon:"💝"}].slice(0,20);
+    await B.updateGroup(S.gid,{anniv:list}); S.group.anniv=list; render(); toast(`${t}을 넣었어요`); }),
   "group-name": fd => guard(async()=>{
     const name=String(fd.name||"").trim().slice(0,20);
     if(!name){ toast("가족 이름을 적어 주세요"); return; }
@@ -7255,6 +7290,7 @@ function viewProfile(){
   const view = `<h2 class="pf-name">${esc(p.name)}</h2>${sub?`<p class="pf-sub">${esc(sub)}</p>`:""}
     ${p.msg?`<p class="pf-msg">${esc(p.msg)}</p>`:can?`<button class="pf-msg empty" data-act="prof-edit">가족에게 하고 싶은 말을 적어 보세요</button>`:""}
     <div class="pf-stats"><span><b>${nMon}편</b>이번 달 일기</span><span><b>${streakOf(p.id)}일</b>연속으로 썼어요</span><span><b>${third[1]}</b>${third[0]}</span></div>
+    ${/^\d\d-\d\d$/.test(p.birthday||"")?`<p class="pf-phone">🎂 ${+p.birthday.slice(0,2)}월 ${+p.birthday.slice(3)}일 · ${ddLabel(mdNext(p.birthday))}</p>`:""}
     ${p.phone?`<p class="pf-phone">${esc(p.phone)}</p>`:""}
     <div class="pf-acts">
       ${IS_APP && p.phone && !isMine(p)?`<a class="pf-act" href="tel:${esc(telOf(p.phone))}"><span style="background:#DAF2E5;color:#2F8C6B">${ic("phone")}</span>전화</a><a class="pf-act" href="sms:${esc(telOf(p.phone))}"><span style="background:#DCE9FF;color:#3F73D1">${ic("mail")}</span>문자</a>`:""}
@@ -7266,6 +7302,7 @@ function viewProfile(){
   const form = `<form class="pf-form" data-form="prof" data-id="${esc(p.id)}">
     <label class="pf-f"><span>이름</span><input name="name" value="${esc(p.name)}" maxlength="10" required></label>
     <label class="pf-f"><span>가족에게 하고 싶은 말 <small>40자까지</small></span><input name="msg" value="${esc(p.msg||"")}" maxlength="40" placeholder="예: 이번 주도 화이팅!"></label>
+    <label class="pf-f"><span>생일 <small>(선택 · 월과 날만)</small></span><span class="pf-bd"><select name="bm" aria-label="생일 월"><option value="">월</option>${[...Array(12)].map((_,i)=>`<option value="${i+1}" ${+(p.birthday||"").slice(0,2)===i+1?"selected":""}>${i+1}월</option>`).join("")}</select><select name="bd" aria-label="생일 날"><option value="">일</option>${[...Array(31)].map((_,i)=>`<option value="${i+1}" ${+(p.birthday||"").slice(3,5)===i+1?"selected":""}>${i+1}일</option>`).join("")}</select></span><em>가족 생일 위젯 · 홈 디데이 줄(2주 전부터)에 🎂 로 나와요. 같은 가족에게만 보여요.</em></label>
     <fieldset class="pf-ch"><span>🐾 내 캐릭터 <small>얼굴 동그라미(사진보다 먼저) · 🌟 연속 기록 자리에 나와요</small></span>
       <div class="pf-ch-grid" role="radiogroup" aria-label="내 캐릭터">
         <label title="이름 글자"><input type="radio" name="char" value="" ${p.char?"":"checked"}><b style="font-size:20px">${esc((p.name||"?").slice(0,1))}</b><small>글자</small></label>
@@ -7483,7 +7520,7 @@ Object.assign(acts,{
 forms.prof = (fd,f) => guard(async()=>{
   const p=prof(f.dataset.id); if(!canEditProf(p)) return;
   const name=String(fd.name||"").trim().slice(0,10); if(!name){ toast("이름을 적어 주세요"); return; }
-  const data={name, msg:String(fd.msg||"").replace(/\s+/g," ").trim().slice(0,40)};
+  const data={name, msg:String(fd.msg||"").replace(/\s+/g," ").trim().slice(0,40), birthday:fd.bm&&fd.bd?`${pad(+fd.bm)}-${pad(+fd.bd)}`:""};
   if(canEditPhone(p) && "phone" in fd){ const ph=String(fd.phone||"").replace(/[^\d+\- ]/g,"").trim().slice(0,20);
     if(ph && telOf(ph).length<8){ toast("전화번호를 다시 확인해 주세요"); return; } data.phone=ph; }
   // 🐾 캐릭터: "" = 이름 글자, "img" = 넣은 그림 그대로, 그 밖 = 목록의 캐릭터 (넣은 그림을 안 쓰게 되면 파일도 지워요)
@@ -7535,8 +7572,10 @@ Object.assign(acts,{
 // 💡 오늘의 기능 띠 단추
 Object.assign(acts,{
   "tip-x": () => { ls.set(tipKey(),"1"); render(); },
+  "anniv-del": el => { if(!isParent()) return; const a=(S.group?.anniv||[]).find(x=>x.id===el.dataset.id); if(!a || !confirm(`${a.t}을 지울까요?`)) return;
+    guard(async()=>{ const list=S.group.anniv.filter(x=>x.id!==a.id); await B.updateGroup(S.gid,{anniv:list}); S.group.anniv=list; render(); toast("기념일을 지웠어요"); }); },
   "pen-x": () => { ls.set(penAskKey(),"1"); render(); toast("다홍펜 고치는 방법은 우리 가족 설정에서 언제든 바꿀 수 있어요"); },
-  "dd-open": el => { const d=el.dataset.v, l=ddayList().filter(x=>x.date===d), n=ddDays(d); toast(`⏳ ${fmtLong(d)} · ${l.map(x=>x.title).join(" · ")} · ${n>0?n+"일 남았어요":"오늘이에요!"}`); },
+  "dd-open": el => { const d=el.dataset.v, l=[...ddayList(),...familyDays()].filter(x=>x.date===d), n=ddDays(d); toast(`⏳ ${fmtLong(d)} · ${l.map(x=>x.title).join(" · ")} · ${n>0?n+"일 남았어요":"오늘이에요!"}`); },
   "tip-go": el => { const t=TIPS[+el.dataset.v]; if(!t) return; ls.set(tipKey(),"1"); const to=t[2];
     if(to==="prof"){ S.prof=S.me.id; S.profEdit=canEditProf(S.me); render(); return; }
     if(to==="tt"){ if(IS_APP) go(()=>{ S.tab="home"; S.sub=null; S.hpage="fav"; S.favTab="tt"; }); else { S.ttOpen=true; render(); } return; }
@@ -7713,18 +7752,8 @@ function widgetData(){
     .map(s=>({when:s.date===t?"오늘":s.date===addDays(t,1)?"내일":md(s.date),title:s.title}));
   const yd=sch.find(s=>s.date===addDays(t,-1));
   const eventNote = yd ? `어제 ${yd.title}, 어땠어요? 일기로 남겨 봐요` : "일정이 있던 날은 일기 쓸 거리가 많아요!";
-  // 받아쓰기: 아직 익히지 못한 낱말 (보기 순서는 섞어요)
-  const quiz=S.quizWords.filter(w=>(w.correctStreak||0)<3 && w.wrong && w.right && prof(w.profileId)).sort(()=>Math.random()-.5).slice(0,5)
-    .map(w=>{ const sw=Math.random()<.5; return {kid:prof(w.profileId).name, a:sw?w.wrong:w.right, b:sw?w.right:w.wrong}; });
-  // 하트 · 댓글 · 도장: 최근 2주, 내 일기에 가족이 남긴 마음
-  const mine=S.diaries.filter(d=>d.profileId===S.me.id), since=Date.now()-14*864e5, ev=[];
+  // (2026-10-09) 받아쓰기 · 하트 위젯은 뺐어요
   const cut=(s,n)=>{ s=String(s||"").replace(/\s+/g," ").trim(); return s.length>n?s.slice(0,n)+"…":s; };
-  for(const d of mine){
-    S.comments.filter(c=>c.diaryId===d.id && !c.deleted && c.profileId!==S.me.id && (c.createdAt||0)>since).forEach(c=>{ const p=prof(c.profileId); if(p) ev.push({at:c.createdAt,who:p.name,color:p.color||"#1F2A44",text:`${md(d.date)} 일기에 댓글 · "${cut(c.text,30)}"`}); });
-    if(d.stamp && (d.stampAt||0)>since){ const p=prof(d.stampBy); if(p) ev.push({at:d.stampAt,who:p.name,color:p.color||"#1F2A44",text:`${md(d.date)} 일기에 도장 '${d.stamp}'`}); }
-    heartsOf(d).filter(id=>id!==S.me.id).forEach(id=>{ const p=prof(id); if(p && d.date>=addDays(t,-14)) ev.push({at:toDate(d.date).getTime(),who:p.name,color:p.color||"#1F2A44",text:`${md(d.date)} 일기에 ♥`}); });
-  }
-  const hearts=ev.sort((a,b)=>b.at-a.at).slice(0,3).map(({who,color,text})=>({who,color,text}));
   // 📅 4×4 달력 위젯 (2026-10-08): 이번 달 날짜마다 일기 쓴 가족 색 · 일정 제목 · 공휴일
   const ym=t.slice(0,7), [cy,cm]=ym.split("-").map(Number), cdays=new Date(cy,cm,0).getDate(), cal={y:cy,m:cm,today:Number(t.slice(8)),lead:toDate(ym+"-01").getDay(),days:cdays,hol:{},wrote:{},ev:{}};
   for(let i=1;i<=cdays;i++){ const d=`${ym}-${pad(i)}`, k=String(i);
@@ -7738,21 +7767,64 @@ function widgetData(){
   // 💬 4×2 가족 채팅 위젯 (2026-10-09): 최근 두 줄 · 안 읽은 수
   const chat={unread:chatUnread(), msgs:S.chats.filter(m=>!m.deleted).slice(-2).map(m=>{ const p=prof(m.profileId); return {who:p?.name||"가족", me:m.profileId===S.me.id, color:pcol(p), text:cut(m.text||(m.photo?"📷 사진":""),40)}; })};
   const ddays=ddayList().slice(0,5).map(x=>({title:x.title,date:x.date,d:ddDays(x.date),from:x.createdAt?new Date(x.createdAt).toISOString().slice(0,10):"",label:fmtShort(x.date)}));
-  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts, cal, tt, chat, ddays};
+  // 🎂 생일 · 기념일 위젯 (2026-10-09): 가까운 순서로 네 개
+  const bdays=familyDays().slice(0,4).map(x=>({icon:x.icon, title:x.title, date:x.date, d:ddDays(x.date), label:fmtShort(x.date), face:x.p?(charOf(x.p)?.e||x.p.name.slice(0,1)):x.icon, color:x.p?pcol(x.p):"#C9B6FF"}));
+  // 📷 하루 한 장 위젯: 가장 최근에 올라온 가족 일기 사진 한 장 (누르면 그 일기)
+  const sd=S.diaries.filter(d=>d.status==="submitted" && (d.photos||[]).some(p=>/^https:/.test(p.url||""))).sort((a,b)=>b.date.localeCompare(a.date)||(b.createdAt||0)-(a.createdAt||0))[0];
+  const snap=sd?{id:sd.id, url:(sd.photos.find(p=>p.fav)||sd.photos.find(p=>/^https:/.test(p.url||""))).url, label:`${ago(sd.date)} · ${prof(sd.profileId)?.name||""}`, text:cut(sd.text,26)}:null;
+  // 🌤 오늘 날씨 한 줄 위젯: 앱에서 날씨를 켠 기기만 (wxGet), 없으면 켜는 안내
+  const weather=wxGet();
+  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, cal, tt, chat, ddays, bdays, snap, weather};
+}
+/* 🌤 위젯 날씨 (2026-10-09, 앱만): 위젯의 '날씨 켜기'를 누르면(iinote://weather) 위치를 한 번 묻고, 대략 위치(소수 둘째 자리 ≈ 1km)를
+   Open-Meteo(무료 · 키 없음)에 보내 지금 날씨만 받아요. 위치 · 날씨는 이 기기에만 1시간 보관(ls iinote-wx), 서버에 저장 안 함 */
+const WX_KEY="iinote-wx", WX_ON="iinote-wx-on";
+const WX_KIND = c => c===0?["☀️","맑음","햇살 좋은 날, 밖에서 한 일을 적어 볼까요?"]
+  : c<=2?["⛅","구름 조금","하늘의 구름은 무슨 모양이었나요?"]
+  : c===3?["☁️","흐림","흐린 날, 마음은 어땠는지 적어 봐요"]
+  : c<=48?["🌫","안개","안개 낀 아침, 무엇이 보였나요?"]
+  : c<=67||(c>=80&&c<=82)?["🌧","비","빗소리를 들으며 무슨 생각을 했나요?"]
+  : c<=77||c===85||c===86?["❄️","눈","눈이 오면 가장 하고 싶은 일은?"]
+  : ["⛈","천둥 번개","천둥이 칠 때 기분이 어땠나요?"];
+function wxGet(){
+  if(!IS_APP) return null;
+  if(ls.get(WX_ON,"")!=="1") return {need:true};
+  let w=null; try{ w=JSON.parse(ls.get(WX_KEY,"null")); }catch(e){}
+  if(!w || Date.now()-w.at>6*3600e3) return {wait:true};
+  const [icon,name,line]=WX_KIND(w.code); return {icon,name,line,temp:w.temp,max:w.max,min:w.min,rain:w.rain,at:w.at};
+}
+async function wxFetch(ask){
+  if(!IS_APP || !navigator.geolocation) return;
+  if(!ask && ls.get(WX_ON,"")!=="1") return;
+  let w=null; try{ w=JSON.parse(ls.get(WX_KEY,"null")); }catch(e){}
+  if(!ask && w && Date.now()-w.at<3600e3) return;
+  try{
+    const pos=await new Promise((ok,no)=>navigator.geolocation.getCurrentPosition(ok,no,{enableHighAccuracy:false,timeout:12000,maximumAge:30*60e3}));
+    const la=pos.coords.latitude.toFixed(2), lo=pos.coords.longitude.toFixed(2);
+    const r=await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=1`)).json();
+    ls.set(WX_ON,"1");
+    ls.set(WX_KEY,JSON.stringify({at:Date.now(), code:+r.current?.weather_code||0, temp:Math.round(r.current?.temperature_2m), max:Math.round(r.daily?.temperature_2m_max?.[0]), min:Math.round(r.daily?.temperature_2m_min?.[0]), rain:r.daily?.precipitation_probability_max?.[0]??null}));
+    widgetsLast=""; syncWidget();
+    if(ask) toast("위젯에 오늘 날씨를 보여 줄게요 🌤");
+  }catch(e){ if(ask) toast("위치를 쓸 수 없어서 날씨를 못 가져왔어요. 휴대폰 설정에서 위치 권한을 켜 주세요"); }
 }
 function syncWidgets(I){ if(!I?.updateWidgets) return;
+  wxFetch(false);   // 켜 둔 기기는 한 시간에 한 번 날씨를 새로
   let data; try{ data=widgetData(); }catch(e){ reportError(e.message,"widgetData"); return; }
-  const k=JSON.stringify({...data,photos:data.photos.length,quiz:data.quiz.map(q=>q.a+q.b).sort().join()}); if(k===widgetsLast) return; widgetsLast=k;   // 무작위 순서만 바뀐 건 다시 안 보내요
+  const k=JSON.stringify({...data,photos:data.photos.length}); if(k===widgetsLast) return; widgetsLast=k;   // 무작위 순서만 바뀐 건 다시 안 보내요
   I.updateWidgets({json:JSON.stringify({at:Date.now(),...data})}).catch(()=>{}); }
 
 // 바로가기 · 위젯 · 알림이 연 주소(iinote://write 같은)를 앱 화면 주소로
 function appPath(url){
   try{ const u=new URL(url);
-    if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase(); return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz",mine:"/mine",cal:"/",tt:"/"})[k]||"/"; }   // mine · cal · tt: 하트 · 달력 · 시간표 위젯 (2026-10-08)   // quiz: 받아쓰기 위젯 (2026-10-07)
+    if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase();
+      if(k==="diary" && u.searchParams.get("d")) return "/?d="+encodeURIComponent(u.searchParams.get("d"));   // 하루 한 장 위젯 → 그 일기
+      return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz",mine:"/mine",cal:"/",tt:"/"})[k]||"/"; }   // mine · cal · tt: 하트 · 달력 · 시간표 위젯 (2026-10-08)   // quiz: 받아쓰기 위젯 (2026-10-07)
     return u.pathname+u.search; }catch(e){ return /^\//.test(String(url||"")) ? String(url) : "/"; } }
 function openAppUrl(url){
   if(url==="help"){ if(S.phase==="app" && S.me) acts["help-open"](); else S.wantHelp=true; return; }   // 운영자 답장 알림
   if(url==="admin"){ openExternal("https://iinote.co.kr/admin.html"); return; }                          // (운영자) 새 문의 알림
+  if(/^iinote:\/\/weather/i.test(String(url||""))){ wxFetch(true); return; }                              // 🌤 날씨 위젯 '날씨 켜기'
   const p=appPath(url);
   // 위젯 '달력 보러 가기' · '시간표 보러 가기' → 홈의 달력 쪽 · 즐겨찾기 쪽의 시간표 칸 (2026-10-08)
   const wk=/^iinote:\/\/(cal|tt)\b/i.exec(String(url||"")); if(wk){ S.hpage = wk[1].toLowerCase()==="cal" ? "cal" : "fav"; if(S.hpage==="fav") S.favTab="tt"; }
