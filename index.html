@@ -2392,6 +2392,32 @@ html.is-app:root .more-it[style*="--mb"]{background:linear-gradient(150deg,var(-
 html.is-app:root .more-it[style*="--mb"] > span{background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 95%,transparent),color-mix(in srgb,var(--surface) 70%,var(--mb)));box-shadow:0 3px 8px color-mix(in srgb,var(--mf) 20%,transparent),inset 0 1px 0 var(--surface)}
 html.is-app:root .more-row{border-radius:16px;background:color-mix(in srgb,var(--tc) 7%,var(--surface2))}
 html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
+
+/* ===== 🎨 단추 · 얼굴 새 모양 (2026-10-08, 사용자가 고른 시안) =====
+   ① 동그란 얼굴(.av) = 말랑 점토  ② 일반 단추(.btn-primary · .btn-accent) = 오로라 + 살짝 입체  ③ 켜기 · 고르기 · 설정 단추(.pill2) = 두 칸 알약 */
+.av:not(.has-ph){background-image:radial-gradient(circle at 30% 24%,rgba(255,255,255,.6) 0 8%,rgba(255,255,255,0) 9%),linear-gradient(180deg,rgba(255,255,255,.26),rgba(0,0,0,.16))!important;box-shadow:inset 0 2px 1px rgba(255,255,255,.45),inset 0 -2px 2px rgba(0,0,0,.18),0 2px 0 rgba(0,0,0,.14),0 4px 7px -3px rgba(46,36,51,.35);text-shadow:0 1px 0 rgba(0,0,0,.2)}
+.av.has-ph{box-shadow:0 2px 0 rgba(0,0,0,.12),0 4px 7px -3px rgba(46,36,51,.35)}
+.btn.btn-primary,.btn.btn-accent{position:relative;border:2.5px solid transparent!important;color:var(--ink)!important;
+  background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 90%,#9B7BE8)) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box!important;
+  background-size:100% 100%,300% 100%!important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.85),0 3px 0 color-mix(in srgb,#9B7BE8 55%,transparent),0 7px 14px -7px rgba(155,123,232,.7)!important;transition:transform .12s,box-shadow .12s}
+.btn.btn-primary:active,.btn.btn-accent:active{transform:translateY(2px);box-shadow:inset 0 2px 0 rgba(255,255,255,.85),0 1px 0 color-mix(in srgb,#9B7BE8 55%,transparent)!important}
+.btn.btn-primary::before,.btn.btn-accent::before{content:"✦";font-size:.7em;color:#E4507F;margin-right:-2px}
+.btn.btn-primary:has(> .ic)::before,.btn.btn-accent:has(> .ic)::before{content:none}
+@media (prefers-reduced-motion:no-preference){ .btn.btn-primary,.btn.btn-accent{animation:btnAurora 7s linear infinite} @keyframes btnAurora{to{background-position:0 0,300% 0}} }
+.btn.pill2{min-width:92px;min-height:34px;padding:0 14px 0 0;gap:0;overflow:hidden;font-weight:700;border:2px solid transparent;
+  background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 94%,#5B8DEF)) padding-box,linear-gradient(135deg,#9B7BE8,#5B8DEF) border-box;
+  box-shadow:0 3px 0 rgba(91,141,239,.35),0 6px 12px -6px rgba(91,141,239,.7);transition:transform .12s,box-shadow .12s}
+.btn.pill2:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(91,141,239,.35)}
+.pill2 > i{position:relative;display:grid;place-items:center;align-self:stretch;width:32px;margin-right:9px;font-style:normal;font-size:13px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.2);background:linear-gradient(160deg,#B49AF2,#9B7BE8 40%,#5B8DEF);box-shadow:inset -1px 0 0 rgba(255,255,255,.45)}
+.pill2 > i::after{content:"";position:absolute;left:6px;top:5px;width:8px;height:4px;border-radius:4px;background:rgba(255,255,255,.7)}
+.pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
+:root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
+.pen-ask-sp{visibility:hidden}
+/* 안내 띠 안의 두 칸 알약: 띠의 작은 단추 규칙보다 앞서게 (두 줄 단추 너비 · 자리 같게) */
+#app .pen-ask .btn.pill2,.btn.pill2{display:inline-flex;align-items:stretch;flex:none!important;width:auto!important;min-width:84px;height:30px!important;min-height:0!important;padding:0 12px 0 0!important;border-radius:15px!important;font-size:12.5px!important;line-height:1!important;box-shadow:0 2px 0 rgba(91,141,239,.35),0 5px 10px -5px rgba(91,141,239,.7)!important}
+.btn.pill2 > i{width:28px;height:auto;margin-right:8px;border-radius:13px 0 0 13px;font-size:12px}
+.btn.pill2 > span{display:flex;align-items:center}
 </style>
 </head>
 <body>
@@ -3947,11 +3973,11 @@ const homeCta = mine => mine && mine.status==="submitted"
 const featAskKey = () => `iinote-featask-${S.gid}`;
 function featAskBanner(){
   if(!isParent() || ls.get(featAskKey(),"") || (S.group?.handOn && S.group?.audioOn)) return "";
-  return `<div class="pen-ask feat-ask" role="note" title="종이 일기장 사진으로 쓰기 · 목소리 녹음은 꺼 두었어요. 우리 가족 설정에서 켤 수 있어요."><span class="pen-ask-i" aria-hidden="true">🧩</span><p><b>꺼 둔 기능</b> 📝 사진으로 쓰기 · 🎙 녹음</p><button class="btn btn-primary sm" data-act="feat-go">켜기</button><button class="link-btn pen-ask-x" data-act="feat-x" aria-label="닫기">✕</button></div>`;
+  return `<div class="pen-ask feat-ask" role="note" title="종이 일기장 사진으로 쓰기 · 목소리 녹음은 꺼 두었어요. 우리 가족 설정에서 켤 수 있어요."><span class="pen-ask-i" aria-hidden="true">🧩</span><p><b>꺼 둔 기능</b> 📝 사진으로 쓰기 · 🎙 녹음</p><button class="btn pill2 sm" data-act="feat-go"><i aria-hidden="true">⏻</i><span>켜기</span></button><button class="link-btn pen-ask-x" data-act="feat-x" aria-label="닫기">✕</button></div>`;
 }
 function penAskBanner(){
   const ks=penUnset(); if(!ks.length) return "";
-  return `<div class="pen-ask" role="note" title="지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요."><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b> 다홍펜 고치는 방법</p><button class="btn btn-primary sm" data-act="pen-set">고르기</button></div>`;
+  return `<div class="pen-ask" role="note" title="지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요."><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b> 다홍펜 고치는 방법</p><button class="btn pill2 sm" data-act="pen-set"><i aria-hidden="true">✎</i><span>고르기</span></button><span class="link-btn pen-ask-x pen-ask-sp" aria-hidden="true">✕</span></div>`;
 }
 function viewHome(){
   const st=homeStyle();
@@ -6611,7 +6637,9 @@ async function saveDiary(status){
   if(d.pen){ data.aiChecked=true; data.aiResult=penResult(d); }
   else if(d.aiChecked){ data.aiChecked=true; data.aiResult=d.aiResult; }
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
-  if(d.photos.some(p=>p.blob) || d.audio?.blob || (d.hand||[]).some(h=>h.blob)) toast("사진과 소리를 올리고 있어요");
+  // 올리는 것만 말해요 (2026-10-08: 사진만 넣어도 '사진과 소리'라고 나오던 것 고침)
+  { const up=[d.photos.some(p=>p.blob)&&"사진", d.audio?.blob&&"소리", (d.hand||[]).some(h=>h.blob)&&"손글씨 사진"].filter(Boolean);
+    if(up.length) toast(`${up.join(" · ")}을 올리고 있어요`); }
   await uploadPending(d);
   Object.assign(data,{ photos:d.photos, audio:d.audio||null, location:d.location||null, talk:d.talk||null, hand:d.hand||[], handReads:d.handReads||0,
     tags:[...new Set([...d.tags,...extractTags(d.title+" "+d.text)])].slice(0,20) });
