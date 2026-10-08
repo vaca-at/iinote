@@ -1912,7 +1912,13 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .tt-who{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none}
 .tt-who::-webkit-scrollbar{display:none}
 .tt-who .hw{position:relative}
-.tt-dot{position:absolute;top:2px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 2px var(--surface)}
+.tt-add{border:1.5px dashed color-mix(in srgb,var(--ink3) 45%,transparent)!important;background:transparent!important;color:var(--ink2)!important;box-shadow:none!important;padding:0 12px!important}
+.tt-addlist{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-2px 0 12px;padding:10px;border-radius:16px;background:var(--surface2)}
+.tt-addlist span{width:100%;font-size:12.5px;color:var(--ink2);font-weight:600}
+.tt-panel{padding:14px;border-radius:var(--r-lg);background:var(--surface);border:1.5px solid var(--line);max-width:760px}
+.tt-panel-h{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
+.tt-panel-h h2{margin:0;font-size:18px}
+.tt-fav span{font-size:16px}
 .tt-card{--k:var(--sky);--ks:var(--sky-soft);position:relative;padding:16px 14px;border-radius:22px;background:linear-gradient(160deg,var(--ks) 0%,var(--surface) 46%);border:1px solid color-mix(in srgb,var(--k) 22%,transparent);box-shadow:0 6px 18px color-mix(in srgb,var(--k) 14%,transparent)}
 .tt-k-elem{--k:var(--coral);--ks:var(--coral-soft)}
 .tt-k-mid{--k:var(--sky);--ks:var(--sky-soft)}
@@ -3597,7 +3603,8 @@ function favRow(){
     return `<a class="fav" href="${ok?esc(l.url):"#"}" target="_blank" rel="noopener noreferrer" title="${esc(host(l.url))}"><span class="lk-mark" style="background:${c};color:${onColor(c)}">${esc((l.title||"?").slice(0,1))}</span>${esc(l.title)}</a>`; }).join("");
   return `<div class="fav-row"><b class="fav-h" title="즐겨찾기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg><span>즐겨찾기</span></b>
     ${chips||`<span class="muted" style="font-size:14px;white-space:nowrap">${isParent()?"자주 가는 누리집을 모아 두세요":"아직 즐겨찾기가 없어요"}</span>`}
-    ${isParent()?`<button class="fav add ${S.favEdit?"on":""}" data-act="fav-edit" aria-expanded="${!!S.favEdit}" aria-label="즐겨찾기 추가 · 편집">${ic("plus")}<span>추가 · 편집</span></button>`:""}</div>`;
+    ${isParent()?`<button class="fav add ${S.favEdit?"on":""}" data-act="fav-edit" aria-expanded="${!!S.favEdit}" aria-label="즐겨찾기 추가 · 편집">${ic("plus")}<span>추가 · 편집</span></button>`:""}
+    <button class="fav tt-fav ${S.ttOpen?"on":""}" data-act="tt-open" aria-expanded="${!!S.ttOpen}"><span aria-hidden="true">📅</span>시간표</button></div>`;
 }
 // 부모 폰으로 아이가 쓸 때: 부모 화면에는 '아이가 쓰기' 단추, 아이로 쓰는 중에는 '부모로 돌아가기'
 // 받침에 따라 "로" · "으로" (ㄹ 받침은 "로")
@@ -3844,6 +3851,7 @@ function viewShell(){
       </div>
       ${kidBar()}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
+      ${S.ttOpen?`<div class="fav-panel tt-panel"><div class="tt-panel-h"><h2>📅 시간표</h2><button class="link-btn" data-act="tt-open">닫기</button></div>${viewTimetable()}</div>`:""}
       ${S.newsOpen?viewNews():""}
       <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
       <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${noticeBar()}${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
@@ -4190,7 +4198,8 @@ const TT_TONES = ["coral","butter","sage","sky","lilac"];
 const ttKind = k => TT_KINDS.find(x=>x[0]===k) || TT_KINDS[0];
 const ttTone = sub => { let h=0; for(const ch of String(sub)) h=(h*31+ch.charCodeAt(0))>>>0; return TT_TONES[h%TT_TONES.length]; };
 function ttBlank(kind){ const [k,,,n]=ttKind(kind); return {days:5, rows:[...Array(n)].map((_,i)=>({t:k==="univ"?`${i+9}시`:`${i+1}교시`, c:["","","","","",""]}))}; }
-function ttWho(){ const ps=sortedProfiles(); return ps.find(p=>p.id===S.ttWho) || ps.find(p=>p.id===S.me.id) || ps[0]; }
+// 시간표를 올린 사람만 칩으로 보여요 (일기처럼 가족 모두가 나오지 않게). 새로 넣는 사람은 ＋ 시간표 넣기에서 골라요
+function ttWho(){ const ps=sortedProfiles(); return ps.find(p=>p.id===S.ttWho) || ps.find(p=>p.tt && p.id===S.me.id) || ps.find(p=>p.tt) || ps.find(p=>p.id===S.me.id) || ps[0]; }
 function ttGridHTML(g){
   const today=new Date().getDay(), tc=today>=1&&today<=g.days ? today-1 : -1;
   return `<div class="tt-wrap"><table class="tt-grid" style="--cols:${g.days}"><thead><tr><th></th>${TT_DAYS.slice(0,g.days).map((d,i)=>`<th class="${i===tc?"today":""}">${d}${i===tc?"<small>오늘</small>":""}</th>`).join("")}</tr></thead>
@@ -4207,7 +4216,10 @@ function ttEditor(p,tt){
 }
 function viewTimetable(){
   const ps=sortedProfiles(), p=ttWho(), tt=p?.tt, ed=canEditProf(p), [kk,kl,ki]=ttKind(tt?.kind||S.ttKind);
-  const chips=`<div class="tt-who">${ps.map(x=>`<button class="hw ${x.id===p.id?"on":""}" data-act="tt-who" data-v="${esc(x.id)}" aria-pressed="${x.id===p.id}">${av(x,24)}${esc(x.name)}${x.tt?'<i class="tt-dot" aria-hidden="true"></i>':""}</button>`).join("")}</div>`;
+  const shown=ps.filter(x=>x.tt || x.id===p.id), addable=ps.filter(x=>!x.tt && canEditProf(x) && x.id!==p.id);
+  const chips=`<div class="tt-who">${shown.map(x=>`<button class="hw ${x.id===p.id?"on":""}" data-act="tt-who" data-v="${esc(x.id)}" aria-pressed="${x.id===p.id}">${av(x,24)}${esc(x.name)}</button>`).join("")}
+    ${addable.length?`<button class="hw tt-add ${S.ttAdd?"on":""}" data-act="tt-add" aria-expanded="${!!S.ttAdd}">＋ 시간표 넣기</button>`:""}</div>
+    ${S.ttAdd&&addable.length?`<div class="tt-addlist"><span>누구 시간표를 넣을까요?</span>${addable.map(x=>`<button class="hw" data-act="tt-who" data-v="${esc(x.id)}">${av(x,24)}${esc(x.name)}</button>`).join("")}</div>`:""}`;
   const kinds=`<div class="tt-kinds" role="radiogroup" aria-label="시간표 종류">${TT_KINDS.map(([k,l,i])=>`<button type="button" role="radio" aria-checked="${kk===k}" class="${kk===k?"on":""}" data-act="tt-kind" data-v="${k}"><span aria-hidden="true">${i}</span>${l}</button>`).join("")}</div>`;
   const file=(l,cls="btn btn-primary")=>`<label class="${cls} tt-up">${ic("camera")}${l}<input type="file" class="tt-file sr" accept="image/*" data-id="${esc(p.id)}"></label>`;
   if(S.ttEdit===p.id) return chips+`<section class="tt-card tt-k-${kk}"><header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(p.name)}의 시간표 만들기</h3></header>${kinds}${ttEditor(p,tt)}</section>`;
@@ -6082,7 +6094,7 @@ const acts = {
     if(!K){ toast("카카오톡을 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요"); return; }
     try{ if(!K.isInitialized()) K.init(KAKAO_JS_KEY); K.Share.sendScrap({requestUrl:SHARE_URL}); }
     catch(e){ console.error(e); toast("카카오톡 공유를 열지 못했어요"); } },
-  "fav-edit": () => { S.favEdit=!S.favEdit; render(); },
+  "fav-edit": () => { S.favEdit=!S.favEdit; if(S.favEdit) S.ttOpen=false; render(); },
   "fav-view": el => { ls.set("iinote-fav-view",el.dataset.v); render(); },
   "w-day": el => { if(!S.draft) return; const box={value:el.dataset.v}; changeDraftDate(box); render(); },
   "kw-q-next": () => { S.kwQ=(S.kwQ||0)+1; render(); },
@@ -6857,7 +6869,9 @@ forms.prof = (fd,f) => guard(async()=>{
 document.addEventListener("change", e=>{ if(e.target.classList?.contains("tt-file")) ttPhoto(e.target); });
 Object.assign(acts,{
   "fav-tab": el => { S.favTab=el.dataset.v; S.favEdit=false; render(); },
-  "tt-who": el => { S.ttWho=el.dataset.v; S.ttEdit=null; S.ttPhoto=null; render(); },
+  "tt-who": el => { S.ttWho=el.dataset.v; S.ttEdit=null; S.ttPhoto=null; S.ttAdd=false; render(); },
+  "tt-add": () => { S.ttAdd=!S.ttAdd; render(); },
+  "tt-open": () => { S.ttOpen=!S.ttOpen; if(S.ttOpen) S.favEdit=false; render(); },
   "tt-kind": el => { const p=ttWho(); S.ttKind=el.dataset.v; if(p?.tt && S.ttEdit!==p.id) guard(async()=>{ await ttSave(p.id,{kind:el.dataset.v}); render(); }); else render(); },
   "tt-edit": el => { const p=prof(el.dataset.v); if(!p) return; S.ttEdit=p.id; const g=p.tt?.grid; S.ttDraft=g?JSON.parse(JSON.stringify(g)):ttBlank(p.tt?.kind||S.ttKind); render(); },
   "tt-edit-off": () => { S.ttEdit=null; S.ttDraft=null; render(); },
