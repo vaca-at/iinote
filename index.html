@@ -6517,7 +6517,7 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden) autoLogo
 const keepBox = () => DEMO || IS_APP ? "" : `<label class="keep-login"><input type="checkbox" data-pref="keep" ${keepLogin()?"checked":""}> 이 기기에서 로그인 유지 <small>(${KEEP_DAYS}일 · 내 휴대폰이나 집 컴퓨터일 때만 켜 주세요. 끄면 ${IDLE_MIN}분 동안 안 쓰면 로그아웃돼요)</small></label>`;
 
 /* ---------- 📱 당겨서 새로고침 (앱에서만, 2026-10-05) ----------
-   화면 맨 위에서 아래로 끌어내렸다 놓으면 가족 일기 · 댓글 · 일정 등을 다시 받아와요.
+   화면 맨 위에서 아래로 끌어내렸다 놓으면 화면 코드와 가족 일기 · 댓글 · 일정을 모두 새로 받아 앱을 다시 열어요.
    일기 쓰는 중 · 사진 크게 보기 · 채팅처럼 안쪽 칸을 스크롤할 때는 하지 않아요 */
 if(IS_APP){
   const ARROW=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 12l6 6 6-6"/></svg>`, SPIN=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>`;
@@ -6533,9 +6533,13 @@ if(IS_APP){
   addEventListener("touchend", async ()=>{ if(y0===null) return; y0=null;
     if(dy<GO){ hide(); return; }
     busy=true; ptr.classList.add("spin"); ptr.innerHTML=SPIN; ptr.style.transition="transform .2s"; ptr.style.transform="translate(-50%,16px)";
+    // 2026-10-08: 화면 코드(index.html)까지 새로 받아서 앱을 다시 열어요 → 고친 화면이 바로 보여요. 인터넷이 안 되면 예전처럼 내용만 다시 받아요
+    try{ await fetch(location.href,{cache:"reload"}); try{ sessionStorage.setItem("iinote-ptr-hp", S.hpage||""); }catch(e){} location.reload(); return; }
+    catch(e){ console.warn("새 화면 받기",e); }
     try{ await Promise.all([reloadAll(), wait(600)]); render(); }catch(e){ console.warn("새로고침",e); toast("새로 불러오지 못했어요. 인터넷 연결을 확인해 주세요"); }
     hide();
   });
+  try{ const hp=sessionStorage.getItem("iinote-ptr-hp"); if(hp!==null){ sessionStorage.removeItem("iinote-ptr-hp"); if(hp) S.hpage=hp; } }catch(e){}   // 새로고침 전에 보던 홈 쪽 그대로
 }
 
 /* =========================================================
