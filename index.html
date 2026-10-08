@@ -2401,6 +2401,36 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .av.corona::after{content:"";position:absolute;right:2%;top:6%;width:24%;height:24%;border-radius:50%;background:radial-gradient(circle,#fff 0 18%,rgba(255,255,255,.75) 28%,transparent 62%);pointer-events:none}
 .av.corona.has-ph{background:none!important}
 .av.corona.has-ph::after{display:none}
+/* 🐾 내 캐릭터: 얼굴 동그라미 · 연속 기록 자리 (전설 캐릭터는 공부방처럼 빛) */
+.ch-e{display:inline-block;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.ch-img{display:inline-block;width:1.25em;height:1.25em;object-fit:contain;vertical-align:middle}
+.av.has-ch .ch-img{width:78%;height:78%}
+.av.has-ch{text-shadow:none!important}
+.chx-fire{animation:chxFire 1.6s ease-in-out infinite alternate}
+@keyframes chxFire{from{filter:drop-shadow(0 0 3px rgba(255,170,0,.9)) drop-shadow(0 0 7px rgba(255,80,0,.55))}to{filter:drop-shadow(0 0 5px rgba(255,200,40,1)) drop-shadow(0 0 12px rgba(255,60,0,.8))}}
+.chx-moon{animation:chxMoon 2.4s ease-in-out infinite alternate}
+@keyframes chxMoon{from{filter:drop-shadow(0 0 3px rgba(140,200,255,.8)) drop-shadow(0 0 7px rgba(80,120,255,.5))}to{filter:drop-shadow(0 0 6px rgba(170,220,255,1)) drop-shadow(0 0 12px rgba(90,130,255,.8))}}
+.chx-rainbow{animation:chxRainbow 4s linear infinite}
+@keyframes chxRainbow{from{filter:hue-rotate(0deg) saturate(1.5) drop-shadow(0 0 5px rgba(255,120,255,.8))}to{filter:hue-rotate(360deg) saturate(1.5) drop-shadow(0 0 5px rgba(255,120,255,.8))}}
+.chx-gold{filter:sepia(.6) saturate(2) hue-rotate(-10deg) brightness(1.1) drop-shadow(0 0 5px rgba(255,210,60,1)) drop-shadow(0 0 10px rgba(255,170,0,.7))}
+.chx-deep{filter:hue-rotate(-50deg) saturate(1.4) drop-shadow(0 0 5px rgba(170,90,255,.95)) drop-shadow(0 0 11px rgba(90,40,200,.8))}
+.chx-star{filter:drop-shadow(0 0 4px rgba(255,255,255,.95)) drop-shadow(0 0 9px rgba(200,230,255,.8))}
+@media (prefers-reduced-motion:reduce){ .chx-fire,.chx-moon,.chx-rainbow{animation:none} }
+/* 프로필 편집: 캐릭터 고르기 */
+.pf-ch{margin:4px 0 14px}
+.pf-ch>span{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.pf-ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;max-height:212px;overflow:auto;padding:2px}
+.pf-ch-grid label{position:relative;display:grid;place-items:center;gap:1px;padding:6px 2px 4px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-size:26px;line-height:1.1}
+.pf-ch-grid label small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+.pf-ch-grid input{position:absolute;opacity:0;pointer-events:none}
+.pf-ch-grid label:has(input:checked){border-color:#2B3670;background:radial-gradient(circle at 50% 40%,#3A4590,#151B44);color:#fff}
+.pf-ch-grid label:has(input:checked) small{color:#E9E4FF}
+.pf-ch-grid label:has(input:focus-visible){outline:2px solid var(--coral);outline-offset:2px}
+.pf-ch-grid .leg small{color:#B07A00}
+.pf-ch-grid .leg::before{content:"전설";position:absolute;top:-6px;right:-2px;font-size:9px;padding:0 5px;border-radius:99px;background:linear-gradient(90deg,#F4BE45,#EF6F53);color:#fff;line-height:15px}
+.pf-ch-up{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
+.pf-ch-up .ch-img{width:34px;height:34px}
+.pf-ch-up em{font-style:normal;font-size:12px;color:var(--muted);flex:1 1 100%}
 .btn.btn-primary,.btn.btn-accent{position:relative;border:2.5px solid transparent!important;color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.25);
   background:linear-gradient(160deg,#33447A,#1F2A44 70%) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box!important;
   background-size:100% 100%,300% 100%!important;
@@ -2933,8 +2963,8 @@ function seedDemo(){
   s.profiles = {
     mom:{name:"엄마",type:"parent",uid:"demo-user",color:"#EF6F53",createdAt:1},
     dad:{name:"아빠",type:"parent",uid:"demo-dad",color:"#1F2A44",createdAt:2},
-    k1:{name:"하랑",type:"child",grade:4,color:"#3F7F70",pin:"",createdAt:3},
-    k2:{name:"이안",type:"child",grade:2,color:"#F4BE45",pin:"1234",createdAt:4}
+    k1:{name:"하랑",type:"child",grade:4,color:"#3F7F70",pin:"",createdAt:3,char:{id:"dino"}},
+    k2:{name:"이안",type:"child",grade:2,color:"#F4BE45",pin:"1234",createdAt:4,char:{id:"phoenix"}}
   };
   // 예시 일기: 그제 · 어제 · 오늘(3일) 가족 네 명이 모두 쓰고, 그 전 2주는 아이들이 거의 날마다 써서 글이 점점 길어져요
   const ai = (praise,feedback,cs=[]) => ({praise,feedback,corrections:cs.map(([wrong,right,explain,how])=>({wrong,right,explain,context:"",how:how||"self"}))});
@@ -3455,6 +3485,7 @@ function onChats(){
   if(S.phase!=="app" || !S.me) return;
   document.querySelectorAll(".chat-list").forEach(box=>{ const bottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML=chatItems(); if(bottom) box.scrollTop=box.scrollHeight; });
   if(chatBoxes().length) markChatSeen(); else chatDots();
+  if(IS_APP && window.appReady) syncWidget();   // 💬 가족 채팅 위젯도 새 메시지로 (2026-10-09)
 }
 function afterChatRender(){
   // 채팅을 처음 열 때만 맨 아래로 (사진 크게 보기를 열고 닫아도 보던 자리 그대로)
@@ -3651,8 +3682,23 @@ const ICONS = {
 const G_LOGO = `<svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
 const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]||""}</svg>`;
 const logo = s => `<span class="logo-wrap" style="width:${s}px;height:${s}px;border-radius:${Math.round(s*.227)}px"><svg viewBox="0 0 440 440" aria-hidden="true"><rect width="440" height="440" fill="#FBF6EE"/><line x1="0" y1="352" x2="440" y2="352" stroke="#E9DCC8" stroke-width="8"/><line x1="92" y1="0" x2="92" y2="440" stroke="#F2B5A4" stroke-width="8"/><rect x="148" y="178" width="54" height="174" rx="27" fill="#1F2A44"/><rect x="240" y="226" width="54" height="126" rx="27" fill="#1F2A44"/><circle cx="175" cy="122" r="34" fill="#EF6F53"/><circle cx="267" cy="170" r="34" fill="#F4BE45"/></svg></span>`;
-const av = (p,s=34) => { if(!p) return `<span class="av" style="width:${s}px;height:${s}px;background:#B9B1A3;color:#fff">?</span>`; const c=p.color||"#1F2A44", ph=p.photo?.thumb||p.photo?.url;   // 👤 프로필 얼굴 사진이 있으면 동그라미 안에 사진
-  return `<span class="av corona ${ph?"has-ph":""}" style="width:${s}px;height:${s}px;--c:${pcol(p)};--b1:${pbg(p)[0]};--b2:${pbg(p)[1]};font-size:${Math.round(s*.42)}px" aria-hidden="true">${ph?`<img src="${esc(ph)}" alt="" loading="lazy">`:esc((p.name||"?").slice(0,1))}</span>`; };
+/* 🐾 내 캐릭터 (2026-10-09): 프로필 편집에서 고름 → profiles.char = {id} (아래 목록) 또는 {img:{url,path}} (캡처한 그림을 올림)
+   얼굴 동그라미(사진이 없을 때 이름 첫 글자 대신) · 🔥 연속 기록 자리에 보여요. 전설 캐릭터는 공부방 방꾸미기처럼 빛이 나요(fx) */
+const CHARS = [
+  ["dog","🐶","강아지"],["cat","🐱","고양이"],["rabbit","🐰","토끼"],["bear","🐻","곰"],["panda","🐼","판다"],["fox","🦊","여우"],
+  ["penguin","🐧","펭귄"],["frog","🐸","개구리"],["lion","🦁","사자"],["tiger","🐯","호랑이"],["shark","🦈","상어"],["dolphin","🐬","돌고래"],
+  ["dino","🦖","공룡"],["unicorn","🦄","유니콘"],["dragon","🐉","용"],["octo","🐙","문어"],["chick","🐥","병아리"],["hamster","🐹","햄스터"],
+  ["hedgehog","🦔","고슴도치"],["koala","🐨","코알라"],["otter","🦦","수달"],["whale","🐳","고래"],["owl","🦉","부엉이"],["elephant","🐘","코끼리"],
+  ["phoenix","🐦‍🔥","피닉스","fire"],["moonwolf","🐺","달빛 늑대","moon"],["peacock","🦚","무지개 공작","rainbow"],
+  ["goldeagle","🦅","황금 독수리","gold"],["kraken","🦑","심해의 크라켄","deep"],["stardeer","🦌","별빛 사슴","star"],
+];
+const charOf = p => { const c=p?.char; if(!c) return null; if(c.img?.url) return {img:c.img.url, n:"내 캐릭터"};
+  const x=CHARS.find(k=>k[0]===c.id); return x?{e:x[1], n:x[2], fx:x[3]||""}:null; };
+// 캐릭터 그림 한 개 (얼굴 동그라미 · 연속 기록 자리). 없으면 dflt(보통 🔥)
+const charHTML = (p,dflt="🔥",cls="") => { const c=charOf(p); if(!c) return dflt;
+  return c.img ? `<img class="ch-img ${cls}" src="${esc(c.img)}" alt="" loading="lazy">` : `<span class="ch-e ${c.fx?"chx-"+c.fx:""} ${cls}">${c.e}</span>`; };
+const av = (p,s=34) => { if(!p) return `<span class="av" style="width:${s}px;height:${s}px;background:#B9B1A3;color:#fff">?</span>`; const c=p.color||"#1F2A44", ph=p.photo?.thumb||p.photo?.url, ch=!ph && charOf(p);   // 👤 프로필 얼굴 사진이 있으면 동그라미 안에 사진, 없고 캐릭터가 있으면 캐릭터
+  return `<span class="av corona ${ph?"has-ph":""} ${ch?"has-ch":""}" style="width:${s}px;height:${s}px;--c:${pcol(p)};--b1:${pbg(p)[0]};--b2:${pbg(p)[1]};font-size:${Math.round(s*(ch?.6:.42))}px" aria-hidden="true">${ph?`<img src="${esc(ph)}" alt="" loading="lazy">`:ch?charHTML(p):esc((p.name||"?").slice(0,1))}</span>`; };
 // 사진 수에 따른 분할 모양 (6칸 격자에서 [가로 칸, 세로 칸])
 const LAYOUT = {
   1:[[6,4]], 2:[[3,3],[3,3]], 3:[[4,4],[2,2],[2,2]], 4:[[3,3],[3,3],[3,3],[3,3]],
@@ -5176,7 +5222,7 @@ function viewMyDiary(){
   const st=streakOf(S.me.id), td=findDiary(S.me.id,todayStr()), done=td?.status==="submitted";
   return `<div class="page-h"><h1>내 일기</h1></div>
     <section class="my-hero ${st?"":"zero"}" aria-label="내 일기 기록">
-      <span class="mh-fire" aria-hidden="true">🔥</span>
+      <span class="mh-fire" aria-hidden="true">${charHTML(S.me)}</span>
       <div class="mh-t"><b>${st?`${st}일 연속`:"연속 기록 시작!"}</b><small>이번 달 ${n}편${st>=7?" · 멋져요 ✨":""}</small></div>
       ${done?`<button class="mh-write done" data-act="open-diary" data-id="${td.id}">✓ 오늘 썼어요</button>`
         :`<button class="mh-write" data-act="write">${ic("pen")}${td?"이어 쓰기":"오늘 일기"}</button>`}
@@ -5199,7 +5245,7 @@ function viewKidsStatus(){
       cal+=`<button class="kc-d ${x?"w":""} ${ds===t?"today":""}" data-act="day-open" data-v="${ds}" ${ds>t?"disabled":""} title="${fmtShort(ds)}${x?" 일기 있음":""}">${i}${x?.stamp?`<i>⭐</i>`:""}</button>`; }
     return `<section class="block kid-card" style="--pc:${p.color||"#1F2A44"}">
       <div class="kid-h">${av(p,40)}<div><b>${esc(p.name)}</b><small class="muted">${esc(gradeName(p.grade))}</small></div><span class="pill ${st[0]}">${st[1]}</span></div>
-      <div class="kid-stats"><span>📔 <b>${mon.length}</b>편</span><span>🔥 <b>${streakOf(p.id)}</b>일 연속</span><span>✏️ 평균 <b>${avg}</b>자</span><span>🖍 고친 곳 <b>${fixes}</b></span></div>
+      <div class="kid-stats"><span>📔 <b>${mon.length}</b>편</span><span>${charHTML(p)} <b>${streakOf(p.id)}</b>일 연속</span><span>✏️ 평균 <b>${avg}</b>자</span><span>🖍 고친 곳 <b>${fixes}</b></span></div>
       <div class="kid-cal">${cal}</div>
       <p class="muted" style="font-size:12px;margin:8px 0 0">색칠된 날 = 일기 쓴 날 · ⭐ = 칭찬 도장. 날짜를 누르면 그날 가족 일기를 펼쳐 봐요.</p>
       ${viewStickers(p,true)}${awardList(p)}
@@ -5514,7 +5560,7 @@ function syncLen(){
 function kwHead(d){
   const t=todayStr(), y=addDays(t,-1), st=kwStreak(), sub=d.status==="submitted";
   return `<div class="sub-top"><button class="btn btn-ghost sm" data-act="back">${ic("back")}나가기</button><span class="muted">${sub?"제출한 일기를 고치고 있어요":d.status==="draft"?"임시 저장된 일기예요":""}</span></div>
-    <header class="kw-head">${av(S.me,48)}<div class="kw-hl"><h2>${esc(kidN(S.me))}의 일기장</h2><small>${gradeName(S.me.grade)?gradeName(S.me.grade)+" · ":""}${fmtLong(d.date)}</small></div><span class="kw-streak">🔥 ${st?`${st}일째 쓰는 중!`:"오늘부터 시작!"}</span></header>
+    <header class="kw-head">${av(S.me,48)}<div class="kw-hl"><h2>${esc(kidN(S.me))}의 일기장</h2><small>${gradeName(S.me.grade)?gradeName(S.me.grade)+" · ":""}${fmtLong(d.date)}</small></div><span class="kw-streak">${charHTML(S.me)} ${st?`${st}일째 쓰는 중!`:"오늘부터 시작!"}</span></header>
     ${d.date===t&&!sub?`<div class="kw-due">📓 오늘 일기는 저녁 8시 전에 써요!</div>`:""}
     <div class="kw-day"><button class="kw-dchip ${d.date===t?"on":""}" data-act="w-day" data-v="${t}">오늘</button><button class="kw-dchip ${d.date===y?"on":""}" data-act="w-day" data-v="${y}">어제</button><b>${fmtLong(d.date)}</b></div>`;
 }
@@ -7097,6 +7143,15 @@ function viewProfile(){
   const form = `<form class="pf-form" data-form="prof" data-id="${esc(p.id)}">
     <label class="pf-f"><span>이름</span><input name="name" value="${esc(p.name)}" maxlength="10" required></label>
     <label class="pf-f"><span>가족에게 하고 싶은 말 <small>40자까지</small></span><input name="msg" value="${esc(p.msg||"")}" maxlength="40" placeholder="예: 이번 주도 화이팅!"></label>
+    <fieldset class="pf-ch"><span>🐾 내 캐릭터 <small>얼굴 동그라미 · 🔥 연속 기록 자리에 나와요</small></span>
+      <div class="pf-ch-grid" role="radiogroup" aria-label="내 캐릭터">
+        <label title="이름 글자"><input type="radio" name="char" value="" ${p.char?"":"checked"}><b style="font-size:20px">${esc((p.name||"?").slice(0,1))}</b><small>글자</small></label>
+        ${p.char?.img?.url?`<label title="내가 넣은 그림"><input type="radio" name="char" value="img" checked><img class="ch-img" src="${esc(p.char.img.url)}" alt=""><small>넣은 그림</small></label>`:""}
+        ${CHARS.map(([k,e,n,fx])=>`<label class="${fx?"leg":""}" title="${esc(n)}"><input type="radio" name="char" value="${k}" ${p.char?.id===k?"checked":""}><span class="ch-e ${fx?"chx-"+fx:""}">${e}</span><small>${esc(n)}</small></label>`).join("")}
+      </div>
+      <div class="pf-ch-up"><label class="btn btn-soft">${ic("camera")}캡처한 그림 넣기<input type="file" class="pf-file sr" data-kind="char" accept="image/*"></label>
+        <em>좋아하는 캐릭터 그림을 캡처해서 넣으면 바탕을 지우고 캐릭터만 꽉 차게 넣어 줘요.${IS_APP?"":" 컴퓨터에서는 캡처한 뒤 이 창에서 Ctrl+V 로 붙여 넣어도 돼요."} 가족에게만 보여요.</em></div>
+    </fieldset>
     ${canEditPhone(p)?`<label class="pf-f"><span>전화번호 <small>(선택)</small></span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.phone||"")}" maxlength="20" placeholder="010-0000-0000"><em>같은 가족에게만 보여요. 비워 두면 전화 · 문자 단추가 안 보여요.${p.type==="child"?" 아이 번호는 보호자만 넣을 수 있어요.":""}</em></label>`
       : p.type==="child"?`<p class="pf-note">전화번호는 엄마 · 아빠가 넣어 줄 수 있어요</p>`:""}
     ${p.photo||p.cover?`<div class="pf-rm">${p.photo?`<button type="button" class="link-btn" data-act="prof-rm" data-v="photo">얼굴 사진 빼기</button>`:""}${p.cover?`<button type="button" class="link-btn" data-act="prof-rm" data-v="cover">배경 사진 빼기</button>`:""}</div>`:""}
@@ -7111,8 +7166,63 @@ function viewProfile(){
     <div class="pf-body"><div class="pf-face">${face}${!ed && submittedOn(p.id,t)?`<span class="pf-today">오늘 씀</span>`:""}</div>${ed?form:view}</div>
   </section>`;
 }
+/* 🐾 캡처한 캐릭터 그림 다듬기 (2026-10-09): 가장자리에서 이어진 바탕색(모서리 색과 비슷한 색)을 투명하게 지우고
+   남은 캐릭터만 꼭 맞게 잘라 정사각형 PNG(320px)로 → 동그라미 · 연속 자리에 꽉 차게. 바탕이 복잡한 그림은 그대로 잘라만 둬요 */
+async function charCut(blob){
+  const bm=await createImageBitmap(blob), k=Math.min(1,640/Math.max(bm.width,bm.height));
+  const W=Math.max(1,Math.round(bm.width*k)), H=Math.max(1,Math.round(bm.height*k));
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const g=cv.getContext("2d",{willReadFrequently:true});
+  g.drawImage(bm,0,0,W,H); bm.close?.();
+  const im=g.getImageData(0,0,W,H), d=im.data, px=(x,y)=>(y*W+x)*4;
+  // 바탕색 후보: 네 모서리 중 가장 흔한 색 (이미 투명하면 그대로)
+  const cs=[[0,0],[W-1,0],[0,H-1],[W-1,H-1]].map(([x,y])=>{ const i=px(x,y); return [d[i],d[i+1],d[i+2],d[i+3]]; });
+  const near=(a,b,t)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])+Math.abs(a[2]-b[2])<=t;
+  const bg=cs.map(c=>[c,cs.filter(o=>near(c,o,60)).length]).sort((a,b)=>b[1]-a[1])[0][0];
+  if(bg[3]>200){
+    const T=70, seen=new Uint8Array(W*H), st=[];
+    for(let x=0;x<W;x++){ st.push(x, x+(H-1)*W); } for(let y=0;y<H;y++){ st.push(y*W, y*W+W-1); }
+    let cleared=0;
+    while(st.length){ const p=st.pop(); if(seen[p]) continue; seen[p]=1; const i=p*4;
+      if(d[i+3]<20 || near([d[i],d[i+1],d[i+2]],bg,T)){ d[i+3]=0; cleared++; const x=p%W, y=(p/W)|0;
+        if(x>0) st.push(p-1); if(x<W-1) st.push(p+1); if(y>0) st.push(p-W); if(y<H-1) st.push(p+W); } }
+    if(cleared >= W*H*0.08 && cleared <= W*H*0.97) g.putImageData(im,0,0);   // 거의 안 지워졌거나 다 지워지면 원래 그림 그대로
+  }
+  // 남은 덩어리 중 가장 큰 것(= 캐릭터)과 그만큼 큰 덩어리만 남기고, 캡처 화면의 글씨 · 작은 부스러기는 지워요
+  const im2=g.getImageData(0,0,W,H), a=im2.data, lab=new Int32Array(W*H), sizes=[0], boxes=[null];
+  for(let p0=0;p0<W*H;p0++){ if(lab[p0] || a[p0*4+3]<=40) continue;
+    const L=sizes.length, st=[p0]; lab[p0]=L; let n=0, bx=[W,H,-1,-1];
+    while(st.length){ const p=st.pop(), x=p%W, y=(p/W)|0; n++;
+      if(x<bx[0])bx[0]=x; if(x>bx[2])bx[2]=x; if(y<bx[1])bx[1]=y; if(y>bx[3])bx[3]=y;
+      for(const q of [x>0?p-1:-1, x<W-1?p+1:-1, y>0?p-W:-1, y<H-1?p+W:-1]) if(q>=0 && !lab[q] && a[q*4+3]>40){ lab[q]=L; st.push(q); } }
+    sizes.push(n); boxes.push(bx); }
+  const big=Math.max(0,...sizes.slice(1)), keep=sizes.map((n,i)=>i>0 && n>=big*0.15);
+  let x0=W,y0=H,x1=-1,y1=-1;
+  keep.forEach((k,i)=>{ if(!k) return; const b=boxes[i]; x0=Math.min(x0,b[0]); y0=Math.min(y0,b[1]); x1=Math.max(x1,b[2]); y1=Math.max(y1,b[3]); });
+  if(big && sizes.length>2){ for(let p=0;p<W*H;p++) if(lab[p] && !keep[lab[p]]) a[p*4+3]=0; g.putImageData(im2,0,0); }
+  if(x1<0){ x0=0;y0=0;x1=W-1;y1=H-1; }
+  const side=Math.max(x1-x0+1,y1-y0+1)*1.08, cx=(x0+x1+1)/2, cy=(y0+y1+1)/2;
+  const out=document.createElement("canvas"); out.width=out.height=320; const o=out.getContext("2d");
+  o.imageSmoothingQuality="high"; o.drawImage(cv, cx-side/2, cy-side/2, side, side, 0, 0, 320, 320);
+  return await new Promise((ok,no)=>out.toBlob(b=>b?ok(b):no(new Error("png")),"image/png"));
+}
+async function profChar(blob){
+  const p=prof(S.prof); if(!p || !blob || !canEditProf(p)) return;
+  if(!/^image\//.test(blob.type||"")){ toast("그림 파일만 넣을 수 있어요"); return; }
+  try{
+    upProg("🐾 캐릭터를 찾아서 다듬는 중…");
+    const png=await charCut(blob), r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png);
+    const old=p.char?.img; await B.update(S.gid,"profiles",p.id,{char:{img:{url:r.url,path:r.path}}});
+    if(old?.path) B.deleteMedia(old.path).catch(()=>{});
+    await reload("profiles"); upProg(); buzz("ok"); render(); toast("캐릭터를 넣었어요");
+  }catch(e){ console.error(e); upProg(); toast("그림을 넣지 못했어요. 다시 해 주세요"); }
+}
+// 웹(컴퓨터): 프로필 편집 중에 Ctrl+V 로 캡처한 그림을 붙여 넣으면 캐릭터로
+document.addEventListener("paste", e=>{ if(!S.prof || !S.profEdit) return;
+  const f=[...(e.clipboardData?.items||[])].find(i=>i.kind==="file" && /^image\//.test(i.type))?.getAsFile(); if(!f) return;
+  e.preventDefault(); profChar(f); });
 // 얼굴 · 배경 사진 올리기: 고르면 바로 올리고 바꿔요 (예전 사진 파일은 지워요)
 async function profPhoto(input){
+  if(input.dataset.kind==="char"){ const f=input.files?.[0]; input.value=""; return profChar(f); }
   const p=prof(S.prof), f=input.files?.[0], kind=input.dataset.kind==="cover"?"cover":"photo"; input.value="";
   if(!p || !f || !canEditProf(p)) return upProg();
   try{
@@ -7146,7 +7256,11 @@ forms.prof = (fd,f) => guard(async()=>{
   const data={name, msg:String(fd.msg||"").replace(/\s+/g," ").trim().slice(0,40)};
   if(canEditPhone(p) && "phone" in fd){ const ph=String(fd.phone||"").replace(/[^\d+\- ]/g,"").trim().slice(0,20);
     if(ph && telOf(ph).length<8){ toast("전화번호를 다시 확인해 주세요"); return; } data.phone=ph; }
+  // 🐾 캐릭터: "" = 이름 글자, "img" = 넣은 그림 그대로, 그 밖 = 목록의 캐릭터 (넣은 그림을 안 쓰게 되면 파일도 지워요)
+  let oldImg=null;
+  if("char" in fd && fd.char!=="img"){ const id=String(fd.char||""); data.char=CHARS.some(k=>k[0]===id)?{id}:null; oldImg=p.char?.img||null; }
   await B.update(S.gid,"profiles",p.id,data); await reload("profiles");
+  if(oldImg?.path) B.deleteMedia(oldImg.path).catch(()=>{});
   S.profEdit=false; render(); buzz("ok"); toast("프로필을 바꿨어요");
 });
 // 📅 시간표 단추 · 저장 (acts · forms 가 만들어진 뒤에 붙여요)
@@ -7352,7 +7466,7 @@ function widgetData(){
   const ph=[...S.diaries.filter(d=>d.status==="submitted").flatMap(d=>(d.photos||[]).filter(p=>p.url&&!p.blob).map(p=>({url:p.url,cap:`${ago(d.date)} · ${prof(d.profileId)?.name||""}`}))),
     ...(S.album||[]).filter(a=>a.url).map(a=>({url:a.url,cap:[a.date?ago(a.date):"",a.place||"",prof(a.by||a.profileId)?.name||""].filter(Boolean).join(" · ")}))]
     .filter(p=>/^https:/.test(p.url)).sort(()=>Math.random()-.5).slice(0,12);
-  const kids=ps.filter(p=>p.type==="child").map(p=>({id:p.id,name:p.name,streak:streakOf(p.id),
+  const kids=ps.filter(p=>p.type==="child").map(p=>({id:p.id,name:p.name,streak:streakOf(p.id),char:charOf(p)?.e||"",charImg:charOf(p)?.img||"",
     week:week.map(d=>{ const x=findDiary(p.id,d); return x?.status==="submitted"?(x.stamp?2:1):0; }), today:week.indexOf(t)}));
   // 일정: 오늘부터 세 개. 어제 일정이 있었으면 "어제 ○○ 어땠어요?"
   const sch=mySchedules(), up=sch.filter(s=>s.date>=t).sort((a,b)=>a.date.localeCompare(b.date)||bySch(a,b)).slice(0,3)
@@ -7381,7 +7495,9 @@ function widgetData(){
   const tt=ps.filter(p=>p.tt && (p.tt.grid?.rows?.length || p.tt.photo)).map(p=>{ const [,kl,ki]=ttKind(p.tt.kind); const g=p.tt.grid;
     return {name:p.name, kind:kl, icon:ki, photo:!!p.tt.photo&&!g?.rows?.length, days:g?.days||5,
       rows:(g?.rows||[]).map(r=>({t:r.t||"", c:TT_DAYS.slice(0,g.days||5).map((_,i)=>{ const v=(r.c?.[i]||"").trim(); return v?[v,ttTone(v)]:[]; })}))}; });
-  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts, cal, tt};
+  // 💬 4×2 가족 채팅 위젯 (2026-10-09): 최근 두 줄 · 안 읽은 수
+  const chat={unread:chatUnread(), msgs:S.chats.filter(m=>!m.deleted).slice(-2).map(m=>{ const p=prof(m.profileId); return {who:p?.name||"가족", me:m.profileId===S.me.id, color:pcol(p), text:cut(m.text||(m.photo?"📷 사진":""),40)}; })};
+  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts, cal, tt, chat};
 }
 function syncWidgets(I){ if(!I?.updateWidgets) return;
   let data; try{ data=widgetData(); }catch(e){ reportError(e.message,"widgetData"); return; }
