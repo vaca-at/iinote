@@ -2419,6 +2419,67 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
 :root[data-theme="dark"] .pill2 > span{background:linear-gradient(90deg,#C7B4FF,#9DBBFF);-webkit-background-clip:text;background-clip:text}
 .pen-ask-sp{visibility:hidden}
+/* 💬 챗봇 상담 창: 오른쪽 위 닫기 · 머리 아이콘 우주색 · 보내기 화살표 단추 (2026-10-08) */
+.help-top>div{flex:1;min-width:0}
+.help-x{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;border:1.5px solid color-mix(in srgb,#9B7BE8 30%,var(--line));background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 88%,#C9B6FF));color:#4B2F9E;cursor:pointer}
+.help-x .ic{width:18px;height:18px}
+.help-av{background:radial-gradient(circle at 26% 26%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 74% 68%,#FFE7A3 0 1.2px,transparent 1.8px),linear-gradient(160deg,#3B4C86,#161C3D)!important;box-shadow:0 0 0 2px rgba(155,123,232,.35)}
+.help-form textarea{border:1.5px solid color-mix(in srgb,#9B7BE8 25%,var(--line));background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 94%,#C9B6FF))}
+.help-form textarea:focus{outline:0;border-color:#9B7BE8;box-shadow:0 0 0 3px rgba(155,123,232,.18)}
+.help-send{position:relative;border:2px solid transparent!important;background:radial-gradient(circle at 24% 28%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 76% 72%,#FFE7A3 0 1.2px,transparent 1.8px),linear-gradient(160deg,#3B4C86,#161C3D) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8) border-box!important;box-shadow:0 0 14px -4px rgba(155,123,232,.8),0 5px 12px -6px rgba(22,28,61,.8);transition:transform .12s}
+.help-send:active{transform:scale(.94)}
+.help-send .ic{transform:rotate(-30deg);color:#FFE7A3}
+/* 🌌 우주 느낌 (2026-10-08): 내 일기 🔥 연속 띠 · 챗봇 상담 헤드셋 단추 · 챗봇 질문 칩(보라) */
+#app .my-hero{border:0;color:#fff;background:radial-gradient(circle at 12% 30%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 38% 80%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 62% 18%,#fff 0 .8px,transparent 1.3px),radial-gradient(circle at 74% 70%,#C9B6FF 0 1.2px,transparent 1.8px),radial-gradient(110% 160% at 100% 120%,rgba(155,123,232,.5),transparent 60%),linear-gradient(160deg,#2B3670,#161C3D);box-shadow:0 10px 22px -12px rgba(22,28,61,.85)}
+#app .my-hero .mh-fire{background:radial-gradient(circle at 50% 60%,rgba(255,160,90,.45),rgba(255,160,90,0) 70%),rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+#app .my-hero .mh-t b{color:#FFE7A3;text-shadow:0 0 10px rgba(255,231,163,.45)}
+#app .my-hero .mh-t small{color:#D9CFFF}
+#app .my-hero .mh-write{color:#fff;border:2px solid transparent;background:linear-gradient(160deg,#3B4C86,#232D58) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8) border-box}
+#app .my-hero .mh-write.done{color:#1F2A44;background:linear-gradient(160deg,#FFF4CC,#FFE39A) padding-box,linear-gradient(120deg,#F4BE45,#FFE7A3) border-box}
+:is(.web-help,.a-help){color:#fff!important;border:2px solid transparent!important;background:radial-gradient(circle at 26% 26%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 74% 68%,#FFE7A3 0 1.2px,transparent 1.8px),linear-gradient(160deg,#3B4C86,#161C3D) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8) border-box!important;box-shadow:0 0 16px -4px rgba(155,123,232,.8),0 6px 14px -6px rgba(22,28,61,.8)!important}
+:is(.web-help,.a-help) .ic{color:#fff}
+.hq{border-color:#9B7BE8!important;color:#6A45D0!important;background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 88%,#C9B6FF))!important}
+.hq.rep{border-color:#6A45D0!important;color:#fff!important;background:radial-gradient(circle at 85% 30%,#FFE7A3 0 1.1px,transparent 1.7px),linear-gradient(160deg,#7B5BD6,#4B2F9E)!important}
+/* 📅 시간표 새 모양 여섯 (2026-10-08) — 과목 색: coral 분홍 · butter 노랑 · sage 초록 · sky 파랑 · lilac 보라 */
+.tt-wrap :is(.tone-coral){--tw:#FFC9D6;--td:#E4507F}.tt-wrap .tone-butter{--tw:#FFE2A8;--td:#D9900F}.tt-wrap .tone-sage{--tw:#C8F0DC;--td:#2F9C6B}.tt-wrap .tone-sky{--tw:#C9D8FF;--td:#4F7BE0}.tt-wrap .tone-lilac{--tw:#E6D2FF;--td:#8F5CE0}
+/* 도트 플래너 */
+.tt-s-dot{border-radius:14px;padding:4px!important;margin:0!important;background:var(--surface);background-image:radial-gradient(color-mix(in srgb,#9B7BE8 25%,var(--line)) 1.2px,transparent 1.5px);background-size:12px 12px}
+.tt-s-dot .tt-grid td{background:transparent}.tt-s-dot .tt-grid td.today{box-shadow:none}
+.tt-s-dot .tt-sub{background:var(--surface)!important;color:var(--td)!important;border:1.5px solid var(--td)}
+.tt-s-dot .tt-grid thead th.today{background:var(--ink);color:var(--surface);border-radius:20px}
+/* 미니멀 라인 */
+.tt-s-line{padding:0!important;margin:0!important}.tt-s-line .tt-grid{border-spacing:0}
+.tt-s-line .tt-grid :is(td,th){border-radius:0}.tt-s-line .tt-grid tbody :is(td,th){border-bottom:1px solid var(--line)}
+.tt-s-line .tt-grid td{background:none}.tt-s-line .tt-grid td.today{background:color-mix(in srgb,#9B7BE8 7%,transparent);box-shadow:none}
+.tt-s-line .tt-grid thead th.today{background:none;color:var(--ink);box-shadow:inset 0 -2.5px 0 var(--ink);border-radius:0}
+.tt-s-line .tt-sub{background:none!important;color:var(--ink)!important;font-weight:600}
+.tt-s-line .tt-sub{display:flex;align-items:center;justify-content:center}.tt-s-line .tt-sub::after{content:"";position:absolute}
+.tt-s-line td{position:relative}.tt-s-line .tt-sub{text-decoration:underline 2.5px var(--td);text-underline-offset:5px}
+/* 포스트잇 */
+.tt-s-postit .tt-grid{border-spacing:5px}.tt-s-postit .tt-grid td{background:transparent}.tt-s-postit .tt-grid td.today{box-shadow:none}
+.tt-s-postit .tt-sub{background:var(--tw)!important;color:#3B2E4A!important;border-radius:3px;box-shadow:1px 2px 0 rgba(0,0,0,.09)}
+.tt-s-postit tr:nth-child(odd) td:nth-child(odd) .tt-sub,.tt-s-postit tr:nth-child(even) td:nth-child(even) .tt-sub{transform:rotate(-1.6deg)}
+.tt-s-postit tr:nth-child(odd) td:nth-child(even) .tt-sub,.tt-s-postit tr:nth-child(even) td:nth-child(odd) .tt-sub{transform:rotate(1.4deg)}
+.tt-s-postit td.today .tt-sub{box-shadow:1px 2px 0 rgba(0,0,0,.09),0 0 0 2px #E4507F}
+.tt-s-postit .tt-grid thead th.today{background:#E4507F;color:#fff;border-radius:6px}
+/* 캔디 팝 */
+.tt-s-candy .tt-grid td{background:transparent}.tt-s-candy .tt-grid td.today{box-shadow:none}
+.tt-s-candy .tt-sub{background:var(--td)!important;color:#fff!important;border-radius:22px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15),inset 0 2px 0 rgba(255,255,255,.35)}
+.tt-s-candy td.today .tt-sub{transform:scale(1.05)}
+.tt-s-candy .tt-grid thead th.today{background:none;color:#E4507F}
+/* 밤하늘 */
+.tt-s-night{border-radius:16px;padding:6px!important;margin:0!important;background:radial-gradient(circle at 10% 12%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 80% 6%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 55% 95%,#fff 0 .9px,transparent 1.4px),radial-gradient(circle at 93% 60%,#C9B6FF 0 1.2px,transparent 1.8px),linear-gradient(160deg,#28336A,#141A3A)}
+.tt-s-night .tt-grid th{color:#C9C3E6}.tt-s-night .tt-grid tbody th{color:#9C95C6}
+.tt-s-night .tt-grid td{background:rgba(255,255,255,.07)}
+.tt-s-night .tt-sub{background:rgba(201,182,255,.2)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(201,182,255,.35)}
+.tt-s-night .tt-grid td.today{box-shadow:inset 0 0 0 1.5px #F4BE45}
+.tt-s-night .tt-grid thead th.today{background:none;color:#FFE7A3}
+/* 오로라 */
+.tt-s-aurora{border-radius:16px;padding:6px!important;margin:0!important;background:linear-gradient(135deg,#E9FFF6,#EAF1FF 50%,#FBEBFF)}
+.tt-s-aurora .tt-grid td{background:rgba(255,255,255,.55)}
+.tt-s-aurora .tt-sub{background:linear-gradient(135deg,rgba(111,211,160,.38),rgba(91,141,239,.32),rgba(155,123,232,.32))!important;color:#2B2F5E!important}
+.tt-s-aurora .tt-grid td.today{box-shadow:0 0 10px -2px rgba(91,141,239,.7)}
+.tt-s-aurora .tt-grid thead th.today{color:#fff;background:linear-gradient(120deg,#6FD3A0,#5B8DEF,#9B7BE8)}
 /* 📅 시간표 (2026-10-08): 사진 올리기 · 칸으로 만들기 = 같은 가벼운 칩 둘, 종류 여섯 = 작은 칩 한 줄 */
 .tt-acts .btn.btn-soft{min-height:42px;padding:0 18px;font-size:15px}
 .tt-acts .btn.btn-soft .ic{width:18px;height:18px}
@@ -3998,7 +4059,7 @@ function viewHelp(){
     : `<div class="help-q" role="group" aria-label="자주 묻는 질문"><button type="button" class="hq rep" data-act="help-rep">🚩 신고하기</button>${FAQ.map(([q],i)=>`<button type="button" class="hq" data-act="help-faq" data-v="${i}">${esc(q)}</button>`).join("")}</div>`;
   const ph = rep?.cat ? "어떤 일이 있었는지 적어 주세요" : "궁금한 것을 적어 주세요";
   return `<section class="help" role="dialog" aria-modal="true" aria-labelledby="help-h">
-    <header class="help-top"><button class="icon-btn" data-act="help-close" aria-label="닫기">${ic("left")}</button><span class="help-av" aria-hidden="true">${ic("help")}</span><div><h2 id="help-h">챗봇 상담</h2><small>챗봇이 못 푼 건 상담원이 보통 하루 안에 답해요${IS_APP?" · 답장이 오면 알려 드려요":" · 답장은 여기에서 볼 수 있어요"}</small></div></header>
+    <header class="help-top"><button class="icon-btn" data-act="help-close" aria-label="닫기">${ic("left")}</button><span class="help-av" aria-hidden="true">${ic("help")}</span><div><h2 id="help-h">챗봇 상담</h2><small>챗봇이 못 푼 건 상담원이 보통 하루 안에 답해요${IS_APP?" · 답장이 오면 알려 드려요":" · 답장은 여기에서 볼 수 있어요"}</small></div><button class="help-x" data-act="help-close" aria-label="닫기">${ic("x")}</button></header>
     <div class="help-list" id="help-list">${msgs.map(bubble).join("")}${S.helpBusy?`<p class="hm-wait">${S.helpBusy}</p>`:""}</div>
     ${chips}
     <form class="help-form" data-form="help"><label class="sr" for="help-in">${ph}</label><textarea id="help-in" name="text" rows="1" maxlength="1000" placeholder="${ph}" required></textarea><button class="help-send" aria-label="보내기">${ic("arrow")}</button></form>
@@ -4375,9 +4436,10 @@ const TT_KINDS = [["elem","초등학생","🎒",6],["mid","중학생","📚",7],
 const TT_DAYS = ["월","화","수","목","금","토"];
 const TT_TONES = ["coral","butter","sage","sky","lilac"];
 // 시간표 모양 (2026-10-08): 보는 사람 취향대로 이 기기에 기억 (ls iinote-tt-style-가족-주인 프로필). 글씨는 지금 화면 글씨체 그대로
-const TT_STYLES = [["pastel","파스텔","🎨"],["note","공책","📓"],["board","칠판","🟩"],["sticker","스티커","⭐"],["mono","깔끔","▫️"]];
+// 2026-10-08 사용자 고름: 깔끔 · 파스텔 + 새 모양 여섯 (도트 플래너 · 미니멀 라인 · 포스트잇 · 캔디 팝 · 밤하늘 · 오로라). 공책 · 칠판 · 스티커는 뺐어요
+const TT_STYLES = [["mono","깔끔","▫️"],["pastel","파스텔","🎨"],["dot","도트 플래너","⠿"],["line","미니멀 라인","➖"],["postit","포스트잇","📝"],["candy","캔디 팝","🍬"],["night","밤하늘","🌌"],["aurora","오로라","✨"]];
 const ttStyleKey = pid => `iinote-tt-style-${S.gid}-${pid}`;
-const ttStyle = pid => { const v=ls.get(ttStyleKey(pid),"pastel"); return TT_STYLES.some(x=>x[0]===v)?v:"pastel"; };
+const ttStyle = pid => { const v=ls.get(ttStyleKey(pid),"mono"); return TT_STYLES.some(x=>x[0]===v)?v:"mono"; };
 const ttKind = k => TT_KINDS.find(x=>x[0]===k) || TT_KINDS[0];
 const ttTone = sub => { let h=0; for(const ch of String(sub)) h=(h*31+ch.charCodeAt(0))>>>0; return TT_TONES[h%TT_TONES.length]; };
 function ttBlank(kind){ const [k,,,n]=ttKind(kind); return {days:5, rows:[...Array(n)].map((_,i)=>({t:k==="univ"?`${i+9}시`:`${i+1}교시`, c:["","","","","",""]}))}; }
