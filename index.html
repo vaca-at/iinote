@@ -3450,7 +3450,7 @@ async function reloadAll(){
   const res = await Promise.all(names.map(c=>B.list(S.gid,c)));
   names.forEach((c,i)=>S[c]=safeList(c,res[i]));
 }
-async function reload(c){ S[c] = safeList(c, await B.list(S.gid,c)); }
+async function reload(c){ S[c] = safeList(c, await B.list(S.gid,c)); if(c==="profiles" && S.me) S.me=prof(S.me.id)||S.me; }   // 프로필을 다시 받으면 "나"도 새 정보로 (캐릭터 · 사진이 바로 보이게)
 // 프로필 색은 style 속성에 그대로 들어가니, 색 모양(#abc · #aabbcc · var(--이름))이 아니면 기본색으로
 function safeList(c,list){
   if(c==="profiles") list.forEach(p=>{ if(!/^(#[0-9a-f]{3,8}|var\(--[a-z0-9-]+\))$/i.test(String(p.color||""))) p.color=COLORS[0]; });
@@ -3695,7 +3695,7 @@ const CHARS = [
 const charOf = p => { const c=p?.char; if(!c) return null; if(c.img?.url) return {img:c.img.url, n:"내 캐릭터"};
   const x=CHARS.find(k=>k[0]===c.id); return x?{e:x[1], n:x[2], fx:x[3]||""}:null; };
 // 캐릭터 그림 한 개 (얼굴 동그라미 · 연속 기록 자리). 없으면 dflt(보통 🔥)
-const charHTML = (p,dflt="🔥",cls="") => { const c=charOf(p); if(!c) return dflt;
+const charHTML = (p,dflt="🌟",cls="") => { const c=charOf(p); if(!c) return dflt;
   return c.img ? `<img class="ch-img ${cls}" src="${esc(c.img)}" alt="" loading="lazy">` : `<span class="ch-e ${c.fx?"chx-"+c.fx:""} ${cls}">${c.e}</span>`; };
 const av = (p,s=34) => { if(!p) return `<span class="av" style="width:${s}px;height:${s}px;background:#B9B1A3;color:#fff">?</span>`; const c=p.color||"#1F2A44", ph=p.photo?.thumb||p.photo?.url, ch=!ph && charOf(p);   // 👤 프로필 얼굴 사진이 있으면 동그라미 안에 사진, 없고 캐릭터가 있으면 캐릭터
   return `<span class="av corona ${ph?"has-ph":""} ${ch?"has-ch":""}" style="width:${s}px;height:${s}px;--c:${pcol(p)};--b1:${pbg(p)[0]};--b2:${pbg(p)[1]};font-size:${Math.round(s*(ch?.6:.42))}px" aria-hidden="true">${ph?`<img src="${esc(ph)}" alt="" loading="lazy">`:ch?charHTML(p):esc((p.name||"?").slice(0,1))}</span>`; };
@@ -4339,7 +4339,7 @@ function growBlock(p){
     chart=`<svg viewBox="0 0 300 60" preserveAspectRatio="none" role="img" aria-label="${esc(p.name)} 최근 일기 ${pts.length}편의 글자 수: ${pts.join(", ")}"><polyline points="${xy}" fill="none" stroke="var(--pc)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`; }
   const wrong=ws.filter(w=>(w.correctStreak||0)<3).sort((a,b)=>(b.wrongCount||1)-(a.wrongCount||1)).slice(0,4);
   return `<div class="qg-kid" style="--pc:${c}">
-    <div class="qg-top">${av(p,24)}<b>${esc(p.name)}</b><span class="qg-stats"><span title="이번 달 일기">📔 <b>${mon.length}편</b></span><span title="이번 달 평균 글자 수">✏️ <b>${avg}자</b></span><span title="${p.type==="child"?"익힌 낱말":"모든 일기"}">${p.type==="child"?"🌱":"📚"} <b>${p.type==="child"?learned+"개":all.length+"편"}</b></span><span title="연속으로 쓴 날">🔥 <b>${streakOf(p.id)}일</b></span></span></div>
+    <div class="qg-top">${av(p,24)}<b>${esc(p.name)}</b><span class="qg-stats"><span title="이번 달 일기">📔 <b>${mon.length}편</b></span><span title="이번 달 평균 글자 수">✏️ <b>${avg}자</b></span><span title="${p.type==="child"?"익힌 낱말":"모든 일기"}">${p.type==="child"?"🌱":"📚"} <b>${p.type==="child"?learned+"개":all.length+"편"}</b></span><span title="연속으로 쓴 날">${charHTML(p)} <b>${streakOf(p.id)}일</b></span></span></div>
     <div class="qg-chart"><small>📈 글 길이 (최근 ${pts.length}편)</small>${chart}</div>
     ${p.type==="child"?`<div class="qg-words" aria-label="자주 틀린 낱말"><em>틀린 낱말</em>${wrong.length?wrong.map(w=>`<span>${esc(w.wrong)}→${esc(w.right)}</span>`).join(""):"없어요 👍"}</div>`:""}
   </div>`;
@@ -7143,7 +7143,7 @@ function viewProfile(){
   const form = `<form class="pf-form" data-form="prof" data-id="${esc(p.id)}">
     <label class="pf-f"><span>이름</span><input name="name" value="${esc(p.name)}" maxlength="10" required></label>
     <label class="pf-f"><span>가족에게 하고 싶은 말 <small>40자까지</small></span><input name="msg" value="${esc(p.msg||"")}" maxlength="40" placeholder="예: 이번 주도 화이팅!"></label>
-    <fieldset class="pf-ch"><span>🐾 내 캐릭터 <small>얼굴 동그라미 · 🔥 연속 기록 자리에 나와요</small></span>
+    <fieldset class="pf-ch"><span>🐾 내 캐릭터 <small>얼굴 동그라미 · 🌟 연속 기록 자리에 나와요</small></span>
       <div class="pf-ch-grid" role="radiogroup" aria-label="내 캐릭터">
         <label title="이름 글자"><input type="radio" name="char" value="" ${p.char?"":"checked"}><b style="font-size:20px">${esc((p.name||"?").slice(0,1))}</b><small>글자</small></label>
         ${p.char?.img?.url?`<label title="내가 넣은 그림"><input type="radio" name="char" value="img" checked><img class="ch-img" src="${esc(p.char.img.url)}" alt=""><small>넣은 그림</small></label>`:""}
@@ -7455,7 +7455,7 @@ function syncWidget(){ const I=plug("Iinote"); if(!I || S.phase!=="app" || !S.gr
   const t=todayStr(), today=S.diaries.filter(d=>d.date===t && d.status==="submitted");
   const names=[...new Set(today.map(d=>prof(d.profileId)?.name).filter(Boolean))], st=streakOf(S.me.id);
   const big = today.length ? `오늘 가족 일기 ${today.length}편` : "오늘 첫 일기를 써 볼까요?";
-  const small = [names.length?`${names.slice(0,4).join(" · ")} 썼어요`:"", st?`${S.me.name} 🔥 ${st}일 연속`:""].filter(Boolean).join("  ·  ") || "오늘 있었던 일을 한 줄 남겨 봐요";
+  const small = [names.length?`${names.slice(0,4).join(" · ")} 썼어요`:"", st?`${S.me.name} 🌟 ${st}일 연속`:""].filter(Boolean).join("  ·  ") || "오늘 있었던 일을 한 줄 남겨 봐요";
   const k=[S.group.name,big,small].join("|"); if(k!==widgetLast){ widgetLast=k; I.updateWidget({title:`${S.group.name||"우리 가족"} 일기장`, big, small}).catch(()=>{}); }
   syncWidgets(I); }
 
