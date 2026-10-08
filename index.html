@@ -1905,6 +1905,77 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .hp-chips.many::-webkit-scrollbar{display:none}
 .hp-chips.many .hp-chip{flex:1 0 auto;padding:0 10px;font-size:14px}
 @media (max-width:419px){ .hp-chips.many{gap:4px} .hp-chips.many .hp-chip u{display:none} .hp-chips.many .hp-chip{padding:0 7px} }
+/* 📅 시간표 (2026-10-08) */
+.tt-sw{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:2px 0 12px;border-radius:16px;background:var(--surface2)}
+.tt-sw button{min-height:38px;border:0;border-radius:12px;background:none;color:var(--ink3);font:inherit;font-size:14.5px;font-weight:650;cursor:pointer}
+.tt-sw button.on{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px color-mix(in srgb,var(--ink) 10%,transparent)}
+.tt-who{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none}
+.tt-who::-webkit-scrollbar{display:none}
+.tt-who .hw{position:relative}
+.tt-dot{position:absolute;top:2px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 2px var(--surface)}
+.tt-card{--k:var(--sky);--ks:var(--sky-soft);position:relative;padding:16px 14px;border-radius:22px;background:linear-gradient(160deg,var(--ks) 0%,var(--surface) 46%);border:1px solid color-mix(in srgb,var(--k) 22%,transparent);box-shadow:0 6px 18px color-mix(in srgb,var(--k) 14%,transparent)}
+.tt-k-elem{--k:var(--coral);--ks:var(--coral-soft)}
+.tt-k-mid{--k:var(--sky);--ks:var(--sky-soft)}
+.tt-k-high{--k:var(--sage);--ks:var(--sage-soft)}
+.tt-k-univ{--k:var(--lilac);--ks:var(--lilac-soft)}
+.tt-k-teacher{--k:var(--butter);--ks:var(--butter-soft)}
+.tt-k-etc{--k:var(--ink3);--ks:var(--surface2)}
+.tt-hd{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 12px}
+.tt-hd h3{margin:0;font-size:18px;flex:1;min-width:8em}
+.tt-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:var(--surface);color:var(--ink);font-size:12.5px;font-weight:700;box-shadow:0 2px 6px color-mix(in srgb,var(--k) 25%,transparent);border:1px solid color-mix(in srgb,var(--k) 30%,transparent)}
+.tt-today{font-size:12.5px;font-weight:700;color:color-mix(in srgb,var(--k) 70%,var(--ink))}
+.tt-empty{text-align:center;padding:24px 16px}
+.tt-empty h3{margin:6px 0 4px;font-size:18px}
+.tt-empty p{margin:0 auto 14px;max-width:30em;color:var(--ink2);font-size:14px;line-height:1.6}
+.tt-hero{font-size:44px;line-height:1}
+.tt-kinds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 14px}
+.tt-kinds button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink2);font:inherit;font-size:12.5px;font-weight:650;cursor:pointer}
+.tt-kinds button span{font-size:20px}
+.tt-kinds button.on{border-color:var(--k);background:var(--ks);color:var(--ink)}
+.tt-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tt-acts.sm{justify-content:flex-start;align-items:center;margin-top:12px}
+.tt-up{cursor:pointer}
+.tt-up .ic{width:18px;height:18px}
+.tt-del{margin-left:auto;color:var(--ink3)}
+.tt-view{display:inline-grid;grid-auto-flow:column;gap:3px;padding:3px;margin:0 0 10px;border-radius:12px;background:var(--surface2)}
+.tt-view button{padding:5px 12px;border:0;border-radius:9px;background:none;color:var(--ink3);font:inherit;font-size:12.5px;cursor:pointer}
+.tt-view button.on{background:var(--surface);color:var(--ink);font-weight:700}
+/* 사진: 테이프로 붙인 액자 */
+.tt-frame{position:relative;display:block;width:100%;margin:6px 0 0;padding:10px 10px 30px;border:0;border-radius:6px;background:var(--surface);box-shadow:0 8px 22px color-mix(in srgb,var(--ink) 16%,transparent);transform:rotate(-.6deg);cursor:zoom-in}
+.tt-frame::before,.tt-frame::after{content:"";position:absolute;top:-9px;width:64px;height:20px;background:color-mix(in srgb,var(--k) 45%,transparent);opacity:.85}
+.tt-frame::before{left:18px;transform:rotate(-8deg)}
+.tt-frame::after{right:18px;transform:rotate(7deg)}
+.tt-frame img{display:block;width:100%;height:auto;border-radius:3px}
+.tt-zoom{position:absolute;left:0;right:0;bottom:6px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--ink3)}
+.tt-zoom .ic{width:14px;height:14px}
+/* 칸 시간표 */
+.tt-wrap{overflow-x:auto;margin:0 -4px;padding:0 4px 4px}
+.tt-grid{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed;min-width:calc(46px + var(--cols) * 52px)}
+.tt-grid th{font-size:12.5px;font-weight:700;color:var(--ink2);padding:4px 2px;text-align:center}
+.tt-grid thead th{padding:6px 2px;border-radius:10px}
+.tt-grid thead th:first-child{width:46px}
+.tt-grid thead th.today{background:var(--k);color:var(--surface)}
+.tt-grid thead th small{display:block;font-size:9.5px;font-weight:600;opacity:.9}
+.tt-grid tbody th{font-size:11.5px;color:var(--ink3);font-weight:600}
+.tt-grid td{height:44px;padding:0;border-radius:11px;background:color-mix(in srgb,var(--surface2) 70%,transparent);text-align:center;vertical-align:middle}
+.tt-grid td.today{background:color-mix(in srgb,var(--k) 12%,var(--surface));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--k) 40%,transparent)}
+.tt-sub{display:grid;place-items:center;height:100%;min-height:44px;padding:2px 3px;border-radius:11px;font-size:12.5px;font-weight:700;line-height:1.2;word-break:keep-all;overflow-wrap:anywhere}
+.tone-coral{background:var(--coral-soft);color:var(--coral-ink)}
+.tone-butter{background:var(--butter-soft);color:color-mix(in srgb,var(--butter) 45%,var(--ink))}
+.tone-sage{background:var(--sage-soft);color:var(--sage)}
+.tone-sky{background:var(--sky-soft);color:color-mix(in srgb,var(--sky) 70%,var(--ink))}
+.tone-lilac{background:var(--lilac-soft);color:color-mix(in srgb,var(--lilac) 70%,var(--ink))}
+.tt-grid.is-edit td{background:none}
+.tt-grid.is-edit input{width:100%;height:40px;padding:0 3px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);text-align:center;font:inherit;font-size:13px!important}
+.tt-grid.is-edit tbody th input{font-size:11.5px!important;color:var(--ink2)}
+.tt-grid.is-edit thead th:last-child,.tt-grid.is-edit td:last-child{width:28px}
+.tt-rm{width:26px;height:26px;padding:0;border:0;border-radius:50%;background:var(--surface2);color:var(--ink3);cursor:pointer}
+.tt-ed-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;font-size:13px;color:var(--ink2)}
+.tt-ed-bar button{padding:5px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);font:inherit;font-size:12.5px;cursor:pointer}
+.tt-ed-bar button.on{border-color:var(--k);background:var(--ks);font-weight:700}
+.tt-ed-bar small{margin-left:auto;color:var(--ink3)}
+.tt-ed-acts{display:flex;align-items:center;gap:6px;margin-top:10px}
+.tt-ed-acts span{flex:1}
 /* ⭐ 즐겨찾기 쪽: 보기 모양 네 가지 (2026-10-08 디자인: 그러데이션 바탕 · 칸마다 그 색이 물든 카드 · 입체 아이콘) */
 .fv{position:relative;margin:2px -2px 0;padding:16px 14px 18px;border-radius:24px;background:linear-gradient(160deg,color-mix(in srgb,var(--lilac) 26%,var(--surface)) 0%,color-mix(in srgb,var(--coral) 12%,var(--surface)) 55%,color-mix(in srgb,var(--butter) 18%,var(--surface)) 100%);overflow:hidden;isolation:isolate}
 .fv::before,.fv::after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(2px)}
@@ -2652,6 +2723,8 @@ function seedDemo(){
   const td=toDate(t), sun=td.getDay()===0?t:addDays(t,-td.getDay()), mon=addDays(sun,-6), wk="report_w"+mon.replace(/-/g,"_");
   const lastDay=new Date(td.getFullYear(),td.getMonth()+1,0).getDate(), lm=new Date(td.getFullYear(),td.getMonth()+(td.getDate()===lastDay?0:-1),1), mk="report_m"+lm.getFullYear()+"_"+pad(lm.getMonth()+1);
   const R = (summary,highlight,tip) => ({summary,highlight,tip,at:now-2*H});
+  // 📅 시간표 예시 (초4)
+  s.profiles.k1.tt={kind:"elem",at:now,grid:{days:5,rows:[["1교시",["국어","수학","사회","국어","과학"]],["2교시",["수학","국어","체육","영어","국어"]],["3교시",["사회","음악","국어","수학","미술"]],["4교시",["과학","체육","수학","도덕","미술"]],["5교시",["영어","창체","과학","체육",""]],["6교시",["","","실과","",""]]].map(([t,c])=>({t,c}))}};
   Object.assign(s.profiles.k1, {
     [wk]:R("하랑이는 이번 주에 하루도 빠짐없이 일기를 썼어요. 처음엔 두세 문장이던 글이 이제는 다섯 문장이 넘을 만큼 길어졌고, 계주 연습처럼 그날 마음이 크게 움직인 장면을 골라 쓰는 힘이 생겼어요. 틀린 맞춤법도 스스로 찾아 고치는 일이 늘었어요. 꾸준히 쓰는 습관이 단단하게 자리 잡고 있어요.","\'바통을 넘겨받을 때 손이 미끄러질까 봐 조마조마했다\'는 문장은 그 순간의 긴장이 눈앞에 보이듯 생생했어요.","다음에는 사건 뒤에 \'그래서 나는 어떤 마음이 들었는지\'를 한 문장 더 적어 보자고 이야기해 주세요. 느낌을 쓰는 연습이 글을 한층 깊게 만들어요."),
     [mk]:R("이번 달 하랑이의 일기는 양도, 내용도 눈에 띄게 자랐어요. 평균 글자 수가 달 초보다 두 배 가까이 늘었고, 새로 배운 낱말을 일기에 써 보는 등 스스로 공부하는 모습도 보였어요. \'할꺼다\'처럼 소리 나는 대로 쓰던 실수는 거의 사라졌어요. 가족의 칭찬 도장과 댓글이 큰 힘이 된 한 달이었어요.","계주 선수로 뽑혀 가족에게 자랑한 날의 일기에 기쁨과 뿌듯함이 고스란히 담겼어요.","다음 달에는 일주일에 한 번, 책이나 영화를 보고 느낀 점을 일기로 써 보는 것을 추천해요.")
@@ -4088,6 +4161,11 @@ const FAV_VIEWS = [["big","큰 아이콘",'<rect x="3" y="3" width="8" height="8
   ["list","목록",'<rect x="3" y="4" width="3" height="3" rx="1"/><rect x="8" y="4.5" width="13" height="2" rx="1"/><rect x="3" y="10.5" width="3" height="3" rx="1"/><rect x="8" y="11" width="13" height="2" rx="1"/><rect x="3" y="17" width="3" height="3" rx="1"/><rect x="8" y="17.5" width="13" height="2" rx="1"/>'],
   ["detail","자세히",'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="12" y="4" width="9" height="2" rx="1"/><rect x="12" y="7.5" width="6" height="1.6" rx=".8"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="12" y="15" width="9" height="2" rx="1"/><rect x="12" y="18.5" width="6" height="1.6" rx=".8"/>']];
 function viewFavPage(){
+  const sw=`<div class="tt-sw" role="tablist">${[["links","⭐ 즐겨찾기"],["tt","📅 시간표"]].map(([k,l])=>`<button role="tab" aria-selected="${(S.favTab||"links")===k}" class="${(S.favTab||"links")===k?"on":""}" data-act="fav-tab" data-v="${k}">${l}</button>`).join("")}</div>`;
+  if(S.favTab==="tt") return sw+viewTimetable();
+  return sw+viewFavLinks();
+}
+function viewFavLinks(){
   const v=FAV_VIEWS.some(x=>x[0]===ls.get("iinote-fav-view","big")) ? ls.get("iinote-fav-view","big") : "big", edit=S.favEdit&&isParent();
   const list=[...S.links].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
   const items=list.map((l,i)=>{ const c=COLORS[i%COLORS.length], ok=/^https?:\/\//.test(l.url), by=prof(l.createdBy)?.name;
@@ -4104,6 +4182,69 @@ function viewFavPage(){
         <button class="btn btn-primary span2">${ic("plus")}즐겨찾기 추가</button></form>`:""}
   </section>`;
 }
+/* 📅 시간표 (2026-10-08, 앱 즐겨찾기 쪽 · 웹 · 앱 공통 함수): 가족마다 하나 (profiles.tt = {kind, photo:{url,path,w,h}, grid:{days, rows:[{t, c:[]}]}, at})
+   가지고 있는 시간표 사진을 올리면 액자 카드로 예쁘게, 원하면 칸으로 직접 만들어 과목마다 색 · 오늘 요일 강조. 고치기는 canEditProf (나 · 보호자는 아이) */
+const TT_KINDS = [["elem","초등학생","🎒",6],["mid","중학생","📚",7],["high","고등학생","🏫",7],["univ","대학생","🎓",9],["teacher","선생님","👩‍🏫",7],["etc","기타","🗂️",6]];
+const TT_DAYS = ["월","화","수","목","금","토"];
+const TT_TONES = ["coral","butter","sage","sky","lilac"];
+const ttKind = k => TT_KINDS.find(x=>x[0]===k) || TT_KINDS[0];
+const ttTone = sub => { let h=0; for(const ch of String(sub)) h=(h*31+ch.charCodeAt(0))>>>0; return TT_TONES[h%TT_TONES.length]; };
+function ttBlank(kind){ const [k,,,n]=ttKind(kind); return {days:5, rows:[...Array(n)].map((_,i)=>({t:k==="univ"?`${i+9}시`:`${i+1}교시`, c:["","","","","",""]}))}; }
+function ttWho(){ const ps=sortedProfiles(); return ps.find(p=>p.id===S.ttWho) || ps.find(p=>p.id===S.me.id) || ps[0]; }
+function ttGridHTML(g){
+  const today=new Date().getDay(), tc=today>=1&&today<=g.days ? today-1 : -1;
+  return `<div class="tt-wrap"><table class="tt-grid" style="--cols:${g.days}"><thead><tr><th></th>${TT_DAYS.slice(0,g.days).map((d,i)=>`<th class="${i===tc?"today":""}">${d}${i===tc?"<small>오늘</small>":""}</th>`).join("")}</tr></thead>
+    <tbody>${g.rows.map(r=>`<tr><th>${esc(r.t)}</th>${TT_DAYS.slice(0,g.days).map((_,i)=>{ const v=(r.c?.[i]||"").trim(); return `<td class="${i===tc?"today":""}">${v?`<span class="tt-sub tone-${ttTone(v)}">${esc(v)}</span>`:""}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function ttEditor(p,tt){
+  const g=S.ttDraft;
+  return `<form class="tt-ed" data-form="tt-grid" data-id="${esc(p.id)}">
+    <div class="tt-ed-bar"><span>요일</span>${[5,6].map(n=>`<button type="button" class="${g.days===n?"on":""}" data-act="tt-days" data-v="${n}">${n===5?"월~금":"월~토"}</button>`).join("")}<small>칸을 눌러 과목을 써요</small></div>
+    <div class="tt-wrap"><table class="tt-grid is-edit" style="--cols:${g.days}"><thead><tr><th></th>${TT_DAYS.slice(0,g.days).map(d=>`<th>${d}</th>`).join("")}<th></th></tr></thead>
+    <tbody>${g.rows.map((r,i)=>`<tr><th><input name="r${i}t" value="${esc(r.t)}" maxlength="8" aria-label="${i+1}번째 줄 이름"></th>${TT_DAYS.slice(0,g.days).map((d,j)=>`<td><input name="r${i}c${j}" value="${esc(r.c?.[j]||"")}" maxlength="10" aria-label="${esc(r.t)} ${d}요일"></td>`).join("")}<td><button type="button" class="tt-rm" data-act="tt-row-del" data-v="${i}" aria-label="이 줄 지우기">✕</button></td></tr>`).join("")}</tbody></table></div>
+    <div class="tt-ed-acts"><button type="button" class="btn btn-ghost sm" data-act="tt-row-add">＋ 줄 더하기</button><span></span><button type="button" class="btn btn-ghost sm" data-act="tt-edit-off">취소</button><button class="btn btn-primary sm">저장</button></div>
+  </form>`;
+}
+function viewTimetable(){
+  const ps=sortedProfiles(), p=ttWho(), tt=p?.tt, ed=canEditProf(p), [kk,kl,ki]=ttKind(tt?.kind||S.ttKind);
+  const chips=`<div class="tt-who">${ps.map(x=>`<button class="hw ${x.id===p.id?"on":""}" data-act="tt-who" data-v="${esc(x.id)}" aria-pressed="${x.id===p.id}">${av(x,24)}${esc(x.name)}${x.tt?'<i class="tt-dot" aria-hidden="true"></i>':""}</button>`).join("")}</div>`;
+  const kinds=`<div class="tt-kinds" role="radiogroup" aria-label="시간표 종류">${TT_KINDS.map(([k,l,i])=>`<button type="button" role="radio" aria-checked="${kk===k}" class="${kk===k?"on":""}" data-act="tt-kind" data-v="${k}"><span aria-hidden="true">${i}</span>${l}</button>`).join("")}</div>`;
+  const file=(l,cls="btn btn-primary")=>`<label class="${cls} tt-up">${ic("camera")}${l}<input type="file" class="tt-file sr" accept="image/*" data-id="${esc(p.id)}"></label>`;
+  if(S.ttEdit===p.id) return chips+`<section class="tt-card tt-k-${kk}"><header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(p.name)}의 시간표 만들기</h3></header>${kinds}${ttEditor(p,tt)}</section>`;
+  if(!tt) return chips+`<section class="tt-card tt-empty tt-k-${kk}">
+      <div class="tt-hero" aria-hidden="true">📅</div>
+      <h3>${esc(p.name)}의 시간표가 아직 없어요</h3>
+      ${ed?`<p>종류를 고르고, 가지고 있는 시간표를 사진으로 올리면 예쁘게 보여 드려요. 칸으로 직접 만들 수도 있어요.</p>${kinds}
+        <div class="tt-acts">${file("시간표 사진 올리기")}<button class="btn btn-ghost" data-act="tt-edit" data-v="${esc(p.id)}">✏️ 칸으로 만들기</button></div>`
+        :`<p>${esc(p.name)}${hasBatchim(p.name)?"이":""}가 직접 넣거나 보호자가 넣어 줄 수 있어요.</p>`}
+    </section>`;
+  const today=new Date(), dn=["일","월","화","수","목","금","토"][today.getDay()], showPhoto=tt.photo && (!tt.grid || S.ttPhoto===p.id);
+  return chips+`<section class="tt-card tt-k-${kk}">
+    <header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(p.name)}의 시간표</h3><span class="tt-today">오늘은 ${dn}요일</span></header>
+    ${tt.grid&&tt.photo?`<div class="tt-view"><button class="${showPhoto?"":"on"}" data-act="tt-photo" data-v="">칸으로 보기</button><button class="${showPhoto?"on":""}" data-act="tt-photo" data-v="${esc(p.id)}">📷 원본 사진</button></div>`:""}
+    ${showPhoto?`<button class="tt-frame" data-act="tt-lb" data-v="${esc(p.id)}" aria-label="시간표 사진 크게 보기"><img src="${esc(tt.photo.url)}" alt="${esc(p.name)}의 시간표 사진" loading="lazy" ${tt.photo.w?`width="${tt.photo.w}" height="${tt.photo.h}"`:""}><span class="tt-zoom">${ic("search")}크게 보기</span></button>`:ttGridHTML(tt.grid)}
+    ${ed?`<div class="tt-acts sm">${file(tt.photo?"사진 바꾸기":"사진 올리기","btn btn-ghost sm")}<button class="btn btn-ghost sm" data-act="tt-edit" data-v="${esc(p.id)}">✏️ ${tt.grid?"칸 고치기":"칸으로 만들기"}</button><button class="link-btn tt-del" data-act="tt-del" data-v="${esc(p.id)}">지우기</button></div>`:""}
+  </section>`;
+}
+async function ttSave(pid, patch){
+  const p=prof(pid); if(!p) return;
+  const tt={...(p.tt||{}), kind:p.tt?.kind||S.ttKind||"elem", ...patch, at:Date.now()};
+  await B.update(S.gid,"profiles",pid,{tt}); p.tt=tt;
+}
+async function ttPhoto(input){
+  const p=prof(input.dataset.id), f=input.files?.[0]; input.value="";
+  if(!p || !f || !canEditProf(p)) return;
+  try{
+    upProg("📅 시간표 사진을 올리는 중…");
+    const big=await compressImage(f,1800,.85); if(!big.blob) throw new Error("사진을 불러올 수 없어요");
+    const r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/tt_${rid()}.jpg`,big.blob), old=p.tt?.photo;
+    await ttSave(p.id,{photo:{url:r.url,path:r.path,w:big.w,h:big.h}}); S.ttPhoto=p.id;
+    if(old?.path) B.deleteMedia(old.path).catch(()=>{});
+    upProg(); buzz("ok"); render(); toast("시간표 사진을 넣었어요");
+  }catch(e){ console.error(e); upProg(); toast("사진을 올리지 못했어요. 다시 해 주세요"); }
+}
+function ttCollect(){ const f=document.querySelector('form[data-form="tt-grid"]'), g=S.ttDraft; if(!f||!g) return;
+  g.rows.forEach((r,i)=>{ r.t=f.elements[`r${i}t`]?.value ?? r.t; r.c=r.c||[]; for(let j=0;j<g.days;j++){ const el=f.elements[`r${i}c${j}`]; if(el) r.c[j]=el.value; } }); }
 function viewLinks(){
   const ls_ = [...S.links].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
   const tiles = ls_.map((l,i)=>{ const c=COLORS[i%COLORS.length]; const ok=/^https?:\/\//.test(l.url);
@@ -6712,6 +6853,26 @@ forms.prof = (fd,f) => guard(async()=>{
   await B.update(S.gid,"profiles",p.id,data); await reload("profiles");
   S.profEdit=false; render(); buzz("ok"); toast("프로필을 바꿨어요");
 });
+// 📅 시간표 단추 · 저장 (acts · forms 가 만들어진 뒤에 붙여요)
+document.addEventListener("change", e=>{ if(e.target.classList?.contains("tt-file")) ttPhoto(e.target); });
+Object.assign(acts,{
+  "fav-tab": el => { S.favTab=el.dataset.v; S.favEdit=false; render(); },
+  "tt-who": el => { S.ttWho=el.dataset.v; S.ttEdit=null; S.ttPhoto=null; render(); },
+  "tt-kind": el => { const p=ttWho(); S.ttKind=el.dataset.v; if(p?.tt && S.ttEdit!==p.id) guard(async()=>{ await ttSave(p.id,{kind:el.dataset.v}); render(); }); else render(); },
+  "tt-edit": el => { const p=prof(el.dataset.v); if(!p) return; S.ttEdit=p.id; const g=p.tt?.grid; S.ttDraft=g?JSON.parse(JSON.stringify(g)):ttBlank(p.tt?.kind||S.ttKind); render(); },
+  "tt-edit-off": () => { S.ttEdit=null; S.ttDraft=null; render(); },
+  "tt-days": el => { ttCollect(); S.ttDraft.days=+el.dataset.v; render(); },
+  "tt-row-add": () => { ttCollect(); const g=S.ttDraft, last=g.rows[g.rows.length-1]?.t||"", n=parseInt(last); g.rows.push({t:isNaN(n)?"":String(n+1)+last.replace(/^\d+/,""), c:[]}); render(); },
+  "tt-row-del": el => { ttCollect(); S.ttDraft.rows.splice(+el.dataset.v,1); render(); },
+  "tt-photo": el => { S.ttPhoto=el.dataset.v||null; render(); },
+  "tt-lb": el => { const p=prof(el.dataset.v); if(!p?.tt?.photo) return; S.lb={photos:[{url:p.tt.photo.url}],caps:[{t:`📅 ${p.name}의 시간표`}],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
+  "tt-del": el => { const p=prof(el.dataset.v); if(!p?.tt || !confirm(`${p.name}의 시간표를 지울까요?`)) return;
+    guard(async()=>{ const old=p.tt.photo; await B.update(S.gid,"profiles",p.id,{tt:null}); p.tt=null; if(old?.path) B.deleteMedia(old.path).catch(()=>{}); render(); toast("시간표를 지웠어요"); }); }
+});
+forms["tt-grid"] = (fd,f) => guard(async()=>{ const g=S.ttDraft; if(!g) return; ttCollect();
+  const rows=g.rows.map(r=>({t:String(r.t||"").trim().slice(0,8), c:TT_DAYS.slice(0,g.days).map((_,j)=>String(r.c?.[j]||"").trim().slice(0,10))})).filter(r=>r.t||r.c.some(Boolean));
+  if(!rows.some(r=>r.c.some(Boolean))){ toast("과목을 한 칸 이상 써 주세요"); return; }
+  await ttSave(f.dataset.id,{grid:{days:g.days,rows}, kind:S.ttKind||prof(f.dataset.id)?.tt?.kind||"elem"}); S.ttEdit=null; S.ttDraft=null; S.ttPhoto=null; buzz("ok"); render(); toast("시간표를 저장했어요"); });
 document.addEventListener("change", e=>{ if(e.target.classList?.contains("pf-file")) profPhoto(e.target); });
 // 프로필 창 안의 다른 단추(아이로 쓰기 · 프로필 바꾸기)를 누르면 창을 닫고 그 일을 해요
 document.addEventListener("click", e=>{ const el=e.target.closest?.(".pf [data-act]"); if(el && !/^prof-/.test(el.dataset.act)){ S.prof=null; S.profEdit=false; } }, true);
