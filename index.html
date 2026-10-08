@@ -2213,6 +2213,45 @@ span.pf-av{cursor:default}
 .fam-menu :is(.col,.fam-grid,.home-grid){gap:0}
 .chatting .chat-list > :first-child{margin-top:auto}
 .app-day .day-col.side .day-stamp{transform:scale(.72) rotate(-8deg);transform-origin:top right}
+
+/* =========================================================
+   🎨 앱 공통 디자인 (2026-10-08): 화면 대표 색 --tc 로 배경 · 칩 · 카드 · 제목 · 메뉴를 한 벌로
+   (앱에서만 · 디자인 설정보다 앞서요. 색 있는 안내 띠 · 4분할 칸은 그대로) */
+html.is-app:root .ashell{--tc:#7A5BC7;background:radial-gradient(120% 55% at 100% 0%,color-mix(in srgb,var(--tc) 16%,transparent) 0%,transparent 62%),radial-gradient(90% 45% at 0% 100%,color-mix(in srgb,var(--butter) 16%,transparent) 0%,transparent 65%),var(--paper);background-attachment:fixed}
+html.is-app:root .a-top{background:color-mix(in srgb,var(--paper) 82%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html.is-app:root .a-top.band{background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 24%,var(--surface)) 0%,color-mix(in srgb,var(--tc) 10%,var(--surface)) 60%,color-mix(in srgb,var(--butter) 14%,var(--surface)) 100%);box-shadow:0 6px 18px color-mix(in srgb,var(--tc) 14%,transparent)}
+/* 칩 */
+html.is-app:root .hp-chip{background:color-mix(in srgb,var(--surface) 72%,transparent);border:1px solid color-mix(in srgb,var(--c) 22%,transparent);color:var(--ink)}
+html.is-app:root .hp-chip.on{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 78%,var(--surface)) 0%,var(--c) 70%);border-color:transparent;color:#fff;box-shadow:0 4px 12px color-mix(in srgb,var(--c) 40%,transparent)}
+html.is-app:root :is(.hw,.chip,.fav,.me-chip){background:color-mix(in srgb,var(--surface) 80%,transparent);border:1px solid color-mix(in srgb,var(--tc) 16%,transparent);box-shadow:0 2px 8px color-mix(in srgb,var(--tc) 10%,transparent)}
+html.is-app:root :is(.hw.on,.chip.on){background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 80%,var(--surface)) 0%,var(--tc) 75%);border-color:transparent;color:#fff;box-shadow:0 4px 12px color-mix(in srgb,var(--tc) 35%,transparent)}
+html.is-app:root .seg span{background:color-mix(in srgb,var(--surface) 80%,transparent);border-color:color-mix(in srgb,var(--tc) 18%,var(--line))}
+html.is-app:root .seg input:checked+span{background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 80%,var(--surface)) 0%,var(--tc) 75%);border-color:transparent;color:#fff;box-shadow:0 3px 10px color-mix(in srgb,var(--tc) 30%,transparent)}
+/* 카드 */
+html.is-app:root .block:not(.wip-ban,.consent-ban,.q-cell,.print-shops){border:1px solid color-mix(in srgb,var(--tc) 14%,transparent);border-radius:22px;background:linear-gradient(150deg,color-mix(in srgb,var(--tc) 8%,var(--surface)) 0%,var(--surface) 55%);box-shadow:0 6px 18px color-mix(in srgb,var(--tc) 10%,transparent)}
+html.is-app:root .block-h h2::before{content:"";display:inline-block;flex:none;width:9px;height:9px;margin-right:8px;border-radius:3px;background:linear-gradient(135deg,var(--tc),color-mix(in srgb,var(--tc) 55%,var(--butter)));vertical-align:middle;transform:translateY(-2px) rotate(45deg)}
+html.is-app:root .empty{background:color-mix(in srgb,var(--surface) 75%,transparent);border:1.5px dashed color-mix(in srgb,var(--tc) 28%,transparent);border-radius:18px}
+html.is-app:root .rk{border-color:color-mix(in srgb,var(--tc) 14%,transparent);box-shadow:0 6px 18px color-mix(in srgb,var(--tc) 10%,transparent)}
+/* 제목 */
+html.is-app:root .page-h h1{position:relative;padding-bottom:8px}
+html.is-app:root .page-h h1::after{content:"";position:absolute;left:0;bottom:0;width:44px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--tc),color-mix(in srgb,var(--tc) 35%,var(--butter)))}
+/* 단추 · 입력 칸 */
+html.is-app:root .btn-ghost{border-color:color-mix(in srgb,var(--tc) 22%,var(--line));background:color-mix(in srgb,var(--surface) 85%,transparent)}
+html.is-app:root .a-main :is(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select){border-radius:14px;border:1.5px solid color-mix(in srgb,var(--tc) 16%,var(--line));background:color-mix(in srgb,var(--surface) 94%,var(--tc))}
+html.is-app:root .a-main :is(input,select,textarea):focus{border-color:var(--tc);box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 20%,transparent);outline:none}
+/* 아래 메뉴 */
+html.is-app:root .a-nav{background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:24px 24px 0 0;box-shadow:0 -4px 18px color-mix(in srgb,var(--tc) 12%,transparent)}
+html.is-app:root .an-it .ic{box-sizing:content-box;padding:3px 13px;border-radius:14px;transition:background .15s}
+html.is-app:root .an-it.on{color:var(--tc)}
+html.is-app:root .an-it.on .ic{background:color-mix(in srgb,var(--tc) 15%,transparent)}
+html.is-app:root .a-fab:not(.save){background:linear-gradient(145deg,color-mix(in srgb,var(--ink) 85%,var(--tc)) 0%,var(--ink) 70%);box-shadow:0 8px 18px color-mix(in srgb,var(--tc) 35%,transparent),inset 0 1px 0 color-mix(in srgb,var(--surface) 25%,transparent)}
+html.is-app:root .a-help{box-shadow:0 4px 14px color-mix(in srgb,var(--tc) 25%,transparent);border:1px solid color-mix(in srgb,var(--tc) 18%,transparent)}
+/* 더보기 판 */
+html.is-app:root .more{background:linear-gradient(180deg,color-mix(in srgb,var(--tc) 7%,var(--surface)) 0%,var(--surface) 160px)}
+html.is-app:root .more-it[style*="--mb"]{background:linear-gradient(150deg,var(--mb) 0%,color-mix(in srgb,var(--mb) 45%,var(--surface)) 100%);border:1px solid color-mix(in srgb,var(--mf) 14%,transparent);box-shadow:0 4px 12px color-mix(in srgb,var(--mf) 14%,transparent)}
+html.is-app:root .more-it[style*="--mb"] > span{background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 95%,transparent),color-mix(in srgb,var(--surface) 70%,var(--mb)));box-shadow:0 3px 8px color-mix(in srgb,var(--mf) 20%,transparent),inset 0 1px 0 var(--surface)}
+html.is-app:root .more-row{border-radius:16px;background:color-mix(in srgb,var(--tc) 7%,var(--surface2))}
+html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 </style>
 </head>
 <body>
@@ -3521,6 +3560,7 @@ const HPAGES = [["diary","일기장","#D63E70","#FFE1EA"],["cal","달력","#C98A
 // 네 번째 쪽 (2026-10-07): 보호자는 AI 리포트, 아이는 받아쓰기 퀴즈
 const hpages = () => [...HPAGES, ...(isParent()?[["report","AI 리포트","#2F8C6B","#DAF2E5"]]:S.me?.type==="child"?[["quiz","받아쓰기","#2F8C6B","#DAF2E5"]]:[]), ["fav","즐겨찾기","#7A5BC7","#ECE3F6"]];   // ⭐ 즐겨찾기는 다섯 번째 쪽 (2026-10-08)
 const hpage = () => hpages().some(x=>x[0]===S.hpage) ? S.hpage : "diary";
+const APP_TONE = {mine:"#E0663F",chat:"#3F73D1",kids:"#C98A00",day:"#2F8C6B",shelf:"#6B47B8",diary:"#6B47B8",album:"#3F73D1",report:"#2F8C6B",quiz:"#2F8C6B",family:"#C2366A",settings:"#3F5FB8",grow:"#B5532B"};
 function viewAppShell(){
   const home=(!S.tab || S.tab==="home") && !S.sub, pg=hpages().find(x=>x[0]===hpage());
   const nb=(k,l,i)=>`<button class="an-it ${S.tab===k||(k==="home"&&!S.tab)?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`;
@@ -3532,7 +3572,9 @@ function viewAppShell(){
   let body = home ? viewHomePages() : viewMain().replace(/(<div class="page-h"><h1>)\s*(?:\p{Extended_Pictographic}️?\s*)+/u,"$1");
   if(!S.sub && S.tab==="day") body=`<div class="app-day">${body}</div>`;
   if(!S.sub && (S.tab==="family" || S.tab==="settings")) body=`<div class="fam-menu">${body}</div>`;
-  return `${tourBar()}<div class="ashell ${writing?"writing":""} ${chatting?"chatting":""}">
+  // 🎨 화면마다 대표 색 (2026-10-08): 배경 · 칩 · 카드 · 제목 · 아래 메뉴가 이 색 하나로 어울려요 (--tc)
+  const tone = home ? pg[2] : writing ? "#D63E70" : (APP_TONE[S.tab] || "#7A5BC7");
+  return `${tourBar()}<div class="ashell ${writing?"writing":""} ${chatting?"chatting":""}" style="--tc:${tone}">
     <div class="a-top ${home?"band":""}" style="--band:${home?pg[3]:"transparent"}">
       <header class="ah">
         <button class="ah-l" data-act="tab" data-v="home" aria-label="홈으로">${logo(30)}<span class="ah-t">${esc(S.group.name)}</span></button>
