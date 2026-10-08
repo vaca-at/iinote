@@ -7145,7 +7145,17 @@ function widgetData(){
     heartsOf(d).filter(id=>id!==S.me.id).forEach(id=>{ const p=prof(id); if(p && d.date>=addDays(t,-14)) ev.push({at:toDate(d.date).getTime(),who:p.name,color:p.color||"#1F2A44",text:`${md(d.date)} 일기에 ♥`}); });
   }
   const hearts=ev.sort((a,b)=>b.at-a.at).slice(0,3).map(({who,color,text})=>({who,color,text}));
-  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts};
+  // 📅 4×4 달력 위젯 (2026-10-08): 이번 달 날짜마다 일기 쓴 가족 색 · 일정 제목 · 공휴일
+  const ym=t.slice(0,7), [cy,cm]=ym.split("-").map(Number), cdays=new Date(cy,cm,0).getDate(), cal={y:cy,m:cm,today:Number(t.slice(8)),lead:toDate(ym+"-01").getDay(),days:cdays,hol:{},wrote:{},ev:{}};
+  for(let i=1;i<=cdays;i++){ const d=`${ym}-${pad(i)}`, k=String(i);
+    if(HOLIDAYS[d]) cal.hol[k]=HOLIDAYS[d];
+    if(d<=t){ const w=ps.filter(p=>submittedOn(p.id,d)).map(p=>p.color||"#1F2A44"); if(w.length) cal.wrote[k]=w; }
+    const e=sch.filter(x=>x.date===d).sort(bySch).map(x=>x.title); if(e.length) cal.ev[k]=e; }
+  // 📚 4×5 시간표 위젯: 시간표를 넣은 가족 (칸 시간표는 과목 · 색, 사진만 있으면 photo:true)
+  const tt=ps.filter(p=>p.tt && (p.tt.grid?.rows?.length || p.tt.photo)).map(p=>{ const [,kl,ki]=ttKind(p.tt.kind); const g=p.tt.grid;
+    return {name:p.name, kind:kl, icon:ki, photo:!!p.tt.photo&&!g?.rows?.length, days:g?.days||5,
+      rows:(g?.rows||[]).map(r=>({t:r.t||"", c:TT_DAYS.slice(0,g.days||5).map((_,i)=>{ const v=(r.c?.[i]||"").trim(); return v?[v,ttTone(v)]:[]; })}))}; });
+  return {family:S.group?.name||"우리 가족", photos:ph, kids, events:up, eventNote, quiz, hearts, cal, tt};
 }
 function syncWidgets(I){ if(!I?.updateWidgets) return;
   let data; try{ data=widgetData(); }catch(e){ reportError(e.message,"widgetData"); return; }
@@ -7155,12 +7165,14 @@ function syncWidgets(I){ if(!I?.updateWidgets) return;
 // 바로가기 · 위젯 · 알림이 연 주소(iinote://write 같은)를 앱 화면 주소로
 function appPath(url){
   try{ const u=new URL(url);
-    if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase(); return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz"})[k]||"/"; }   // quiz: 받아쓰기 위젯 (2026-10-07)
+    if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase(); return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz",mine:"/mine",cal:"/",tt:"/"})[k]||"/"; }   // mine · cal · tt: 하트 · 달력 · 시간표 위젯 (2026-10-08)   // quiz: 받아쓰기 위젯 (2026-10-07)
     return u.pathname+u.search; }catch(e){ return /^\//.test(String(url||"")) ? String(url) : "/"; } }
 function openAppUrl(url){
   if(url==="help"){ if(S.phase==="app" && S.me) acts["help-open"](); else S.wantHelp=true; return; }   // 운영자 답장 알림
   if(url==="admin"){ openExternal("https://iinote.co.kr/admin.html"); return; }                          // (운영자) 새 문의 알림
   const p=appPath(url);
+  // 위젯 '달력 보러 가기' · '시간표 보러 가기' → 홈의 달력 쪽 · 즐겨찾기 쪽의 시간표 칸 (2026-10-08)
+  const wk=/^iinote:\/\/(cal|tt)\b/i.exec(String(url||"")); if(wk){ S.hpage = wk[1].toLowerCase()==="cal" ? "cal" : "fav"; if(S.hpage==="fav") S.favTab="tt"; }
   // 🔗 카톡 · 문자로 받은 초대 링크(https://iinote.co.kr/?join=… · ?k=…)가 앱으로 열리면: 그 주소로 앱 화면을 한 번 새로 열어 초대를 받아요 (2026-10-07)
   if(/[?&](join|k)=/.test(p) && !location.search.includes(p.split("?")[1]||"\u0000")){ location.replace(p); return; }
   if(S.phase==="app" && S.me && S.routed){
