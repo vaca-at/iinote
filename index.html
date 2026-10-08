@@ -2395,8 +2395,12 @@ html.is-app:root[data-theme="dark"] .hp-chip:not(.on){color:var(--ink)}
 
 /* ===== 🎨 단추 · 얼굴 새 모양 (2026-10-08, 사용자가 고른 시안) =====
    ① 동그란 얼굴(.av) = 말랑 점토  ② 일반 단추(.btn-primary · .btn-accent) = 밤하늘 남색 + 흐르는 오로라 테두리 + 금빛 ✦ (밤에 쓰는 일기장, 시안 5번)  ③ 켜기 · 고르기 · 설정 단추(.pill2) = 두 칸 알약 */
-.av:not(.has-ph){background-image:radial-gradient(circle at 30% 24%,rgba(255,255,255,.6) 0 8%,rgba(255,255,255,0) 9%),linear-gradient(180deg,rgba(255,255,255,.26),rgba(0,0,0,.16))!important;box-shadow:inset 0 2px 1px rgba(255,255,255,.45),inset 0 -2px 2px rgba(0,0,0,.18),0 2px 0 rgba(0,0,0,.14),0 4px 7px -3px rgba(46,36,51,.35);text-shadow:0 1px 0 rgba(0,0,0,.2)}
-.av.has-ph{box-shadow:0 2px 0 rgba(0,0,0,.12),0 4px 7px -3px rgba(46,36,51,.35)}
+/* 🌌 얼굴 동그라미 = 10번 '일식 코로나' + B 별빛 파스텔 (2026-10-08): 남색 밤하늘 원 + 자기 색 빛무리 + 한쪽 반짝 */
+.av.corona{position:relative;background:radial-gradient(circle at 40% 34%,#2B3570,#10153A 80%)!important;color:#fff!important;
+  box-shadow:0 0 0 max(1.5px,.05em) var(--c),0 0 .5em .05em color-mix(in srgb,var(--c) 70%,transparent),0 3px 8px -3px rgba(16,21,58,.55);text-shadow:0 0 .35em color-mix(in srgb,var(--c) 90%,transparent)}
+.av.corona::after{content:"";position:absolute;right:2%;top:6%;width:24%;height:24%;border-radius:50%;background:radial-gradient(circle,#fff 0 18%,rgba(255,255,255,.75) 28%,transparent 62%);pointer-events:none}
+.av.corona.has-ph{background:none!important}
+.av.corona.has-ph::after{display:none}
 .btn.btn-primary,.btn.btn-accent{position:relative;border:2.5px solid transparent!important;color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.25);
   background:linear-gradient(160deg,#33447A,#1F2A44 70%) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box!important;
   background-size:100% 100%,300% 100%!important;
@@ -3243,6 +3247,12 @@ function applyPrefs(){ document.documentElement.dataset.theme=S.theme; document.
 applyPrefs();
 
 const prof = id => S.profiles.find(p=>p.id===id);
+// 🌌 밤하늘 색 (2026-10-08, 사용자가 고른 B '별빛 파스텔'): 얼굴 동그라미 빛무리 = 밝은 색, 달력 작은 점 = 한 단계 진한 색.
+//    가족 순서대로 여덟 색을 나눠 줘서 서로 겹치지 않아요 (예전 프로필 색 p.color 는 그대로 두고 화면에서만 바꿔요)
+const NIGHT = ["#FFB59E","#C9B6FF","#9FD4FF","#FFE39A","#FF9EC4","#B6F0E0","#A9B8FF","#F5C6FF"];
+const NIGHT_DOT = ["#EE8766","#9A82EC","#5AA6E8","#E0B43C","#E46A9E","#4FBE9A","#6F84E6","#C97FE4"];
+const nightIdx = p => { if(!p) return 0; const i=sortedProfiles().findIndex(x=>x.id===p.id); if(i>=0) return i%8; let h=0; for(const ch of String(p.id||p.name||"")) h=(h*31+ch.charCodeAt(0))>>>0; return h%8; };
+const pcol = p => NIGHT[nightIdx(p)], pdot = p => NIGHT_DOT[nightIdx(p)];
 const sortedProfiles = () => [...S.profiles].sort((a,b)=>(a.type===b.type?0:a.type==="parent"?-1:1)||(a.createdAt||0)-(b.createdAt||0));
 const findDiary = (pid,date) => S.diaries.find(d=>d.profileId===pid && d.date===date);
 // 한 사람이 구글 · 카카오로 따로 가입했어도 같은 프로필: uid(처음 계정) + uids(합친 로그인들)
@@ -3496,7 +3506,7 @@ const G_LOGO = `<svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path
 const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]||""}</svg>`;
 const logo = s => `<span class="logo-wrap" style="width:${s}px;height:${s}px;border-radius:${Math.round(s*.227)}px"><svg viewBox="0 0 440 440" aria-hidden="true"><rect width="440" height="440" fill="#FBF6EE"/><line x1="0" y1="352" x2="440" y2="352" stroke="#E9DCC8" stroke-width="8"/><line x1="92" y1="0" x2="92" y2="440" stroke="#F2B5A4" stroke-width="8"/><rect x="148" y="178" width="54" height="174" rx="27" fill="#1F2A44"/><rect x="240" y="226" width="54" height="126" rx="27" fill="#1F2A44"/><circle cx="175" cy="122" r="34" fill="#EF6F53"/><circle cx="267" cy="170" r="34" fill="#F4BE45"/></svg></span>`;
 const av = (p,s=34) => { if(!p) return `<span class="av" style="width:${s}px;height:${s}px;background:#B9B1A3;color:#fff">?</span>`; const c=p.color||"#1F2A44", ph=p.photo?.thumb||p.photo?.url;   // 👤 프로필 얼굴 사진이 있으면 동그라미 안에 사진
-  return `<span class="av ${ph?"has-ph":""}" style="width:${s}px;height:${s}px;background:${c};color:${onColor(c)};font-size:${Math.round(s*.42)}px" aria-hidden="true">${ph?`<img src="${esc(ph)}" alt="" loading="lazy">`:esc((p.name||"?").slice(0,1))}</span>`; };
+  return `<span class="av corona ${ph?"has-ph":""}" style="width:${s}px;height:${s}px;--c:${pcol(p)};font-size:${Math.round(s*.42)}px" aria-hidden="true">${ph?`<img src="${esc(ph)}" alt="" loading="lazy">`:esc((p.name||"?").slice(0,1))}</span>`; };
 // 사진 수에 따른 분할 모양 (6칸 격자에서 [가로 칸, 세로 칸])
 const LAYOUT = {
   1:[[6,4]], 2:[[3,3],[3,3]], 3:[[4,4],[2,2],[2,2]], 4:[[3,3],[3,3],[3,3],[3,3]],
@@ -3862,11 +3872,11 @@ function hpCal(){
   const cells=dates.map((d,i)=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], ev=sch.filter(s=>s.date===d).sort(bySch), n=ev.length, who=d<=t?ps.filter(x=>submittedOn(x.id,d)):[];
     const cls=["hc-d", d===t?"today":"", d>t?"fut":"", (dow===0||hol)?"red":dow===6?"blue":"", who.length?"has":""].join(" ");
     const evs=n?`<span class="hc-evs">${ev.slice(0,2).map(s=>`<b class="hc-ev">${esc(s.title)}</b>`).join("")}${n>2?`<b class="hc-ev more">+${n-2}</b>`:""}</span>`:"";
-    return `<button class="${cls}" data-act="hp-cal-day" data-v="${d}" ${d>t?"disabled":""} aria-label="${fmtLong(d)}${hol?" "+hol:""}, ${who.length}명 씀${n?`, 일정 ${n}개: ${esc(ev.map(s=>s.title).join(", "))}`:""}"><span>${i+1}</span><em>${who.map(x=>`<u style="background:${x.color||"var(--ink)"}"></u>`).join("")}</em>${evs}</button>`; }).join("");
+    return `<button class="${cls}" data-act="hp-cal-day" data-v="${d}" ${d>t?"disabled":""} aria-label="${fmtLong(d)}${hol?" "+hol:""}, ${who.length}명 씀${n?`, 일정 ${n}개: ${esc(ev.map(s=>s.title).join(", "))}`:""}"><span>${i+1}</span><em>${who.map(x=>`<u style="background:${pdot(x)}"></u>`).join("")}</em>${evs}</button>`; }).join("");
   return `<div class="hp-calwrap"><section class="block hp-cal" aria-labelledby="hc-h">
     <div class="hc-top"><button class="hp-arw" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("left")}</button><h2 id="hc-h">${yy}년 ${mm}월</h2><button class="hp-arw" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("right")}</button></div>
     <div class="hc-grid">${DAYS.map((w,i)=>`<span class="hc-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
-    <div class="hc-legend">${ps.map(p=>`<span><i style="background:${p.color||"var(--ink)"}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("")}</div>
+    <div class="hc-legend">${ps.map(p=>`<span><i style="background:${pdot(p)}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("")}</div>
     ${month!==t.slice(0,7)?`<button class="btn btn-ghost sm" data-act="cal-move" data-v="0">이번 달로</button>`:""}
   </section>${viewSchedules()}</div>`;
 }
@@ -4062,7 +4072,7 @@ function viewHomeCalendar(){
     return `<div class="ct-card ct-${st[0]}" style="--pc:${p.color||"var(--ink)"}"><div class="ct-top"><span class="ct-ring">${av(p,44)}</span><b>${esc(p.name)}</b><span class="ct-st">${st[0]==="done"?"✓ ":""}${st[1]}</span></div>
       <div class="ct-body"><span class="ct-title">${d?esc((d.text||"").slice(0,30)||"쓴 일기"):`<span class="muted">${isT?"오늘 일기를 기다려요":"이날 쓴 일기가 없어요"}</span>`}</span>
       ${open?(d.status==="submitted"?`<button class="btn btn-ghost sm" data-act="open-diary" data-id="${d.id}">읽기</button>`:`<button class="btn btn-ghost sm" data-act="write" data-date="${hd}">이어 쓰기</button>`):""}</div></div>`; }).join("");
-  const legend = ps.map(p=>`<span><i style="background:${p.color||"var(--ink)"}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("");
+  const legend = ps.map(p=>`<span><i style="background:${pdot(p)}"></i>${esc(p.name)} ${dates.filter(d=>submittedOn(p.id,d)).length}일</span>`).join("");
   const sch = mySchedules();
   const cells = dates.map(d=>{ const dow=toDate(d).getDay(), hol=HOLIDAYS[d], list=sch.filter(s=>s.date===d).sort(bySch);
     const who=ps.filter(p=>submittedOn(p.id,d));
@@ -4070,7 +4080,7 @@ function viewHomeCalendar(){
     return `<button class="${cls}" data-act="cal-day" data-v="${d}" aria-label="${fmtLong(d)}${hol?" "+hol:""}, 일정 ${list.length}개, ${who.length}명 씀">
       <span class="cal-n">${+d.slice(8)}${hol?`<small>${hol}</small>`:""}</span>
       <span class="cal-sc">${list.slice(0,2).map(s=>`<em>${s.time?esc(s.time)+" ":""}${esc(s.title)}</em>`).join("")}${list.length>2?`<em class="more">+${list.length-2}</em>`:""}</span>
-      <span class="cal-dots">${d<=t?ps.map(p=>`<i class="${submittedOn(p.id,d)?"on":""}" style="--c:${p.color||"var(--ink)"}"></i>`).join(""):""}</span></button>`; }).join("");
+      <span class="cal-dots">${d<=t?ps.map(p=>`<i class="${submittedOn(p.id,d)?"on":""}" style="--c:${pdot(p)}"></i>`).join(""):""}</span></button>`; }).join("");
   return `${heroDate()}
   <section class="block" aria-labelledby="h-ct"><div class="block-h"><h2 id="h-ct">${isT?"오늘":fmtShort(hd)}</h2><span class="muted">${ps.filter(p=>submittedOn(p.id,hd)).length}/${ps.length}명 썼어요</span></div>
     <div class="ct-grid" style="--n:${Math.min(ps.length,5)}">${today}</div></section>
@@ -4104,7 +4114,7 @@ function quadCal(){
   return `<section class="block q-cell q-cal" aria-labelledby="h-qc"><div class="block-h"><h2 id="h-qc"><button class="icon-btn qc-mv" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("back")}</button>${mm}월<button class="icon-btn qc-mv flip" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("back")}</button>${month!==t.slice(0,7)?`<button class="link-btn" data-act="cal-move" data-v="0">이번 달</button>`:""}</h2>
       <button class="btn btn-ghost sm" data-act="${done?"open-diary":"write"}" ${done?`data-id="${mine.id}"`:""}>${done?"📖 내 일기":"✏️ 오늘 일기"}</button></div>
     <div class="qc-grid" style="--rows:${rows}">${DAYS.map((w,i)=>`<span class="qc-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
-    <div class="qc-legend">${ps.map(x=>`<span><i style="background:${x.color||"var(--ink)"}"></i>${esc(x.name)}</span>`).join("")}<span><i class="sc"></i>일정</span></div></section>`;
+    <div class="qc-legend">${ps.map(x=>`<span><i style="background:${pdot(x)}"></i>${esc(x.name)}</span>`).join("")}<span><i class="sc"></i>일정</span></div></section>`;
 }
 // 2. 일기 히스토리: 가족의 새 일기와 나에게 온 댓글 · 답글 (최신순)
 function quadNews(){
@@ -7218,7 +7228,7 @@ function widgetData(){
   const ym=t.slice(0,7), [cy,cm]=ym.split("-").map(Number), cdays=new Date(cy,cm,0).getDate(), cal={y:cy,m:cm,today:Number(t.slice(8)),lead:toDate(ym+"-01").getDay(),days:cdays,hol:{},wrote:{},ev:{}};
   for(let i=1;i<=cdays;i++){ const d=`${ym}-${pad(i)}`, k=String(i);
     if(HOLIDAYS[d]) cal.hol[k]=HOLIDAYS[d];
-    if(d<=t){ const w=ps.filter(p=>submittedOn(p.id,d)).map(p=>p.color||"#1F2A44"); if(w.length) cal.wrote[k]=w; }
+    if(d<=t){ const w=ps.filter(p=>submittedOn(p.id,d)).map(p=>pdot(p)); if(w.length) cal.wrote[k]=w; }
     const e=sch.filter(x=>x.date===d).sort(bySch).map(x=>x.title); if(e.length) cal.ev[k]=e; }
   // 📚 4×5 시간표 위젯: 시간표를 넣은 가족 (칸 시간표는 과목 · 색, 사진만 있으면 photo:true)
   const tt=ps.filter(p=>p.tt && (p.tt.grid?.rows?.length || p.tt.photo)).map(p=>{ const [,kl,ki]=ttKind(p.tt.kind); const g=p.tt.grid;
