@@ -6639,7 +6639,7 @@ async function saveDiary(status){
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
   // 올리는 것만 말해요 (2026-10-08: 사진만 넣어도 '사진과 소리'라고 나오던 것 고침)
   { const up=[d.photos.some(p=>p.blob)&&"사진", d.audio?.blob&&"소리", (d.hand||[]).some(h=>h.blob)&&"손글씨 사진"].filter(Boolean);
-    if(up.length) toast(`${up.join(" · ")}을 올리고 있어요`); }
+    if(up.length) toast(`${up.join(" · ")}${hasBatchim(up[up.length-1])?"을":"를"} 올리고 있어요`); }
   await uploadPending(d);
   Object.assign(data,{ photos:d.photos, audio:d.audio||null, location:d.location||null, talk:d.talk||null, hand:d.hand||[], handReads:d.handReads||0,
     tags:[...new Set([...d.tags,...extractTags(d.title+" "+d.text)])].slice(0,20) });
