@@ -5666,6 +5666,7 @@ function render(){
     if(scTop){ const sc=$app.querySelector(".sc-scroll"); if(sc) sc.scrollTop=scTop; }
     keepStrip(stripX);
     if(S.sub?.type==="write") penHL();
+    if(cmtRestore()){ render(); return; }   // 쓰던 답글이 있으면 그 답글 칸을 열고 한 번 더 그려요
     afterChatRender();
     if(syncUrl()==="again"){ render(); return; }
   }
@@ -5675,7 +5676,28 @@ function render(){
 // 쓰던 일기에서 다른 화면으로 가면: 묻지 않고 이 기기에 보관한 뒤 알려 줘요 (아이가 실수로 눌러도 날아가지 않게, 2026-10-07)
 const LEFT_MSG = "쓰던 일기는 이 기기에 보관해 두었어요. 첫 화면에서 이어 쓸 수 있어요 ✏️";
 function leaveDraft(){ if(draftDirty()){ wipNow(); return true; } return false; }
-function go(fn){ const was=S.sub?.type==="write" && leaveDraft(); fn(); if(was && S.sub?.type!=="write") toast(LEFT_MSG); render(); window.scrollTo(0,0); }
+function go(fn){ const was=S.sub?.type==="write" && leaveDraft(), cm=!was && cmtTyping(); fn(); if(was && S.sub?.type!=="write") toast(LEFT_MSG); else if(cm) toast(CMT_MSG); render(); window.scrollTo(0,0); }
+/* 💬 쓰던 댓글 · 답글 지키기 (2026-10-08): 칠 때마다 이 기기에 보관(ls iinote-cmt-가족-프로필 = {열쇠:{v,t}}),
+   그 일기를 다시 열면 칸에 그대로 · 답글이면 답글 칸도 다시 열어요. 올리면 지우고, 14일 지난 건 버려요 */
+const CMT_MSG = "쓰던 댓글은 이 기기에 보관해 두었어요. 그 일기를 다시 열면 이어 쓸 수 있어요 💬";
+const cmtLsKey = () => `iinote-cmt-${S.gid}-${S.me?.id}`;
+function cmtAll(){ try{ const o=JSON.parse(ls.get(cmtLsKey(),"{}"))||{}, lim=Date.now()-14*864e5; for(const k in o) if(!o[k]||o[k].t<lim) delete o[k]; return o; }catch(e){ return {}; } }
+function cmtKey(f){ const diary=f.dataset.diary||S.sub?.id||""; return f.dataset.form==="edit-comment" ? `e|${f.dataset.id}` : `c|${diary}|${f.dataset.parent||""}`; }
+function cmtSave(f){ const el=f.querySelector("[name=text]"); if(!el) return; const o=cmtAll(), k=cmtKey(f), v=el.value;
+  if(v.trim()) o[k]={v,t:Date.now()}; else delete o[k]; ls.set(cmtLsKey(),JSON.stringify(o)); }
+function cmtDrop(f){ const o=cmtAll(); delete o[cmtKey(f)]; ls.set(cmtLsKey(),JSON.stringify(o)); }
+const cmtTyping = () => [...document.querySelectorAll('form[data-form="comment"] [name=text],form[data-form="edit-comment"] [name=text]')].some(el=>el.value.trim());
+function cmtRestore(){
+  if(!S.me || !S.gid) return false;
+  const o=cmtAll(); if(!Object.keys(o).length) return false;
+  // 일기 읽기 화면인데 이 일기에 쓰던 답글이 있고 답글 칸이 닫혀 있으면 → 열기
+  if(S.sub?.type==="diary" && !S.replyTo){ const k=Object.keys(o).find(k=>k.startsWith(`c|${S.sub.id}|`) && k.split("|")[2]); const pid=k&&k.split("|")[2];
+    if(pid && S.comments.some(c=>c.id===pid)){ S.replyTo=pid; return true; } }
+  document.querySelectorAll('form[data-form="comment"],form[data-form="edit-comment"]').forEach(f=>{ const el=f.querySelector("[name=text]"), d=o[cmtKey(f)];
+    if(el && d && !el.value) el.value=d.v; });
+  return false;
+}
+document.addEventListener("input", e=>{ const f=e.target.closest?.('form[data-form="comment"],form[data-form="edit-comment"]'); if(f && e.target.name==="text") cmtSave(f); });
 /* ---------- 주소와 뒤로 가기 ----------
    / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /album 사진첩 · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
    화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
@@ -5887,9 +5909,9 @@ const acts = {
     ta.focus({preventScroll:true}); ta.setSelectionRange(i,i+er.wrong.length);
     [...document.querySelectorAll("#w-hl mark.pen-x")].find(m=>m.textContent===er.wrong)?.scrollIntoView({behavior:"smooth",block:"center"}); },
   reply: el => { S.replyTo=el.dataset.id; S.editing=null; render(); document.getElementById("r-"+el.dataset.id)?.focus(); },
-  "cancel-reply": () => { S.replyTo=null; render(); },
+  "cancel-reply": el => { const f=el.closest("form"); if(f) cmtDrop(f); S.replyTo=null; render(); },   // 취소하면 보관한 답글도 지워요
   "edit-comment": el => { S.editing=el.dataset.id; S.replyTo=null; render(); document.getElementById("e-"+el.dataset.id)?.focus(); },
-  "cancel-edit": () => { S.editing=null; render(); },
+  "cancel-edit": el => { const f=el.closest("form"); if(f) cmtDrop(f); S.editing=null; render(); },
   "del-diary": el => { const d=S.diaries.find(x=>x.id===el.dataset.id); if(!d) return;
     if(!confirm(`${fmtShort(d.date)} 일기를 지울까요?\n사진 · 소리와 달린 댓글도 함께 지워지고 되돌릴 수 없어요.`)) return;
     guard(async()=>{ await removeDiary(S.gid,d,S.comments); await Promise.all([reload("diaries"),reload("comments")]); S.sub=null; render(); window.scrollTo(0,0); toast("일기를 지웠어요"); }); },
@@ -6464,9 +6486,9 @@ const forms = {
     await B.add(S.gid,"links",{title:fd.title.trim(),url:u,createdBy:S.me.id,createdAt:Date.now()}); await reload("links"); render(); toast("즐겨찾기를 추가했어요"); }),
   comment: (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
     await B.add(S.gid,"comments",{diaryId:f.dataset.diary||S.sub.id,parentId:f.dataset.parent||null,profileId:S.me.id,text,createdAt:Date.now()});
-    S.replyTo=null; await reload("comments"); render(); toast(f.dataset.parent?"답글을 달았어요":"댓글을 달았어요"); }),
+    cmtDrop(f); S.replyTo=null; await reload("comments"); render(); toast(f.dataset.parent?"답글을 달았어요":"댓글을 달았어요"); }),
   "edit-comment": (fd,f) => guard(async()=>{ const text=fd.text.trim(); if(!text) return;
-    await B.update(S.gid,"comments",f.dataset.id,{text,edited:true,updatedAt:Date.now()}); S.editing=null; await reload("comments"); render(); toast("댓글을 수정했어요"); }),
+    await B.update(S.gid,"comments",f.dataset.id,{text,edited:true,updatedAt:Date.now()}); cmtDrop(f); S.editing=null; await reload("comments"); render(); toast("댓글을 수정했어요"); }),
   child: (fd,f) => guard(async()=>{ if(fd.pin && !/^\d{4}$/.test(fd.pin)){ toast("비밀번호는 숫자 네 자리로 넣어 주세요"); return; }
     if(!fd.consent){ toast("보호자 동의 칸에 표시해 주세요"); return; }
     await B.add(S.gid,"profiles",{name:fd.name.trim(),type:"child",grade:Number(fd.grade),pin:fd.pin||"",color:COLORS[S.profiles.length%COLORS.length],createdAt:Date.now(),guardianConsent:consentRec()});
