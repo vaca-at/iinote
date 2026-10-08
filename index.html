@@ -4280,11 +4280,22 @@ const TIPS = [
   ["🎧","궁금한 점은 오른쪽 아래 챗봇 상담에 물어보세요. 못 푼 건 상담원이 답해요","","",""],
 ];
 const tipKey = () => `iinote-tipx-${S.gid}-${todayStr()}`;
+// 날마다 하나: 아직 안 본 것 중에서 무작위로 골라 20개를 겹치지 않게 다 보여 주고, 다 본 뒤에는 무작위 (어제 것은 빼고)
+// ls iinote-tipseen-가족 = 본 번호들, iinote-tipday-가족 = {d:날짜, i:번호} (그날은 같은 것)
 function todayTip(){
   const list=TIPS.map((t,i)=>[t,i]).filter(([t])=>(!t[3] || isParent()) && (!t[4] || (t[4]==="app")===IS_APP));
   if(!list.length) return null;
-  const day=Math.floor(toDate(todayStr()).getTime()/864e5);
-  return list[day % list.length];
+  const t=todayStr(), kd=`iinote-tipday-${S.gid}`, ks=`iinote-tipseen-${S.gid}`;
+  let day={}; try{ day=JSON.parse(ls.get(kd,"{}"))||{}; }catch(e){}
+  const hit=day.d===t && list.find(x=>x[1]===day.i); if(hit) return hit;
+  let seen=[]; try{ seen=JSON.parse(ls.get(ks,"[]"))||[]; }catch(e){}
+  let pool=list.filter(x=>!seen.includes(x[1]));
+  if(!pool.length) pool=list.filter(x=>x[1]!==day.i);
+  if(!pool.length) pool=list;
+  const pick=pool[Math.floor(Math.random()*pool.length)];
+  if(!seen.includes(pick[1])) seen.push(pick[1]);
+  ls.set(kd,JSON.stringify({d:t,i:pick[1]})); ls.set(ks,JSON.stringify(seen));
+  return pick;
 }
 function tipBanner(){
   if(ls.get(tipKey(),"")) return "";
@@ -4298,7 +4309,7 @@ const penAskKey = () => `iinote-penask-${S.gid}`;
 function penAskBanner(){
   if(ls.get(penAskKey(),"")) return "";
   const ks=penUnset(); if(!ks.length) return "";
-  return `<div class="pen-ask" role="note" title="지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요."><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b> 다홍펜 고치는 방법</p><button class="btn pill2 sm" data-act="pen-set"><i aria-hidden="true">✎</i><span>고르기</span></button><span class="link-btn pen-ask-x pen-ask-sp" aria-hidden="true">✕</span></div>`;
+  return `<div class="pen-ask" role="note" title="지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요."><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b> 다홍펜 고치는 방법</p><button class="btn pill2 sm" data-act="pen-set"><i aria-hidden="true">✎</i><span>고르기</span></button><button class="link-btn pen-ask-x" data-act="pen-x" aria-label="다시 보지 않기">✕</button></div>`;
 }
 function viewHome(){
   const st=homeStyle();
@@ -7520,6 +7531,7 @@ Object.assign(acts,{
 // 💡 오늘의 기능 띠 단추
 Object.assign(acts,{
   "tip-x": () => { ls.set(tipKey(),"1"); render(); },
+  "pen-x": () => { ls.set(penAskKey(),"1"); render(); toast("다홍펜 고치는 방법은 우리 가족 설정에서 언제든 바꿀 수 있어요"); },
   "dd-open": el => { const d=el.dataset.v, l=ddayList().filter(x=>x.date===d), n=ddDays(d); toast(`⏳ ${fmtLong(d)} · ${l.map(x=>x.title).join(" · ")} · ${n>0?n+"일 남았어요":"오늘이에요!"}`); },
   "tip-go": el => { const t=TIPS[+el.dataset.v]; if(!t) return; ls.set(tipKey(),"1"); const to=t[2];
     if(to==="prof"){ S.prof=S.me.id; S.profEdit=canEditProf(S.me); render(); return; }
