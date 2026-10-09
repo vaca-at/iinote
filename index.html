@@ -979,6 +979,25 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .news-panel{position:fixed;z-index:45;top:calc(72px + env(safe-area-inset-top,0px));right:max(16px,calc((100vw - 1320px)/2 + 16px));width:min(420px,calc(100vw - 32px));max-height:min(72vh,620px);overflow:auto;padding:14px 16px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);box-shadow:0 18px 44px rgba(31,42,68,.22);animation:newsIn .16s ease-out}
 @keyframes newsIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .news-h{position:sticky;top:-14px;background:var(--surface);padding:4px 0 6px;z-index:1}
+.me-pop{position:fixed;z-index:45;top:calc(64px + env(safe-area-inset-top,0px));right:12px;width:min(320px,calc(100vw - 24px));max-height:calc(100dvh - 160px);overflow:auto;padding:12px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:0 14px 40px rgba(20,26,40,.18);animation:newsIn .16s ease-out}
+.me-pop button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+.me-pop :is(.mm-me,.mm-p){display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:14px}
+.me-pop :is(.mm-me,.mm-p):hover{background:var(--paper)}
+.me-pop .mm-me{background:var(--butter-soft)}
+.me-pop span{display:grid;min-width:0}
+.me-pop span b{font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me-pop span small{font-size:12px;color:var(--ink3)}
+.mm-h{margin:12px 6px 4px;font-size:12px;font-weight:700;color:var(--ink3)}
+.mm-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.mm-list li{display:flex;align-items:center;gap:6px}
+.mm-list .mm-p:disabled{opacity:.45;cursor:default}
+.me-pop .mm-w{flex:none;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:var(--coral-soft);color:var(--coral);font-size:13px;font-weight:700}
+.me-pop .mm-w .ic{width:14px;height:14px}
+.me-pop .mm-out{display:flex;align-items:center;gap:6px;width:100%;margin-top:10px;padding:10px 8px 4px;border-top:1px solid var(--line);font-size:14px;color:var(--ink3)}
+.me-pop .mm-out .ic{width:16px;height:16px}
+.me-m.on{outline:2.5px solid var(--coral);outline-offset:2px;border-radius:50%}
+@media (min-width:760px){ .me-pop{top:calc(72px + env(safe-area-inset-top,0px))} }
+@media (max-width:759px){ .shell .kid-bar:not(.kid-now){display:none} }
 @media (max-width:759px){ .news-panel{top:calc(112px + env(safe-area-inset-top,0px));right:12px;width:calc(100vw - 24px);max-height:calc(100dvh - 200px)} }
 @media (prefers-reduced-motion:reduce){ .news-panel{animation:none} }
 .news-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -4103,6 +4122,19 @@ async function savePin(p,v){
 }
 const needParentPin = p =>p?.type==="parent" && !!p.pin && S.me?.type==="child";
 const myParentProfile = () => S.profiles.find(p=>p.type==="parent" && isMine(p));
+// (2026-10-09) 휴대폰 웹: 위쪽 내 얼굴을 누르면 작은 창 — 내 프로필 · 프로필 바꾸기(아이는 ✏️ 바로 쓰기) · 로그아웃
+// 그래서 휴대폰 웹에서는 보호자 화면의 '아이가 쓰기' 줄을 숨겨요 (아이로 쓰는 중의 '돌아가기' 줄은 그대로)
+function viewMeMenu(){
+  const others=sortedProfiles().filter(p=>p.id!==S.me.id);
+  const row=p=>{ const ok=canUse(p), lock=(p.type==="child"&&p.pin)||needParentPin(p);
+    return `<li><button class="mm-p" data-act="me-pick" data-id="${esc(p.id)}" ${ok?"":"disabled"}>${av(p,36)}<span><b>${esc(p.name)}</b><small>${p.type==="child"?esc(gradeName(p.grade)||"어린이"):ok?"나":"본인 계정으로 접속"}${lock?" · 🔒":""}</small></span></button>${ok&&isParent()&&p.type==="child"?`<button class="mm-w" data-act="kid-write" data-id="${esc(p.id)}" aria-label="${esc(p.name)}${ro(p.name)} 바꿔서 일기 쓰기">${ic("pen")}쓰기</button>`:""}</li>`; };
+  return `<div class="news-bg" data-act="me-menu" aria-hidden="true"></div><div class="me-pop" role="dialog" aria-label="내 프로필 · 프로필 바꾸기">
+    <button class="mm-me" data-act="prof-open" data-v="${esc(S.me.id)}">${av(S.me,48)}<span><b>${esc(S.me.name)}</b><small>내 프로필 보기 ›</small></span></button>
+    ${others.length?`<p class="mm-h">프로필 바꾸기</p><ul class="mm-list">${others.map(row).join("")}</ul>`:""}
+    <button class="mm-out" data-act="signout">${ic("out")}로그아웃</button></div>`;
+}
+// 창을 내 얼굴 단추 바로 아래에 붙여요 (맨 위 띠 · 휴대폰 위쪽 여백이 있어도)
+function meMenuPlace(){ const b=document.querySelector(".me-m"), pop=document.querySelector(".me-pop"); if(!b||!pop) return; const r=b.getBoundingClientRect(); if(r.height) pop.style.top=Math.max(8,r.bottom+8)+"px"; }
 function kidBar(){
   if(isParent()){
     const kids=sortedProfiles().filter(p=>p.type==="child"); if(!kids.length) return "";
@@ -4316,7 +4348,7 @@ function viewShell(){
       <header class="mast">
         <button class="home-btn" data-act="tab" data-v="home" ${S.tab==="home"&&!S.sub?'aria-current="page"':""}>${ic("home")}<span>홈</span></button>
         <h1 class="mast-h"><button class="mast-l" data-act="tab" data-v="home" title="홈으로">${logo(44)}<span class="mast-t">${esc(S.group.name)} 일기장</span></button></h1>
-        <div class="mast-m">${newsBell()}<button class="prefs-btn ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 · 디자인 · 글씨 고르기">🎨</button><button class="me-m" data-act="switch-profile" aria-label="${esc(S.me.name)} · 프로필 바꾸기">${av(S.me,34)}</button></div>
+        <div class="mast-m">${newsBell()}<button class="prefs-btn ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 · 디자인 · 글씨 고르기">🎨</button><button class="me-m ${S.meMenu?"on":""}" data-act="me-menu" aria-expanded="${!!S.meMenu}" aria-label="${esc(S.me.name)} · 내 프로필 · 프로필 바꾸기">${av(S.me,34)}</button></div>
       </header>
       <div class="mast-sub">
         <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>${newsBell()}
@@ -4324,6 +4356,7 @@ function viewShell(){
         ${isParent()?`<button class="link-btn out" data-act="signout" aria-label="로그아웃">${ic("out")}<span>로그아웃</span></button>`:""}
       </div>
       ${kidBar()}
+      ${S.meMenu?viewMeMenu():""}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       ${S.ttOpen?`<div class="tt-modal-bg" data-act="tt-open" aria-hidden="true"></div><div class="fav-panel tt-panel tt-modal" role="dialog" aria-modal="true" aria-label="시간표"><div class="tt-panel-h"><h2>📅 시간표</h2><button class="link-btn" data-act="tt-open">닫기 ✕</button></div>${viewTimetable()}</div>`:""}
       ${S.newsOpen?viewNews():""}
@@ -6416,6 +6449,7 @@ function render(){
     if(scTop){ const sc=$app.querySelector(".sc-scroll"); if(sc) sc.scrollTop=scTop; }
     keepStrip(stripX);
     if(S.sub?.type==="write") penHL();
+    if(S.meMenu) meMenuPlace();
     if(cmtRestore()){ render(); return; }   // 쓰던 답글이 있으면 그 답글 칸을 열고 한 번 더 그려요
     afterChatRender();
     if(syncUrl()==="again"){ render(); return; }
@@ -6616,6 +6650,10 @@ const acts = {
   "kid-pin-clear": el => guard(async()=>{ const p=prof(el.dataset.id); if(!p || !isParent()) return; if(!confirm(`${kidN(p)}의 비밀번호를 없앨까요? 누구나 ${p.name} 프로필로 들어갈 수 있게 돼요.`)) return;
     await savePin(p,""); S.pinEdit=null; render(); toast(`${kidN(p)}의 비밀번호를 없앴어요`); }),
   "parent-pin-clear": () =>guard(async()=>{ if(!confirm("부모 비밀번호를 없앨까요?")) return; await B.update(S.gid,"profiles",S.me.id,{pin:""}); S.me.pin=""; const p=prof(S.me.id); if(p) p.pin=""; render(); toast("부모 비밀번호를 없앴어요"); }),
+  "me-menu": () => { S.meMenu=!S.meMenu; render(); },
+  "me-pick": el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
+    if((p.type==="child" && p.pin) || needParentPin(p)){ S.phase="picker"; S.pinFor=p.id; S.afterPin=null; S.sub=null; render(); return; }
+    enterAs(p); toast(`${p.name}${ro(p.name)} 바꿨어요`); },
   "switch-profile": () => go(()=>{ S.phase="picker"; S.pinFor=null; S.afterPin=null; S.sub=null; }),
   // 부모 화면의 '아이가 쓰기': 그 아이로 바꾸고 바로 오늘 일기 쓰기 (비밀번호가 있으면 먼저 물어요)
   "kid-write": el => { const p=prof(el.dataset.id); if(!p) return;
@@ -7250,6 +7288,7 @@ const forms = {
     await reload("profiles"); render(); toast("아이 프로필을 추가했어요"); })
 };
 
+document.addEventListener("click", e => { if(S.meMenu && e.target.closest?.(".me-pop [data-act]")) S.meMenu=false; }, true);   // 내 얼굴 창 안 단추를 누르면 창을 닫고 그 일을 해요
 document.addEventListener("click", e => { const el=e.target.closest("[data-act]"); if(!el) return; const f=acts[el.dataset.act]; if(f){ e.preventDefault(); f(el,e); } });
 document.addEventListener("submit", e => { const f=e.target.closest("form[data-form]"); if(!f) return; e.preventDefault(); forms[f.dataset.form]?.(Object.fromEntries(new FormData(f)), f); });
 // 아이 일기: 붙여넣기 · 끌어다 놓기 막기
