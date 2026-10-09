@@ -3671,7 +3671,7 @@ function newsItems(){
 }
 function famNewsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return famNews().filter(x=>x.at>seen).length; }
 function newsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return newsItems().filter(x=>x.at>seen).length; }
-const newsBell = () => { const n=(IS_APP ? famNewsUnread() : newsUnread()) + ddItems().length; /* 디데이 · 생일 개수도 함께 */ return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">${IS_APP?ic("bell"):"🔔"}${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
+const newsBell = () => { const n=IS_APP ? famNewsUnread() : newsUnread(); /* 디데이 · 생일은 새 소식 창 안에만, 숫자에는 안 세요 (2026-10-09) */ return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}">${IS_APP?ic("bell"):"🔔"}${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
 const newsDd = () => { const r=ddayRow(); return r?`<div class="news-dd"><small>⏳ 다가오는 날</small>${r}</div>`:""; };
 function viewNews(){
   // 앱: 가족 소식 전체(famNews · hpNews)를 팝업으로 — 예전 홈 '소식' 쪽 (2026-10-07)
