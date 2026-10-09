@@ -4228,8 +4228,9 @@ const FAQ = [
 // 일기 · 댓글의 '신고'를 누르면 S.helpRep={cat,ref} 로 바로 이 단계부터. ref 는 "일기 10월 7일 · 지우" 같은 짧은 표시만 (내용은 보내지 않아요)
 const REPORT_CATS = ["불편한 글 · 댓글","이상한 AI 답변","사진 · 채팅","오류 · 고장","기타"];
 function viewHelp(){
-  const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! 챗봇 상담이에요. 무엇을 도와드릴까요?\n아래에서 고르거나 궁금한 것을 적어 보내 주세요. 불편한 글이나 고장은 🚩 신고하기로 알려 주세요.`};
-  const msgs=[hello,...(S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":"me",text:m.text})),...(S.helpLocal||[])];
+  const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! 챗봇 상담이에요. 무엇을 도와드릴까요?\n아래에서 고르거나 궁금한 것을 적어 보내 주세요. 불편한 글이나 고장은 🚩 신고하기로 알려 주세요.
+💬 상담 기록은 관리자가 확인하고 관리해요.`};
+  const msgs=[hello,...(S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":m.from==="bot"?"bot":"me",text:m.text})),...(S.helpLocal||[])];
   const bubble=m=>m.from==="me" ? `<p class="hm me">${esc(m.text)}</p>`
     : `<div class="hm-row"><span class="hm-av ${m.from}" aria-hidden="true">${m.from==="op"?"상":ic("help")}</span><p class="hm ${m.from}">${m.from==="op"?"<b>상담원</b>":""}${esc(m.text)}</p></div>`;
   const rep=S.helpRep;
@@ -7655,15 +7656,35 @@ Object.assign(acts,{
   "help-rep-x": () => { S.helpRep=null; helpSay({from:"bot",text:"신고를 그만뒀어요. 다른 궁금한 게 있으면 말씀해 주세요."}); render(); helpScroll(); },
 });
 document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.ttOpen && !S.lb){ S.ttOpen=false; render(); return; } if(e.key==="Escape" && S.helpOpen && !S.lb && !S.prof) acts["help-close"](); });
-// 상담원에게 보내기 (신고면 종류 · 표시를 함께)
+// 보내기: 🚩 신고는 상담원에게 바로. 그 밖에는 🤖 챗봇(무료 AI, 워커 mode "help")이 먼저 답하고, 대화는 모두 운영자 문의함에 남아요 (2026-10-09)
+//  화면 · 디자인 고칠 곳(design) · 오류(bug) · 사람이 봐야 할 것(human)은 상담원에게도 알림이 가요. AI 가 안 되면 예전처럼 상담원에게만
+const helpGuide = () => [...FAQ.map(([q,a])=>`Q. ${q}\nA. ${a}`), ...TIPS.filter(t=>!t[4] || (t[4]==="app")===IS_APP).map(t=>`- ${t[1]}`),
+  IS_APP?"- 이 사람은 안드로이드 앱을 쓰고 있어요. 아래 메뉴: 홈 · 내 일기 · 가운데 ✏️ 쓰기 · 채팅 · 더보기(우리 가족 설정 · 앱 설정 · 챗봇 상담 · 아이들 현황 · 책장 PDF · 그래프 · 화면 꾸미기)"
+    :"- 이 사람은 웹(iinote.co.kr)을 쓰고 있어요. 위쪽 탭: 홈 · 내 일기 · 가족 채팅 · 달력 · 하루 펼쳐보기 · 책장 · 사진첩 · AI 리포트 · 우리 가족 설정 · 설정. 디자인 · 글씨는 오른쪽 위 🎨 화면 꾸미기"].join("\n");
 forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return;
   if(DEMO){ toast("둘러보기에서는 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
-  const rep=S.helpRep?.cat?S.helpRep:null;
-  S.helpBusy=rep?"신고를 보내는 중…":"상담원에게 보내는 중…"; render();
-  B.callFn("supportSend",{text,name:S.me.name,family:S.group?.name||"",...(rep?{report:rep.cat,ref:rep.ref}:{})}).then(r=>{ S.helpMsgs=r.msgs||[]; S.helpRep=null;
-    helpSay({from:"bot",text:rep?"신고를 받았어요. 알려 줘서 고마워요. 상담원이 살펴보고 답해 드릴게요.":`상담원에게 전달했어요. ${IS_APP?"답장이 오면 알림으로 알려 드릴게요.":"답장은 여기 챗봇 상담에서 볼 수 있어요."}`}); buzz("ok"); })
-    .catch(e=>{ console.warn("상담 보내기",e); toast("보내지 못했어요. 인터넷 연결을 확인하고 다시 보내 주세요"); document.getElementById("help-in")&&(document.getElementById("help-in").value=text); })
-    .finally(()=>{ S.helpBusy=""; render(); helpScroll(); }); };
+  const rep=S.helpRep?.cat?S.helpRep:null, ta=document.getElementById("help-in"); if(ta) ta.value="";
+  const history=[...(S.helpMsgs||[]).map(m=>({from:m.from==="user"?"me":"bot",text:m.text})),...(S.helpLocal||[])].slice(-6);
+  S.helpLocal=[...(S.helpLocal||[]),{from:"me",text}];
+  S.helpBusy=rep?"신고를 보내는 중…":"🤖 챗봇이 답을 찾고 있어요…"; render(); helpScroll();
+  (async()=>{
+    let ai=null;
+    if(!rep){ try{ ai=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"help",pid:S.me.id,text,guide:helpGuide(),history})}); }catch(e){ console.warn("챗봇 AI",e); ai=null; } }
+    if(ai?.reply){ S.helpLocal=[...S.helpLocal,{from:"bot",text:ai.reply}]; S.helpBusy=""; render(); helpScroll(); }
+    else S.helpBusy=rep?"신고를 보내는 중…":"상담원에게 보내는 중…";
+    try{
+      const r=await B.callFn("supportSend",{text,name:S.me.name,family:S.group?.name||"",...(rep?{report:rep.cat,ref:rep.ref}:{}),...(ai?.reply?{bot:ai.reply,kind:ai.kind}:{})});
+      S.helpMsgs=r.msgs||[]; S.helpRep=null; S.helpLocal=[];   // 서버에 남은 대화(내 글 · 챗봇 답)로 바꿔 그려요
+      if(rep) helpSay({from:"bot",text:"신고를 받았어요. 알려 줘서 고마워요. 상담원이 살펴보고 답해 드릴게요."});
+      else if(!ai?.reply) helpSay({from:"bot",text:`상담원에게 전달했어요. ${IS_APP?"답장이 오면 알림으로 알려 드릴게요.":"답장은 여기 챗봇 상담에서 볼 수 있어요."}`});
+      buzz("ok");
+    }catch(e){ console.warn("상담 보내기",e); if(!ai?.reply){ toast("보내지 못했어요. 인터넷 연결을 확인하고 다시 보내 주세요"); const t2=document.getElementById("help-in"); if(t2) t2.value=text; S.helpLocal=(S.helpLocal||[]).filter(m=>m.text!==text); } }
+    finally{ S.helpBusy=""; render(); helpScroll(); }
+  })(); };
+// 챗봇 글 칸: 엔터 = 보내기, Shift+엔터 = 줄 바꿈 (한글 조합 중에는 안 보내요)
+document.addEventListener("keydown", e=>{ if(e.target?.id!=="help-in" || e.key!=="Enter" || e.shiftKey || e.isComposing || e.keyCode===229) return;
+  e.preventDefault(); e.target.closest("form")?.requestSubmit(); });
+
 
 /* =========================================================
    📱 앱 전용 기능 (2026-10-05, 앱에서만 · 웹은 그대로)
