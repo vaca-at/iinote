@@ -7810,8 +7810,12 @@ forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return
     finally{ S.helpBusy=""; render(); helpScroll(); }
   })(); };
 // 챗봇 글 칸: 엔터 = 보내기, Shift+엔터 = 줄 바꿈 (한글 조합 중에는 안 보내요)
-document.addEventListener("keydown", e=>{ if(e.target?.id!=="help-in" || e.key!=="Enter" || e.shiftKey || e.isComposing || e.keyCode===229) return;
+let helpShift=false;
+document.addEventListener("keydown", e=>{ if(e.target?.id!=="help-in") return; helpShift=e.shiftKey; if(e.key!=="Enter" || e.shiftKey || e.isComposing || e.keyCode===229) return;
   e.preventDefault(); e.target.closest("form")?.requestSubmit(); });
+// 안드로이드 키보드(앱 · 휴대폰 웹)는 엔터를 keyCode 229 로 보내서 위가 못 잡아요 → 줄 바꿈이 들어가려 할 때 대신 보내요 (2026-10-09)
+document.addEventListener("beforeinput", e=>{ if(e.target?.id!=="help-in" || e.inputType!=="insertLineBreak" && e.inputType!=="insertParagraph") return;
+  if(helpShift || e.isComposing) return; e.preventDefault(); e.target.closest("form")?.requestSubmit(); });
 
 
 /* =========================================================
