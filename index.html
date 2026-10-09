@@ -2631,6 +2631,7 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 .qk-w i.t{outline:2px solid #2B3670;outline-offset:1px}
 .qk-n{display:flex;flex-direction:column;align-items:center;min-width:56px}
 .qk-n b{font-size:22px;line-height:1}.qk-n small{font-size:11px;color:var(--ink2)}.qk-n span{font-size:12px;margin-top:3px;white-space:nowrap}
+.media-tip{margin-left:auto;font-size:12px;color:var(--ink2);font-weight:400}
 #app .tip-ask p{white-space:normal;overflow:visible;line-height:1.45}   /* 오늘의 기능은 긴 한 줄이라 줄 바꿈 허락 */
 /* 👆 손가락으로 누르기 쉽게 (2026-10-08 앱 점검): 작은 닫기 · ✕ · 약관 링크의 누르는 자리를 넓혀요 (보이는 크기는 그대로) */
 #app :is(.pen-ask-x,.news-h .link-btn,.more-head .link-btn){position:relative;min-width:32px;min-height:32px;display:inline-grid;place-items:center}
@@ -6083,7 +6084,7 @@ function insertEmoji(e){
 }
 function viewMedia(d){
   const secs=[];
-  if(allow("photos")) secs.push(`<section class="media-sec" aria-label="사진"><div class="media-h">사진<span>${d.photos.length}/${MAX_PHOTOS}장</span></div>
+  if(allow("photos")) secs.push(`<section class="media-sec" aria-label="사진"><div class="media-h">사진<span>${d.photos.length}/${MAX_PHOTOS}장</span>${IS_APP?"":`<small class="media-tip">📋 캡처한 사진은 Ctrl+V 로 붙여 넣어도 돼요</small>`}</div>
     <div class="thumbs">${d.photos.map((p,i)=>`<div class="thumb"><img src="${esc(p.thumb||p.url)}" alt="${i+1}번째 사진">${d.photos.length>1?`<button type="button" class="fav-btn ${p.fav?"on":""}" data-act="photo-fav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${i+1}번째 사진 미리보기로 고르기" title="목록 미리보기에 보일 사진 (2장까지)">${p.fav?"★":"☆"}</button>`:""}<button class="icon-btn" data-act="photo-del" data-id="${p.id}" aria-label="${i+1}번째 사진 빼기">${ic("x")}</button><button type="button" class="crop-btn" data-act="photo-crop" data-id="${esc(p.id)}" aria-label="${i+1}번째 사진 자르기 · 돌리기" title="자르기 · 돌리기">✂️</button></div>`).join("")}
     ${d.photos.length<MAX_PHOTOS?`<label class="thumb-add">${ic("image")}<span>사진 추가</span><input type="file" id="w-photos" accept="image/*" multiple></label>${IS_APP?`<label class="thumb-add">${ic("camera")}<span>사진 찍기</span><input type="file" id="w-camera" accept="image/*" capture="environment"></label>`:""}`:""}</div>
     ${d.photos.length>1?`<p class="muted" style="margin:10px 0 0;font-size:13px">${d.photos.length}장은 일기장에 ${d.photos.length}분할로 보이고, 누르면 크게 볼 수 있어요.</p>`:""}</section>`);
@@ -6883,6 +6884,12 @@ function lbMove(n){ const l=S.lb; if(!l) return;
     render(); };
   if(S.alEdit?.inLb) guard(async()=>{ await albumSaveEdit(); go(); }); else go(); }
 function addTag(v){ const t=cleanTag(v); if(t && !S.draft.tags.includes(t) && S.draft.tags.length<10) S.draft.tags.push(t); render(); document.getElementById("w-tag")?.focus(); }
+// 📋 (2026-10-09) 웹(컴퓨터): 일기 쓰는 중 Ctrl+V 하면 복사한 사진을 일기 사진으로 (글을 붙이는 거면 그대로 글로)
+document.addEventListener("paste", e=>{ if(S.sub?.type!=="write" || !S.draft || !allow("photos") || S.helpOpen || S.prof) return;
+  const items=[...(e.clipboardData?.items||[])], files=items.filter(i=>i.kind==="file" && /^image\//.test(i.type)).map(i=>i.getAsFile()).filter(Boolean);
+  if(!files.length) return;
+  if(items.some(i=>i.type==="text/plain") && e.target.closest?.("textarea,input")) return;   // 워드 · 웹에서 글과 함께 복사한 건 글로 붙여요
+  e.preventDefault(); e.stopPropagation(); addPhotos(files).then(()=>toast(`📋 사진 ${files.length}장을 붙였어요`)); }, true);
 async function addPhotos(files){
   const d=S.draft, room=MAX_PHOTOS-d.photos.length;
   if(room<=0){ toast(`사진은 ${MAX_PHOTOS}장까지 넣을 수 있어요`); return; }
