@@ -2631,6 +2631,7 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 .qk-w i.t{outline:2px solid #2B3670;outline-offset:1px}
 .qk-n{display:flex;flex-direction:column;align-items:center;min-width:56px}
 .qk-n b{font-size:22px;line-height:1}.qk-n small{font-size:11px;color:var(--ink2)}.qk-n span{font-size:12px;margin-top:3px;white-space:nowrap}
+.day-auto{margin:-4px 0 12px;font-size:13px}
 .media-tip{margin-left:auto;font-size:12px;color:var(--ink2);font-weight:400}
 #app .tip-ask p{white-space:normal;overflow:visible;line-height:1.45}   /* 오늘의 기능은 긴 한 줄이라 줄 바꿈 허락 */
 /* 👆 손가락으로 누르기 쉽게 (2026-10-08 앱 점검): 작은 닫기 · ✕ · 약관 링크의 누르는 자리를 넓혀요 (보이는 크기는 그대로) */
@@ -2842,6 +2843,58 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
 :root[data-design="wongoji"] .btn.btn-soft{border:1.5px solid color-mix(in srgb,var(--brand) 55%,var(--line));border-radius:0;color:var(--ink);background:var(--surface);box-shadow:none}
 :root[data-design="wongoji"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:1.5px solid var(--brand)!important;border-radius:0!important;color:var(--coral-ink)!important;font-weight:700;background:var(--coral-soft)!important;box-shadow:none!important}
 :root[data-design="wongoji"] .chip.conn{border:1.5px solid var(--brand);border-radius:0;color:var(--brand);background:var(--surface);box-shadow:none}
+/* 🎨 디자인마다 다른 꾸밈 (2026-10-10): 밤하늘 느낌으로 칠해 둔 곳(초대 코드 · 주소 상자 · 내 일기 연속 띠 · 알림 띠 · AI 챗봇 단추와 창 ·
+   디데이 칩 · 채팅 접기 · 설정 단추의 동그란 아이콘 · 설명 쪽지 · 켜기 스위치)을 고른 디자인의 단추와 같은 느낌으로. 밤하늘은 그대로 */
+:root[data-design="fresh"]{--dx-bg:radial-gradient(circle at calc(100% - 22px) 26%,#fff 0 2px,rgba(255,255,255,.45) 3px,transparent 5px),linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%),linear-gradient(120deg,#FF8DB0,#E4507F 55%,#F07A5A);--dx-fg:#fff;--dx-sub:#FFE3EC;--dx-bd:0;--dx-ic:linear-gradient(135deg,#FF8DB0,#E4507F);--dx-ic-fg:#fff;--dx-ic-bd:0;--dx-note:color-mix(in srgb,#E4507F 6%,var(--surface));--dx-note-bd:1px solid color-mix(in srgb,#E4507F 24%,var(--line));--dx-mark:"•";--dx-acc:#E4507F;--dx-r:18px;--dx-sh:0 10px 22px -12px rgba(228,80,127,.75)}
+:root[data-design="warm"]{--dx-bg:var(--surface);--dx-fg:var(--coral-ink);--dx-sub:var(--ink2);--dx-bd:2px dashed var(--coral);--dx-ic:var(--coral-soft);--dx-ic-fg:var(--coral-ink);--dx-ic-bd:1.5px dashed var(--coral);--dx-note:var(--butter-soft);--dx-note-bd:2px dashed color-mix(in srgb,var(--butter) 70%,var(--line));--dx-mark:"✎";--dx-acc:var(--coral);--dx-r:16px;--dx-sh:0 3px 0 -1px color-mix(in srgb,var(--coral) 25%,transparent)}
+:root[data-design="clean"]{--dx-bg:var(--surface);--dx-fg:var(--accent);--dx-sub:var(--ink2);--dx-bd:1.5px solid var(--accent);--dx-ic:var(--accent-soft);--dx-ic-fg:var(--accent);--dx-ic-bd:0;--dx-note:var(--accent-soft);--dx-note-bd:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));--dx-mark:"•";--dx-acc:var(--accent);--dx-r:12px;--dx-sh:0 6px 16px -12px color-mix(in srgb,var(--accent) 60%,transparent)}
+:root[data-design="bright"]{--dx-bg:linear-gradient(115deg,#FF6A3D 0 52%,#FFC23D 52% 100%);--dx-fg:#fff;--dx-sub:rgba(255,255,255,.92);--dx-bd:0;--dx-ic:linear-gradient(115deg,#2F7BE5 0 55%,#0FA3B1 55% 100%);--dx-ic-fg:#fff;--dx-ic-bd:0;--dx-note:color-mix(in srgb,#FF6A3D 6%,var(--surface));--dx-note-bd:2px dashed #FF9A6B;--dx-mark:"●";--dx-acc:#FF6A3D;--dx-r:16px;--dx-sh:0 5px 0 -1px #E0A21E,0 12px 20px -14px rgba(255,106,61,.8)}
+:root[data-design="wongoji"]{--dx-bg:linear-gradient(90deg,transparent calc(100% - 1px),color-mix(in srgb,var(--brand) 20%,transparent) 0) 0 0/24px 100%,var(--surface);--dx-fg:var(--brand);--dx-sub:var(--ink2);--dx-bd:1.5px solid var(--brand);--dx-ic:var(--coral-soft);--dx-ic-fg:var(--brand);--dx-ic-bd:1.5px solid var(--brand);--dx-note:var(--surface2);--dx-note-bd:1.5px solid color-mix(in srgb,var(--brand) 45%,var(--line));--dx-mark:"✎";--dx-acc:var(--brand);--dx-r:4px;--dx-sh:none}
+/* 큰 꾸밈 상자: 초대 코드 · 주소 · 내 일기 연속 띠 · 알림 띠 */
+:root:not([data-design="night"]) :is(.set-page .inv-code,.set-page .addr,#app .my-hero,#toast.toast){background:var(--dx-bg)!important;color:var(--dx-fg)!important;border:var(--dx-bd)!important;border-radius:var(--dx-r);box-shadow:var(--dx-sh)!important}
+:root:not([data-design="night"]) #toast.toast::before{content:none}
+:root:not([data-design="night"]) :is(.set-page .inv-code .inv-k,.set-page .addr small,#app .my-hero .mh-t small){color:var(--dx-sub)!important}
+:root:not([data-design="night"]) :is(.set-page .inv-code .code,.set-page .addr strong,#app .my-hero .mh-t b){color:var(--dx-fg)!important;text-shadow:none!important}
+:root:not([data-design="night"]) :is(.set-page .inv-code .btn,.set-page .addr .btn){background:color-mix(in srgb,var(--surface) 22%,transparent)!important;border:1.5px solid color-mix(in srgb,var(--dx-fg) 45%,transparent)!important;color:var(--dx-fg)!important}
+:root:not([data-design="night"]) :is(.set-page .inv-code .btn .ic,.set-page .addr .btn .ic){color:var(--dx-fg)!important}
+:root:not([data-design="night"]) #app .my-hero .mh-fire{background:color-mix(in srgb,var(--surface) 30%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--dx-fg) 30%,transparent)}
+:root:not([data-design="night"]) #app .my-hero .mh-write{color:var(--dx-ic-fg)!important;background:var(--dx-ic)!important;border:var(--dx-ic-bd)!important;box-shadow:none}
+:root:not([data-design="night"]) #app .my-hero .mh-write.done{color:var(--ink)!important;background:var(--surface)!important}
+/* 동그란 아이콘 · 작은 꾸밈: 설정 단추 아이콘 · AI 챗봇 단추 · 챗봇 머리 · 보내기 · 디데이 칩 · 채팅 접기 */
+:root:not([data-design="night"]) .set-page .btn.btn-ghost .ic{background:var(--dx-ic)!important;color:var(--dx-ic-fg)!important;border:var(--dx-ic-bd)}
+:root:not([data-design="night"]) .set-page .btn.btn-ghost:not(:is(.inv-code,.addr) .btn){background:var(--surface)!important;box-shadow:none!important}
+:root:not([data-design="night"]) :is(.web-help,.a-help,.help-av,.help-send){background:var(--dx-bg)!important;color:var(--dx-fg)!important;border:var(--dx-bd)!important;box-shadow:var(--dx-sh)!important}
+:root:not([data-design="night"]) :is(.web-help,.a-help,.help-av,.help-send) .ic{color:var(--dx-fg)!important}
+:root[data-design="wongoji"] :is(.web-help,.a-help,.help-av,.help-send){border-radius:6px!important}
+:root:not([data-design="night"]) :is(.dd-chip,.cs-fold){background:var(--dx-bg)!important;color:var(--dx-fg)!important;border:var(--dx-bd)!important;box-shadow:none!important}
+:root:not([data-design="night"]) .cs-fold i{background:var(--dx-ic);color:var(--dx-ic-fg);box-shadow:none}
+:root:not([data-design="night"]) .dd-chip b{background:var(--dx-ic);color:var(--dx-ic-fg)}
+@media (min-width:1100px){ :root:not([data-design="night"]) .chat-side-open{background:var(--dx-bg)!important;color:var(--dx-fg)!important;border:var(--dx-bd)!important;box-shadow:var(--dx-sh)!important}
+  :root:not([data-design="night"]) .chat-side-open span{color:var(--dx-fg);text-shadow:none}:root:not([data-design="night"]) .chat-side-open small{color:var(--dx-sub)}
+  :root:not([data-design="night"]) .chat-side-open .cs-unfold{background:var(--dx-ic);color:var(--dx-ic-fg);box-shadow:none} }
+/* AI 챗봇 창: 질문 칩 · 닫기 */
+:root:not([data-design="night"]) .hq{border:1.5px solid color-mix(in srgb,var(--dx-acc) 55%,var(--line))!important;color:var(--dx-acc)!important;background:var(--surface)!important;box-shadow:none!important}
+:root:not([data-design="night"]) .hq.rep{border-color:transparent!important;color:var(--dx-ic-fg)!important;background:var(--dx-ic)!important}
+:root[data-design="warm"] .hq{border-style:dashed!important}:root[data-design="wongoji"] .hq{border-radius:0!important}
+/* 설명 쪽지 · 안내 줄 */
+:root:not([data-design="night"]) .set-page .block>p:not(.set-hint){background:var(--dx-note);border:var(--dx-note-bd)}
+:root:not([data-design="night"]) .set-page .block>p:not(.set-hint)::before{content:var(--dx-mark);color:var(--dx-acc)}
+:root:not([data-design="night"]) .set-hint{background:var(--dx-note)!important;border:var(--dx-note-bd)!important}
+:root:not([data-design="night"]) .set-hint::before{content:var(--dx-mark);color:var(--dx-acc)}
+:root:not([data-design="night"]) .set-page .set-row{background:var(--dx-note);border:var(--dx-note-bd)}
+/* 켜기 스위치: 켜진 쪽은 디자인 색 */
+:root:not([data-design="night"]) .feat-sw:checked{background:var(--dx-ic)!important;box-shadow:none!important}
+:root:not([data-design="night"]) .feat-sw:checked::after{background:#fff!important;box-shadow:0 1px 3px rgba(0,0,0,.25)!important}
+:root[data-design="warm"] .feat-sw:checked,:root[data-design="clean"] .feat-sw:checked,:root[data-design="wongoji"] .feat-sw:checked{background:var(--dx-acc)!important}
+/* 🎨 디자인마다 다른 얼굴 동그라미 (2026-10-10): 밤하늘은 남색 원 + 빛무리 그대로 */
+:root:is([data-design="fresh"],[data-design="warm"],[data-design="clean"],[data-design="wongoji"]) .av.corona:not(.has-ph){text-shadow:none!important}
+:root[data-design="fresh"] .av.corona{color:#2E2433!important;box-shadow:0 0 0 max(2px,.06em) var(--c),0 4px 10px -4px color-mix(in srgb,var(--c) 70%,transparent)}
+:root[data-design="warm"] .av.corona{color:#5A2E45!important;box-shadow:none;outline:max(2px,.06em) dashed var(--c);outline-offset:1px}
+:root[data-design="clean"] .av.corona{color:#16213A!important;box-shadow:0 0 0 max(1.5px,.05em) var(--c),0 2px 6px -3px rgba(22,33,58,.25)}
+:root[data-design="bright"] .av.corona{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 0 0 max(2px,.06em) #fff,0 3px 0 max(1.5px,.05em) color-mix(in srgb,var(--c) 70%,#000 10%)}
+:root[data-design="wongoji"] .av.corona{color:var(--c)!important;box-shadow:0 0 0 max(1.5px,.05em) #1E1E24,max(2px,.06em) max(2px,.06em) 0 #1E1E24}
+:root:is([data-design="warm"],[data-design="clean"],[data-design="bright"],[data-design="wongoji"]) .av.corona::after{display:none}
+:root[data-design="fresh"] .av.corona::after{width:18%;height:18%;right:8%;top:10%}
 </style>
 </head>
 <body>
@@ -3665,6 +3718,22 @@ const nightIdx = p => { if(!p) return 0; const i=sortedProfiles().findIndex(x=>x
 // 얼굴 동그라미 바탕 우주색: 남색 둘레의 여덟 가지 밤하늘 (빛무리 색과 짝: 복숭아 ↔ 자두빛 밤, 라벤더 ↔ 자정 보라 …)
 const NIGHT_BG = [["#4A2F5E","#1E1530"],["#3B2F7A","#17123A"],["#21477A","#0D1A3A"],["#3A3F72","#141838"],["#5A2C5A","#22102A"],["#1F4F5E","#0B1E28"],["#2C3A86","#10173F"],["#4B2D72","#1B1236"]];
 const pcol = p => NIGHT[nightIdx(p)], pdot = p => NIGHT_DOT[nightIdx(p)], pbg = p => NIGHT_BG[nightIdx(p)];
+// 🎨 (2026-10-10) 얼굴 동그라미 색은 디자인마다: 밤하늘 = 위 NIGHT · NIGHT_BG(남색 원 + 빛무리), 나머지는 그 디자인의 단추와 어울리는 색
+//  r = 테두리(사람 색), b = 원 안 [밝은 쪽, 진한 쪽]. 글자 색 · 테두리 모양은 CSS(디자인마다 다른 얼굴 동그라미)
+const AV_PAL = {
+  fresh:{r:["#F28BB0","#F2B94B","#7FAEEB","#6CC69A","#A994EC","#F2946F","#5FC9C0","#E89AD2"],
+    b:[["#FFEDF3","#FFD3E2"],["#FFF6DD","#FFE6A8"],["#EAF2FF","#CFE0FB"],["#E3F7EC","#C2EAD5"],["#F2ECFF","#DCD0FA"],["#FFEEE6","#FFD6C4"],["#E2F7F5","#C0EDE8"],["#FDEBF7","#F6CDEB"]]},
+  warm:{r:["#E4507F","#E9B92E","#7FA8E6","#4FA88A","#A98FE0","#EE7F5E","#55B8B2","#DA7FBE"],
+    b:[["#FFF7FA","#FCE3EC"],["#FFFBEF","#FDF0C8"],["#F5F9FF","#E1ECFB"],["#F3FBF7","#DCF1E7"],["#F8F4FF","#ECE4FA"],["#FFF6F1","#FCE2D7"],["#F1FBFA","#D9F1EF"],["#FDF4FA","#F7E0F0"]]},
+  clean:{r:["#1F4FD8","#0FA3B1","#2F8C6B","#7A5AF0","#E8604C","#C98A00","#2D5E9E","#B8306A"],
+    b:[["#FFFFFF","#EEF3FF"],["#FFFFFF","#E8F8F9"],["#FFFFFF","#EAF6F0"],["#FFFFFF","#F1EDFF"],["#FFFFFF","#FDEDEA"],["#FFFFFF","#FBF3DF"],["#FFFFFF","#EBF1F9"],["#FFFFFF","#FAEAF1"]]},
+  bright:{r:["#FF6A3D","#2F7BE5","#0FA3B1","#7A5AF0","#1B8A55","#E4507F","#F2A900","#16A394"],
+    b:[["#FF9A6B","#FF5A2E"],["#6AA6F5","#2F7BE5"],["#4FCFDA","#0FA3B1"],["#A58BF7","#7A5AF0"],["#5BCB8E","#1B8A55"],["#FF8DB0","#E4507F"],["#FFD45E","#F2A900"],["#5DDACC","#16A394"]]},
+  wongoji:{r:["#D7263D","#1E1E24","#2B5DAA","#2F7D5B","#6E4FB0","#C2410C","#0F766E","#A61A2C"],
+    b:[["#FFFFFF","#FFF4F5"],["#FFFFFF","#F4F4F6"],["#FFFFFF","#F1F5FB"],["#FFFFFF","#F1F8F4"],["#FFFFFF","#F5F2FB"],["#FFFFFF","#FDF3EE"],["#FFFFFF","#EFF8F7"],["#FFFFFF","#FCEFF1"]]},
+};
+const avPal = () => AV_PAL[(typeof S!=="undefined" && S?.design) || "night"];
+const avRing = p => (avPal()?.r || NIGHT)[nightIdx(p)], avBg = p => (avPal()?.b || NIGHT_BG)[nightIdx(p)];
 // 📅 달력 아래 '누가 며칠 썼나' 카드 (2026-10-08): 얼굴 · 이름 · 큰 날 수 · 이번 달 채운 만큼 막대 (점 색과 같은 진한 색)
 function calStats(ps,dates){ const t=todayStr(), past=Math.max(1,dates.filter(d=>d<=t).length);
   return `<div class="cst">${ps.map(p=>{ const n=dates.filter(d=>submittedOn(p.id,d)).length, pct=Math.min(100,Math.round(n/past*100));
@@ -3939,7 +4008,7 @@ const charOf = p => { const c=p?.char; if(!c) return null; if(c.img?.url) return
 const charHTML = (p,dflt="🌟",cls="") => { const c=charOf(p); if(!c) return dflt;
   return c.img ? `<img class="ch-img ${cls}" src="${esc(c.img)}" alt="" loading="lazy">` : `<span class="ch-e ${c.fx?"chx-"+c.fx:""} ${cls}">${c.e}</span>`; };
 const av = (p,s=34) => { if(!p) return `<span class="av" style="width:${s}px;height:${s}px;background:#B9B1A3;color:#fff">?</span>`; const c=p.color||"#1F2A44", ch=charOf(p), ph=!ch && (p.photo?.thumb||p.photo?.url);   // 🐾 캐릭터를 골랐으면 캐릭터가 먼저, 아니면 얼굴 사진, 둘 다 없으면 이름 첫 글자
-  return `<span class="av corona ${ph?"has-ph":""} ${ch?"has-ch":""}" style="width:${s}px;height:${s}px;--c:${pcol(p)};--b1:${pbg(p)[0]};--b2:${pbg(p)[1]};font-size:${Math.round(s*(ch?.6:.42))}px" aria-hidden="true">${ph?`<img src="${esc(ph)}" alt="" loading="lazy">`:ch?charHTML(p):esc((p.name||"?").slice(0,1))}</span>`; };
+  return `<span class="av corona ${ph?"has-ph":""} ${ch?"has-ch":""}" style="width:${s}px;height:${s}px;--c:${avRing(p)};--b1:${avBg(p)[0]};--b2:${avBg(p)[1]};font-size:${Math.round(s*(ch?.6:.42))}px" aria-hidden="true">${ph?`<img src="${esc(ph)}" alt="" loading="lazy">`:ch?charHTML(p):esc((p.name||"?").slice(0,1))}</span>`; };
 // 사진 수에 따른 분할 모양 (6칸 격자에서 [가로 칸, 세로 칸])
 const LAYOUT = {
   1:[[6,4]], 2:[[3,3],[3,3]], 3:[[4,4],[2,2],[2,2]], 4:[[3,3],[3,3],[3,3],[3,3]],
@@ -5596,9 +5665,13 @@ function viewKidsStatus(){
 }
 // 📖 하루 펼쳐보기: 한 날짜의 가족 일기를 나란히
 function viewDayOpen(){
-  const t=todayStr(), d=S.dayView||t;
+  const t=todayStr(), seen=y=>y.status==="submitted" || y.profileId===S.me.id;
+  // (2026-10-10) 날짜를 안 골랐는데 오늘 쓴 일기가 없으면, 일기가 있었던 가장 최근 날로 (그날을 고른 것으로 해서 ‹ › 도 그날부터)
+  let auto=false;
+  if(!S.dayView && !S.diaries.some(y=>y.date===t && seen(y))){ const last=S.diaries.filter(y=>seen(y) && y.date<t).map(y=>y.date).sort().pop(); if(last){ S.dayView=last; auto=true; } }
+  const d=S.dayView||t;
   const list=sortedProfiles().map(p=>({p, x:S.diaries.find(y=>y.profileId===p.id && y.date===d && (y.status==="submitted" || y.profileId===S.me.id))})).filter(o=>o.x);
-  const nav=`<div class="day-nav"><button class="icon-btn" data-act="day-move" data-v="-1" aria-label="전날">${ic("back")}</button><h1>${fmtLong(d)}</h1><button class="icon-btn flip" data-act="day-move" data-v="1" aria-label="다음 날" ${d>=t?"disabled":""}>${ic("back")}</button>${d!==t?`<button class="btn btn-ghost sm" data-act="day-move" data-v="0">오늘로 이동 ›</button>`:""}</div>`;
+  const nav=`<div class="day-nav"><button class="icon-btn" data-act="day-move" data-v="-1" aria-label="전날">${ic("back")}</button><h1>${fmtLong(d)}</h1><button class="icon-btn flip" data-act="day-move" data-v="1" aria-label="다음 날" ${d>=t?"disabled":""}>${ic("back")}</button>${d!==t?`<button class="btn btn-ghost sm" data-act="day-move" data-v="0">오늘로 이동 ›</button>`:""}</div>${auto?`<p class="day-auto muted">오늘은 아직 아무도 안 썼어요. 일기가 있는 가장 최근 날을 보여 드려요.</p>`:""}`;
   if(!list.length) return nav+`<p class="empty">${d===t?"오늘은 아직 아무도 일기를 쓰지 않았어요.":"이날은 가족이 쓴 일기가 없어요."}</p>`;
   // 📱 앱: 가족 일기를 가로로 나란히(엄마 | 아이 | 아이). 칸을 누르면 그 칸이 넓어지고 나머지는 좁게 접혀요 (다시 '나란히 보기')
   if(IS_APP && list.length>1){
