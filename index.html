@@ -727,6 +727,8 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .hb-g span{width:38px;min-height:38px;padding:0;justify-content:center;font-size:18px;white-space:nowrap}
 .hb-g span .ic{width:20px;height:20px}
 .hb-g span.pen{font-size:24px}
+.ft-sub{font-style:normal;font-size:11.5px;font-weight:700;color:var(--ink3);white-space:nowrap;padding:0 2px 0 6px}
+.ft-g .ft-sub:first-of-type{padding-left:0}
 .hb-g+.hb-g{border-left:1.5px solid var(--line);padding-left:10px}
 /* 4분할형 첫 화면 */
 .quad{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
@@ -4043,7 +4045,9 @@ function prefBar(){
 function prefGroups(withLayout){
   // 글자 대신 그림으로: 모양은 도형, 글씨는 그 글씨체로 쓴 '가'. 이름은 마우스를 올리면 보여요
   const st = withLayout && isParent() && (!S.tab || S.tab==="home") && !S.sub ? `<div class="seg hb-g" role="radiogroup" aria-label="첫 화면 모양"><b>레이아웃</b>${HOME_STYLES.map(([k,l])=>`<label title="${l}"><input type="radio" name="home" value="${k}" aria-label="${l}" ${homeStyle()===k?"checked":""} data-pref="home"><span>${ic("lay-"+k)}</span></label>`).join("")}</div>` : "";
-  const ft = `<div class="seg hb-g" role="radiogroup" aria-label="일기 글씨"><b>글씨</b>${DFONTS.map(([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`).join("")}</div>`;
+  // 글씨: ① ② 손글씨 / ③ ④ 일반체 로 묶어 이름표를 붙여요 (2026-10-09)
+  const fo=([k,l,f])=>`<label title="${l}"><input type="radio" name="dfont" value="${k}" aria-label="${l}" ${S.dfont===k?"checked":""} data-pref="dfont"><span class="${k}" style="font-family:${f}">가</span></label>`;
+  const ft = `<div class="seg hb-g ft-g" role="radiogroup" aria-label="일기 글씨"><b>글씨</b><i class="ft-sub">손글씨</i>${DFONTS.slice(0,2).map(fo).join("")}<i class="ft-sub">일반체</i>${DFONTS.slice(2).map(fo).join("")}</div>`;
   const dz = `<div class="seg hb-g" role="radiogroup" aria-label="디자인"><b>디자인</b>${DESIGNS.map(([k,l])=>`<label title="${l}"><input type="radio" name="design" value="${k}" aria-label="${l}" ${S.design===k?"checked":""} data-pref="design"><span><i class="dsw ${k}"></i></span></label>`).join("")}</div>`;
   return `${st}${dz}${ft}`;
 }
