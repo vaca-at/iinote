@@ -4270,7 +4270,7 @@ const REPORT_CATS = ["불편한 글 · 댓글","이상한 AI 답변","사진 · 
 function viewHelp(){
   const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! 챗봇 상담이에요. 무엇을 도와드릴까요?\n아래에서 고르거나 궁금한 것을 적어 보내 주세요. 불편한 글이나 고장은 🚩 신고하기로 알려 주세요.
 💬 상담 기록은 관리자가 확인하고 관리해요.`};
-  const msgs=[hello,...(S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":m.from==="bot"?"bot":"me",text:m.text})),...(S.helpLocal||[])];
+  const msgs=[hello,...(S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":m.from==="bot"?"bot":"me",text:helpMsgText(m.text)})).filter(m=>m.text),...(S.helpLocal||[])];   // 예전에 [object Object] 로 남은 답은 빼요
   const bubble=m=>m.from==="me" ? `<p class="hm me">${esc(m.text)}</p>`
     : `<div class="hm-row"><span class="hm-av ${m.from}" aria-hidden="true">${m.from==="op"?"상":ic("help")}</span><p class="hm ${m.from}">${m.from==="op"?"<b>상담원</b>":""}${esc(m.text)}</p></div>`;
   const rep=S.helpRep;
@@ -7704,15 +7704,22 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.ttOpen && !S.
 const helpGuide = () => [...FAQ.map(([q,a])=>`Q. ${q}\nA. ${a}`), ...TIPS.filter(t=>!t[4] || (t[4]==="app")===IS_APP).map(t=>`- ${t[1]}`),
   IS_APP?"- 이 사람은 안드로이드 앱을 쓰고 있어요. 아래 메뉴: 홈 · 내 일기 · 가운데 ✏️ 쓰기 · 채팅 · 더보기(우리 가족 설정 · 앱 설정 · 챗봇 상담 · 아이들 현황 · 책장 PDF · 그래프 · 화면 꾸미기)"
     :"- 이 사람은 웹(iinote.co.kr)을 쓰고 있어요. 위쪽 탭: 홈 · 내 일기 · 가족 채팅 · 달력 · 하루 펼쳐보기 · 책장 · 사진첩 · AI 리포트 · 우리 가족 설정 · 설정. 디자인 · 글씨는 오른쪽 위 🎨 화면 꾸미기"].join("\n");
+// 챗봇 AI 답에서 글만 꺼내요 (2026-10-09): 워커가 글 대신 {reply|text|response…} 묶음 · 배열로 줄 때가 있어 [object Object] 가 보였어요
+const aiText = (x,d=0) => { if(x==null || d>4) return ""; if(typeof x==="string") return x.trim(); if(typeof x==="number") return String(x);
+  if(Array.isArray(x)) return x.map(v=>aiText(v,d+1)).filter(Boolean).join("\n");
+  if(typeof x==="object"){ for(const k of ["reply","text","response","answer","content","message","output","result"]) if(k in x){ const t=aiText(x[k],d+1); if(t) return t; } }
+  return ""; };
+const helpMsgText = t => { const v=aiText(t); return v==="[object Object]" ? "" : v; };
 forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return;
   if(DEMO){ toast("둘러보기에서는 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
   const rep=S.helpRep?.cat?S.helpRep:null, ta=document.getElementById("help-in"); if(ta) ta.value="";
-  const history=[...(S.helpMsgs||[]).map(m=>({from:m.from==="user"?"me":"bot",text:m.text})),...(S.helpLocal||[])].slice(-6);
+  const history=[...(S.helpMsgs||[]).map(m=>({from:m.from==="user"?"me":"bot",text:helpMsgText(m.text)})).filter(m=>m.text),...(S.helpLocal||[])].slice(-6);
   S.helpLocal=[...(S.helpLocal||[]),{from:"me",text}];
   S.helpBusy=rep?"신고를 보내는 중…":"🤖 챗봇이 답을 찾고 있어요…"; render(); helpScroll();
   (async()=>{
     let ai=null;
     if(!rep){ try{ ai=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"help",pid:S.me.id,text,guide:helpGuide(),history})}); }catch(e){ console.warn("챗봇 AI",e); ai=null; } }
+    if(ai){ const rt=aiText(ai.reply ?? ai.response ?? ai.text ?? ai.answer); ai={reply:rt, kind:ai.kind || ai.reply?.kind || ""}; }   // 글만 꺼내 쓰기
     if(ai?.reply){ S.helpLocal=[...S.helpLocal,{from:"bot",text:ai.reply}]; S.helpBusy=""; render(); helpScroll(); }
     else S.helpBusy=rep?"신고를 보내는 중…":"상담원에게 보내는 중…";
     try{
