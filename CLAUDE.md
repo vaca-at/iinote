@@ -113,6 +113,10 @@
 - 🐾 (2026-10-09) 내 캐릭터: 프로필 편집에서 CHARS(공부방 동물 24 + 전설 6, 빛 .chx-*) 고르기 → profiles.char={id} 또는 캡처 그림 {img:{url,path}}(groups/{gid}/profiles/{pid}/char_*.png). 캐릭터가 있으면 얼굴 사진보다 먼저 av() 동그라미 · 연속 자리(charHTML, 없으면 🌟)에. 캡처는 '캐릭터 다듬기' 창(charEdOpen, body 에 따로 붙음: 붙여 넣는 칸 · 📋 가져오기 · 파일, charProcess = 테두리 바탕색 지우기 · 가는 줄 · 부스러기 빼기, 크기 · 끌기 · 바탕 지우기 정도) → profCharSave. reload("profiles") 가 S.me 도 새로
 - 💡 (2026-10-09) 홈 초록 띠는 많아야 두 줄(greenBanners: 다홍펜 → 꺼 둔 기능 → 오늘의 기능 TIPS 20줄, 날마다 하나, ✕ = ls iinote-tipx-가족-날짜). 다홍펜 띠는 고르기 한 번이면 끝(ls iinote-penask-), 꺼 둔 기능 띠는 handOn/audioOn 을 한 번 고르면 끝. 채팅 기둥 접기 단추(.cs-fold) · 접힌 기둥 밤하늘
 - 🧩 (2026-10-09) 위젯 ChatWidget(4×2, widgetData.chat) · CollageWidget(4×4, ↻) · StreakWidget(2×2 밤하늘, kids[].char/charImg) → AAB 1.0(7). 시안 claude.ai/artifact/DdjB2SzXYNUSnT8TD8VSqt
+- ⏳🎂 (2026-10-09) 디데이 = 일정의 dday 칸(schedules.dday) · 생일 = profiles.birthday "MM-DD" · 가족 기념일 = groups.anniv [{id,t,md,icon}] (우리 가족 설정 viewAnniv) → 홈 디데이 줄(ddayRow, 생일 · 기념일은 2주 전부터) · 위젯
+- 💬 (2026-10-09) 챗봇 상담: 워커 mode "help"(무료 Workers AI 라마 3.3 70b → 3.1 8b, guide = FAQ + TIPS) 가 먼저 답하고 kind(answer · design · bug · human) → supportSend 가 내 글 + 챗봇 답(from:"bot")을 남기고, answer 가 아니면 운영자 알림. admin.html 문의함에 🤖 표시. 엔터 = 보내기. 받아쓰기 비슷한 문제(similar)도 무료 Workers AI. 무료 AI 는 하루 횟수를 Claude 와 따로(lim:…:freeall)
+- 📅 (2026-10-09) 웹 탭: 아이들 현황 자리에 달력(/cal = viewHomeCalendar), 아이들 현황은 4분할 2칸(quadKids, 보호자) · 달력 모양 홈은 '오늘 ○/○명' 카드 없음 · 🌌 디자인 night(밤하늘, 고르면 늘 어둡게)
+- 🧩 (2026-10-09) 위젯 13개, 매니페스트 순서 = 크기별: 2×2 아이아이노트 오늘 · 연속 기록 · 디데이 · 하루 한 장(snap) / 4×1 오늘 날씨(weather, Open-Meteo, iinote://weather 로 켬, ls iinote-wx-on) · 오늘 시간표(TodayTtWidget) / 4×2 다가오는 일정 · 가족 채팅 · 생일 · 기념일(bdays) / 4×3 사진첩 / 4×4 콜라주 / 4×5 달력 · 시간표. 우리 아이의 이번 주 · 받아쓰기 · 하트 위젯은 뺌. AAB 1.0(9)
 - 남은 일: ① 카카오 로그인 휴대폰에서 확인 (안 되면 카카오 네이티브 SDK + 커스텀 토큰 방식) ② 다홍펜 워커 CORS 와 파이어베이스 승인된 도메인에 https://localhost ③ 푸시 · 문의 서버는 올림(2026-10-05, asia-northeast3), 고치면 iinote-app/firebase 에서 다시 deploy ④ 플레이스토어 가족 정책 · 데이터 보안 양식
 
 ## 다른 PC에서 이어서 작업하기
