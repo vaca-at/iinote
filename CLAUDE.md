@@ -119,6 +119,7 @@
 - 💬 (2026-10-09) 챗봇 상담: 워커 mode "help"(무료 Workers AI 라마 3.3 70b → 3.1 8b, guide = FAQ + TIPS) 가 먼저 답하고 kind(answer · design · bug · human) → supportSend 가 내 글 + 챗봇 답(from:"bot")을 남기고, answer 가 아니면 운영자 알림. admin.html 문의함에 🤖 표시. 엔터 = 보내기. 받아쓰기 비슷한 문제(similar)도 무료 Workers AI. 무료 AI 는 하루 횟수를 Claude 와 따로(lim:…:freeall). (2026-10-09) 서버 대화에 챗봇 답이 안 남아도 사라지지 않게 이 기기에 질문 → 답 보관(helpBotKeep · helpWithBot, ls iinote-helpbot-uid), AI 가 못 답하면 helpLocalAnswer(인사 · 개인정보 · FAQ 낱말 겹침) → 그래도 없으면 상담원에게 전달했어요, 실패 이유는 오류 기록(챗봇 AI 못 부름)
 - 📅 (2026-10-09) 웹 탭: 아이들 현황 자리에 달력(/cal = viewHomeCalendar), 아이들 현황은 4분할 2칸(quadKids, 보호자) · 달력 모양 홈은 '오늘 ○/○명' 카드 없음 · 🌌 디자인 night(밤하늘, 고르면 늘 어둡게)
 - 🧩 (2026-10-09) 위젯 13개, 매니페스트 순서 = 크기별: 2×2 아이아이노트 오늘 · 연속 기록 · 디데이 · 하루 한 장(snap) / 4×1 오늘 날씨(weather, Open-Meteo, iinote://weather 로 켬, ls iinote-wx-on) · 오늘 시간표(TodayTtWidget) / 4×2 다가오는 일정 · 가족 채팅 · 생일 · 기념일(bdays) / 4×3 사진첩 / 4×4 콜라주 / 4×5 달력 · 시간표. 우리 아이의 이번 주 · 받아쓰기 · 하트 위젯은 뺌. AAB 1.0(9)
+- 🎨 (2026-10-10) 디자인마다 단추 다르게 (CSS 맨 끝 블록 "디자인마다 다른 단추"): 새 색 = 분홍 리본 + 오른쪽 하얀 점 하나 · 따뜻한 일기장 = 크레파스 점선 · 깔끔 = 파랑 테두리 + 고른 칸 밑줄 · 산뜻 = 주황/노랑 두 색 나눔 · 원고지 = 원고지 칸. 밤하늘만 예전 별 단추(남색 + 별점 + 오로라 테두리)
 - 남은 일: ① 카카오 로그인 휴대폰에서 확인 (안 되면 카카오 네이티브 SDK + 커스텀 토큰 방식) ② 다홍펜 워커 CORS 와 파이어베이스 승인된 도메인에 https://localhost ③ 푸시 · 문의 서버는 올림(2026-10-05, asia-northeast3), 고치면 iinote-app/firebase 에서 다시 deploy ④ 플레이스토어 가족 정책 · 데이터 보안 양식
 
 ## 다른 PC에서 이어서 작업하기

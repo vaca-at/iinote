@@ -2799,6 +2799,49 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
 #app .pen-ask .btn.pill2,.btn.pill2{display:inline-flex;align-items:stretch;flex:none!important;width:auto!important;min-width:84px;height:30px!important;min-height:0!important;padding:0 12px 0 0!important;border-radius:15px!important;font-size:12.5px!important;line-height:1!important;box-shadow:0 2px 0 rgba(91,141,239,.35),0 5px 10px -5px rgba(91,141,239,.7)!important}
 .btn.pill2 > i{width:28px;height:auto;margin-right:8px;border-radius:13px 0 0 13px;font-size:12px}
 .btn.pill2 > span{display:flex;align-items:center}
+/* 🎨 디자인마다 다른 단추 (2026-10-10, 시안 claude.ai/artifact/3d8yp1geGKANnpLm9rdo1i)
+   새 색 = 분홍 리본(오른쪽 하얀 점 하나) · 따뜻한 일기장 = 크레파스 점선 · 깔끔 = 파랑 테두리 + 밑줄 탭 · 산뜻 = 두 색 나눔 · 원고지 = 원고지 칸
+   밤하늘은 위의 별 단추(남색 + 하얀 별점 + 오로라 테두리) 그대로. 대상: 일반 단추(.btn-primary · .btn-accent) · 가벼운 단추(.btn-soft)
+   · 밝게/어둡게 · 가족/나만에서 고른 쪽 · 연결됨 칩 */
+:root:not([data-design="night"]) :is(.btn.btn-primary,.btn.btn-accent){animation:none!important;text-shadow:none}
+:root:not([data-design="night"]) :is(.btn.btn-primary,.btn.btn-accent,.btn.btn-soft)::before{content:none}
+:root:not([data-design="night"]) .chip.conn i{color:inherit;background:color-mix(in srgb,currentColor 12%,transparent)}
+/* 새 색: 분홍→산호 리본, 위쪽 빛 + 오른쪽 하얀 점 하나 (별자리처럼 가볍게) */
+:root[data-design="fresh"] :is(.btn.btn-primary,.btn.btn-accent){border:0!important;border-radius:999px;color:#fff!important;
+  background:radial-gradient(circle at calc(100% - 16px) 32%,#fff 0 1.7px,rgba(255,255,255,.45) 2.4px,transparent 4px),linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 55%),linear-gradient(120deg,#FF8DB0,#E4507F 55%,#F07A5A)!important;
+  background-size:auto!important;box-shadow:0 8px 18px -9px rgba(228,80,127,.7),inset 0 0 0 1.5px rgba(255,255,255,.28)!important}
+:root[data-design="fresh"] .btn.btn-soft{border:1.5px solid color-mix(in srgb,#E4507F 30%,var(--line));color:var(--coral-ink,#B8306A);
+  background:radial-gradient(circle at calc(100% - 13px) 32%,#F7A8C4 0 1.4px,transparent 2.4px),color-mix(in srgb,#E4507F 6%,var(--surface));box-shadow:none}
+:root[data-design="fresh"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:0!important;
+  background:radial-gradient(circle at calc(100% - 10px) 30%,#fff 0 1.3px,transparent 2.4px),linear-gradient(120deg,#FF8DB0,#E4507F)!important;box-shadow:0 4px 10px -5px rgba(228,80,127,.7)!important}
+:root[data-design="fresh"] .chip.conn{border:1.5px solid #BDE8D3;color:#226B50;background:radial-gradient(circle at calc(100% - 10px) 30%,#7FCFA6 0 1.3px,transparent 2.2px),#EAF8F0;box-shadow:none}
+/* 따뜻한 일기장: 크레파스 점선 */
+:root[data-design="warm"] :is(.btn.btn-primary,.btn.btn-accent){border:2px dashed var(--coral)!important;border-radius:14px;color:var(--coral-ink)!important;background:var(--surface)!important;box-shadow:0 3px 0 -1px color-mix(in srgb,var(--coral) 25%,transparent)!important;font-weight:700}
+:root[data-design="warm"] :is(.btn.btn-primary,.btn.btn-accent) .ic{color:var(--coral-ink)}
+:root[data-design="warm"] .btn.btn-soft{border:2px dashed var(--line);border-radius:14px;color:var(--ink2);background:var(--surface);box-shadow:none}
+:root[data-design="warm"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:2px dashed #D9A800!important;color:#5A2E45!important;background:var(--butter)!important;box-shadow:none!important}
+:root[data-design="warm"] .chip.conn{border:2px dashed var(--sage);color:color-mix(in srgb,var(--sage) 70%,var(--ink));background:var(--sage-soft);box-shadow:none}
+/* 깔끔: 파랑 테두리, 고른 칸은 파란 밑줄 (탭처럼) */
+:root[data-design="clean"] :is(.btn.btn-primary,.btn.btn-accent){border:1.5px solid var(--accent)!important;border-radius:10px;color:var(--accent)!important;background:var(--surface)!important;box-shadow:none!important;font-weight:700}
+:root[data-design="clean"] :is(.btn.btn-primary,.btn.btn-accent) .ic{color:var(--accent)}
+:root[data-design="clean"] :is(.btn.btn-primary,.btn.btn-accent):hover{background:var(--accent)!important;color:#fff!important}
+:root[data-design="clean"] :is(.btn.btn-primary,.btn.btn-accent):hover .ic{color:#fff}
+:root[data-design="clean"] .btn.btn-soft{border:1.5px solid var(--line);border-radius:10px;color:var(--ink2);background:var(--surface);box-shadow:none}
+:root[data-design="clean"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:0!important;border-radius:0!important;color:var(--accent)!important;background:transparent!important;box-shadow:inset 0 -3px 0 var(--accent)!important}
+:root[data-design="clean"] .chip.conn{border:1.5px solid color-mix(in srgb,#1E7A50 35%,var(--line));color:#1E7A50;background:var(--surface);box-shadow:none}
+/* 산뜻: 비스듬히 두 색 나눔 */
+:root[data-design="bright"] :is(.btn.btn-primary,.btn.btn-accent){border:0!important;border-radius:14px;color:#fff!important;text-shadow:0 1px 2px rgba(120,50,0,.4);background:linear-gradient(115deg,#FF6A3D 0 52%,#FFC23D 52% 100%)!important;background-size:auto!important;box-shadow:0 5px 0 -1px #E0A21E,0 10px 18px -10px rgba(255,106,61,.8)!important}
+:root[data-design="bright"] .btn.btn-soft{border:2px dashed #FF9A6B;border-radius:14px;color:var(--ink);background:var(--surface);box-shadow:none}
+:root[data-design="bright"] .btn.btn-soft::before{content:"";width:8px;height:8px;border-radius:50%;background:#FF6A3D;margin-right:2px}
+:root[data-design="bright"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:0!important;color:#fff!important;background:linear-gradient(115deg,#2F7BE5 0 55%,#0FA3B1 55% 100%)!important;box-shadow:0 3px 8px -4px rgba(47,123,229,.7)!important}
+:root[data-design="bright"] .chip.conn{border:0;color:#fff;background:linear-gradient(115deg,#1B8A55 0 55%,#45C27F 55% 100%);box-shadow:none}
+/* 원고지: 원고지 칸 (네모 · 빨간 줄 · 칸 무늬) */
+:root[data-design="wongoji"] :is(.btn.btn-primary,.btn.btn-accent){border:1.5px solid var(--brand)!important;border-radius:0;color:var(--brand)!important;font-weight:700;box-shadow:none!important;
+  background:linear-gradient(90deg,transparent calc(100% - 1px),color-mix(in srgb,var(--brand) 22%,transparent) 0) 0 0/22px 100%,var(--surface)!important}
+:root[data-design="wongoji"] :is(.btn.btn-primary,.btn.btn-accent) .ic{color:var(--brand)}
+:root[data-design="wongoji"] .btn.btn-soft{border:1.5px solid color-mix(in srgb,var(--brand) 55%,var(--line));border-radius:0;color:var(--ink);background:var(--surface);box-shadow:none}
+:root[data-design="wongoji"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:1.5px solid var(--brand)!important;border-radius:0!important;color:var(--coral-ink)!important;font-weight:700;background:var(--coral-soft)!important;box-shadow:none!important}
+:root[data-design="wongoji"] .chip.conn{border:1.5px solid var(--brand);border-radius:0;color:var(--brand);background:var(--surface);box-shadow:none}
 </style>
 </head>
 <body>
