@@ -45,6 +45,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sp.op span{background:#5A2E45;color:#fff}
 .sp.bot{align-self:flex-end;text-align:right}
 .sp.bot span{background:#E9E4FF;color:#2E2433;border:1.5px dashed #9B7BE8}
+.sp-img{display:block;max-width:260px;max-height:320px;border-radius:10px;margin:0 0 6px;object-fit:contain;background:#fff;cursor:zoom-in}
 .sp.rep span{background:#FFE1E1;border:1.5px solid #E4507F}
 .sp-rep{color:#C2366A;font-size:14px}
 .sp small{font-size:12px;opacity:.7}
@@ -398,7 +399,7 @@ async function loadInbox(uid,reply){
     const r=await callAdmin(uid?(reply?{uid,text:reply}:{uid}):{});
     if(uid){ const t=threads.find(x=>x.uid===uid)||{};
       el.innerHTML=`<h2>💌 ${esc(t.name||"사용자")} <span class="sub">${esc(t.family||"")}</span> <button class="pill" data-act="inbox">← 문의함</button></h2>
-        <div class="sp-msgs">${(r.msgs||[]).map(m=>`<p class="sp ${m.from==="op"?"op":m.from==="bot"?"bot":"user"}${m.report?" rep":""}"><span>${esc(m.text)}</span><small>${m.from==="op"?"운영자 · ":m.from==="bot"?"🤖 챗봇(AI) · ":m.kind?({answer:"🤖 바로 답함",design:"🎨 디자인 의견",bug:"🐞 오류",human:"🙋 상담원 필요"})[m.kind]+" · ":""}${when(m.at)}</small></p>`).join("")}</div>
+        <div class="sp-msgs">${(r.msgs||[]).map(m=>`<p class="sp ${m.from==="op"?"op":m.from==="bot"?"bot":"user"}${m.report?" rep":""}"><span>${/^data:image\/(jpeg|png|webp);base64,/.test(m.img||"")?`<a href="${m.img}" target="_blank" rel="noopener"><img class="sp-img" src="${m.img}" alt="보낸 사진"></a>`:""}${esc(m.text)}</span><small>${m.from==="op"?"운영자 · ":m.from==="bot"?"🤖 AI 챗봇 · ":m.kind?({answer:"🤖 바로 답함",design:"🎨 디자인 의견",bug:"🐞 오류",human:"🙋 상담원 필요"})[m.kind]+" · ":""}${when(m.at)}</small></p>`).join("")}</div>
         <form id="sp-form"><label class="sub" for="sp-t">답장 (보내면 그 사람 휴대폰으로 알림이 가요)</label><textarea id="sp-t" name="t" rows="3" required></textarea><button class="pill">답장 보내기</button></form>`;
       const box=el.querySelector(".sp-msgs"); if(box) box.scrollTop=box.scrollHeight;
     } else { threads=r.threads||[]; const n=threads.reduce((s,x)=>s+(x.unreadOp||0),0);

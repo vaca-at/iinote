@@ -2302,10 +2302,10 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .grow-page .qg-chart svg{min-height:110px}
 .grow-page .qg-words{flex-wrap:wrap;white-space:normal}
 .more-prefs{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding:12px;border-radius:18px;background:var(--surface2)}
-/* 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통) */
+/* 💬 AI 챗봇 상담 · 🚩 신고 (웹 · 앱 공통) */
 .hq.rep{border-color:var(--coral);color:var(--coral);font-weight:600}
 .help-rep{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 12px 8px;padding:8px 12px;border-radius:14px;background:var(--coral-soft);color:var(--ink);font-size:14px}
-/* 웹 챗봇 상담: 오른쪽 아래 동그란 단추 (2026-10-08, 투명하지 않게 · 휴대폰은 아래 메뉴 위로) */
+/* 웹 AI 챗봇 상담: 오른쪽 아래 동그란 단추 (2026-10-08, 투명하지 않게 · 휴대폰은 아래 메뉴 위로) */
 .web-help{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:35;display:grid;place-items:center;width:54px;height:54px;border:0;border-radius:50%;background:var(--ink);color:var(--surface);box-shadow:0 6px 18px rgba(31,42,68,.28);cursor:pointer}
 .web-help .ic{width:26px;height:26px}
 .web-help:hover{transform:translateY(-2px)}
@@ -2329,6 +2329,13 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .help-q{display:flex;gap:8px;overflow-x:auto;padding:8px 12px;scrollbar-width:none}
 .help-q::-webkit-scrollbar{display:none}
 .hq{flex:none;height:38px;padding:0 14px;border:1.5px solid #E4507F;border-radius:19px;background:var(--surface);color:#B8306A;font:inherit;font-size:14px;cursor:pointer}
+/* 📎 상담 사진 붙이기 */
+.help-clip{display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;cursor:pointer;font-size:20px;background:color-mix(in srgb,#C9B6FF 22%,var(--surface));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#9B7BE8 30%,var(--line))}
+.help-clip:focus-within{outline:2px solid #9B7BE8;outline-offset:2px}
+.help-att{display:flex;align-items:center;gap:10px;margin:0 12px;padding:8px 10px;border-radius:14px;background:color-mix(in srgb,#C9B6FF 16%,var(--surface));box-shadow:inset 0 0 0 1px var(--line);font-size:13px}
+.help-att img{width:48px;height:48px;object-fit:cover;border-radius:10px}
+.help-att span{flex:1}
+.hm-img{display:block;max-width:220px;max-height:260px;border-radius:12px;margin:0 0 6px;object-fit:contain;background:#fff}
 .help-form{display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:var(--surface);box-shadow:0 -1px 8px rgba(46,36,51,.06)}
 .help-form textarea{flex:1;min-height:46px;max-height:120px;border-radius:23px;padding:11px 16px;resize:none}
 .help-send{display:grid;place-items:center;width:46px;height:46px;flex:none;border:0;border-radius:50%;background:var(--ink);color:var(--surface);cursor:pointer}
@@ -2640,7 +2647,7 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 /* 🌌 알림 띠(토스트): 별이 박힌 남색 밤하늘 + 오로라 테두리 + 앞에 금빛 ✦ (2026-10-08) */
 #toast.toast{color:#fff!important;border:2px solid transparent;background:radial-gradient(circle at 8% 30%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 30% 78%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 58% 16%,#fff 0 .8px,transparent 1.3px),radial-gradient(circle at 86% 64%,#C9B6FF 0 1.2px,transparent 1.8px),radial-gradient(120% 160% at 100% 120%,rgba(155,123,232,.45),transparent 60%),linear-gradient(160deg,#2B3670,#161C3D) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8) border-box!important;box-shadow:0 0 18px -4px rgba(155,123,232,.7),0 10px 22px -10px rgba(22,28,61,.85)}
 #toast.toast::before{content:"✦";color:#FFE7A3;margin-right:8px;text-shadow:0 0 8px rgba(255,231,163,.8)}
-/* 💬 챗봇 상담 창: 오른쪽 위 닫기 · 머리 아이콘 우주색 · 보내기 화살표 단추 (2026-10-08) */
+/* 💬 AI 챗봇 상담 창: 오른쪽 위 닫기 · 머리 아이콘 우주색 · 보내기 화살표 단추 (2026-10-08) */
 .help-top>div{flex:1;min-width:0}
 .help-x{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;border:1.5px solid color-mix(in srgb,#9B7BE8 30%,var(--line));background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 88%,#C9B6FF));color:#4B2F9E;cursor:pointer}
 .help-x .ic{width:18px;height:18px}
@@ -2650,7 +2657,7 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 .help-send{position:relative;border:2px solid transparent!important;background:radial-gradient(circle at 24% 28%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 76% 72%,#FFE7A3 0 1.2px,transparent 1.8px),linear-gradient(160deg,#3B4C86,#161C3D) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8) border-box!important;box-shadow:0 0 14px -4px rgba(155,123,232,.8),0 5px 12px -6px rgba(22,28,61,.8);transition:transform .12s}
 .help-send:active{transform:scale(.94)}
 .help-send .ic{transform:rotate(-30deg);color:#FFE7A3}
-/* 🌌 우주 느낌 (2026-10-08): 내 일기 🔥 연속 띠 · 챗봇 상담 헤드셋 단추 · 챗봇 질문 칩(보라) */
+/* 🌌 우주 느낌 (2026-10-08): 내 일기 🔥 연속 띠 · AI 챗봇 상담 헤드셋 단추 · AI 챗봇 질문 칩(보라) */
 #app .my-hero{border:0;color:#fff;background:radial-gradient(circle at 12% 30%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 38% 80%,#FFE7A3 0 1.2px,transparent 1.8px),radial-gradient(circle at 62% 18%,#fff 0 .8px,transparent 1.3px),radial-gradient(circle at 74% 70%,#C9B6FF 0 1.2px,transparent 1.8px),radial-gradient(110% 160% at 100% 120%,rgba(155,123,232,.5),transparent 60%),linear-gradient(160deg,#2B3670,#161C3D);box-shadow:0 10px 22px -12px rgba(22,28,61,.85)}
 #app .my-hero .mh-fire{background:radial-gradient(circle at 50% 60%,rgba(255,160,90,.45),rgba(255,160,90,0) 70%),rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
 #app .my-hero .mh-t b{color:#FFE7A3;text-shadow:0 0 10px rgba(255,231,163,.45)}
@@ -3352,7 +3359,7 @@ async function makeFirebase(){
     async getUser(uid){ const s=await F.getDoc(F.doc(db,"users",uid)); return s.exists()?s.data():null; },
     // 📱 앱 푸시 알림: 이 휴대폰의 알림 주소(FCM 토큰)를 내 계정에 적어 두면, 가족 소식이 생길 때 서버(iinote-app/firebase)가 보내요
     async savePushToken(uid,token,on=true){ await F.setDoc(F.doc(db,"users",uid),{pushTokens:on?F.arrayUnion(token):F.arrayRemove(token)},{merge:true}); },
-    // 서버 함수 부르기 (챗봇 상담 · 신고: supportSend · supportList · supportAdmin, iinote-app/firebase/functions)
+    // 서버 함수 부르기 (AI 챗봇 상담 · 신고: supportSend · supportList · supportAdmin, iinote-app/firebase/functions)
     async callFn(name,data){ const FN=await import(`https://www.gstatic.com/firebasejs/${V}/firebase-functions.js`);
       const r=await FN.httpsCallable(FN.getFunctions(app,"asia-northeast3"),name)(data||{}); return r.data; },
     async addUserGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{groupIds:F.arrayUnion(gid),lastGroupId:gid,kind:kindOf()},{merge:true}); },
@@ -4180,7 +4187,7 @@ function viewAppShell(){
     ${S.me.type==="child"?kidBar():""}
     ${S.newsOpen?viewNews():""}
     <main class="a-main ${home?"is-home":""}" id="main">${noticeBar()}${dupBanner()}${body}</main>
-    ${home?`<button class="a-help" data-act="help-open" aria-label="챗봇 상담">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
+    ${home?`<button class="a-help" data-act="help-open" aria-label="AI 챗봇 상담">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
     ${`<nav class="a-nav" aria-label="메뉴">
       ${nb("home","홈","home")}${nb("mine","내 일기","lay-diary")}
       ${writing && S.draft ? `<button class="a-fab save" data-act="save-diary" data-v="submitted" aria-label="${esc(saveLabel)}">${ic("check")}<b>${esc(saveLabel)}</b></button>`   // 쓰는 중에는 가운데 단추가 저장 (2026-10-07)
@@ -4196,11 +4203,11 @@ function viewAppShell(){
 }
 // 더보기 판: 아래 메뉴에 없는 화면들 · 화면 꾸미기(디자인 · 글씨) · 도움
 function viewMore(){
-  // (2026-10-07) 더보기 = 상자 6개(1줄: 우리 가족 설정 · 앱 설정 · 챗봇 상담 / 2줄: 아이들 현황 · 책장 PDF · 우리 아이 그래프)
+  // (2026-10-07) 더보기 = 상자 6개(1줄: 우리 가족 설정 · 앱 설정 · AI 챗봇 상담 / 2줄: 아이들 현황 · 책장 PDF · 우리 아이 그래프)
   //  + 아래에 작게: 화면 꾸미기 · 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침
   // 사진첩 · AI 리포트(아이는 받아쓰기)는 홈 쪽에, 하루 펼쳐보기는 홈 일기장 쪽과 겹쳐서 뺐어요
   const kid=S.me.type==="child";
-  const it=[["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["settings","앱 설정","gear","#E5ECFF","#3F5FB8"],["help","챗봇 상담","help","#E3F4EC","#2F7A56"],
+  const it=[["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["settings","앱 설정","gear","#E5ECFF","#3F5FB8"],["help","AI 챗봇 상담","help","#E3F4EC","#2F7A56"],
     ...(isParent()?[["kids","아이들 현황","spark","#FFF0C2","#8A6300"]]:[]),["shelf","책장 · PDF","book","#F0E6FF","#6B47B8"],["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"]];
   const box=([k,l,i,bg,fg])=>`<button class="more-it" ${k==="help"?'data-act="help-open"':`data-act="more-go" data-v="${k}"`} style="--mb:${bg};--mf:${fg}"><span>${ic(i)}</span>${l}</button>`;
   return `<div class="more-bg" data-act="app-more" aria-hidden="true"></div>
@@ -4300,7 +4307,7 @@ function hpNews(){
   const body=groups.map(([h,f])=>{ const L=items.filter(f); return L.length?`<h3 class="nw-h">${h}</h3><ul class="nw-list block">${L.map(row).join("")}</ul>`:""; }).join("");
   return body || `<p class="empty">최근 2주 동안 새 소식이 없어요. 가족 일기에 먼저 댓글을 남겨 보세요.</p>`;
 }
-// 💬 챗봇 상담 (웹 · 앱 공통, 2026-10-07 '도움 · 문의'에서 이름 바꿈): 자주 묻는 질문은 바로 답하고, 그 밖의 것은 상담원에게 (앱은 답장이 푸시로 와요)
+// 💬 AI 챗봇 상담 (웹 · 앱 공통, 2026-10-07 '도움 · 문의'에서 이름 바꿈): 자주 묻는 질문은 바로 답하고, 그 밖의 것은 상담원에게 (앱은 답장이 푸시로 와요)
 const FAQ = [
   ["아이 휴대폰 연결하기","우리 가족 설정에서 아이 프로필의 '휴대폰 연결 링크'를 아이 휴대폰으로 보내 주세요. 아이는 그 링크를 한 번만 누르면 계정 없이 바로 들어와요."],
   ["PDF 일기책 만들기", IS_APP ? "더보기 › 책장 · PDF에서 기간과 사람을 고르고 'PDF 만들기'를 누르세요. 미리 보기에서 'PDF 저장'이나 '보내기'(카카오톡 · 드라이브 · 문자)를 고르면 돼요."
@@ -4310,14 +4317,13 @@ const FAQ = [
   ["가족 초대하기","우리 가족 설정에서 초대 코드나 초대 링크를 가족에게 보내 주세요. 받은 가족이 링크를 누르고 로그인하면 같은 일기장에 들어와요."],
   ["로그인이 안 돼요","처음 가입한 방법(구글 또는 카카오)으로 로그인해 주세요. 둘 다 쓰려면 로그인한 뒤 설정 › 계정에서 연결할 수 있어요."]
 ];
-// 🚩 신고 (2026-10-07): 챗봇 상담 안에서 종류 고르기 → 내용 적기 → 상담원에게 (서버 함수 supportSend 의 report · ref)
+// 🚩 신고 (2026-10-07): AI 챗봇 상담 안에서 종류 고르기 → 내용 적기 → 상담원에게 (서버 함수 supportSend 의 report · ref)
 // 일기 · 댓글의 '신고'를 누르면 S.helpRep={cat,ref} 로 바로 이 단계부터. ref 는 "일기 10월 7일 · 지우" 같은 짧은 표시만 (내용은 보내지 않아요)
 const REPORT_CATS = ["불편한 글 · 댓글","이상한 AI 답변","사진 · 채팅","오류 · 고장","기타"];
 function viewHelp(){
-  const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! 챗봇 상담이에요. 무엇을 도와드릴까요?\n아래에서 고르거나 궁금한 것을 적어 보내 주세요. 불편한 글이나 고장은 🚩 신고하기로 알려 주세요.
-💬 상담 기록은 관리자가 확인하고 관리해요.`};
-  const msgs=[hello,...helpWithBot((S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":m.from==="bot"?"bot":"me",text:helpMsgText(m.text)})).filter(m=>m.text)),...(S.helpLocal||[])];   // 예전에 [object Object] 로 남은 답은 빼요
-  const bubble=m=>m.from==="me" ? `<p class="hm me">${esc(m.text)}</p>`
+  const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! AI 챗봇 상담이에요. 무엇을 도와드릴까요?\n아래에서 고르거나 궁금한 것을 적어 보내 주세요. 불편한 글이나 고장은 🚩 신고하기로 알려 주세요.\n📎 캡처한 화면은 ${IS_APP?"글 칸 옆 📎 단추로":"📎 단추나 Ctrl+V(붙여 넣기)로"} 사진을 붙여 보낼 수 있어요.\n👀 여기서 나눈 채팅 내용은 관리자에게 보이고, 관리자가 확인하고 관리해요.`};
+  const msgs=[hello,...helpWithBot((S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":m.from==="bot"?"bot":"me",text:helpMsgText(m.text),img:/^data:image\//.test(m.img||"")?m.img:""})).filter(m=>m.text||m.img)),...(S.helpLocal||[])];   // 예전에 [object Object] 로 남은 답은 빼요
+  const bubble=m=>m.from==="me" ? `<p class="hm me">${m.img?`<img class="hm-img" src="${esc(m.img)}" alt="보낸 사진">`:""}${esc(m.text)}</p>`
     : `<div class="hm-row"><span class="hm-av ${m.from}" aria-hidden="true">${m.from==="op"?"상":ic("help")}</span><p class="hm ${m.from}">${m.from==="op"?"<b>상담원</b>":""}${esc(m.text)}</p></div>`;
   const rep=S.helpRep;
   const chips = rep && !rep.cat
@@ -4326,10 +4332,11 @@ function viewHelp(){
     : `<div class="help-q" role="group" aria-label="자주 묻는 질문"><button type="button" class="hq rep" data-act="help-rep">🚩 신고하기</button>${FAQ.map(([q],i)=>`<button type="button" class="hq" data-act="help-faq" data-v="${i}">${esc(q)}</button>`).join("")}</div>`;
   const ph = rep?.cat ? "어떤 일이 있었는지 적어 주세요" : "궁금한 것을 적어 주세요";
   return `<section class="help" role="dialog" aria-modal="true" aria-labelledby="help-h">
-    <header class="help-top"><button class="icon-btn" data-act="help-close" aria-label="닫기">${ic("left")}</button><span class="help-av" aria-hidden="true">${ic("help")}</span><div><h2 id="help-h">챗봇 상담</h2><small>챗봇이 못 푼 건 상담원이 보통 하루 안에 답해요${IS_APP?" · 답장이 오면 알려 드려요":" · 답장은 여기에서 볼 수 있어요"}</small></div><button class="help-x" data-act="help-close" aria-label="닫기">${ic("x")}</button></header>
+    <header class="help-top"><button class="icon-btn" data-act="help-close" aria-label="닫기">${ic("left")}</button><span class="help-av" aria-hidden="true">${ic("help")}</span><div><h2 id="help-h">AI 챗봇 상담</h2><small>AI 챗봇이 못 푼 건 상담원이 보통 하루 안에 답해요${IS_APP?" · 답장이 오면 알려 드려요":" · 답장은 여기에서 볼 수 있어요"}</small></div><button class="help-x" data-act="help-close" aria-label="닫기">${ic("x")}</button></header>
     <div class="help-list" id="help-list">${msgs.map(bubble).join("")}${S.helpBusy?`<p class="hm-wait">${S.helpBusy}</p>`:""}</div>
     ${chips}
-    <form class="help-form" data-form="help"><label class="sr" for="help-in">${ph}</label><textarea id="help-in" name="text" rows="1" maxlength="1000" placeholder="${ph}" required></textarea><button class="help-send" aria-label="보내기">${ic("arrow")}</button></form>
+    ${S.helpImg?`<div class="help-att"><img src="${esc(S.helpImg)}" alt="붙인 사진"><span>사진 1장을 같이 보내요</span><button type="button" class="link-btn" data-act="help-img-x" aria-label="붙인 사진 빼기">✕ 빼기</button></div>`:""}
+    <form class="help-form" data-form="help"><label class="help-clip" title="사진 붙이기" aria-label="사진 붙이기">📎<input type="file" class="sr help-file" accept="image/*"></label><label class="sr" for="help-in">${ph}</label><textarea id="help-in" name="text" rows="1" maxlength="1000" placeholder="${S.helpImg?"사진에 대해 한마디 적어 주세요 (안 적어도 돼요)":ph}" ${S.helpImg?"":"required"}></textarea><button class="help-send" aria-label="보내기">${ic("arrow")}</button></form>
   </section>`;
 }
 function viewShell(){
@@ -4366,7 +4373,7 @@ function viewShell(){
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}</div>
     </nav>
-    ${S.helpOpen?"":`<button class="web-help" data-act="help-open" aria-label="챗봇 상담" title="챗봇 상담">${ic("help")}</button>`}
+    ${S.helpOpen?"":`<button class="web-help" data-act="help-open" aria-label="AI 챗봇 상담" title="AI 챗봇 상담">${ic("help")}</button>`}
     ${S.helpOpen?viewHelp():""}
     ${S.prof?viewProfile():""}
     ${S.lb?viewLightbox():""}
@@ -4420,7 +4427,7 @@ const TIPS = [
   ["⭐","즐겨찾기에 학교 · 학원 홈페이지를 넣어 두면 한 번에 열 수 있어요","","p",""],
   ["🔒","앱 잠금을 켜면 지문 · 얼굴로만 열 수 있어요 (설정 › 앱 설정)","settings","p","app"],
   ["📄","쓴 일기를 PDF 일기책으로 만들어 인쇄할 수 있어요 (쪽 모양 10가지)","shelf","p",""],
-  ["🎧","궁금한 점은 오른쪽 아래 챗봇 상담에 물어보세요. 못 푼 건 상담원이 답해요","","",""],
+  ["🎧","궁금한 점은 오른쪽 아래 AI 챗봇 상담에 물어보세요. 못 푼 건 상담원이 답해요","","",""],
 ];
 const tipKey = () => `iinote-tipx-${S.gid}-${todayStr()}`;
 // 날마다 하나: 아직 안 본 것 중에서 무작위로 골라 20개를 겹치지 않게 다 보여 주고, 다 본 뒤에는 무작위 (어제 것은 빼고)
@@ -4529,7 +4536,7 @@ function viewHomeCalendar(){
       <span class="cal-n">${+d.slice(8)}${hol?`<small>${hol}</small>`:""}</span>
       <span class="cal-sc">${list.slice(0,2).map(s=>`<em>${s.time?esc(s.time)+" ":""}${esc(s.title)}</em>`).join("")}${list.length>2?`<em class="more">+${list.length-2}</em>`:""}</span>
       <span class="cal-dots">${d<=t?ps.map(p=>`<i class="${submittedOn(p.id,d)?"on":""}" style="--c:${pdot(p)}"></i>`).join(""):""}</span></button>`; }).join("");
-  return `${heroDate()}
+  return `${S.tab==="cal"?"":heroDate()}
   <section class="block cal" aria-labelledby="h-cal">
     <div class="cal-h"><button class="icon-btn" data-act="cal-move" data-v="-1" aria-label="지난달">${ic("back")}</button>
       <h2 id="h-cal">${yy}년 ${mm}월</h2><button class="icon-btn flip" data-act="cal-move" data-v="1" aria-label="다음 달">${ic("back")}</button>
@@ -5787,7 +5794,7 @@ function viewDiaryDetail(){
       <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-soft">댓글 달기</button></div></form>
     </section></article>`;
 }
-// 🚩 신고 단추: 누르면 챗봇 상담이 '불편한 글 · 댓글' 신고로 열려요 (ref 는 누구의 언제 글인지만, 내용은 안 보내요)
+// 🚩 신고 단추: 누르면 AI 챗봇 상담이 '불편한 글 · 댓글' 신고로 열려요 (ref 는 누구의 언제 글인지만, 내용은 안 보내요)
 const repBtn = ref => `<button class="link-btn rep-btn" data-act="help-open" data-rep="불편한 글 · 댓글" data-ref="${esc(ref)}">${ic("flag")}신고</button>`;
 // 댓글 지우기: 쓴 사람, 그리고 아이가 쓴 댓글은 보호자(부모)도 (2026-10-04)
 const canDelCmt = c => !!S.me && (c.profileId===S.me.id || (isParent() && prof(c.profileId)?.type==="child"));
@@ -7736,7 +7743,7 @@ Object.assign(acts,{
     if(to==="tt"){ if(IS_APP) go(()=>{ S.tab="home"; S.sub=null; S.hpage="fav"; S.favTab="tt"; }); else { S.ttOpen=true; render(); } return; }
     go(()=>{ S.tab=to; S.sub=null; }); },
 });
-// 💬 챗봇 상담 · 🚩 신고 (웹 · 앱 공통)
+// 💬 AI 챗봇 상담 · 🚩 신고 (웹 · 앱 공통)
 const helpSay = (...m) => { S.helpLocal=[...(S.helpLocal||[]),...m]; };
 const helpScroll = () => requestAnimationFrame(()=>{ const l=document.getElementById("help-list"); if(l) l.scrollTop=l.scrollHeight; });
 Object.assign(acts,{
@@ -7752,12 +7759,12 @@ Object.assign(acts,{
   "help-rep-x": () => { S.helpRep=null; helpSay({from:"bot",text:"신고를 그만뒀어요. 다른 궁금한 게 있으면 말씀해 주세요."}); render(); helpScroll(); },
 });
 document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.ttOpen && !S.lb){ S.ttOpen=false; render(); return; } if(e.key==="Escape" && S.helpOpen && !S.lb && !S.prof) acts["help-close"](); });
-// 보내기: 🚩 신고는 상담원에게 바로. 그 밖에는 🤖 챗봇(무료 AI, 워커 mode "help")이 먼저 답하고, 대화는 모두 운영자 문의함에 남아요 (2026-10-09)
+// 보내기: 🚩 신고는 상담원에게 바로. 그 밖에는 🤖 AI 챗봇(무료 AI, 워커 mode "help")이 먼저 답하고, 대화는 모두 운영자 문의함에 남아요 (2026-10-09)
 //  화면 · 디자인 고칠 곳(design) · 오류(bug) · 사람이 봐야 할 것(human)은 상담원에게도 알림이 가요. AI 가 안 되면 예전처럼 상담원에게만
 const helpGuide = () => [...FAQ.map(([q,a])=>`Q. ${q}\nA. ${a}`), ...TIPS.filter(t=>!t[4] || (t[4]==="app")===IS_APP).map(t=>`- ${t[1]}`),
-  IS_APP?"- 이 사람은 안드로이드 앱을 쓰고 있어요. 아래 메뉴: 홈 · 내 일기 · 가운데 ✏️ 쓰기 · 채팅 · 더보기(우리 가족 설정 · 앱 설정 · 챗봇 상담 · 아이들 현황 · 책장 PDF · 그래프 · 화면 꾸미기)"
+  IS_APP?"- 이 사람은 안드로이드 앱을 쓰고 있어요. 아래 메뉴: 홈 · 내 일기 · 가운데 ✏️ 쓰기 · 채팅 · 더보기(우리 가족 설정 · 앱 설정 · AI 챗봇 상담 · 아이들 현황 · 책장 PDF · 그래프 · 화면 꾸미기)"
     :"- 이 사람은 웹(iinote.co.kr)을 쓰고 있어요. 위쪽 탭: 홈 · 내 일기 · 가족 채팅 · 달력 · 하루 펼쳐보기 · 책장 · 사진첩 · AI 리포트 · 우리 가족 설정 · 설정. 디자인 · 글씨는 오른쪽 위 🎨 화면 꾸미기"].join("\n");
-// 챗봇 AI 답에서 글만 꺼내요 (2026-10-09): 워커가 글 대신 {reply|text|response…} 묶음 · 배열로 줄 때가 있어 [object Object] 가 보였어요
+// AI 챗봇 답에서 글만 꺼내요 (2026-10-09): 워커가 글 대신 {reply|text|response…} 묶음 · 배열로 줄 때가 있어 [object Object] 가 보였어요
 const aiText = (x,d=0) => { if(x==null || d>4) return ""; if(typeof x==="string") return x.trim(); if(typeof x==="number") return String(x);
   if(Array.isArray(x)) return x.map(v=>aiText(v,d+1)).filter(Boolean).join("\n");
   if(typeof x==="object"){ for(const k of ["reply","text","response","answer","content","message","output","result"]) if(k in x){ const t=aiText(x[k],d+1); if(t) return t; }
@@ -7767,7 +7774,7 @@ const aiText = (x,d=0) => { if(x==null || d>4) return ""; if(typeof x==="string"
   return ""; };
 // 답에서 글을 못 찾으면 모양만(칸 이름 · 글자 수, 내용 없이) 오류 기록으로 남겨요
 const aiShape = (x,d=0) => x==null?null : typeof x==="string"?`str${x.length}` : Array.isArray(x)?x.slice(0,3).map(v=>aiShape(v,d+1)) : typeof x==="object"&&d<4?Object.fromEntries(Object.entries(x).slice(0,12).map(([k,v])=>[k,aiShape(v,d+1)])) : typeof x;
-// (2026-10-09) 챗봇 답 지키기: 서버 대화에 챗봇 답이 안 남아도 이 기기에 질문 → 답을 남겨(ls iinote-helpbot-uid, 30개) 그 질문 바로 아래에 보여요
+// (2026-10-09) AI 챗봇 답 지키기: 서버 대화에 AI 챗봇 답이 안 남아도 이 기기에 질문 → 답을 남겨(ls iinote-helpbot-uid, 30개) 그 질문 바로 아래에 보여요
 const helpBotKey = () => "iinote-helpbot-"+(S.user?.uid||"x");
 const helpBots = () => { try{ return JSON.parse(ls.get(helpBotKey(),"[]"))||[]; }catch(e){ return []; } };
 function helpBotKeep(q,a){ ls.set(helpBotKey(), JSON.stringify([...helpBots(),{q,a,t:Date.now()}].slice(-30))); }
@@ -7777,39 +7784,63 @@ function helpWithBot(list){ const bots=helpBots(), used=new Set(), out=[];
   return out; }
 // AI 챗봇이 답하지 못할 때: 인사는 인사로, 아니면 자주 묻는 질문 중 낱말이 가장 많이 겹치는 답
 function helpLocalAnswer(q){ const s=String(q).replace(/\s+/g," ").trim();
-  if(/^(안녕|하이|헬로|ㅎㅇ|hi\b|hello|반가)/i.test(s) && s.length<15) return `안녕하세요, ${S.me?.name||""}님! 아이아이노트 챗봇이에요 😊 궁금한 것을 편하게 적어 주세요. 아래 단추에서 자주 묻는 질문을 골라도 돼요.`;
-  if(/(관리자|운영자|운영진|회사).*(보|읽|알)|누가.*(보|읽)|개인\s*정보|비밀/.test(s)) return "일기 · 댓글 · 사진은 우리 가족만 볼 수 있어요. 운영자는 일기 내용을 보지 않고, 가족 수 · 일기 편수 같은 숫자만 봐요. 다만 이 챗봇 상담에 적은 글은 답해 드리려고 상담원이 읽어요. 자세한 건 개인정보처리방침(iinote.co.kr/privacy.html)에 있어요.";
+  if(/^(안녕|하이|헬로|ㅎㅇ|hi\b|hello|반가)/i.test(s) && s.length<15) return `안녕하세요, ${S.me?.name||""}님! 아이아이노트 AI 챗봇이에요 😊 궁금한 것을 편하게 적어 주세요. 아래 단추에서 자주 묻는 질문을 골라도 돼요.`;
+  if(/(관리자|운영자|운영진|회사).*(보|읽|알)|누가.*(보|읽)|개인\s*정보|비밀/.test(s)) return "일기 · 댓글 · 사진은 우리 가족만 볼 수 있어요. 운영자는 일기 내용을 보지 않고, 가족 수 · 일기 편수 같은 숫자만 봐요. 다만 이 AI 챗봇 상담에 적은 글은 답해 드리려고 상담원이 읽어요. 자세한 건 개인정보처리방침(iinote.co.kr/privacy.html)에 있어요.";
   const words=s.split(/[\s,.?!·]+/).map(w=>w.replace(/(은|는|이|가|을|를|에|에서|으로|로|도|만|요|나요|까요|해요|해)$/,"")).filter(w=>w.length>=2);
   let best=null, top=0;
   FAQ.forEach(([fq,fa])=>{ const hay=fq+" "+fa; const sc=words.reduce((n,w)=>n+(hay.includes(w)?(fq.includes(w)?2:1):0),0); if(sc>top){ top=sc; best=[fq,fa]; } });
   return top>=2 ? `혹시 '${best[0]}'에 대해 궁금하셨나요?\n${best[1]}` : ""; }
 const helpMsgText = t => { const v=aiText(t); return v==="[object Object]" ? "" : v; };
-forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return;
+// 📎 상담에 캡처 화면 붙이기 (2026-10-09): 📎 단추 · 글 칸에서 Ctrl+V · 끌어다 놓기 → 긴 변 1280px JPEG(최대 약 450KB)로 줄여 S.helpImg
+//  보내면 서버(supportSend)가 그 사진을 대화 기록에 같이 남겨 관리자 문의함에서 봐요. AI 챗봇에는 사진을 보내지 않아요
+async function helpImgSet(blob){
+  if(!blob) return; if(blob.type && !/^image\//.test(blob.type)){ toast("사진(그림) 파일만 붙일 수 있어요"); return; }
+  try{
+    const bm=await createImageBitmap(blob).catch(()=>new Promise((ok,no)=>{ const u=URL.createObjectURL(blob), im=new Image(); im.onload=()=>ok(im); im.onerror=()=>no(new Error("open")); im.src=u; }));
+    const bw=bm.naturalWidth||bm.width, bh=bm.naturalHeight||bm.height;
+    let max=1280, q=.82, out="";
+    for(let i=0;i<4;i++){ const k=Math.min(1,max/Math.max(bw,bh)), cv=document.createElement("canvas"); cv.width=Math.round(bw*k); cv.height=Math.round(bh*k);
+      const g=cv.getContext("2d"); g.fillStyle="#fff"; g.fillRect(0,0,cv.width,cv.height); g.drawImage(bm,0,0,cv.width,cv.height);
+      out=cv.toDataURL("image/jpeg",q); if(out.length<=600000) break; max=Math.round(max*.8); q=Math.max(.55,q-.1); }
+    bm.close?.();
+    if(out.length>600000){ toast("사진이 너무 커요. 화면 일부만 캡처해서 다시 붙여 주세요"); return; }
+    S.helpImg=out; render(); helpScroll(); document.getElementById("help-in")?.focus(); toast("📎 사진을 붙였어요. 보내기를 누르면 같이 가요");
+  }catch(e){ console.warn("상담 사진",e); toast("사진을 붙이지 못했어요. 다른 사진으로 해 주세요"); }
+}
+document.addEventListener("change", e=>{ if(!e.target.classList?.contains("help-file")) return; const f=e.target.files?.[0]; e.target.value=""; helpImgSet(f); });
+// 상담 창이 열려 있으면 Ctrl+V 한 그림을 붙여요 (글 칸 · 상담 창 어디서든, 캐릭터 다듬기 창이 열려 있을 땐 그쪽으로)
+document.addEventListener("paste", e=>{ if(!S.helpOpen || CE.el) return;
+  const f=[...(e.clipboardData?.items||[])].find(i=>i.kind==="file" && /^image\//.test(i.type))?.getAsFile(); if(!f) return;
+  e.preventDefault(); helpImgSet(f); });
+document.addEventListener("drop", e=>{ if(!S.helpOpen || !e.target.closest?.(".help")) return; const f=e.dataTransfer?.files?.[0]; if(f && /^image\//.test(f.type)){ e.preventDefault(); helpImgSet(f); } });
+document.addEventListener("dragover", e=>{ if(S.helpOpen && e.target.closest?.(".help")) e.preventDefault(); });
+Object.assign(acts,{ "help-img-x": () => { S.helpImg=null; render(); } });
+forms.help = (fd,f) => { let text=String(fd.text||"").trim(); const img=S.helpImg||""; if(!text && !img) return; if(!text) text="(캡처 화면을 보냈어요)";
   if(DEMO){ toast("둘러보기에서는 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
   const rep=S.helpRep?.cat?S.helpRep:null, ta=document.getElementById("help-in"); if(ta) ta.value="";
   const history=[...(S.helpMsgs||[]).map(m=>({from:m.from==="user"?"me":"bot",text:helpMsgText(m.text)})).filter(m=>m.text),...(S.helpLocal||[])].slice(-6);
-  S.helpLocal=[...(S.helpLocal||[]),{from:"me",text}];
-  S.helpBusy=rep?"신고를 보내는 중…":"🤖 챗봇이 답을 찾고 있어요…"; render(); helpScroll();
+  S.helpLocal=[...(S.helpLocal||[]),{from:"me",text,img}]; S.helpImg=null;
+  S.helpBusy=rep?"신고를 보내는 중…":"🤖 AI 챗봇이 답을 찾고 있어요…"; render(); helpScroll();
   (async()=>{
     let ai=null;
-    if(!rep){ try{ ai=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"help",pid:S.me.id,text,guide:helpGuide(),history})}); }catch(e){ console.warn("챗봇 AI",e); ai=null; try{ reportError(`챗봇 AI 못 부름: ${e?.message||e}`,"helpBot"); }catch(_){} } }
+    if(!rep){ try{ ai=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"help",pid:S.me.id,text:img?text+" (캡처 화면 사진을 함께 보냈어요)":text,guide:helpGuide(),history})}); }catch(e){ console.warn("AI 챗봇 AI",e); ai=null; try{ reportError(`AI 챗봇 못 부름: ${e?.message||e}`,"helpBot"); }catch(_){} } }
     if(ai){ const raw=ai, rt=aiText(ai.reply ?? ai.response ?? ai.text ?? ai.answer) || aiText(ai); ai={reply:rt, kind:(typeof raw.kind==="string"?raw.kind:"") || (typeof raw.reply?.kind==="string"?raw.reply.kind:"")};   // 글만 꺼내 쓰기
-      if(!rt) try{ reportError(`챗봇 답 모양: ${JSON.stringify(aiShape(raw)).slice(0,400)}`,"helpBot"); }catch(_){} }
+      if(!rt) try{ reportError(`AI 챗봇 답 모양: ${JSON.stringify(aiShape(raw)).slice(0,400)}`,"helpBot"); }catch(_){} }
     if(!rep && !ai?.reply){ const la=helpLocalAnswer(text); if(la) ai={reply:la, kind:"local"}; }   // AI 가 못 답하면 자주 묻는 질문에서 찾아 답해요
     if(ai?.reply){ S.helpLocal=[...S.helpLocal,{from:"bot",text:ai.reply}]; S.helpBusy=""; render(); helpScroll(); }
     else S.helpBusy=rep?"신고를 보내는 중…":"상담원에게 보내는 중…";
     try{
       const local=ai?.kind==="local";
-      const r=await B.callFn("supportSend",{text,name:S.me.name,family:S.group?.name||"",...(rep?{report:rep.cat,ref:rep.ref}:{}),...(ai?.reply&&!local?{bot:ai.reply,kind:ai.kind}:{})});
-      S.helpMsgs=r.msgs||[]; S.helpRep=null; S.helpLocal=[];   // 서버에 남은 대화(내 글 · 챗봇 답)로 바꿔 그려요
-      const sent=`상담원에게 전달했어요. ${IS_APP?"답장이 오면 알림으로 알려 드릴게요.":"답장은 여기 챗봇 상담에서 볼 수 있어요."}`;
+      const r=await B.callFn("supportSend",{text,name:S.me.name,family:S.group?.name||"",...(rep?{report:rep.cat,ref:rep.ref}:{}),...(ai?.reply&&!local?{bot:ai.reply,kind:ai.kind}:{}),...(img?{img}:{})});
+      S.helpMsgs=r.msgs||[]; S.helpRep=null; S.helpLocal=[];   // 서버에 남은 대화(내 글 · AI 챗봇 답)로 바꿔 그려요
+      const sent=`상담원에게 전달했어요. ${IS_APP?"답장이 오면 알림으로 알려 드릴게요.":"답장은 여기 AI 챗봇 상담에서 볼 수 있어요."}`;
       if(rep) helpSay({from:"bot",text:"신고를 받았어요. 알려 줘서 고마워요. 상담원이 살펴보고 답해 드릴게요."});
-      else helpBotKeep(text, ai?.reply ? ai.reply+(local?"\n\n"+sent:"") : sent);   // 서버가 챗봇 답을 안 돌려줘도 사라지지 않게 이 기기에 남겨요
+      else helpBotKeep(text, ai?.reply ? ai.reply+(local?"\n\n"+sent:"") : sent);   // 서버가 AI 챗봇 답을 안 돌려줘도 사라지지 않게 이 기기에 남겨요
       buzz("ok");
-    }catch(e){ console.warn("상담 보내기",e); if(!ai?.reply){ toast("보내지 못했어요. 인터넷 연결을 확인하고 다시 보내 주세요"); const t2=document.getElementById("help-in"); if(t2) t2.value=text; S.helpLocal=(S.helpLocal||[]).filter(m=>m.text!==text); } }
+    }catch(e){ console.warn("상담 보내기",e); if(!ai?.reply){ toast("보내지 못했어요. 인터넷 연결을 확인하고 다시 보내 주세요"); const t2=document.getElementById("help-in"); if(t2) t2.value=text; if(img) S.helpImg=img; S.helpLocal=(S.helpLocal||[]).filter(m=>m.text!==text); } }
     finally{ S.helpBusy=""; render(); helpScroll(); }
   })(); };
-// 챗봇 글 칸: 엔터 = 보내기, Shift+엔터 = 줄 바꿈 (한글 조합 중에는 안 보내요)
+// AI 챗봇 글 칸: 엔터 = 보내기, Shift+엔터 = 줄 바꿈 (한글 조합 중에는 안 보내요)
 let helpShift=false;
 document.addEventListener("keydown", e=>{ if(e.target?.id!=="help-in") return; helpShift=e.shiftKey; if(e.key!=="Enter" || e.shiftKey || e.isComposing || e.keyCode===229) return;
   e.preventDefault(); e.target.closest("form")?.requestSubmit(); });
