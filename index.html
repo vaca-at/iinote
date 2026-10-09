@@ -4096,10 +4096,10 @@ const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? 
 /* ---------- 📱 앱 화면 뼈대 (2026-10-05, 앱에서만 · 웹은 아래 viewShell 그대로) ----------
    머리 한 줄(로고 · 가족 이름 · 🔔 · 내 얼굴) · 아래 메뉴 5칸(홈 · 내 일기 · ✏️ 쓰기 · 채팅 · 더보기) · 더보기 판 · 도움 단추
    홈은 칩을 누르거나 옆으로 밀어 넘기는 네 쪽: 일기장 · 달력 · 사진첩 · 소식 (쪽마다 색) */
-const HPAGES = [["diary","일기장","#D63E70","#FFE1EA"],["cal","달력","#C98A00","#FFF0C2"],["album","사진첩","#3F73D1","#DCE9FF"]];   // 소식은 2026-10-07부터 위쪽 🔔 팝업으로 (viewNews)
+const HPAGES = [["cal","달력","#C98A00","#FFF0C2"],["diary","일기장","#D63E70","#FFE1EA"],["album","사진첩","#3F73D1","#DCE9FF"]];   // (2026-10-09) 홈은 늘 달력부터: 첫 칩 · 처음 열 때 · 다른 메뉴에서 홈으로 올 때   // 소식은 2026-10-07부터 위쪽 🔔 팝업으로 (viewNews)
 // 네 번째 쪽 (2026-10-07): 보호자는 AI 리포트, 아이는 받아쓰기 퀴즈
 const hpages = () => [...HPAGES, ...(isParent()?[["report","AI 리포트","#2F8C6B","#DAF2E5"]]:S.me?.type==="child"?[["quiz","받아쓰기","#2F8C6B","#DAF2E5"]]:[]), ["fav","즐겨찾기","#7A5BC7","#ECE3F6"]];   // ⭐ 즐겨찾기는 다섯 번째 쪽 (2026-10-08)
-const hpage = () => hpages().some(x=>x[0]===S.hpage) ? S.hpage : "diary";
+const hpage = () => hpages().some(x=>x[0]===S.hpage) ? S.hpage : "cal";
 const APP_TONE = {mine:"#E0663F",chat:"#3F73D1",kids:"#C98A00",day:"#2F8C6B",shelf:"#6B47B8",diary:"#6B47B8",album:"#3F73D1",report:"#2F8C6B",quiz:"#2F8C6B",family:"#C2366A",settings:"#3F5FB8",grow:"#B5532B"};
 function viewAppShell(){
   const home=(!S.tab || S.tab==="home") && !S.sub, pg=hpages().find(x=>x[0]===hpage());
@@ -4171,7 +4171,7 @@ function viewGrow(){
 function viewHomePages(){
   const k=hpage();
   const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="report" ? viewReport() : k==="quiz" ? viewQuizHome() : k==="fav" ? viewFavPage() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"?wipBanner()+consentBanner()+awardBanner()+greenBanners()+ddayRow():""}${body}</div>`;   // 상장 · 다홍펜 안내는 일기장 쪽에만
+  return `<div class="hp" data-hp="${k}">${k==="diary"||k==="cal"?wipBanner()+consentBanner()+awardBanner()+greenBanners()+ddayRow():""}${body}</div>`;   // 상장 · 다홍펜 안내 · 디데이는 홈 첫 쪽(달력)과 일기장 쪽에
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -6579,7 +6579,7 @@ const acts = {
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => TOUR ? acts["tour-exit"]() : guard(async()=>{ S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
   "pen-set": () => { ls.set(penAskKey(),"1"); go(()=>{ S.tab="family"; S.sub=null; S.draft=null; S.penOpen=true; S.famOpen="h-feat"; /* 앱에서는 '가족 구성원' 칸을 펼쳐서 보여 줘요 */ }); setTimeout(()=>document.getElementById("pen-mode")?.scrollIntoView({behavior:"smooth",block:"center"}),80); },
-  tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); if(el.dataset.v==="chat") S.chatJump=true; S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
+  tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); if(el.dataset.v==="chat") S.chatJump=true; if(IS_APP && el.dataset.v==="home") S.hpage="cal"; S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
     if((p.type==="child" && p.pin) || needParentPin(p)){ S.pinFor=p.id; render(); return; }
@@ -7980,7 +7980,7 @@ if(IS_APP){
     if(S.prof){ if(S.profEdit) S.profEdit=false; else S.prof=null; render(); return; }
     if(S.helpOpen){ S.helpOpen=false; render(); return; }
     if(S.moreOpen){ S.moreOpen=false; render(); return; }
-    if(S.phase==="app" && S.me && (!S.tab||S.tab==="home") && !S.sub && hpage()!=="diary"){ S.hpage="diary"; render(); window.scrollTo(0,0); return; }   // 홈 다른 쪽 → 일기장
+    if(S.phase==="app" && S.me && (!S.tab||S.tab==="home") && !S.sub && hpage()!=="cal"){ S.hpage="cal"; render(); window.scrollTo(0,0); return; }   // 홈 다른 쪽 → 달력 (홈의 첫 쪽)
     if(S.lb){ S.lb=null; render(); return; }
     if(S.newsOpen){ S.newsOpen=false; render(); return; }
     if(S.phase==="picker" && S.pinFor){ S.pinFor=null; render(); return; }
