@@ -714,11 +714,13 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
   .ct-body{flex-direction:column;align-items:flex-start;gap:6px;font-size:14px}
   .ct-body .muted{font-size:13px}
   .cal-grid{gap:3px}
-  .cal-cell{min-height:64px;padding:5px 4px;border-radius:10px}
+  .cal-cell{min-height:72px;padding:4px 3px;border-radius:10px;gap:3px}
   .cal-n{font-size:14px}
   .cal-n small{display:none}
-  .cal-sc em{font-size:0;height:5px;padding:0;background:var(--butter)}
-  .cal-sc em.more{display:none}
+  /* (2026-10-09) 휴대폰에서도 일정 제목이 보이게: 노란 막대 대신 작은 글씨 */
+  .cal-sc{gap:2px}
+  .cal-sc em{font-size:9.5px;line-height:1.35;padding:1px 3px;border-radius:4px;letter-spacing:-.4px;font-weight:600}
+  .cal-sc em.more{font-size:9px;padding:0 2px}
   .cal-dots i{width:7px;height:7px}
 }
 /* 화면 위쪽: 모양 · 글씨 고르기 */
@@ -2737,6 +2739,17 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 .cst-n em small{font-size:12px;margin-left:1px;color:var(--ink3);font-weight:400}
 .cst-bar{display:block;height:5px;border-radius:3px;background:color-mix(in srgb,var(--d) 14%,var(--line))}
 .cst-bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,color-mix(in srgb,var(--d) 55%,#fff),var(--d));min-width:3px}
+@media (max-width:759px){   /* (2026-10-09) '누가 며칠 썼나': 한 줄 알약 (얼굴 · 며칠 · 얇은 막대), 넘치면 옆으로 밀기 */
+  .cst,.hp-cal .cst{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px 0 10px;padding:2px}
+  .cst::-webkit-scrollbar{display:none}
+  .cst-c{flex:none;gap:6px;padding:3px 10px 3px 3px;border-radius:999px}
+  .cst-c .av{width:24px!important;height:24px!important;font-size:10px!important}
+  .cst-t{gap:2px}
+  .cst-n b{display:none}
+  .cst-n em{font-size:14px}
+  .cst-n em small{font-size:10px}
+  .cst-bar{height:3px;width:30px}
+}
 /* 🌙 가족 · 나만 고르기 = 밤 스위치 (2026-10-08 시안 2번): 한 판 안에서 별 박힌 남색 손잡이 */
 .seg:has(input[name="scope"]){width:fit-content;max-width:100%;justify-self:start;display:inline-flex!important;flex-wrap:nowrap;gap:0!important;padding:4px;border:0;border-radius:24px;background:color-mix(in srgb,#C9B6FF 22%,var(--surface));box-shadow:inset 0 1px 3px rgba(46,36,51,.14)}
 fieldset.seg:has(input[name="scope"]){margin-top:1.6em;position:relative}
