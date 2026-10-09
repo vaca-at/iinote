@@ -7898,7 +7898,7 @@ function appPath(url){
   try{ const u=new URL(url);
     if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase();
       if(k==="diary" && u.searchParams.get("d")) return "/?d="+encodeURIComponent(u.searchParams.get("d"));   // 하루 한 장 위젯 → 그 일기
-      return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz",mine:"/mine",cal:"/",tt:"/"})[k]||"/"; }   // mine · cal · tt: 하트 · 달력 · 시간표 위젯 (2026-10-08)   // quiz: 받아쓰기 위젯 (2026-10-07)
+      return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz",mine:"/mine",cal:"/",tt:"/",family:"/family"})[k]||"/"; }   // mine · cal · tt: 하트 · 달력 · 시간표 위젯 (2026-10-08)   // quiz: 받아쓰기 위젯 (2026-10-07)
     return u.pathname+u.search; }catch(e){ return /^\//.test(String(url||"")) ? String(url) : "/"; } }
 function openAppUrl(url){
   if(url==="help"){ if(S.phase==="app" && S.me) acts["help-open"](); else S.wantHelp=true; return; }   // 운영자 답장 알림
