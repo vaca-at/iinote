@@ -7707,8 +7707,13 @@ const helpGuide = () => [...FAQ.map(([q,a])=>`Q. ${q}\nA. ${a}`), ...TIPS.filter
 // 챗봇 AI 답에서 글만 꺼내요 (2026-10-09): 워커가 글 대신 {reply|text|response…} 묶음 · 배열로 줄 때가 있어 [object Object] 가 보였어요
 const aiText = (x,d=0) => { if(x==null || d>4) return ""; if(typeof x==="string") return x.trim(); if(typeof x==="number") return String(x);
   if(Array.isArray(x)) return x.map(v=>aiText(v,d+1)).filter(Boolean).join("\n");
-  if(typeof x==="object"){ for(const k of ["reply","text","response","answer","content","message","output","result"]) if(k in x){ const t=aiText(x[k],d+1); if(t) return t; } }
+  if(typeof x==="object"){ for(const k of ["reply","text","response","answer","content","message","output","result"]) if(k in x){ const t=aiText(x[k],d+1); if(t) return t; }
+    // 이름이 달라도: 묶음 안에서 가장 긴 글을 답으로 (kind · type · role · id · model 같은 짧은 표시는 빼요)
+    let best=""; const walk=(v,dd)=>{ if(dd>6||v==null) return; if(typeof v==="string"){ if(v.length>best.length) best=v; return; } if(Array.isArray(v)) return v.forEach(y=>walk(y,dd+1)); if(typeof v==="object") for(const [k,y] of Object.entries(v)) if(!/^(kind|type|role|id|model|error|status|pid|mode)$/.test(k)) walk(y,dd+1); };
+    walk(x,0); return best.trim(); }
   return ""; };
+// 답에서 글을 못 찾으면 모양만(칸 이름 · 글자 수, 내용 없이) 오류 기록으로 남겨요
+const aiShape = (x,d=0) => x==null?null : typeof x==="string"?`str${x.length}` : Array.isArray(x)?x.slice(0,3).map(v=>aiShape(v,d+1)) : typeof x==="object"&&d<4?Object.fromEntries(Object.entries(x).slice(0,12).map(([k,v])=>[k,aiShape(v,d+1)])) : typeof x;
 const helpMsgText = t => { const v=aiText(t); return v==="[object Object]" ? "" : v; };
 forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return;
   if(DEMO){ toast("둘러보기에서는 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
@@ -7719,7 +7724,8 @@ forms.help = (fd,f) => { const text=String(fd.text||"").trim(); if(!text) return
   (async()=>{
     let ai=null;
     if(!rep){ try{ ai=await talkFetch(SPELL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"help",pid:S.me.id,text,guide:helpGuide(),history})}); }catch(e){ console.warn("챗봇 AI",e); ai=null; } }
-    if(ai){ const rt=aiText(ai.reply ?? ai.response ?? ai.text ?? ai.answer); ai={reply:rt, kind:ai.kind || ai.reply?.kind || ""}; }   // 글만 꺼내 쓰기
+    if(ai){ const raw=ai, rt=aiText(ai.reply ?? ai.response ?? ai.text ?? ai.answer) || aiText(ai); ai={reply:rt, kind:(typeof raw.kind==="string"?raw.kind:"") || (typeof raw.reply?.kind==="string"?raw.reply.kind:"")};   // 글만 꺼내 쓰기
+      if(!rt) try{ reportError(`챗봇 답 모양: ${JSON.stringify(aiShape(raw)).slice(0,400)}`,"helpBot"); }catch(_){} }
     if(ai?.reply){ S.helpLocal=[...S.helpLocal,{from:"bot",text:ai.reply}]; S.helpBusy=""; render(); helpScroll(); }
     else S.helpBusy=rep?"신고를 보내는 중…":"상담원에게 보내는 중…";
     try{
