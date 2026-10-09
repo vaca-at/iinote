@@ -417,7 +417,35 @@ html.typing :is(.a-nav,.a-help){display:none!important}
   .mast-sub .me-chip small,.fav-h span,.fav.add span,.mast-sub .out span{display:none}
   .fav.add{padding:0 10px}
   .sheet{padding:18px 0 120px}
+  /* (2026-10-09) 휴대폰 웹 머리 줄이기: 1줄 = 홈 · 제목 · 🔔 · 🎨 · 내 얼굴 / 2줄 = 즐겨찾기 · 시간표 · 로그아웃 / 3줄 = 아이가 쓰기(작게) */
+  .frame{padding-top:calc(8px + env(safe-area-inset-top))}
+  .mast{flex-wrap:nowrap;gap:8px}
+  .home-btn{width:38px;padding:0;justify-content:center}
+  .home-btn span{display:none}
+  .mast-l{gap:8px}
+  .mast-t{font-size:19px}
+  .mast-m{display:flex;align-items:center;gap:6px;flex:none}
+  .mast-m .bell{width:36px;height:36px;font-size:17px}
+  .mast-m .prefs-btn{width:36px;height:36px;font-size:16px}
+  .me-m{display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+  .mast-sub{margin-top:8px;gap:4px}
+  .mast-sub>.me-chip,.mast-sub>.bell{display:none}
+  .mast-sub .fav-row{padding:2px 0}
+  .fav-row{gap:6px}
+  .fav{min-height:32px;font-size:13px;padding:0 11px 0 4px}
+  .fav .lk-mark{width:24px;height:24px}
+  .mast-sub .out{padding:0 4px}
+  .mast-sub .help-fab span{display:none}
+  .mast-sub .help-fab{padding:0 4px}
+  .kid-bar{margin-top:6px;gap:5px}
+  .kid-bar b{font-size:12px}
+  .kq{min-height:32px;font-size:13px;padding:0 10px 0 3px}
+  .kq .av{width:24px!important;height:24px!important}
+  .sheet-prefs .prefs-btn{display:none}
+  .sheet-prefs:not(:has(.prefs.open)){display:none}
+  .sheet-prefs{margin:0 0 8px}
 }
+@media (min-width:760px){ .mast-m{display:none} }
 
 /* ============ 홈 ============ */
 .hero-date{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px}
@@ -4266,6 +4294,7 @@ function viewShell(){
       <header class="mast">
         <button class="home-btn" data-act="tab" data-v="home" ${S.tab==="home"&&!S.sub?'aria-current="page"':""}>${ic("home")}<span>홈</span></button>
         <h1 class="mast-h"><button class="mast-l" data-act="tab" data-v="home" title="홈으로">${logo(44)}<span class="mast-t">${esc(S.group.name)} 일기장</span></button></h1>
+        <div class="mast-m">${newsBell()}<button class="prefs-btn ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 · 디자인 · 글씨 고르기">🎨</button><button class="me-m" data-act="switch-profile" aria-label="${esc(S.me.name)} · 프로필 바꾸기">${av(S.me,34)}</button></div>
       </header>
       <div class="mast-sub">
         <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>${newsBell()}

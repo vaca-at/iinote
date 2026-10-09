@@ -68,7 +68,7 @@
 - 일기장 이름 바꾸기 (2026-10-03): 우리 가족 설정 > 초대 카드 아래(부모만, data-form="group-name") → groups/{gid}.name (최대 20자, 위쪽 '○○ 일기장'에 보임)
 - 백업: 우리 가족 설정(부모만) → 일기 · 댓글 CSV (엑셀용 BOM, =+-@ 로 시작하는 칸은 ' 붙임)
 - 자동 로그아웃: 첫 화면 · 계정에 '이 기기에서 로그인 유지'(iinote-keep). 로그인은 늘 local 저장(새 탭 · 공부방 ?write 링크에서도 유지). 켜면 30일(KEEP_DAYS) 뒤, 끄면 30분(IDLE_MIN) 안 쓰면 autoLogoutCheck 가 로그아웃 (iinote-login · iinote-active 시각으로 판단). 일기 쓰는 중엔 기다림. 익명(아이 휴대폰 연결) 계정은 제외
-- 위쪽 머리: 맨 위 홈 단추(.home-btn) · 휴대폰은 1줄(홈 · 제목 · 🎨) + 2줄(나 · 즐겨찾기 · 로그아웃), 🎨 누르면 화면 구성 → 디자인 → 글씨
+- 위쪽 머리: 맨 위 홈 단추(.home-btn) · 휴대폰 웹(759px 이하, 2026-10-09 줄임)은 1줄(홈 아이콘 · 제목 · 🔔 · 🎨 · 내 얼굴 = .mast-m) + 2줄(즐겨찾기 · 📅 시간표 · 챗봇 아이콘 · 로그아웃) + 3줄(아이가 쓰기 작게). 🎨 누르면 그때만 .sheet-prefs 고르기 칸(화면 구성 → 디자인 → 글씨)
 - 🌐📱 접속 현황 웹 · 앱 나눠 세기 (2026-10-08): VISIT_SRC = Capacitor.isNativePlatform() ? "app" : "web" → countVisit 가 예전 stats/{날짜} 는 그대로 + statsSrc/{날짜} 에 visitors_web · visitors_app · views_* · members_* 를 따로 1씩. admin.html 대문 접속 현황 표에 웹 방문 · 앱 방문 칸과 오늘/최근 7일 웹 · 앱 숫자. ⚠ Firestore 규칙에 match /statsSrc 를 넣어야 쌓임(현황판이 붙여 넣을 규칙을 보여 줌, 넣기 전엔 그 쓰기만 조용히 실패)
 - 운영 현황판: 워커 GET /usage 로 AI 횟수 · 토큰 · 예상 금액(Opus 5 입력 $5 · 출력 $25 /100만 토큰, 1달러≈1,400원). /usage 는 아이 이름 없이 who {iinote, other} 만
 - 카카오 로그인 (2026-09-28): 파이어베이스 Identity Platform 업그레이드 + 로그인 방법 OpenID Connect(이름 kakao → oidc.kakao, 코드 흐름, 발급자 https://kauth.kakao.com, 클라이언트 ID = 카카오 REST API 키, 비밀번호 = 카카오 클라이언트 시크릿). 카카오 쪽: 카카오 로그인 · OpenID Connect ON, 리다이렉트 URI https://iinote.firebaseapp.com/__/auth/handler, 동의항목 닉네임만(이메일 안 받음). 코드: signInKakao = signInWithPopup(OAuthProvider("oidc.kakao")), reauth도 카카오 계정이면 카카오로. 구글 · 카카오는 서로 다른 계정. OIDC는 한 달 로그인 50명까지 무료
