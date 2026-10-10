@@ -6470,8 +6470,6 @@ function viewFamily(){
             <button class="btn btn-primary span2">저장</button>
           </form></details>`:""}
       </section>
-      ${isParent()?viewFeatToggles():""}
-      ${viewAnniv()}
       <section class="block" aria-labelledby="h-mem"><div class="block-h"><h2 id="h-mem">가족 구성원</h2><span class="muted">${ps.length}명</span></div>
         <ul class="mem-list">${ps.map(p=>`<li class="mem"><button class="av-btn" data-act="prof-open" data-v="${esc(p.id)}" aria-label="${esc(p.name)} 프로필">${av(p)}</button><span>${esc(p.name)}</span>${p.phone?`<small class="muted">${esc(p.phone)}</small>`:""}<small class="muted">${p.type==="child"?`${gradeName(p.grade)||"어린이"}${p.pin?" (비밀번호)":""}`:"보호자"}</small>${p.type==="child"&&!p.uid&&isParent()?`<button class="link-btn" data-act="copy" data-v="${esc(kidInviteMsg(p,`https://${SITE_ADDRESS}/?k=${g.inviteCode}-${p.id}&n=${encodeURIComponent(p.name)}`))}" aria-label="${esc(p.name)}에게 보낼 초대 문자 복사">${ic("link")}초대 문자 복사</button>`:""}${p.type==="child"&&isParent()?`<button class="link-btn" data-act="kid-pin-open" data-id="${p.id}" aria-expanded="${S.pinEdit===p.id}">🔑 비밀번호</button><button class="icon-btn" data-act="del-child" data-id="${p.id}" aria-label="${esc(p.name)} 프로필과 기록 지우기" title="프로필과 기록 지우기">${ic("trash")}</button>`:""}</li>
           ${p.type==="child"&&isParent()&&S.pinEdit===p.id?`<li class="mem-pin">${pinForm("kid-pin",p,false)}</li>`:""}`).join("")}</ul>
@@ -6494,11 +6492,13 @@ function viewFamily(){
       </section>
     </div>
     <div class="col">
+      <p class="set-hint">알림 · 앱 잠금 · 화면 밝기 · 로그인 같은 <b>나만의 설정</b>은 <button class="link-btn" data-act="tab" data-v="settings">${ic("gear")}설정</button>에 있어요.</p>
+      ${isParent()?viewFeatToggles():""}
+      ${viewAnniv()}
       ${isParent()?`<section class="block" aria-labelledby="h-bak"><div class="block-h"><h2 id="h-bak">백업 (엑셀 파일)</h2></div>
         <p style="margin:0 0 12px;color:var(--ink2)">우리 가족의 일기와 댓글을 엑셀에서 열 수 있는 CSV 파일로 이 기기에 저장해요. 사진 · 소리는 파일 안에 주소(링크)로 들어가요. 가끔 받아 두면 안심이에요.</p>
         <div class="row"><button class="btn btn-ghost sm" data-act="backup" data-v="diaries">${ic("download")}일기 받기 (${S.diaries.length}편)</button><button class="btn btn-ghost sm" data-act="backup" data-v="comments">${ic("download")}댓글 받기 (${S.comments.length}개)</button></div>
       </section>`:""}
-      <p class="set-hint">알림 · 앱 잠금 · 화면 밝기 · 로그인 같은 <b>나만의 설정</b>은 <button class="link-btn" data-act="tab" data-v="settings">${ic("gear")}설정</button>에 있어요.</p>
     </div>
   </div>`;
 }
