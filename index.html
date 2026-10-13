@@ -1521,6 +1521,8 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .upbar .upbar-track{height:6px;border-radius:3px;background:rgba(255,255,255,.25);margin-top:8px;overflow:hidden}
 .upbar .upbar-fill{height:100%;width:0;background:var(--coral);transition:width .3s}
 .upbar.wait{cursor:pointer}
+.upbar-x{display:none;position:absolute;top:6px;right:8px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(255,255,255,.15);color:inherit;font-size:15px;line-height:30px;padding:0;cursor:pointer}
+.upbar.wait .upbar-x{display:block}   /* 사진 기다림 띠에만 ✕ (저장 중에는 닫지 않아요) */
 .upbar.wait .upbar-fill{width:35%;animation:upwait 1.3s ease-in-out infinite alternate}
 @keyframes upwait{from{transform:translateX(-10%)}to{transform:translateX(195%)}}
 @media (prefers-reduced-motion:reduce){.upbar.wait .upbar-fill{animation:none;width:100%;opacity:.5}}
@@ -2967,7 +2969,7 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
   <noscript><p>아이아이노트는 자바스크립트를 켜야 쓸 수 있어요.</p></noscript>
 </main></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<div id="upbar" class="upbar" role="status" aria-live="polite" hidden><span class="upbar-t"></span><div class="upbar-track"><div class="upbar-fill"></div></div><small class="upbar-s"></small></div>
+<div id="upbar" class="upbar" role="status" aria-live="polite" hidden><button type="button" class="upbar-x" aria-label="닫기">✕</button><span class="upbar-t"></span><div class="upbar-track"><div class="upbar-fill"></div></div><small class="upbar-s"></small></div>
 
 <script type="module">
 /* =========================================================
@@ -6659,13 +6661,29 @@ function upProg(label,done,n,o={}){ const b=document.getElementById("upbar"); if
   b.querySelector(".upbar-fill").style.width=n?`${Math.round(done/n*100)}%`:""; }
 addEventListener("beforeunload",e=>{ if(upBusy){ e.preventDefault(); e.returnValue=""; } });
 // 사진 고르는 칸을 누르면 바로 띠를 띄워 둬요: 아이폰은 ✓ 를 누르고도 사진을 넘겨주기까지(아이클라우드 원본 받기 · 바꾸기) 한참 걸릴 때가 있어서
-// 아이폰은 '사진 보관함'을 고르는 사이에 cancel 을 잘못 보내기도 해서, 아이폰에서는 cancel 로 닫지 않아요 (사진이 오거나 · 띠를 누르거나 · 3분 뒤 닫힘)
+// 아이폰은 '사진 보관함'을 고르는 사이에 cancel 을 잘못 보내기도 해서, 아이폰에서는 cancel 로 닫지 않아요
+// 대신 이 띠는 안내일 뿐이라(닫아도 사진은 그대로 와요) 여러 길로 금방 닫혀요 (2026-10-13, 띠가 남아 저장을 못 한다는 제보):
+//   사진이 오면 · 띠나 ✕ 를 누르면 · 사진 창에서 돌아온 뒤 10초 안에 사진이 안 오면 · 늦어도 1분 뒤
+const UP_WAIT_MAX = 60000, UP_BACK_WAIT = 10000;
+let upBackT=0;
+function upWaitBack(){ clearTimeout(upBackT); if(!document.querySelector("#upbar.wait")) return;
+  upBackT=setTimeout(()=>{ if(document.querySelector("#upbar.wait")) upProg(); },UP_BACK_WAIT); }
+addEventListener("focus",upWaitBack);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) upWaitBack(); });
+plug("App")?.addListener("appStateChange",({isActive})=>{ if(isActive) upWaitBack(); });
 document.addEventListener("click",e=>{
   const t=e.target instanceof HTMLInputElement ? e.target : e.target.closest?.("label")?.querySelector('input[type="file"]');
   if(!t || t.type!=="file" || !/^image/.test(t.accept||"") || document.querySelector("#upbar:not([hidden])")) return;
-  upProg("📥 사진을 가져오는 중…",0,0,{wait:true,note:"✓ 를 누른 뒤 사진을 받아 오는 데 조금 걸릴 수 있어요 · 안 골랐으면 눌러서 닫기"});
-  upWaitT=setTimeout(()=>upProg(),180000);
+  upProg("📥 사진을 가져오는 중…",0,0,{wait:true,note:"✓ 를 누른 뒤 사진을 받아 오는 데 조금 걸릴 수 있어요 · 안 골랐으면 ✕ 나 띠를 눌러서 닫기"});
+  upWaitT=setTimeout(()=>upProg(),UP_WAIT_MAX);
   if(!IS_IOS) t.addEventListener("cancel",()=>{ if(document.querySelector("#upbar.wait")) upProg(); },{once:true});
+  // 사진 창이 열린 사이 화면이 다시 그려지면 이 칸이 화면에서 빠져, 사진이 와도 아래 change 처리까지 닿지 않아요
+  // → 빠진 칸이면 잠깐 화면에 붙여 같은 change 를 다시 보내요 (사진을 잃지 않고, 띠도 닫혀요)
+  t.addEventListener("change",()=>{
+    if(t.isConnected || !t.files?.length){ if(document.querySelector("#upbar.wait")) upProg(); return; }
+    t.hidden=true; document.body.appendChild(t);
+    try{ t.dispatchEvent(new Event("change",{bubbles:true})); } finally{ t.remove(); }
+  },{once:true});
 },true);
 document.addEventListener("click",e=>{ if(e.target.closest?.("#upbar.wait")) upProg(); });
 // 여러 개를 k개씩 같이 처리 (결과 순서는 그대로)
