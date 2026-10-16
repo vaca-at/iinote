@@ -4378,10 +4378,10 @@ function viewAppShell(){
     ${S.lb?viewLightbox():""}
   </div>`;
 }
-// 더보기 판: 아래 메뉴에 없는 화면들 · 화면 꾸미기(디자인 · 글씨) · 도움
+// 더보기 판: 아래 메뉴에 없는 화면들 · 도움 (2026-10-16: 화면 꾸미기는 뺐어요. 디자인 · 글씨는 위 막대 🎨 · 가 단추로)
 function viewMore(){
   // (2026-10-07) 더보기 = 상자 6개(1줄: 우리 가족 설정 · 앱 설정 · AI 챗봇 상담 / 2줄: 아이들 현황 · 책장 PDF · 우리 아이 그래프)
-  //  + 아래에 작게: 화면 꾸미기 · 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침
+  //  + 아래에 작게: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침
   // 사진첩 · AI 리포트(아이는 받아쓰기)는 홈 쪽에, 하루 펼쳐보기는 홈 일기장 쪽과 겹쳐서 뺐어요
   const kid=S.me.type==="child";
   const it=[["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["settings","앱 설정","gear","#E5ECFF","#3F5FB8"],["help","AI 챗봇 상담","help","#E3F4EC","#2F7A56"],
@@ -4391,8 +4391,6 @@ function viewMore(){
   <section class="more" role="dialog" aria-modal="true" aria-labelledby="more-h"><i class="more-grip" aria-hidden="true"></i>
     <div class="more-head"><h2 id="more-h">더보기</h2><button class="link-btn" data-act="app-more">닫기</button></div>
     <div class="more-grid">${it.map(box).join("")}</div>
-    <button class="more-row ${S.morePrefs?"on":""}" data-act="more-prefs" aria-expanded="${!!S.morePrefs}">${ic("palette")}<span>화면 꾸미기</span><small>디자인 · 글씨</small><i aria-hidden="true">›</i></button>
-    ${S.morePrefs?`<div class="more-prefs">${prefGroups(false)}</div>`:""}
     <div class="more-foot">
       <div class="more-share"><button class="mf-kakao" data-act="kakao-share">${ic("talk")}카카오톡 공유</button><button class="mf-link" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button></div>
       <p class="more-legal"><a href="terms.html" target="_blank" rel="noopener">이용약관</a><span aria-hidden="true">·</span><a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></p>
@@ -4595,7 +4593,7 @@ const TIPS = [
   ["🏆","한 달 내내 쓰면 개근상, 20일 넘게 쓰면 성실상을 받아요","mine","",""],
   ["🌙","하루 펼쳐보기에서 같은 날 가족 일기를 나란히 읽어 보세요","day","",""],
   ["🗓","일정은 '가족 모두' 또는 '나만 보기'로 나눠 넣을 수 있어요","","",""],
-  ["🎨","화면 꾸미기에서 디자인 · 글씨체를 내 마음대로 골라 보세요","settings","",""],
+  ["🎨",IS_APP?"위 막대의 🎨 · 가 단추를 눌러 디자인 · 글씨체를 바꿔 보세요":"화면 꾸미기에서 디자인 · 글씨체를 내 마음대로 골라 보세요",IS_APP?"":"settings","",""],
   ["💌","가족 일기에 하트와 댓글을 남겨 보세요. 보호자는 칭찬 도장도 찍어 줄 수 있어요","day","",""],
   ["🔔","위쪽 종을 누르면 내 일기에 달린 댓글 · 하트 · 도장을 모아 볼 수 있어요","","",""],
   ["🧩","홈 화면에 달력 · 사진 등 다양한 위젯을 두고 활용해 보세요","","","app"],
@@ -6577,7 +6575,7 @@ function viewSettings(){
       ${IS_APP?appSettings():""}
       <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
         <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
-        <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 더보기 › 화면 꾸미기에서 고를 수 있어요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
+        <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추를 누를 때마다 바뀌어요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
       </section>
       <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
         <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. 휴대폰에서는 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들 수 있어요. (안드로이드 앱은 10월 중 출시 예정)</p>${addrBox()}${kakaoBtn(true)}
@@ -7965,7 +7963,7 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.ttOpen && !S.
 // 보내기: 🚩 신고는 상담원에게 바로. 그 밖에는 🤖 AI 챗봇(무료 AI, 워커 mode "help")이 먼저 답하고, 대화는 모두 운영자 문의함에 남아요 (2026-10-09)
 //  화면 · 디자인 고칠 곳(design) · 오류(bug) · 사람이 봐야 할 것(human)은 상담원에게도 알림이 가요. AI 가 안 되면 예전처럼 상담원에게만
 const helpGuide = () => [...FAQ.map(([q,a])=>`Q. ${q}\nA. ${a}`), ...TIPS.filter(t=>!t[4] || (t[4]==="app")===IS_APP).map(t=>`- ${t[1]}`),
-  IS_APP?"- 이 사람은 안드로이드 앱을 쓰고 있어요. 아래 메뉴: 홈 · 내 일기 · 가운데 ✏️ 쓰기 · 채팅 · 더보기(우리 가족 설정 · 앱 설정 · AI 챗봇 상담 · 아이들 현황 · 책장 PDF · 그래프 · 화면 꾸미기)"
+  IS_APP?"- 이 사람은 안드로이드 앱을 쓰고 있어요. 아래 메뉴: 홈 · 내 일기 · 가운데 ✏️ 쓰기 · 채팅 · 더보기(우리 가족 설정 · 앱 설정 · AI 챗봇 상담 · 아이들 현황 · 책장 PDF · 그래프). 디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추를 누를 때마다 바뀌어요"
     :"- 이 사람은 웹(iinote.co.kr)을 쓰고 있어요. 위쪽 탭: 홈 · 내 일기 · 가족 채팅 · 달력 · 하루 펼쳐보기 · 책장 · 사진첩 · AI 리포트 · 우리 가족 설정 · 설정. 디자인 · 글씨는 오른쪽 위 🎨 화면 꾸미기"].join("\n");
 // AI 챗봇 답에서 글만 꺼내요 (2026-10-09): 워커가 글 대신 {reply|text|response…} 묶음 · 배열로 줄 때가 있어 [object Object] 가 보였어요
 const aiText = (x,d=0) => { if(x==null || d>4) return ""; if(typeof x==="string") return x.trim(); if(typeof x==="number") return String(x);
@@ -8392,8 +8390,8 @@ if(IS_APP){
     "more-go": el => { S.moreOpen=false; acts.tab(el); },
     "more-prefs": () => { S.morePrefs=!S.morePrefs; render(); },
     // 위 막대 🎨 · 가: 탭탭 누르면 차례로 바뀌고, 마지막 것을 기억해요 (2026-10-16)
-    "ah-dz": () => { const i=DESIGNS.findIndex(x=>x[0]===S.design), n=DESIGNS[(i+1)%DESIGNS.length]; S.design=n[0]; ls.set("iinote-design",n[0]); applyPrefs(); render(); syncWidget();   // 디자인 이름 알림(토스트)은 띄우지 않아요 (2026-10-16) },
-    "ah-ft": () => { const i=DFONTS.findIndex(x=>x[0]===S.dfont), n=DFONTS[(i+1)%DFONTS.length]; S.dfont=n[0]; ls.set("iinote-dfont",n[0]); applyPrefs(); render(); toast(`가 ${n[1]}`); },
+    "ah-dz": () => { const i=DESIGNS.findIndex(x=>x[0]===S.design), n=DESIGNS[(i+1)%DESIGNS.length]; S.design=n[0]; ls.set("iinote-design",n[0]); applyPrefs(); render(); syncWidget(); },   // 디자인 이름 알림(토스트)은 띄우지 않아요 (2026-10-16)
+    "ah-ft": () => { const i=DFONTS.findIndex(x=>x[0]===S.dfont), n=DFONTS[(i+1)%DFONTS.length]; S.dfont=n[0]; ls.set("iinote-dfont",n[0]); applyPrefs(); render(); },   // 글씨 이름 알림(토스트)도 띄우지 않아요 (2026-10-16)
     // 일기 쓰기 날씨 · 기분: 단추를 누르면 그 줄만 펼쳐요
     "wm-open": el => { S.wmOpen = S.wmOpen===el.dataset.v ? null : el.dataset.v; render(); },
     // 하루 펼쳐보기: 누른 사람 칸을 넓게 (빈 값이면 다시 나란히)
