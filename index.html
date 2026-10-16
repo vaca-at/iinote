@@ -2311,7 +2311,8 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .web-help{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:35;display:grid;place-items:center;width:54px;height:54px;border:0;border-radius:50%;background:var(--ink);color:var(--surface);box-shadow:0 6px 18px rgba(31,42,68,.28);cursor:pointer}
 .web-help .ic{width:26px;height:26px}
 .web-help:hover{transform:translateY(-2px)}
-@media (max-width:640px){ .web-help{right:14px;bottom:calc(84px + env(safe-area-inset-bottom));width:50px;height:50px} }
+@media (max-width:640px){ .web-help{right:14px;bottom:calc(84px + env(safe-area-inset-bottom));width:50px;height:50px}
+  body:has(.chat > .chat-list) .web-help{bottom:calc(150px + env(safe-area-inset-bottom))} }   /* 가족 채팅 탭: 보내기 단추를 가리지 않게 글 칸 위로 */
 .w-mode .web-help{display:none}
 .cmt-acts .rep-btn,.rep-btn{color:var(--ink3)}
 @media (min-width:700px){ #app .help{inset:auto 24px 24px auto;width:400px;height:min(640px,calc(100dvh - 48px));border-radius:22px;overflow:hidden;box-shadow:0 12px 40px rgba(46,36,51,.28)} }
@@ -3816,16 +3817,49 @@ function chatDots(){
 // 새 메시지가 오면: 채팅이 보이면 목록만 바꾸고(쓰던 글 그대로), 안 보이면 탭 · 채팅 단추에 빨간 숫자만
 function onChats(){
   if(S.phase!=="app" || !S.me) return;
-  document.querySelectorAll(".chat-list").forEach(box=>{ const bottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML=chatItems(); if(bottom) box.scrollTop=box.scrollHeight; });
+  document.querySelectorAll(".chat-list").forEach(box=>{ const bottom=box.scrollHeight-box.scrollTop-box.clientHeight<120; box.innerHTML=chatItems(); if(bottom){ box.scrollTop=box.scrollHeight; chatStickBottom(box); } });
   if(chatBoxes().length) markChatSeen(); else chatDots();
   if(IS_APP && window.appReady) syncWidget();   // 💬 가족 채팅 위젯도 새 메시지로 (2026-10-09)
 }
 function afterChatRender(){
   // 채팅을 처음 열 때만 맨 아래로 (사진 크게 보기를 열고 닫아도 보던 자리 그대로)
   const boxes=chatBoxes(); if(!boxes.length){ chatDots(); return; }
-  if(S.chatJump){ boxes.forEach(b=>b.scrollTop=b.scrollHeight); S.chatJump=false; }
+  fitChat();
+  if(S.chatJump){ boxes.forEach(b=>{ b.scrollTop=b.scrollHeight; chatStickBottom(b); }); S.chatJump=false; }
   markChatSeen(); cleanOldChats();
 }
+/* 💬 채팅 높이를 실제 화면에 맞춰요 (2026-10-16): 예전엔 '화면 − 330px' · '화면 − 24px' 처럼 어림해서
+   휴대폰 웹 · 앱은 글 칸이 아래 메뉴 뒤로, 컴퓨터는 채팅 기둥 아래가 화면 밖으로 잘렸어요.
+   이제 목록 위쪽 위치와 아래 메뉴 위치를 재서, 글 칸까지 한 화면에 들어오게 해요 */
+function fitChat(){
+  const vh=window.visualViewport?.height || innerHeight;
+  // 컴퓨터: 종이 판 오른쪽 채팅 기둥 (따라 내려오는 기둥이라 스크롤할 때마다 다시 재요)
+  document.querySelectorAll(".chat-side:not(.closed)").forEach(el=>{
+    if(el.offsetParent===null) return;
+    const top=Math.max(12, el.getBoundingClientRect().top);
+    el.style.height=Math.round(Math.max(320, Math.min(900, vh-top-12)))+"px";
+  });
+  // 휴대폰 웹 '가족 채팅' 탭 · 앱 채팅 화면
+  const box=document.querySelector(".chat > .chat-list"); if(!box || box.offsetParent===null) return;
+  const navs=[...document.querySelectorAll(".nav,.a-nav")].filter(n=>getComputedStyle(n).display!=="none" && n.getBoundingClientRect().height>0);
+  const limit=Math.min(vh, ...navs.map(n=>n.getBoundingClientRect().top)) - 8;   // 아래 메뉴 바로 위까지
+  const bottom=box.scrollHeight-box.scrollTop-box.clientHeight<120;
+  const app=box.closest(".chatting .chat");
+  if(app){ app.style.height=Math.round(Math.max(260, limit-(app.getBoundingClientRect().top+scrollY)))+"px"; }   // 앱: 상자 가득, 목록은 flex 로 늘어나요
+  else {
+    const p=box.parentElement, below=p.getBoundingClientRect().bottom-box.getBoundingClientRect().bottom;   // 목록 아래 답장 띠 · 글 칸 높이
+    box.style.minHeight="0";   // CSS 의 최소 320px 이 맞춘 높이를 덮지 않게
+    box.style.height=Math.round(Math.max(160, limit-(box.getBoundingClientRect().top+scrollY)-below))+"px";
+  }
+  if(bottom) box.scrollTop=box.scrollHeight;
+}
+// 사진이 늦게 떠서 목록이 길어지면, 맨 아래를 보던 중이었으면 다시 맨 아래로 (화면이 끝까지 안 내려가던 것)
+function chatStickBottom(b){
+  b.querySelectorAll("img").forEach(i=>{ if(!i.complete) i.addEventListener("load",()=>{ if(b.scrollHeight-b.scrollTop-b.clientHeight<b.clientHeight*.6) b.scrollTop=b.scrollHeight; },{once:true}); });
+}
+{ let t=0; const re=()=>{ cancelAnimationFrame(t); t=requestAnimationFrame(fitChat); };
+  addEventListener("resize",re); window.visualViewport?.addEventListener("resize",re);
+  addEventListener("scroll",()=>{ if(document.querySelector(".chat-side:not(.closed)")) re(); },{passive:true}); }
 /* ---------- 🔔 새 소식 ----------
    내 일기에 달린 댓글 · 내 댓글에 달린 답글 · 하트 · 칭찬 도장, (어른) 아이가 쓴 일기. 따로 저장하지 않고 있는 기록에서 모아요 */
 const newsSeenKey = () => `iinote-news-${S.gid}-${S.me?.id}`;

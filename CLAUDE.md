@@ -50,6 +50,7 @@
 - 🎉 연속 일기 축하 (2026-10-04, streakCelebrate): 아이가 제출해서 연속(streakOf)이 3 · 5 · 7 · 10 · 15 · 20일, 그다음 5일마다(streakMile) → 화면 가득 축하(.cele, 꽃가루 · 날짜 점 · 다음 축하까지 며칠). 같은 연속 기록에서 한 번만(ls iinote-cele-{gid}-{pid} = 시작일:날짜 수)
 - 🏆 이달의 상장 (2026-10-04, awardsOf): 지난 달 하루도 안 빠지면 개근상, 20일(AWARD_MIN) 이상이면 성실상. 계산만 하고 저장 안 함. 아이의 내 일기 · 아이들 현황 카드에 상장 단추(awardList), 달 바뀐 뒤 10일 동안 홈 맨 위 띠(awardBanner, 닫으면 ls iinote-awardseen-…), 누르면 새 창 A4 가로 상장(openAward, 인쇄 · PDF)
 - 🏅 스티커판(STICKERS 14개, stickerStats): 아이의 내 일기 탭 위 + 아이들 현황 카드. 제출하면 새 스티커 토스트. 계산만 하고 저장 안 함
+- 💬 채팅 높이 (2026-10-16, fitChat): 어림값(100vh−330px · 100vh−24px · 100dvh−64−96) 대신 목록 위치와 아래 메뉴(.nav · .a-nav) 위치를 재서 글 칸까지 한 화면에. 컴퓨터 채팅 기둥은 스크롤 · 창 크기 바뀔 때마다 다시 잼. 사진이 늦게 떠도 맨 아래 유지(chatStickBottom). 휴대폰 웹 채팅 탭에서는 상담 단추(.web-help)를 글 칸 위로
 - 채팅 반응: chats.reactions = {프로필id: 이모지} (REACTS 6개, 한 사람당 하나)
 - 채팅 답장 (2026-09-29): 메시지 시간 아래 '답장' → S.chatReply, 글 칸 위 띠(chatReplyBar · drawReplyBars, 쓰던 글 유지) → chats.replyTo = {id, profileId, text(앞 60자), photo}. 말풍선 안 인용(chatQuote)을 누르면 원래 메시지로 스크롤 + 반짝(chat-jump, #cm-{id})
 - 휴대폰 점검 (2026-09-29): 아래 메뉴는 640px 이하에서 짧은 이름(NAV_SHORT: 채팅 · 현황 · 하루 · 리포트 · 퀴즈 · 설정), .st-name flex:1 1 auto(짧은 이름 '지..' 잘림 고침), 아이 쓰기 화면 .kw-prog 줄바꿈(가로 넘침 고침). 체험 모드로 390 · 360px 전 화면 가로 넘침 없음 확인
