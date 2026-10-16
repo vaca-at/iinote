@@ -8392,7 +8392,7 @@ if(IS_APP){
     "more-go": el => { S.moreOpen=false; acts.tab(el); },
     "more-prefs": () => { S.morePrefs=!S.morePrefs; render(); },
     // 위 막대 🎨 · 가: 탭탭 누르면 차례로 바뀌고, 마지막 것을 기억해요 (2026-10-16)
-    "ah-dz": () => { const i=DESIGNS.findIndex(x=>x[0]===S.design), n=DESIGNS[(i+1)%DESIGNS.length]; S.design=n[0]; ls.set("iinote-design",n[0]); applyPrefs(); render(); toast(`🎨 ${n[1]}`); syncWidget(); },
+    "ah-dz": () => { const i=DESIGNS.findIndex(x=>x[0]===S.design), n=DESIGNS[(i+1)%DESIGNS.length]; S.design=n[0]; ls.set("iinote-design",n[0]); applyPrefs(); render(); syncWidget();   // 디자인 이름 알림(토스트)은 띄우지 않아요 (2026-10-16) },
     "ah-ft": () => { const i=DFONTS.findIndex(x=>x[0]===S.dfont), n=DFONTS[(i+1)%DFONTS.length]; S.dfont=n[0]; ls.set("iinote-dfont",n[0]); applyPrefs(); render(); toast(`가 ${n[1]}`); },
     // 일기 쓰기 날씨 · 기분: 단추를 누르면 그 줄만 펼쳐요
     "wm-open": el => { S.wmOpen = S.wmOpen===el.dataset.v ? null : el.dataset.v; render(); },
