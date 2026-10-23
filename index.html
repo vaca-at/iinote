@@ -7396,6 +7396,7 @@ async function saveDiary(status){
   }
   const pend=document.getElementById("w-tag")?.value; if(pend){ const t=cleanTag(pend); if(t && !d.tags.includes(t)) d.tags.push(t); }
   const data={profileId:S.me.id,date:d.date,mood:d.mood,weather:d.weather||"",prompt:d.prompt||"",title:d.title.trim(),text:d.text,status,updatedAt:Date.now()};
+  if(S.user?.uid) data.by=S.user.uid;   // 🔔 올린 휴대폰의 로그인 (2026-10-24): 엄마 휴대폰으로 아이가 썼을 때 그 휴대폰엔 '○○이가 썼어요' 알림을 안 보내요
   if(d.pen){ data.aiChecked=true; data.aiResult=penResult(d); }
   else if(d.aiChecked){ data.aiChecked=true; data.aiResult=d.aiResult; }
   if(!d.id){ data.createdAt=Date.now(); d.id=await B.add(S.gid,"diaries",{...data,photos:[],audio:null,location:null,tags:[]}); }
