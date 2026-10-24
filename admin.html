@@ -25,6 +25,8 @@ b,strong,th{font-weight:400}
 .when{color:var(--sub);font-size:16px;background:var(--paper);border:1.5px dashed var(--line);border-radius:999px;padding:4px 12px}
 button{font:inherit;color:inherit;cursor:pointer}
 .btn{border:0;border-radius:999px;padding:10px 20px;background:var(--ink);color:var(--paper);font-size:19px}
+.bill-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.bill-links .pill{text-decoration:none;color:inherit}
 .pill{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 14px;font-size:17px;transition:background .15s,border-color .15s}
 .pill:hover{background:var(--soft);border-color:var(--sub)}
 .card{background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:16px;box-shadow:0 2px 0 var(--line)}
@@ -316,7 +318,8 @@ function aiCard(usage){
       <td><b>${won(cost(m))}</b><br><span class="sub">$${cost(m).toFixed(2)}</span></td></tr>`; }).join("");
   return `<div class="card"><h2>🤖 AI 사용량 · 예상 금액</h2><div class="scroll"><table>
     <tr><th class="l">달</th>${AI_KINDS.map(([,l])=>`<th>${l}</th>`).join("")}<th>합계 횟수</th><th>토큰 (입력 / 출력)</th><th>예상 금액</th></tr>${rows}</table></div>
-    <p class="note">모델 ${esc(usage.model||"")} · 100만 토큰당 입력 $${PRICE.input} · 출력 $${PRICE.output}, 1달러 ≈ ${KRW.toLocaleString()}원으로 어림한 금액이에요. 정확한 청구액은 Anthropic 콘솔(Billing)에서 확인하세요. 횟수는 공부방 · 예전 일기장 사용도 함께 세요 (아이 이름은 보이지 않아요).</p></div>`;
+    <p class="note">모델 ${esc(usage.model||"")} · 100만 토큰당 입력 $${PRICE.input} · 출력 $${PRICE.output}, 1달러 ≈ ${KRW.toLocaleString()}원으로 어림한 금액이에요. 정확한 청구액은 Anthropic 콘솔(Billing)에서 확인하세요. 횟수는 공부방 · 예전 일기장 사용도 함께 세요 (아이 이름은 보이지 않아요).</p>
+    <div class="bill-links"><a class="pill" href="https://console.anthropic.com/settings/cost" target="_blank" rel="noopener">💰 실제 사용 금액 보기</a><a class="pill" href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">💳 남은 잔액 · 충전</a><a class="pill" href="https://dash.cloudflare.com/?to=/:account/ai/workers-ai" target="_blank" rel="noopener">☁️ 무료 AI(클라우드플레어) 사용량</a></div></div>`;
 }
 
 function render(fams,users,idx,usage,stats,kinds){
