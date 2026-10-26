@@ -28,7 +28,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Pen+Script&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Jua&family=Nanum+Pen+Script&display=swap">
 <style>
 /* =========================================================
    색은 모두 여기 변수로 관리해요. (다크 모드도 여기서 바뀜)
@@ -346,13 +346,30 @@ html.typing :is(.a-nav,.a-help){display:none!important}
 .mast-sub .link-btn{margin-left:auto;flex:none}
 .mast-sub .fav-row{flex:1;min-width:0;margin:0}
 /* 부모 폰으로 아이가 쓰기 */
-/* 칸 안 스크롤 막대 (다가오는 일정 · 4분할 칸 · 가족 채팅): 화살표 없이 얇고 둥글게, 고른 디자인 색을 따라가요 */
-:is(.sc-scroll,.q-body,.chat-list)::-webkit-scrollbar{width:10px;height:10px}
-:is(.sc-scroll,.q-body,.chat-list)::-webkit-scrollbar-button{display:none;width:0;height:0}
-:is(.sc-scroll,.q-body,.chat-list)::-webkit-scrollbar-track{background:color-mix(in srgb,var(--line) 45%,transparent);border-radius:99px;margin:6px 0}
-:is(.sc-scroll,.q-body,.chat-list)::-webkit-scrollbar-thumb{background-color:color-mix(in srgb,var(--coral) 55%,var(--line));border-radius:99px;border:3px solid transparent;background-clip:padding-box}
-:is(.sc-scroll,.q-body,.chat-list)::-webkit-scrollbar-thumb:hover{background-color:var(--coral)}
-@supports (-moz-appearance:none){ :is(.sc-scroll,.q-body,.chat-list){scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--coral) 55%,var(--line)) transparent} }
+/* 스크롤 막대 (창 전체 · 다가오는 일정 · 4분할 칸 · 가족 채팅 등 모두): 화살표 없이, 디자인마다 --sb-* 로 모양 · 색이 달라요 */
+:root{--sb-w:10px;--sb-r:99px;--sb-gap:3px;--sb-track:color-mix(in srgb,var(--line) 45%,transparent);--sb-thumb:color-mix(in srgb,var(--coral) 55%,var(--line));--sb-hover:var(--coral);--sb-ff:color-mix(in srgb,var(--coral) 55%,var(--line))}
+::-webkit-scrollbar{width:var(--sb-w);height:var(--sb-w)}
+::-webkit-scrollbar-button{display:none;width:0;height:0}
+::-webkit-scrollbar-corner{background:transparent}
+::-webkit-scrollbar-track{background:var(--sb-track);border-radius:var(--sb-r)}
+:is(.sc-scroll,.q-body,.chat-list)::-webkit-scrollbar-track{margin:6px 0}
+::-webkit-scrollbar-thumb{background:var(--sb-thumb);border-radius:var(--sb-r);border:var(--sb-gap) solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--sb-hover);border:var(--sb-gap) solid transparent;background-clip:padding-box}
+@supports (-moz-appearance:none){ html,:is(.sc-scroll,.q-body,.chat-list){scrollbar-width:thin;scrollbar-color:var(--sb-ff) transparent} }
+/* 새 색: 분홍 그러데이션 알약 */
+:root[data-design="fresh"]{--sb-track:color-mix(in srgb,#FF8DB0 14%,transparent);--sb-thumb:linear-gradient(180deg,#FF8DB0,#E4507F);--sb-hover:linear-gradient(180deg,#FF7AA3,#D63E6E);--sb-ff:#E4507F}
+/* 따뜻한 일기장: 버터색 길 위 코랄 크레파스 */
+:root[data-design="warm"]{--sb-w:12px;--sb-track:var(--butter-soft);--sb-thumb:var(--coral);--sb-hover:var(--coral-ink);--sb-ff:var(--coral)}
+/* 깔끔: 얇은 파랑, 길은 안 보이게 */
+:root[data-design="clean"]{--sb-w:8px;--sb-gap:2px;--sb-track:transparent;--sb-thumb:color-mix(in srgb,var(--accent) 45%,var(--line));--sb-hover:var(--accent);--sb-ff:color-mix(in srgb,var(--accent) 45%,var(--line))}
+/* 산뜻: 굵은 주황→노랑 막대 */
+:root[data-design="bright"]{--sb-w:14px;--sb-track:color-mix(in srgb,#FF6A3D 10%,transparent);--sb-thumb:linear-gradient(180deg,#FF6A3D,#FFC23D);--sb-hover:linear-gradient(180deg,#F2552A,#FFB21F);--sb-ff:#FF6A3D}
+/* 원고지: 네모난 빨강, 길에 칸 줄 */
+:root[data-design="wongoji"]{--sb-r:2px;--sb-gap:2px;--sb-track:repeating-linear-gradient(180deg,transparent 0 23px,color-mix(in srgb,var(--brand) 22%,transparent) 23px 24px),color-mix(in srgb,var(--brand) 5%,transparent);--sb-thumb:var(--brand);--sb-hover:#A81B2E;--sb-ff:var(--brand)}
+/* 황금 들녘: 크림 길 위 벼 줄무늬 */
+:root[data-design="harvest"]{--sb-w:12px;--sb-track:#F6E7C1;--sb-thumb:repeating-linear-gradient(115deg,#E0962B 0 6px,#EDAE45 6px 12px);--sb-hover:#C97A1C;--sb-ff:#E0962B}
+/* 밤하늘: 어두운 길 위 연보라 → 별빛 노랑 */
+:root[data-design="night"]{--sb-track:color-mix(in srgb,#343C78 60%,transparent);--sb-thumb:linear-gradient(180deg,#C9B6FF,#9FC2FF);--sb-hover:linear-gradient(180deg,#FFD36E,#C9B6FF);--sb-ff:#C9B6FF}
 .kid-bar{display:flex;align-items:center;gap:6px 8px;margin:8px 0 0;overflow-x:auto;scrollbar-width:none;padding:2px}
 .kid-bar::-webkit-scrollbar{display:none}
 .kid-bar b{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink2);white-space:nowrap;margin-right:2px}
@@ -790,7 +807,7 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 /* 가로 화면(컴퓨터 · 아이패드 가로)에서는 네 칸이 한 화면에 다 들어오게.
    1 · 3 · 4칸은 내용을 줄여서 스크롤 없이, 2칸(교환일기)만 길면 스크롤 */
 @media (min-width:760px) and (orientation:landscape){
-  .quad{grid-template-rows:repeat(2,minmax(0,1fr));height:calc(100dvh - 384px);min-height:320px}
+  .quad{grid-template-rows:repeat(2,minmax(0,1fr));height:calc(100dvh - 384px);min-height:620px}
   .sheet:has(.quad){padding-top:20px;padding-bottom:20px;margin-bottom:12px}
   .quad .block{padding:14px 18px}
   .quad .block-h{margin-bottom:10px}
@@ -806,9 +823,10 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
   @container (max-height:300px){ .qc-legend{display:none} .qc-dots i{width:6px;height:6px} .qc-n{font-size:11px} .qc-d{padding:2px 3px} }
   @container (max-height:220px){ .qc-sc{width:5px;height:5px} }
 }
-/* 높이가 낮은 가로 화면: 머리 부분이 납작해진 만큼 네 칸을 더 크게 */
-@media (min-width:760px) and (orientation:landscape) and (max-height:900px){ .quad{height:calc(100dvh - 324px);min-height:300px} }
-@media (min-width:760px) and (orientation:landscape) and (max-height:700px){ .quad{height:calc(100dvh - 339px);min-height:280px} }
+/* 높이가 낮은 가로 화면(노트북 작은 창): 머리 부분이 납작해진 만큼 네 칸을 더 크게.
+   그래도 칸 하나가 300px 아래로 찌부되지 않게 최소 높이를 두고, 넘치면 창 전체가 스크롤 */
+@media (min-width:760px) and (orientation:landscape) and (max-height:900px){ .quad{height:calc(100dvh - 324px);min-height:620px} }
+@media (min-width:760px) and (orientation:landscape) and (max-height:700px){ .quad{height:calc(100dvh - 339px);min-height:620px} }
 /* 앨범형 첫 화면 */
 .album{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-rows:150px;grid-auto-flow:dense}
 .al{position:relative;overflow:hidden;border:0;padding:0;border-radius:14px;background:var(--pc);color:var(--pt);text-align:left}
@@ -1737,6 +1755,27 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
   :root[data-design="warm"] .sheet .block{background:var(--surface)}
 }
 .dsw.warm{border-color:#F2CADA;background:linear-gradient(#E4507F 0 0) top/100% 5px no-repeat,radial-gradient(circle at 70% 65%,#F6C945 0 3px,transparent 3.5px),#FDEEF3}
+/* 🌾 황금 들녘 (2026-10-26, 가을 시안 B): 크림 바탕 + 고동색 글씨 + 금빛 강조, 제목은 주아체.
+   앱 홈은 위쪽을 노을 들녘 그림으로 꽉 채우고 본문이 크림 시트로 올라와요 (CSS '황금 들녘 · 앱 홈') */
+[data-design="harvest"]:not([data-theme="dark"]){
+  --paper:#FFF6DE; --grid:transparent; --surface:#FFFDF6; --surface2:#FBF0D6;
+  --ink:#4A2E12; --ink2:#6E4A24; --ink3:#86633A;
+  --line:#EEDDB5; --rule:#F1E3C2; --margin:#F2C48A;
+  --coral:#D9622B; --coral-ink:#A8461A; --coral-soft:#FDE3CF;
+  --butter:#E0962B; --butter-soft:#FBEAC2;
+  --sage:#5E8A3A; --sage-soft:#E6F0D6;
+  --sky:#3F6FB5; --sky-soft:#DDE8F6; --lilac:#8B5E9E; --lilac-soft:#F0E3F2;
+  --accent:#C97A1C; --accent-soft:#FBEAC2; --focus:#E0962B; --r-lg:20px; --r-md:14px; --r-sm:10px;
+}
+[data-design="harvest"][data-theme="dark"]{--accent:#F2B54A;--accent-soft:#3A3020}
+:root[data-design="harvest"]:not([data-theme="dark"]) body{background-image:none}
+:root[data-design="harvest"] :is(.mast-t,.page-h h1,.block-h h2,.day-nav h1,.today-date,.ah-t){font-family:'Jua',var(--sans);font-weight:400;letter-spacing:0}
+:root[data-design="harvest"] .block{border:0;border-radius:20px;background:var(--surface);box-shadow:0 2px 0 var(--line)}
+:root[data-design="harvest"] .btn{border-radius:14px}
+:root[data-design="harvest"] .btn-primary{background:var(--ink);color:var(--surface)}
+:root[data-design="harvest"] :is(.fav,.me-chip){border:0;background:var(--surface);box-shadow:0 2px 0 var(--line)}
+:root[data-design="harvest"] .chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.dsw.harvest{border:0;border-radius:6px;background:radial-gradient(circle at 68% 52%,#FFE6A6 0 3px,transparent 3.5px),linear-gradient(180deg,#C4567A 0 30%,#F59A4E 30% 55%,#E9A93A 55% 100%)}
 /* ═════════ 손글씨 글씨: 화면 전체를 손글씨로 (눈누 무료 폰트 3가지 · 모두 웹 임베딩 허용 확인 2026-09-28) ═════════
    거의 전부 = 온글잎 윤탱체 (사용자 요청), 큰 글자(제목) = 온글잎 언즈체 (2026-10-03 다예쁨체 → 언즈체, 기호는 Pretendard 로). 카페24 아네모네 에어는 불러 두기만 (지금은 안 씀) */
 @font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
@@ -2467,6 +2506,24 @@ html.is-app:root .ashell{--tc:#7A5BC7;background:radial-gradient(120% 55% at 100
 /* 🌌 밤하늘 디자인 · 앱: 화면 바탕에도 별 */
 html.is-app:root[data-design="night"] .ashell{background:radial-gradient(circle at 12% 18%,rgba(255,255,255,.9) 0 1px,transparent 1.6px) 0 0/260px 260px,radial-gradient(circle at 78% 9%,rgba(255,231,163,.95) 0 1.2px,transparent 1.9px) 0 0/330px 330px,radial-gradient(circle at 42% 64%,rgba(255,255,255,.7) 0 .9px,transparent 1.5px) 0 0/210px 210px,radial-gradient(circle at 90% 74%,rgba(201,182,255,.9) 0 1.1px,transparent 1.8px) 0 0/380px 380px,radial-gradient(120% 55% at 100% 0%,color-mix(in srgb,var(--tc) 22%,transparent) 0%,transparent 62%),radial-gradient(90% 45% at 0% 100%,rgba(63,115,209,.25) 0%,transparent 65%),var(--paper)}
 html.is-app:root[data-design="night"] .ashell :is(.bell,.ah-me){background:var(--surface2)}
+/* 🌾 황금 들녘 · 앱 홈 (2026-10-26): 위쪽 띠를 노을 들녘 그림으로 꽉 채우고(스크롤하면 같이 올라가요), 본문은 크림 시트로 겹쳐 올라와요.
+   아래 메뉴는 고동색 + 금빛 쓰기 단추. 다른 화면은 크림 바탕 그대로 */
+html.is-app:root[data-design="harvest"] .ashell{background:var(--paper)}
+html.is-app:root[data-design="harvest"] .a-top.band{position:relative;z-index:0;padding-bottom:42px;border-radius:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 250'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%234E3576'/%3E%3Cstop offset='.48' stop-color='%23C4567A'/%3E%3Cstop offset='.8' stop-color='%23F59A4E'/%3E%3Cstop offset='1' stop-color='%23FFD487'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23E9A93A'/%3E%3Cstop offset='1' stop-color='%23B9701C'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='390' height='192' fill='url(%23s)'/%3E%3Ccircle cx='250' cy='188' r='62' fill='%23FFE6A6' opacity='.25'/%3E%3Ccircle cx='250' cy='188' r='42' fill='%23FFE6A6'/%3E%3Cpath d='M0 176 Q70 154 150 170 T300 164 T390 166 V200 H0Z' fill='%239B4E5E'/%3E%3Cpath d='M0 186 Q90 175 190 184 T390 180 V205 H0Z' fill='%237A3C50'/%3E%3Crect y='192' width='390' height='58' fill='url(%23f)'/%3E%3Cg fill='none' stroke='%23F7C860' stroke-width='2' stroke-linecap='round' opacity='.8'%3E%3Cpath d='M-10 204 Q195 196 400 204'/%3E%3Cpath d='M-10 220 Q195 210 400 220'/%3E%3Cpath d='M-10 240 Q195 226 400 240'/%3E%3C/g%3E%3Cg transform='translate(326 132) scale(.72)'%3E%3Crect x='18' y='20' width='5' height='120' fill='%235A3416'/%3E%3Crect x='-14' y='44' width='70' height='5' rx='2' fill='%235A3416'/%3E%3Cpath d='M2 40 h38 l6 46 h-50 z' fill='%233F6FB5'/%3E%3Cpath d='M2 40 h38 l2 14 h-42 z' fill='%23E2574C'/%3E%3Ccircle cx='20' cy='24' r='14' fill='%23F6DDA8'/%3E%3Ccircle cx='15' cy='23' r='1.8' fill='%234A2E12'/%3E%3Ccircle cx='25' cy='23' r='1.8' fill='%234A2E12'/%3E%3Cpath d='M15 29 q5 4 10 0' stroke='%234A2E12' stroke-width='1.6' fill='none'/%3E%3Cellipse cx='20' cy='12' rx='26' ry='6' fill='%23D9A441'/%3E%3Cpath d='M8 12 q12 -18 24 0 z' fill='%23E8B955'/%3E%3C/g%3E%3Cg fill='%23D93A2B'%3E%3Cg transform='translate(200 118) rotate(-12)'%3E%3Crect x='-1' y='-10' width='2.5' height='20' rx='1.2'/%3E%3Cellipse cx='-7' cy='-5' rx='7' ry='2.6' fill='rgba(255,240,220,.75)'/%3E%3Cellipse cx='7' cy='-5' rx='7' ry='2.6' fill='rgba(255,240,220,.75)'/%3E%3C/g%3E%3Cg transform='translate(300 92) rotate(18) scale(.8)'%3E%3Crect x='-1' y='-10' width='2.5' height='20' rx='1.2'/%3E%3Cellipse cx='-7' cy='-5' rx='7' ry='2.6' fill='rgba(255,240,220,.75)'/%3E%3Cellipse cx='7' cy='-5' rx='7' ry='2.6' fill='rgba(255,240,220,.75)'/%3E%3C/g%3E%3C/g%3E%3Cg fill='none' stroke='%233A2050' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M290 40 q6 -6 12 0 q6 -6 12 0'/%3E%3Cpath d='M326 60 q4 -4 8 0 q4 -4 8 0'/%3E%3C/g%3E%3C/svg%3E") center bottom/cover no-repeat,#4E3576}
+html.is-app:root[data-design="harvest"] .a-top.band .ah{color:#FFF6DE}
+html.is-app:root[data-design="harvest"] .a-top.band .ah-l{color:#FFF6DE}
+html.is-app:root[data-design="harvest"] .a-top.band :is(.ah-pf,.bell,.ah-me){color:#FFF6DE;background:rgba(255,246,222,.16);box-shadow:inset 0 0 0 1.5px rgba(255,246,222,.5)}
+html.is-app:root[data-design="harvest"] .a-top.band .bell .ic{color:#FFF6DE}
+.hv-hero{padding:4px 22px 18px;color:#FFF6DE;text-shadow:0 2px 10px rgba(60,20,60,.45)}
+.hv-hero small{display:block;font-size:14px;opacity:.92}
+.hv-hero b{display:block;margin-top:2px;font-family:'Jua',var(--sans);font-weight:400;font-size:30px;line-height:1.18}
+html.is-app:root[data-design="harvest"] .a-main.is-home{position:relative;z-index:1;margin-top:-28px;min-height:calc(100dvh - 160px);padding-top:24px;border-radius:28px 28px 0 0;background:var(--paper);box-shadow:0 -10px 24px -12px rgba(60,20,10,.45)}
+html.is-app:root[data-design="harvest"] .a-main.is-home::before{content:"";position:absolute;top:10px;left:50%;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:var(--line)}
+html.is-app:root[data-design="harvest"] .a-nav{background:#4A2E12;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -4px 18px rgba(60,20,10,.25)}
+html.is-app:root[data-design="harvest"] .an-it{color:#E8D3A4}
+html.is-app:root[data-design="harvest"] .an-it.on{color:#FFD487}
+html.is-app:root[data-design="harvest"] .an-it.on .ic{background:rgba(255,212,135,.16)}
 html.is-app:root .a-top{background:color-mix(in srgb,var(--paper) 82%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 html.is-app:root .a-top.band{background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 24%,var(--surface)) 0%,color-mix(in srgb,var(--tc) 10%,var(--surface)) 60%,color-mix(in srgb,var(--butter) 14%,var(--surface)) 100%);box-shadow:0 6px 18px color-mix(in srgb,var(--tc) 14%,transparent)}
 /* 칩 */
@@ -2860,6 +2917,7 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
 :root[data-design="clean"]{--dx-bg:var(--surface);--dx-fg:var(--accent);--dx-sub:var(--ink2);--dx-bd:1.5px solid var(--accent);--dx-ic:var(--accent-soft);--dx-ic-fg:var(--accent);--dx-ic-bd:0;--dx-note:var(--accent-soft);--dx-note-bd:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));--dx-mark:"•";--dx-acc:var(--accent);--dx-r:12px;--dx-sh:0 6px 16px -12px color-mix(in srgb,var(--accent) 60%,transparent)}
 :root[data-design="bright"]{--dx-bg:linear-gradient(115deg,#FF6A3D 0 52%,#FFC23D 52% 100%);--dx-fg:#fff;--dx-sub:rgba(255,255,255,.92);--dx-bd:0;--dx-ic:linear-gradient(115deg,#2F7BE5 0 55%,#0FA3B1 55% 100%);--dx-ic-fg:#fff;--dx-ic-bd:0;--dx-note:color-mix(in srgb,#FF6A3D 6%,var(--surface));--dx-note-bd:2px dashed #FF9A6B;--dx-mark:"●";--dx-acc:#FF6A3D;--dx-r:16px;--dx-sh:0 5px 0 -1px #E0A21E,0 12px 20px -14px rgba(255,106,61,.8)}
 :root[data-design="wongoji"]{--dx-bg:linear-gradient(90deg,transparent calc(100% - 1px),color-mix(in srgb,var(--brand) 20%,transparent) 0) 0 0/24px 100%,var(--surface);--dx-fg:var(--brand);--dx-sub:var(--ink2);--dx-bd:1.5px solid var(--brand);--dx-ic:var(--coral-soft);--dx-ic-fg:var(--brand);--dx-ic-bd:1.5px solid var(--brand);--dx-note:var(--surface2);--dx-note-bd:1.5px solid color-mix(in srgb,var(--brand) 45%,var(--line));--dx-mark:"✎";--dx-acc:var(--brand);--dx-r:4px;--dx-sh:none}
+:root[data-design="harvest"]{--dx-bg:linear-gradient(160deg,#F7C860,#E9A93A 60%,#E0962B);--dx-fg:#4A2E12;--dx-sub:#5E3C18;--dx-bd:0;--dx-ic:#4A2E12;--dx-ic-fg:#FFD487;--dx-ic-bd:0;--dx-note:var(--surface2);--dx-note-bd:2px dashed #E8C98A;--dx-mark:"•";--dx-acc:#C97A1C;--dx-r:16px;--dx-sh:0 4px 0 -1px #C9A35A}
 /* 큰 꾸밈 상자: 초대 코드 · 주소 · 내 일기 연속 띠 · 알림 띠 */
 :root:not([data-design="night"]) :is(.set-page .inv-code,.set-page .addr,#app .my-hero,#toast.toast){background:var(--dx-bg)!important;color:var(--dx-fg)!important;border:var(--dx-bd)!important;border-radius:var(--dx-r);box-shadow:var(--dx-sh)!important}
 :root:not([data-design="night"]) #toast.toast::before{content:none}
@@ -2896,6 +2954,7 @@ html.is-app:root[data-design="wongoji"] .a-fab:not(.save){border-radius:4px;widt
   background:linear-gradient(color-mix(in srgb,var(--brand) 18%,transparent),color-mix(in srgb,var(--brand) 18%,transparent)) center/100% 1px no-repeat,linear-gradient(90deg,color-mix(in srgb,var(--brand) 18%,transparent),color-mix(in srgb,var(--brand) 18%,transparent)) center/1px 100% no-repeat,var(--surface);
   box-shadow:inset 4px 0 0 var(--brand),3px 3px 0 color-mix(in srgb,var(--brand) 25%,transparent)}
 html.is-app:root[data-design="night"] .a-fab:not(.save){color:#FFF6DA;border:2.5px solid transparent;background:var(--nightbase) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box;background-size:100% 100%,100% 100%,100% 100%,100% 100%,300% 100%;box-shadow:0 8px 20px -6px rgba(91,141,239,.55)}
+html.is-app:root[data-design="harvest"] .a-fab:not(.save){border-radius:18px;color:#4A2E12;background:linear-gradient(160deg,#F7C860,#E0962B 60%,#C97A1C);box-shadow:0 5px 0 -1px #9A5E14,0 12px 18px -10px rgba(224,150,43,.8)}
 html.is-app:root[data-design="night"] .a-fab:not(.save)::after{content:"✦";position:absolute;top:7px;right:9px;font-size:11px;line-height:1;color:#F4BE45}
 @media (prefers-reduced-motion:no-preference){ html.is-app:root[data-design="night"] .a-fab:not(.save){animation:fabAurora 7s linear infinite} @keyframes fabAurora{from{background-position:0 0,0 0,0 0,0 0,0 0}to{background-position:0 0,0 0,0 0,0 0,300% 0}} }
 /* 위 막대 🎨 · 가 단추 (알림 왼쪽, 2026-10-16) */
@@ -3735,10 +3794,10 @@ if(S.joinCode && S.kidId) ls.set("iinote-kidlink",JSON.stringify({join:S.joinCod
 function useSavedKidLink(){ try{ const k=JSON.parse(ls.get("iinote-kidlink","null")); if(k?.join && k?.kid && !S.joinCode){ S.joinCode=k.join; S.kidId=k.kid; S.kidName=k.n||""; } }catch(e){} }
 if(S.dfont==="batang") S.dfont="unz";
 if(!["unz","pen","gothic","dodum"].includes(S.dfont)) S.dfont="pen";
-if(!["fresh","warm","clean","bright","wongoji","night"].includes(S.design)) S.design="fresh";   // 노트 디자인은 원고지와 겹쳐서 뺐어요 (2026-10-03) · 새 색이 기본 (2026-10-05)
+if(!["fresh","warm","clean","bright","wongoji","night","harvest"].includes(S.design)) S.design="fresh";   // 노트 디자인은 원고지와 겹쳐서 뺐어요 (2026-10-03) · 새 색이 기본 (2026-10-05)
 function applyPrefs(){ document.documentElement.dataset.theme=S.design==="night"?"dark":S.theme;   // 🌌 밤하늘은 늘 어둡게
   document.documentElement.dataset.dfont=S.dfont; document.documentElement.dataset.design=S.design;
-  document.querySelector('meta[name="theme-color"]').content = S.design==="night" ? "#12163A" : S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7"})[S.design] || "#FBF6EE"; }
+  document.querySelector('meta[name="theme-color"]').content = S.design==="night" ? "#12163A" : S.theme==="dark" ? "#141A28" : ({clean:"#F4F6FA",bright:"#FFFFFF",wongoji:"#FCFBF7",harvest:"#FFF6DE"})[S.design] || "#FBF6EE"; }
 applyPrefs();
 
 const prof = id => S.profiles.find(p=>p.id===id);
@@ -3763,6 +3822,8 @@ const AV_PAL = {
     b:[["#FF9A6B","#FF5A2E"],["#6AA6F5","#2F7BE5"],["#4FCFDA","#0FA3B1"],["#A58BF7","#7A5AF0"],["#5BCB8E","#1B8A55"],["#FF8DB0","#E4507F"],["#FFD45E","#F2A900"],["#5DDACC","#16A394"]]},
   wongoji:{r:["#D7263D","#1E1E24","#2B5DAA","#2F7D5B","#6E4FB0","#C2410C","#0F766E","#A61A2C"],
     b:[["#FFFFFF","#FFF4F5"],["#FFFFFF","#F4F4F6"],["#FFFFFF","#F1F5FB"],["#FFFFFF","#F1F8F4"],["#FFFFFF","#F5F2FB"],["#FFFFFF","#FDF3EE"],["#FFFFFF","#EFF8F7"],["#FFFFFF","#FCEFF1"]]},
+  harvest:{r:["#E2574C","#3F6FB5","#E0962B","#5E8A3A","#8B5E9E","#C9572B","#2F8C8C","#B8742F"],
+    b:[["#FFF4EC","#FCDCD2"],["#F2F6FD","#D9E5F6"],["#FFF8E6","#FBE6B8"],["#F4F8EC","#DDEACB"],["#F8F1FA","#EADBF0"],["#FFF3EC","#FADBC9"],["#EEF8F8","#D2ECEC"],["#FBF4EA","#F0DDC4"]]},
 };
 const avPal = () => AV_PAL[(typeof S!=="undefined" && S?.design) || "night"];
 const avRing = p => (avPal()?.r || NIGHT)[nightIdx(p)], avBg = p => (avPal()?.b || NIGHT_BG)[nightIdx(p)];
@@ -4255,7 +4316,7 @@ const TAB_TONE = {cal:["var(--sky-soft)","var(--sky)"],chat:["var(--coral-soft)"
 // 글씨 네 가지 (2026-10-08): ① 언즈체 · ② 윤탱체 (화면 대부분 손글씨) / ③ 고딕 · ④ 동글 (또박또박 간결). 예전 '바탕체'를 고른 기기는 언즈체로
 const DFONTS = [["unz","언즈체","'OngleipUnz',cursive"],["pen","윤탱체","'OwnglyphYuntaeng','Nanum Pen Script',cursive"],["gothic","고딕체","var(--sans)"],["dodum","동글체","'Gowun Dodum',sans-serif"]];
 // 디자인 4가지 (기기마다 기억): 노트 · 깔끔(흰 카드) · 산뜻(색 카드) · 원고지(빨간 원고지 + 먹색 외곽선)
-const DESIGNS = [["fresh","새 색"],["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"],["night","밤하늘"]];
+const DESIGNS = [["fresh","새 색"],["warm","따뜻한 일기장"],["clean","깔끔"],["bright","산뜻"],["wongoji","원고지"],["night","밤하늘"],["harvest","황금 들녘"]];
 // 화면 위쪽: 디자인, 첫 화면 모양(어른만), 일기 글씨 고르기
 // 레이아웃(첫 화면 모양)은 홈 화면에서만 보여요 (다른 탭에서는 바뀌는 게 없고, 누르면 홈으로 가 버려서)
 function prefBar(){
@@ -4374,6 +4435,7 @@ function viewAppShell(){
         ${ahPrefBtns()}${newsBell()}
         <button class="ah-me" data-act="prof-open" data-v="${esc(S.me.id)}" aria-label="내 프로필 · ${esc(S.me.name)}">${av(S.me,36)}</button>
       </header>
+      ${home && S.design==="harvest" ? (d=>`<div class="hv-hero"><small>${d.getMonth()+1}월 ${d.getDate()}일 ${"일월화수목금토"[d.getDay()]}요일</small><b>가을이<br>노랗게 익어 가요</b></div>`)(new Date()) : ""}
       ${home?`<nav class="hp-chips ${hpages().length>4?"many":""}" aria-label="홈 쪽">${hpages().map(([k,l,c])=>`<button class="hp-chip ${k===pg[0]?"on":""}" style="--c:${c}" data-act="hpage" data-v="${k}" ${k===pg[0]?'aria-current="page"':""}><u></u>${l}</button>`).join("")}</nav>`:""}
     </div>
     ${S.me.type==="child"?kidBar():""}
@@ -8251,7 +8313,8 @@ function widgetData(){
   const snap=sd?{id:sd.id, url:(sd.photos.find(p=>p.fav)||sd.photos.find(p=>/^https:/.test(p.url||""))).url, label:`${ago(sd.date)} · ${prof(sd.profileId)?.name||""}`, text:cut(sd.text,26)}:null;
   // 🌤 오늘 날씨 한 줄 위젯: 앱에서 날씨를 켠 기기만 (wxGet), 없으면 켜는 안내
   const weather=wxGet();
-  return {family:S.group?.name||"우리 가족", design:S.design, photos:ph, kids, events:up, eventNote, cal, tt, chat, ddays, bdays, snap, weather};
+  // 위젯(FwTheme.java)은 디자인 여섯 가지만 알아요 → 황금 들녘은 같은 금빛 계열인 산뜻으로 (새 AAB 에서 위젯 색을 넣기 전까지)
+  return {family:S.group?.name||"우리 가족", design:S.design==="harvest"?"bright":S.design, photos:ph, kids, events:up, eventNote, cal, tt, chat, ddays, bdays, snap, weather};
 }
 /* 🌤 위젯 날씨 (2026-10-09, 앱만): 위젯의 '날씨 켜기'를 누르면(iinote://weather) 위치를 한 번 묻고, 대략 위치(소수 둘째 자리 ≈ 1km)를
    Open-Meteo(무료 · 키 없음)에 보내 지금 날씨만 받아요. 위치 · 날씨는 이 기기에만 1시간 보관(ls iinote-wx), 서버에 저장 안 함 */
