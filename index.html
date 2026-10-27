@@ -3678,7 +3678,7 @@ const needConsent = () => isParent() && !DEMO ? sortedProfiles().filter(p=>p.typ
 function consentBanner(){
   const ks=needConsent(); if(!ks.length) return "";
   return `<section class="block consent-ban" role="note"><b>👨‍👩‍👧 보호자 동의를 한 번 확인해 주세요</b>
-    <p>${ks.map(p=>esc(p.name)).join(" · ")}의 이름 · 학년 · 일기 · 사진 · 목소리를 아이아이노트에 저장하려면 보호자 동의가 필요해요 (만 14세 미만 아이). <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침 보기</a></p>
+    <p>${ks.map(p=>esc(kidN(p))).join(" · ")}의 이름 · 학년 · 일기 · 사진 · 목소리를 아이아이노트에 저장하려면 보호자 동의가 필요해요 (만 14세 미만 아이). <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침 보기</a></p>
     <button class="btn btn-primary sm" data-act="consent-kids">보호자로서 동의해요</button></section>`;
 }
 const PEN_MAX_CHECK = 1;   // 다홍펜 검사는 아이마다 하루 한 번 (2026-10-07, 워커도 같이 세요)
@@ -4946,7 +4946,7 @@ function quadAlbum(){
   // 칸을 꽉 채우게: 사진 수에 맞춰 열 × 줄을 고르고, 줄이 다 차는 만큼만 (12장 이상 4×3 · 6장 이상 3×2 · 4장 2×2 · 2장 2×1)
   const n=tiles.length, [qc,qr]=n>=12?[4,3]:n>=6?[3,2]:n>=4?[2,2]:n>=2?[2,1]:[1,1];
   const body=tiles.length
-    ? `<div class="qa-grid qa-fill" style="--qc:${qc};--qr:${qr}">${tiles.slice(0,qc*qr).map((x,i)=>`<button class="qa" data-act="album-lb" data-i="${i}" style="--pc:${x.p?.color||"var(--ink)"}" title="${esc(x.p?.name||"")} · ${fmtShort(x.d.date)}" aria-label="${esc(x.p?.name||"")}의 ${fmtShort(x.d.date)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><i></i></button>`).join("")}</div>`
+    ? `<div class="qa-grid qa-fill" style="--qc:${qc};--qr:${qr}">${tiles.slice(0,qc*qr).map((x,i)=>`<button class="qa" data-act="album-lb" data-i="${i}" style="--pc:${x.p?.color||"var(--ink)"}" title="${esc(x.p?.name||"")} · ${fmtShort(x.d.date)}" aria-label="${esc(kidN(x.p))}의 ${fmtShort(x.d.date)} 일기 사진"><img src="${esc(x.url)}" alt="" loading="lazy"><i></i></button>`).join("")}</div>`
     : `<p class="empty">아직 사진이 없어요. 일기에 사진을 넣으면 여기에 차곡차곡 모여요.</p>`;
   return `<section class="block q-cell" aria-labelledby="h-qa"><div class="block-h"><h2 id="h-qa">앨범</h2><span class="muted">${tiles.length?`사진 ${tiles.length}장`:"사진"}</span></div>
     <div class="q-body">${body}</div></section>`;
@@ -5139,19 +5139,19 @@ function viewTimetable(){
     ${S.ttAdd&&addable.length?`<div class="tt-addlist"><span>누구 시간표를 넣을까요?</span>${addable.map(x=>`<button class="hw" data-act="tt-who" data-v="${esc(x.id)}">${av(x,24)}${esc(x.name)}</button>`).join("")}</div>`:""}`;
   const kinds=`<div class="tt-kinds" role="radiogroup" aria-label="시간표 종류">${TT_KINDS.map(([k,l,i])=>`<button type="button" role="radio" aria-checked="${kk===k}" class="${kk===k?"on":""}" data-act="tt-kind" data-v="${k}"><span aria-hidden="true">${i}</span>${l}</button>`).join("")}</div>`;
   const file=(l,cls="btn btn-soft")=>`<label class="${cls} tt-up">${ic("camera")}${l}<input type="file" class="tt-file sr" accept="image/*" data-id="${esc(p.id)}"></label>`;
-  if(S.ttEdit===p.id) return chips+`<section class="tt-card tt-k-${kk}"><header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(p.name)}의 시간표 만들기</h3></header>${kinds}${ttEditor(p,tt)}</section>`;
+  if(S.ttEdit===p.id) return chips+`<section class="tt-card tt-k-${kk}"><header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(kidN(p))}의 시간표 만들기</h3></header>${kinds}${ttEditor(p,tt)}</section>`;
   if(!tt) return chips+`<section class="tt-card tt-empty tt-k-${kk}">
       <div class="tt-hero" aria-hidden="true">📅</div>
-      <h3>${esc(p.name)}의 시간표가 아직 없어요</h3>
+      <h3>${esc(kidN(p))}의 시간표가 아직 없어요</h3>
       ${ed?`<p>종류를 고르고, 가지고 있는 시간표를 사진으로 올리면 <b>AI가 읽어서 예쁜 표</b>로 만들어 드려요. 모양은 다섯 가지 중에서 고를 수 있고, 칸으로 직접 만들 수도 있어요.</p>${kinds}
         <div class="tt-acts">${file("시간표 사진 올리기")}<button class="btn btn-soft" data-act="tt-edit" data-v="${esc(p.id)}">✏️ 칸으로 만들기</button></div>`
         :`<p>${esc(p.name)}${hasBatchim(p.name)?"이":""}가 직접 넣거나 보호자가 넣어 줄 수 있어요.</p>`}
     </section>`;
   const today=new Date(), dn=["일","월","화","수","목","금","토"][today.getDay()], showPhoto=tt.photo && (!tt.grid || S.ttPhoto===p.id);
   return chips+`<section class="tt-card tt-k-${kk}">
-    <header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(p.name)}의 시간표</h3><span class="tt-today">오늘은 ${dn}요일</span></header>
+    <header class="tt-hd"><span class="tt-badge">${ki} ${kl}</span><h3>${esc(kidN(p))}의 시간표</h3><span class="tt-today">오늘은 ${dn}요일</span></header>
     ${tt.grid&&tt.photo?`<div class="tt-view"><button class="${showPhoto?"":"on"}" data-act="tt-photo" data-v="">칸으로 보기</button><button class="${showPhoto?"on":""}" data-act="tt-photo" data-v="${esc(p.id)}">📷 원본 사진</button></div>`:""}
-    ${showPhoto?`<button class="tt-frame" data-act="tt-lb" data-v="${esc(p.id)}" aria-label="시간표 사진 크게 보기"><img src="${esc(tt.photo.url)}" alt="${esc(p.name)}의 시간표 사진" loading="lazy" ${tt.photo.w?`width="${tt.photo.w}" height="${tt.photo.h}"`:""}><span class="tt-zoom">${ic("search")}크게 보기</span></button>`:ttStylePick(p.id)+ttGridHTML(tt.grid,ttStyle(p.id))}
+    ${showPhoto?`<button class="tt-frame" data-act="tt-lb" data-v="${esc(p.id)}" aria-label="시간표 사진 크게 보기"><img src="${esc(tt.photo.url)}" alt="${esc(kidN(p))}의 시간표 사진" loading="lazy" ${tt.photo.w?`width="${tt.photo.w}" height="${tt.photo.h}"`:""}><span class="tt-zoom">${ic("search")}크게 보기</span></button>`:ttStylePick(p.id)+ttGridHTML(tt.grid,ttStyle(p.id))}
     ${ed?`<div class="tt-acts sm">${file(tt.photo?"사진 바꾸기":"사진 올리기","btn btn-ghost sm")}<button class="btn btn-ghost sm" data-act="tt-edit" data-v="${esc(p.id)}">✏️ ${tt.grid?"칸 고치기":"칸으로 만들기"}</button><button class="link-btn tt-del" data-act="tt-del" data-v="${esc(p.id)}">지우기</button></div>`:""}
   </section>`;
 }
@@ -5739,7 +5739,7 @@ function stickerStats(p){
 const stickersOf = p => { const s=stickerStats(p); return STICKERS.filter(x=>x[3](s)).map(x=>x[0]); };
 function viewStickers(p, small){
   const got=new Set(stickersOf(p));
-  return `<section class="stk ${small?"small":""}" aria-label="${esc(kidN(p))}의 스티커판"><div class="stk-h"><b>🏅 ${small?"스티커":`${esc(p.name)}의 스티커판`}</b><span>${got.size} / ${STICKERS.length}</span></div>
+  return `<section class="stk ${small?"small":""}" aria-label="${esc(kidN(p))}의 스티커판"><div class="stk-h"><b>🏅 ${small?"스티커":`${esc(kidN(p))}의 스티커판`}</b><span>${got.size} / ${STICKERS.length}</span></div>
     <div class="stk-grid">${STICKERS.map(([k,e,n])=>`<span class="stk-i ${got.has(k)?"on":""}" title="${n}${got.has(k)?" · 받았어요!":" · 아직이에요"}"><i>${e}</i>${small?"":`<small>${n}</small>`}</span>`).join("")}</div></section>`;
 }
 /* ---------- 🎉 연속 일기 축하 (2026-10-04) ----------
@@ -5783,7 +5783,7 @@ const awardName = a => a.kind==="full" ? "개근상" : "성실상";
 const monthName = m => { const [y,mm]=m.split("-").map(Number); return `${y}년 ${mm}월`; };
 function awardList(p){
   const L=awardsOf(p); if(!L.length) return "";
-  return `<section class="awards" aria-label="상장"><b>🏆 ${p.id===S.me?.id?"내 상장":esc(p.name)+"의 상장"}</b><div class="aw-row">${L.slice(0,12).map(a=>`<button class="aw ${a.kind}" data-act="award" data-id="${p.id}" data-v="${a.m}" title="${monthName(a.m)} ${awardName(a)} · 상장 보기"><i>${a.kind==="full"?"🏆":"🎖️"}</i><span>${Number(a.m.slice(5))}월 ${awardName(a)}</span><small>${a.n}/${a.last}일</small></button>`).join("")}</div></section>`;
+  return `<section class="awards" aria-label="상장"><b>🏆 ${p.id===S.me?.id?"내 상장":esc(kidN(p))+"의 상장"}</b><div class="aw-row">${L.slice(0,12).map(a=>`<button class="aw ${a.kind}" data-act="award" data-id="${p.id}" data-v="${a.m}" title="${monthName(a.m)} ${awardName(a)} · 상장 보기"><i>${a.kind==="full"?"🏆":"🎖️"}</i><span>${Number(a.m.slice(5))}월 ${awardName(a)}</span><small>${a.n}/${a.last}일</small></button>`).join("")}</div></section>`;
 }
 // 달이 바뀐 뒤 열흘 동안 홈 맨 위에 지난 달 상장 소식 (아이는 내 것, 부모는 우리 아이들 것 · 닫으면 그 달은 안 보여요)
 function awardBanner(){
@@ -5907,7 +5907,7 @@ function dayCard(p,x,mode){
     </div>`:"";
   const canStamp=sub && isParent() && !mine && p.type==="child";
   const thread=(pid,depth)=>cs.filter(k=>(k.parentId||null)===pid).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).map(k=>{ const q=prof(k.profileId);
-    return `<li class="${depth?"re":""}" style="--d:${Math.min(depth,3)}">${depth?"↪ ":""}<b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${k.deleted?`<span class="muted">${delCmtNote(k)}</span>`:esc(k.text)} <small class="cm-when">${cmtTime(k.createdAt)}${k.edited?" · 고침":""}</small>${!k.deleted && canDelCmt(k)?`<button class="dc-del" data-act="del-comment" data-id="${k.id}" aria-label="${esc(q?.name||"")}의 댓글 지우기" title="댓글 지우기">✕</button>`:""}</li>${thread(k.id,depth+1)}`; }).join("");
+    return `<li class="${depth?"re":""}" style="--d:${Math.min(depth,3)}">${depth?"↪ ":""}<b style="color:${q?.color||"var(--ink)"}">${esc(q?.name||"")}</b> ${k.deleted?`<span class="muted">${delCmtNote(k)}</span>`:esc(k.text)} <small class="cm-when">${cmtTime(k.createdAt)}${k.edited?" · 고침":""}</small>${!k.deleted && canDelCmt(k)?`<button class="dc-del" data-act="del-comment" data-id="${k.id}" aria-label="${esc(kidN(q))}의 댓글 지우기" title="댓글 지우기">✕</button>`:""}</li>${thread(k.id,depth+1)}`; }).join("");
   return `<article class="day-col${x.stamp?" has-stamp":""}${mode?" "+mode:""}" style="--pc:${c}">${mode&&mode!=="focus"?`<button class="day-cover" data-act="day-focus" data-v="${esc(p.id)}" aria-label="${esc(p.name)} 일기 넓게 보기"></button>`:""}
       <div class="day-h"><button class="av-btn" data-act="prof-open" data-v="${esc(p.id)}" aria-label="${esc(p.name)} 프로필">${av(p,30)}</button><b>${esc(p.name)}</b>${moodChip(x.mood,x.weather)}${!sub?'<span class="pill draft">쓰는 중</span>':""}</div>
       ${x.stamp?`<div class="day-stamp" role="img" aria-label="칭찬 도장: ${esc(x.stamp)}">${esc(x.stamp)}</div>`:""}
@@ -5987,7 +5987,7 @@ function repHero(kids){
           ${x.saved.highlight?`<p class="rh-pt rh-hi"><span>🌟 빛난 순간</span>${esc(x.saved.highlight)}</p>`:""}
           ${x.saved.tip?`<p class="rh-pt rh-tip"><span>💡 함께 해 보세요</span>${esc(x.saved.tip)}</p>`:""}`
         : x.err?`<p class="rh-err">총평을 만들지 못했어요. <button class="link-btn" data-act="rep-ai" data-id="${esc(x.p.id)}" data-v="${per.mode}">다시 만들기</button></p>`
-        : `<div class="rh-load" role="status"><span class="rh-dots" aria-hidden="true"><i></i><i></i><i></i></span>AI 선생님이 ${esc(x.p.name)}의 일기 ${x.s.n}편을 읽고 있어요…<div class="rh-sk" aria-hidden="true"><i></i><i></i><i></i></div></div>`}
+        : `<div class="rh-load" role="status"><span class="rh-dots" aria-hidden="true"><i></i><i></i><i></i></span>AI 선생님이 ${esc(kidN(x.p))}의 일기 ${x.s.n}편을 읽고 있어요…<div class="rh-sk" aria-hidden="true"><i></i><i></i><i></i></div></div>`}
         </div>`).join("")}
       ${rows.filter(x=>x.skip).map(x=>`<p class="rh-skip">${many?`<b>${esc(x.p.name)}</b> · `:""}${x.skip}</p>`).join("")}
     </article>`; });
@@ -6103,7 +6103,7 @@ function viewDiaryDetail(){
     ${d.talk?.dialog?.length?`<details class="talk-log"><summary>🎙 엄마 · 아빠와 나눈 이야기로 쓴 일기예요 · 이야기 보기</summary>${talkLines(d.talk.dialog)}</details>`:""}
     ${(d.hand||[]).length?`<section class="hand-att" aria-label="첨부파일"><h3>📝 종이 일기장에 손으로 쓴 일기예요 · 첨부파일 ${d.hand.length}개</h3>${handFiles(d.hand,false)}</section>`:""}
     ${viewReact(d,mine)}
-    ${mine?"":`<p class="ai-report">${repBtn(`${p?.name||"가족"}의 ${fmtShort(d.date)} 일기`)}</p>`}
+    ${mine?"":`<p class="ai-report">${repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(d.date)} 일기`)}</p>`}
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
@@ -6124,7 +6124,7 @@ function renderThread(cs,parent,depth){
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
-        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":repBtn(`${p?.name||"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)}</div>`}
+        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)}</div>`}
       ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
@@ -7136,7 +7136,7 @@ const acts = {
     render(); },
   "notice-x": () => { if(S.notice) ls.set("iinote-notice-x",S.notice.id); render(); },
   "consent-kids": () => guard(async()=>{ const ks=needConsent(); if(!ks.length) return;
-    if(!confirm(`${ks.map(p=>p.name).join(", ")}의 보호자로서, 아이의 이름 · 학년 · 일기 · 사진 · 목소리를 아이아이노트에 저장하고 가족끼리 함께 보는 데 동의하나요?\n(개인정보처리방침에 적힌 대로만 쓰고, 언제든 우리 가족 설정에서 아이 기록을 지울 수 있어요)`)) return;
+    if(!confirm(`${ks.map(p=>kidN(p)).join(", ")}의 보호자로서, 아이의 이름 · 학년 · 일기 · 사진 · 목소리를 아이아이노트에 저장하고 가족끼리 함께 보는 데 동의하나요?\n(개인정보처리방침에 적힌 대로만 쓰고, 언제든 우리 가족 설정에서 아이 기록을 지울 수 있어요)`)) return;
     for(const p of ks) await B.update(S.gid,"profiles",p.id,{guardianConsent:consentRec()});
     await reload("profiles"); render(); toast("고마워요! 보호자 동의를 남겼어요"); }),
   "hand-read": () => handRead(),
@@ -7354,7 +7354,7 @@ async function mergeOtherLogin(kind,cred){
     if(other && other.type!==me.type) throw new Error("어른 프로필과 아이 프로필은 합칠 수 없어요. 아이 프로필은 '우리 가족 설정'에서 지워 주세요.");
     const cnt=c=>S[c].filter(x=>x.profileId===other?.id).length;
     const msg = other
-      ? `'${other.name}'(${loginName(kind)}로 들어온 프로필)을 지금의 '${me.name}'과 하나로 합칠까요?\n\n· ${other.name}의 일기 ${cnt("diaries")}편, 댓글 ${cnt("comments")}개, 일정 ${cnt("schedules")}개가 '${me.name}'으로 옮겨져요.\n· 앞으로 구글 · 카카오 어느 쪽으로 들어와도 같은 '${me.name}'이에요.\n· 합친 뒤에는 되돌릴 수 없어요.`
+      ? `'${other.name}'(${loginName(kind)}로 들어온 프로필)을 지금의 '${me.name}'과 하나로 합칠까요?\n\n· ${kidN(other)}의 일기 ${cnt("diaries")}편, 댓글 ${cnt("comments")}개, 일정 ${cnt("schedules")}개가 '${me.name}'으로 옮겨져요.\n· 앞으로 구글 · 카카오 어느 쪽으로 들어와도 같은 '${me.name}'이에요.\n· 합친 뒤에는 되돌릴 수 없어요.`
       : `${loginName(kind)}로 들어와도 '${me.name}' 프로필이 열리게 할까요?`;
     if(!confirm(msg)) return;
     const uids=[...new Set([...(me.uids||[]), o.uid, ...(other?[other.uid,...(other.uids||[])]:[])])].filter(x=>x && x!==me.uid);
@@ -8068,8 +8068,8 @@ Object.assign(acts,{
   "tt-row-add": () => { ttCollect(); const g=S.ttDraft, last=g.rows[g.rows.length-1]?.t||"", n=parseInt(last); g.rows.push({t:isNaN(n)?"":String(n+1)+last.replace(/^\d+/,""), c:[]}); render(); },
   "tt-row-del": el => { ttCollect(); S.ttDraft.rows.splice(+el.dataset.v,1); render(); },
   "tt-photo": el => { S.ttPhoto=el.dataset.v||null; render(); },
-  "tt-lb": el => { const p=prof(el.dataset.v); if(!p?.tt?.photo) return; S.lb={photos:[{url:p.tt.photo.url}],caps:[{t:`📅 ${p.name}의 시간표`}],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
-  "tt-del": el => { const p=prof(el.dataset.v); if(!p?.tt || !confirm(`${p.name}의 시간표를 지울까요?`)) return;
+  "tt-lb": el => { const p=prof(el.dataset.v); if(!p?.tt?.photo) return; S.lb={photos:[{url:p.tt.photo.url}],caps:[{t:`📅 ${kidN(p)}의 시간표`}],i:0}; render(); document.querySelector(".lb-x")?.focus(); },
+  "tt-del": el => { const p=prof(el.dataset.v); if(!p?.tt || !confirm(`${kidN(p)}의 시간표를 지울까요?`)) return;
     guard(async()=>{ const old=p.tt.photo; await B.update(S.gid,"profiles",p.id,{tt:null}); p.tt=null; if(old?.path) B.deleteMedia(old.path,old.where||undefined).catch(()=>{}); render(); toast("시간표를 지웠어요"); }); }
 });
 forms["tt-grid"] = (fd,f) => guard(async()=>{ const g=S.ttDraft; if(!g) return; ttCollect();
@@ -8260,7 +8260,7 @@ async function planRemind(){ const L=plug("LocalNotifications"); if(!L) return;
   const [h,m]=time.split(":").map(Number), now=Date.now(), wrote=S.diaries.some(x=>x.profileId===S.me.id && x.date===todayStr() && x.status==="submitted");
   const list=[]; for(let i=0;i<REMIND_DAYS;i++){ const at=new Date(); at.setDate(at.getDate()+i); at.setHours(h,m,0,0);
     if(at.getTime()<=now || (i===0 && wrote)) continue;
-    list.push({id:REMIND_BASE+i, title:"오늘 일기 썼나요? ✏️", body:`${S.me.name}의 오늘을 한 줄만 남겨 봐요. 가족이 읽어 줄 거예요`, channelId:"remind", smallIcon:"ic_stat_iinote", schedule:{at, allowWhileIdle:true}, extra:{url:"/write"}}); }
+    list.push({id:REMIND_BASE+i, title:"오늘 일기 썼나요? ✏️", body:`${kidN(S.me)}의 오늘을 한 줄만 남겨 봐요. 가족이 읽어 줄 거예요`, channelId:"remind", smallIcon:"ic_stat_iinote", schedule:{at, allowWhileIdle:true}, extra:{url:"/write"}}); }
   if(list.length) await L.schedule({notifications:list}).catch(e=>console.warn("일기 알림",e)); }
 async function setRemind(time){ const L=plug("LocalNotifications"); if(!L) return false;
   if(time){ let p=await L.checkPermissions(); if(p.display!=="granted") p=await L.requestPermissions();
