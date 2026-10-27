@@ -2973,6 +2973,35 @@ html.is-app:root[data-design="night"] .a-fab:not(.save)::after{content:"✦";pos
 .ah-ft{font-size:19px;line-height:1;font-weight:700}
 .ah-pf:active{transform:scale(.9)}
 html.is-app:root[data-design="night"] .ashell .ah-pf{background:var(--surface2)}
+/* 🧭 웹 맨 위 한 줄 (2026-10-27, webBar) · 팝업 (즐겨찾기 · 꾸미기 · 메뉴) */
+.wbar{display:flex;align-items:center;gap:8px;min-height:60px;padding:6px 2px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.wb-l{display:flex;align-items:center;gap:8px;min-width:0;margin-right:12px;border:0;background:none;padding:0;color:var(--ink);font:inherit;cursor:pointer}
+.wb-l b{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb-tabs{display:flex;gap:2px;flex:1;min-width:0}
+.wb-tab{height:38px;padding:0 14px;border:0;border-radius:10px;background:none;color:var(--ink);font:inherit;font-size:15px;white-space:nowrap;cursor:pointer}
+.wb-tab:hover{background:var(--surface2)}
+.wb-tab.on{background:var(--accent-soft,#FDE3EC);color:var(--accent,#B8306A);font-weight:700}
+.wb-r{display:flex;align-items:center;gap:4px;margin-left:auto}
+.wb-ic,.wbar .bell{position:relative;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:none;color:var(--ink);cursor:pointer}
+.wb-ic:hover,.wb-ic.on,.wbar .bell:hover,.wbar .bell.on{background:var(--surface2)}
+.wb-ic .ic,.wbar .bell .ic{width:21px;height:21px}
+.wb-ic .dsw{width:18px;height:18px;min-width:18px}
+.wb-ic .cdot,.wbar .bell .cdot{position:absolute;top:2px;right:1px}
+.wb-me{display:flex;align-items:center;gap:6px;height:40px;padding:0 10px 0 4px;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.wb-me small{color:var(--ink3);font-size:11px}
+.wb-write{margin-left:6px;white-space:nowrap}
+.wb-pop{position:fixed;z-index:45;top:calc(70px + env(safe-area-inset-top,0px));right:max(12px,calc(50vw - 590px));width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 110px);overflow:auto;box-sizing:border-box;padding:14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 40px -18px rgba(20,26,40,.35)}
+.wb-prefs{width:min(580px,calc(100vw - 24px))}
+.wb-prefs .seg{flex-wrap:wrap}
+.wb-fav .fav-row{flex-wrap:wrap;overflow:visible;margin:0 0 8px}
+.wbm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.wbm-it{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:78px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.wbm-it:hover,.wbm-it.on{border-color:var(--accent,#B8306A);color:var(--accent,#B8306A)}
+.wbm-it .ic{width:22px;height:22px}
+.wbm-kids{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.wbm-kids b{font-size:13px;color:var(--ink2);margin-right:4px}
+.wbm-out{margin-top:10px}
+@media (max-width:760px){ .wb-tabs{display:none} .wb-write span,.wb-me span,.wb-me small{display:none} .wb-me{padding:0 4px} .wb-l b{font-size:16px} .wb-l{margin-right:auto} }
 /* AI 챗봇 창: 질문 칩 · 닫기 */
 :root:not([data-design="night"]) .hq{border:1.5px solid color-mix(in srgb,var(--dx-acc) 55%,var(--line))!important;color:var(--dx-acc)!important;background:var(--surface)!important;box-shadow:none!important}
 :root:not([data-design="night"]) .hq.rep{border-color:transparent!important;color:var(--dx-ic-fg)!important;background:var(--dx-ic)!important}
@@ -4603,6 +4632,37 @@ function viewHelp(){
     <form class="help-form" data-form="help"><label class="help-clip" title="사진 붙이기" aria-label="사진 붙이기">📎<input type="file" class="sr help-file" accept="image/*"></label><label class="sr" for="help-in">${ph}</label><textarea id="help-in" name="text" rows="1" maxlength="1000" placeholder="${S.helpImg?"사진에 대해 한마디 적어 주세요 (안 적어도 돼요)":ph}" ${S.helpImg?"":"required"}></textarea><button class="help-send" aria-label="보내기">${ic("arrow")}</button></form>
   </section>`;
 }
+/* 🧭 웹 맨 위 한 줄 (2026-10-27, 시안 ⑩): 예전 5줄(제목 · 프로필/알림/즐겨찾기 · 아이가 쓰기 · 탭 9개 · 디자인 고르기)을 60px 한 줄로.
+   로고 · 가족 이름 | 오늘 · 달력 · 사진첩 · 메뉴 | ★ 즐겨찾기 · 🎨 꾸미기 · 🔔 · 💬 · [나 ▾] · 일기 쓰기. 나머지는 단추를 누르면 팝업 */
+const WEB_TABS = [["home","오늘"],["cal","달력"],["album","사진첩"]];
+function webBar(){
+  const inMenu = !WEB_TABS.some(([k])=>k===S.tab) && S.tab!=="chat";
+  const un = chatUnread();
+  const menu = [["mine","내 일기","pen"],["day","하루 펼쳐보기","cal"],["shelf","책장","book"]];
+  if(isParent()) menu.push(["report","AI 리포트","chart"]);
+  if(S.me.type==="child") menu.push(["quiz","받아쓰기 퀴즈","quiz"]);
+  menu.push(["family","우리 가족 설정","people"],["settings","설정","gear"]);
+  const kids = isParent() ? sortedProfiles().filter(p=>p.type==="child") : [];
+  return `<header class="wbar">
+      <button class="wb-l" data-act="tab" data-v="home" title="홈으로">${logo(30)}<b>${esc(S.group.name)} 일기장</b></button>
+      <nav class="wb-tabs" aria-label="화면">${WEB_TABS.map(([k,l])=>`<button class="wb-tab ${S.tab===k&&!S.sub?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}<button class="wb-tab ${S.webMenu||inMenu?"on":""}" data-act="web-menu" aria-expanded="${!!S.webMenu}">메뉴</button></nav>
+      <div class="wb-r">
+        <button class="wb-ic ${S.favPop?"on":""}" data-act="fav-pop" aria-expanded="${!!S.favPop}" aria-label="즐겨찾기" title="즐겨찾기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg></button>
+        <button class="wb-ic ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 꾸미기 · 디자인 · 글씨" title="화면 꾸미기"><i class="dsw ${S.design}"></i></button>
+        ${newsBell()}
+        <button class="wb-ic ${S.tab==="chat"?"on":""}" data-act="tab" data-v="chat" aria-label="가족 채팅${un?` · 새 메시지 ${un}개`:""}" title="가족 채팅">${ic("talk")}${un?`<i class="cdot">${un>9?"9+":un}</i>`:""}</button>
+        <button class="wb-me ${S.meMenu?"on":""}" data-act="me-menu" aria-expanded="${!!S.meMenu}" aria-label="${esc(S.me.name)} · 프로필 바꾸기">${av(S.me,30)}<span>${esc(S.me.name)}</span><small aria-hidden="true">▾</small></button>
+        <button class="btn btn-primary wb-write" data-act="write">${ic("pen")}<span>일기 쓰기</span></button>
+      </div>
+    </header>
+    ${S.favPop?`<div class="news-bg" data-act="fav-pop" aria-hidden="true"></div><div class="wb-pop wb-fav" role="dialog" aria-label="즐겨찾기">${favRow()}${isParent()?`<button class="link-btn" data-act="fav-edit">+ 추가 · 편집</button>`:""}</div>`:""}
+    ${S.prefsOpen?`<div class="news-bg" data-act="prefs-open" aria-hidden="true"></div><div class="wb-pop wb-prefs" role="dialog" aria-label="화면 꾸미기">${prefGroups(true)}</div>`:""}
+    ${S.webMenu?`<div class="news-bg" data-act="web-menu" aria-hidden="true"></div><div class="wb-pop wb-menu" role="dialog" aria-label="메뉴">
+      <div class="wbm-grid">${menu.map(([k,l,i])=>`<button class="wbm-it ${S.tab===k?"on":""}" data-act="web-go" data-v="${k}">${ic(i)}<span>${l}</span></button>`).join("")}<button class="wbm-it" data-act="web-go" data-v="tt">${ic("lay-calendar")}<span>시간표</span></button><button class="wbm-it" data-act="web-go" data-v="help">${ic("help")}<span>AI 챗봇 상담</span></button></div>
+      ${kids.length?`<div class="wbm-kids"><b>아이가 쓰기</b>${kids.map(k=>`<button class="kq" data-act="kid-write" data-id="${k.id}">${av(k,26)}<span>${esc(k.name)}</span>${k.pin?"<small>🔒</small>":""}</button>`).join("")}</div>`:""}
+      ${isParent()?`<button class="link-btn wbm-out" data-act="signout">${ic("out")}로그아웃</button>`:""}
+    </div>`:""}`;
+}
 function viewShell(){
   if(IS_APP) return viewAppShell();
   // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
@@ -4616,28 +4676,16 @@ function viewShell(){
   const tone=TAB_TONE[S.tab]||TAB_TONE.home;
   return `${tourBar()}<div class="shell${S.sub?.type==="write"?" w-mode":""}">
     <div class="frame">
-      <header class="mast">
-        <button class="home-btn" data-act="tab" data-v="home" ${S.tab==="home"&&!S.sub?'aria-current="page"':""}>${ic("home")}<span>홈</span></button>
-        <h1 class="mast-h"><button class="mast-l" data-act="tab" data-v="home" title="홈으로">${logo(44)}<span class="mast-t">${esc(S.group.name)} 일기장</span></button></h1>
-        <div class="mast-m">${newsBell()}<button class="prefs-btn ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 · 디자인 · 글씨 고르기">🎨</button><button class="me-m ${S.meMenu?"on":""}" data-act="me-menu" aria-expanded="${!!S.meMenu}" aria-label="${esc(S.me.name)} · 내 프로필 · 프로필 바꾸기">${av(S.me,34)}</button></div>
-      </header>
-      <div class="mast-sub">
-        <button class="me-chip" data-act="switch-profile" aria-label="프로필 바꾸기">${av(S.me,28)}<span>${esc(S.me.name)}</span><small>바꾸기</small></button>${newsBell()}
-        ${favRow()}
-        ${isParent()?`<button class="link-btn out" data-act="signout" aria-label="로그아웃">${ic("out")}<span>로그아웃</span></button>`:""}
-      </div>
-      ${kidBar()}
+      ${webBar()}
       ${S.meMenu?viewMeMenu():""}
       ${S.favEdit&&isParent()?`<div class="fav-panel">${viewLinks()}</div>`:""}
       ${S.ttOpen?`<div class="tt-modal-bg" data-act="tt-open" aria-hidden="true"></div><div class="fav-panel tt-panel tt-modal" role="dialog" aria-modal="true" aria-label="시간표"><div class="tt-panel-h"><h2>📅 시간표</h2><button class="link-btn" data-act="tt-open">닫기 ✕</button></div>${viewTimetable()}</div>`:""}
       ${S.newsOpen?viewNews():""}
-      <nav class="ftabs" aria-label="메뉴">${tabs.map(([k,l,i])=>{ const [bg,ln]=TAB_TONE[k]; return `<button class="ftab ${S.tab===k?"on":""}" style="--tb:${bg};--tl:${ln}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span>${l}</span></button>`; }).join("")}</nav>
-      <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}"><div class="sheet-prefs">${prefBar()}</div>${noticeBar()}${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
+      <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}">${noticeBar()}${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
     </div>
     <nav class="nav" aria-label="메뉴">
       <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}</div>
     </nav>
-    ${S.helpOpen?"":`<button class="web-help" data-act="help-open" aria-label="AI 챗봇 상담" title="AI 챗봇 상담">${ic("help")}</button>`}
     ${S.helpOpen?viewHelp():""}
     ${S.prof?viewProfile():""}
     ${S.lb?viewLightbox():""}
@@ -7037,7 +7085,14 @@ const acts = {
   "fav-view": el => { ls.set("iinote-fav-view",el.dataset.v); render(); },
   "w-day": el => { if(!S.draft) return; const box={value:el.dataset.v}; changeDraftDate(box); render(); },
   "kw-q-next": () => { S.kwQ=(S.kwQ||0)+1; render(); },
-  "prefs-open": () => { S.prefsOpen=!S.prefsOpen; render(); },
+  "prefs-open": () => { S.prefsOpen=!S.prefsOpen; S.favPop=false; S.webMenu=false; render(); },
+  // 🧭 웹 맨 위 한 줄 (2026-10-27): ★ 즐겨찾기 · 메뉴 팝업, 메뉴 안 항목
+  "fav-pop": () => { S.favPop=!S.favPop; S.prefsOpen=false; S.webMenu=false; render(); },
+  "web-menu": () => { S.webMenu=!S.webMenu; S.prefsOpen=false; S.favPop=false; render(); },
+  "web-go": el => { const v=el.dataset.v; S.webMenu=false;
+    if(v==="tt"){ acts["tt-open"](el); return; }
+    if(v==="help"){ render(); acts["help-open"](el); return; }
+    acts.tab(el); },
   backup: el => { if(!isParent()) return; try{ backup(el.dataset.v); }catch(e){ console.error(e); toast("파일을 만들지 못했어요. 다시 눌러 주세요"); } },
   grow: el => { S.growId=el.dataset.v; render(); },
   // 일정 순서 · 고치기: 그날 목록을 고치는 모드로 (다시 누르면 끝)
