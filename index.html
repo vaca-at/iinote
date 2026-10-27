@@ -2994,6 +2994,7 @@ html.is-app:root[data-design="night"] .ashell .ah-pf{background:var(--surface2)}
 .wb-prefs{width:min(580px,calc(100vw - 24px))}
 .wb-prefs .seg{flex-wrap:wrap}
 .wb-fav .fav-row{flex-wrap:wrap;overflow:visible;margin:0 0 8px}
+.wb-fav :is(.fav,.fav-h,.fav-row a,.fav-row button){font-weight:400}
 .wbm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .wbm-it{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:78px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
 .wbm-it:hover,.wbm-it.on{border-color:var(--accent,#B8306A);color:var(--accent,#B8306A)}
@@ -4655,7 +4656,7 @@ function webBar(){
         <button class="btn btn-primary wb-write" data-act="write">${ic("pen")}<span>일기 쓰기</span></button>
       </div>
     </header>
-    ${S.favPop?`<div class="news-bg" data-act="fav-pop" aria-hidden="true"></div><div class="wb-pop wb-fav" role="dialog" aria-label="즐겨찾기">${favRow()}${isParent()?`<button class="link-btn" data-act="fav-edit">+ 추가 · 편집</button>`:""}</div>`:""}
+    ${S.favPop?`<div class="news-bg" data-act="fav-pop" aria-hidden="true"></div><div class="wb-pop wb-fav" role="dialog" aria-label="즐겨찾기">${favRow()}</div>`:""}
     ${S.prefsOpen?`<div class="news-bg" data-act="prefs-open" aria-hidden="true"></div><div class="wb-pop wb-prefs" role="dialog" aria-label="화면 꾸미기">${prefGroups(true)}</div>`:""}
     ${S.webMenu?`<div class="news-bg" data-act="web-menu" aria-hidden="true"></div><div class="wb-pop wb-menu" role="dialog" aria-label="메뉴">
       <div class="wbm-grid">${menu.map(([k,l,i])=>`<button class="wbm-it ${S.tab===k?"on":""}" data-act="web-go" data-v="${k}">${ic(i)}<span>${l}</span></button>`).join("")}<button class="wbm-it" data-act="web-go" data-v="tt">${ic("lay-calendar")}<span>시간표</span></button><button class="wbm-it" data-act="web-go" data-v="help">${ic("help")}<span>AI 챗봇 상담</span></button></div>
