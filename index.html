@@ -1090,7 +1090,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .stk-i{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;background:var(--surface);border:1.5px dashed var(--line);text-align:center}
 .stk-i i{font-style:normal;font-size:30px;line-height:1;filter:grayscale(1);opacity:.3}
 .stk-i small{font-size:11.5px;color:var(--ink3);line-height:1.3}
-.stk-i.on{border-style:solid;border-color:var(--butter);box-shadow:0 3px 0 color-mix(in srgb,var(--butter) 60%,transparent)}
+.stk-i.on{border-style:solid;border-color:var(--butter);box-shadow:none}
 .stk-i.on i{filter:none;opacity:1}
 .stk-i.on small{color:var(--ink);font-weight:700}
 .stk.small .stk-i{padding:4px 2px;border-radius:10px}
@@ -1159,7 +1159,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .kw-pen{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border:0;padding:0;background:none;margin-top:16px}
 .kw-lock{min-height:46px;padding:0 20px;border-radius:14px;border:2px dashed var(--coral);background:var(--surface);color:var(--coral);font-weight:750;font-size:15px;opacity:.85}
 .kw-pen-t{font-size:13px;color:var(--ink2)}
-.kw-done{min-height:50px;padding:0 24px;border-radius:14px;border:0;background:var(--sage);color:#fff;font-weight:800;font-size:17px;box-shadow:0 6px 0 -2px color-mix(in srgb,var(--sage) 60%,#000)}
+.kw-done{min-height:50px;padding:0 24px;border-radius:14px;border:0;background:var(--sage);color:#fff;font-weight:800;font-size:17px;box-shadow:none}
 .kw-done:hover{filter:brightness(1.05)}
 .kw-qshow{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:var(--butter-soft);font-weight:650;font-size:14px}
 @media (max-width:759px){ .kw{padding:14px 12px 18px;border-radius:18px} .kw .w-text,.kw .w-hl{padding-left:44px} .kw .w-text{background-image:linear-gradient(to right,transparent 32px,var(--coral) 32px,var(--coral) 33.5px,transparent 33.5px),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))} .kw-prog{flex-wrap:wrap} .kw-msg{flex:1 1 100%;min-width:0;order:3} }
@@ -1646,7 +1646,7 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 :root[data-design="wongoji"] :is(.mast-t,.page-h h1){font-family:var(--sans);font-weight:800;letter-spacing:-.5px}
 :root[data-design="wongoji"] .block-h h2{font-weight:800;letter-spacing:-.2px}
 :root[data-design="wongoji"] .btn{border-radius:6px}
-:root[data-design="wongoji"] :is(.btn-primary,.btn-accent){background:var(--brand);color:var(--on-brand);box-shadow:0 3px 0 var(--brand-deep)}
+:root[data-design="wongoji"] :is(.btn-primary,.btn-accent){background:var(--brand);color:var(--on-brand);box-shadow:none}
 :root[data-design="wongoji"] .btn-ghost{border-width:2px;border-color:var(--card-line)}
 :root[data-design="wongoji"] .sheet{box-shadow:var(--sheet-shadow);border-top-color:var(--brand)}
 :root[data-design="wongoji"] .ftab.on{background:var(--surface);box-shadow:inset 0 4px 0 var(--brand)}
@@ -1738,10 +1738,10 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 [data-design="warm"][data-theme="dark"]{--margin:#7A4A5E}
 :root[data-design="warm"]:not([data-theme="dark"]) body{background-image:none}
 :root[data-design="warm"] :is(.mast-t,.page-h h1,.block-h h2,.day-nav h1){font-family:var(--diary);letter-spacing:0}
-:root[data-design="warm"] .block{border:2px solid var(--line);border-radius:14px;box-shadow:0 2px 0 var(--line)}
+:root[data-design="warm"] .block{border:2px solid var(--line);border-radius:14px;box-shadow:none}
 :root[data-design="warm"] .btn{border-radius:12px}
 :root[data-design="warm"] .btn-primary{background:var(--ink);color:var(--surface)}
-:root[data-design="warm"] .day-col{border:0;border-top:8px solid var(--pc);border-radius:14px;box-shadow:0 2px 0 var(--line),0 6px 18px rgba(90,46,69,.06)}
+:root[data-design="warm"] .day-col{border:0;border-top:8px solid var(--pc);border-radius:14px;box-shadow:0 6px 18px rgba(90,46,69,.06)}
 :root[data-design="warm"] .day-text{background-image:none}
 :root[data-design="warm"] :is(.fav,.me-chip){border-width:1.5px;background:var(--surface)}
 @media (min-width:760px){
@@ -1750,7 +1750,7 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
   :root[data-design="warm"] .ftab .ic{color:var(--ink)}
   :root[data-design="warm"] .ftab:hover{transform:translateY(1px)}
   :root[data-design="warm"] .ftab.on{background:var(--tl);transform:none;box-shadow:none}
-  :root[data-design="warm"] .sheet{border-radius:6px 16px 16px 16px;border-top:6px solid var(--tl);box-shadow:0 3px 0 var(--line),0 10px 30px rgba(90,46,69,.08);padding-left:40px}
+  :root[data-design="warm"] .sheet{border-radius:6px 16px 16px 16px;border-top:6px solid var(--tl);box-shadow:0 10px 30px rgba(90,46,69,.08);padding-left:40px}
   :root[data-design="warm"] .sheet::before{display:none}
   :root[data-design="warm"] .sheet .block{background:var(--surface)}
 }
@@ -1770,10 +1770,10 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 [data-design="harvest"][data-theme="dark"]{--accent:#F2B54A;--accent-soft:#3A3020}
 :root[data-design="harvest"]:not([data-theme="dark"]) body{background-image:none}
 :root[data-design="harvest"] :is(.mast-t,.page-h h1,.block-h h2,.day-nav h1,.today-date,.ah-t){font-family:'Jua',var(--sans);font-weight:400;letter-spacing:0}
-:root[data-design="harvest"] .block{border:0;border-radius:20px;background:var(--surface);box-shadow:0 2px 0 var(--line)}
+:root[data-design="harvest"] .block{border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:none}
 :root[data-design="harvest"] .btn{border-radius:14px}
 :root[data-design="harvest"] .btn-primary{background:var(--ink);color:var(--surface)}
-:root[data-design="harvest"] :is(.fav,.me-chip){border:0;background:var(--surface);box-shadow:0 2px 0 var(--line)}
+:root[data-design="harvest"] :is(.fav,.me-chip){border:1px solid var(--line);background:var(--surface);box-shadow:none}
 :root[data-design="harvest"] .chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .dsw.harvest{border:0;border-radius:6px;background:radial-gradient(circle at 68% 52%,#FFE6A6 0 3px,transparent 3.5px),linear-gradient(180deg,#C4567A 0 30%,#F59A4E 30% 55%,#E9A93A 55% 100%)}
 /* ═════════ 손글씨 글씨: 화면 전체를 손글씨로 (눈누 무료 폰트 3가지 · 모두 웹 임베딩 허용 확인 2026-09-28) ═════════
@@ -2637,16 +2637,16 @@ body:has(.che-wrap) :is(.toast,.upbar){z-index:450}   /* 다듬기 창 위에 �
 .btn.btn-primary,.btn.btn-accent{position:relative;border:2.5px solid transparent!important;color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.25);
   background:linear-gradient(160deg,#33447A,#1F2A44 70%) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box!important;
   background-size:100% 100%,300% 100%!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 0 rgba(31,42,68,.35),0 8px 14px -7px rgba(155,123,232,.65)!important;transition:transform .12s,box-shadow .12s}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 14px -7px rgba(155,123,232,.65)!important;transition:transform .12s,box-shadow .12s}
 .btn.btn-primary .ic,.btn.btn-accent .ic{color:#fff}
-.btn.btn-primary:active,.btn.btn-accent:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 1px 0 rgba(31,42,68,.35)!important}
+.btn.btn-primary:active,.btn.btn-accent:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22)!important}
 .btn.btn-primary::before,.btn.btn-accent::before{content:"✦";font-size:.75em;color:#F4BE45;margin-right:-2px}
 .btn.btn-primary:has(> .ic)::before,.btn.btn-accent:has(> .ic)::before{content:none}
 @media (prefers-reduced-motion:no-preference){ .btn.btn-primary,.btn.btn-accent{animation:btnAurora 7s linear infinite} @keyframes btnAurora{to{background-position:0 0,300% 0}} }
 .btn.pill2{min-width:92px;min-height:34px;padding:0 14px 0 0;gap:0;overflow:hidden;font-weight:700;border:2px solid transparent;
   background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 94%,#5B8DEF)) padding-box,linear-gradient(135deg,#9B7BE8,#5B8DEF) border-box;
-  box-shadow:0 3px 0 rgba(91,141,239,.35),0 6px 12px -6px rgba(91,141,239,.7);transition:transform .12s,box-shadow .12s}
-.btn.pill2:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(91,141,239,.35)}
+  box-shadow:0 6px 12px -6px rgba(91,141,239,.7);transition:transform .12s,box-shadow .12s}
+.btn.pill2:active{transform:translateY(2px);box-shadow:none}
 .pill2 > i{position:relative;display:grid;place-items:center;align-self:stretch;width:32px;margin-right:9px;font-style:normal;font-size:13px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.2);background:linear-gradient(160deg,#B49AF2,#9B7BE8 40%,#5B8DEF);box-shadow:inset -1px 0 0 rgba(255,255,255,.45)}
 .pill2 > i::after{content:"";position:absolute;left:6px;top:5px;width:8px;height:4px;border-radius:4px;background:rgba(255,255,255,.7)}
 .pill2 > span{background:linear-gradient(90deg,#6A45D0,#2F62D0);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -2864,7 +2864,7 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
 .btn.btn-soft:active{transform:translateY(1px)}
 :root[data-theme="dark"] .btn.btn-soft{color:#EDE6FF}
 /* 안내 띠 안의 두 칸 알약: 띠의 작은 단추 규칙보다 앞서게 (두 줄 단추 너비 · 자리 같게) */
-#app .pen-ask .btn.pill2,.btn.pill2{display:inline-flex;align-items:stretch;flex:none!important;width:auto!important;min-width:84px;height:30px!important;min-height:0!important;padding:0 12px 0 0!important;border-radius:15px!important;font-size:12.5px!important;line-height:1!important;box-shadow:0 2px 0 rgba(91,141,239,.35),0 5px 10px -5px rgba(91,141,239,.7)!important}
+#app .pen-ask .btn.pill2,.btn.pill2{display:inline-flex;align-items:stretch;flex:none!important;width:auto!important;min-width:84px;height:30px!important;min-height:0!important;padding:0 12px 0 0!important;border-radius:15px!important;font-size:12.5px!important;line-height:1!important;box-shadow:0 5px 10px -5px rgba(91,141,239,.7)!important}
 .btn.pill2 > i{width:28px;height:auto;margin-right:8px;border-radius:13px 0 0 13px;font-size:12px}
 .btn.pill2 > span{display:flex;align-items:center}
 /* 🎨 디자인마다 다른 단추 (2026-10-10, 시안 claude.ai/artifact/3d8yp1geGKANnpLm9rdo1i)
@@ -2884,7 +2884,7 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
   background:radial-gradient(circle at calc(100% - 10px) 30%,#fff 0 1.3px,transparent 2.4px),linear-gradient(120deg,#FF8DB0,#E4507F)!important;box-shadow:0 4px 10px -5px rgba(228,80,127,.7)!important}
 :root[data-design="fresh"] .chip.conn{border:1.5px solid #BDE8D3;color:#226B50;background:radial-gradient(circle at calc(100% - 10px) 30%,#7FCFA6 0 1.3px,transparent 2.2px),#EAF8F0;box-shadow:none}
 /* 따뜻한 일기장: 크레파스 점선 */
-:root[data-design="warm"] :is(.btn.btn-primary,.btn.btn-accent){border:2px dashed var(--coral)!important;border-radius:14px;color:var(--coral-ink)!important;background:var(--surface)!important;box-shadow:0 3px 0 -1px color-mix(in srgb,var(--coral) 25%,transparent)!important;font-weight:700}
+:root[data-design="warm"] :is(.btn.btn-primary,.btn.btn-accent){border:2px dashed var(--coral)!important;border-radius:14px;color:var(--coral-ink)!important;background:var(--surface)!important;box-shadow:none!important;font-weight:700}
 :root[data-design="warm"] :is(.btn.btn-primary,.btn.btn-accent) .ic{color:var(--coral-ink)}
 :root[data-design="warm"] .btn.btn-soft{border:2px dashed var(--line);border-radius:14px;color:var(--ink2);background:var(--surface);box-shadow:none}
 :root[data-design="warm"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:2px dashed #D9A800!important;color:#5A2E45!important;background:var(--butter)!important;box-shadow:none!important}
@@ -2898,7 +2898,7 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
 :root[data-design="clean"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:0!important;border-radius:0!important;color:var(--accent)!important;background:transparent!important;box-shadow:inset 0 -3px 0 var(--accent)!important}
 :root[data-design="clean"] .chip.conn{border:1.5px solid color-mix(in srgb,#1E7A50 35%,var(--line));color:#1E7A50;background:var(--surface);box-shadow:none}
 /* 산뜻: 비스듬히 두 색 나눔 */
-:root[data-design="bright"] :is(.btn.btn-primary,.btn.btn-accent){border:0!important;border-radius:14px;color:#fff!important;text-shadow:0 1px 2px rgba(120,50,0,.4);background:linear-gradient(115deg,#FF6A3D 0 52%,#FFC23D 52% 100%)!important;background-size:auto!important;box-shadow:0 5px 0 -1px #E0A21E,0 10px 18px -10px rgba(255,106,61,.8)!important}
+:root[data-design="bright"] :is(.btn.btn-primary,.btn.btn-accent){border:0!important;border-radius:14px;color:#fff!important;text-shadow:0 1px 2px rgba(120,50,0,.4);background:linear-gradient(115deg,#FF6A3D 0 52%,#FFC23D 52% 100%)!important;background-size:auto!important;box-shadow:0 10px 18px -10px rgba(255,106,61,.8)!important}
 :root[data-design="bright"] .btn.btn-soft{border:2px dashed #FF9A6B;border-radius:14px;color:var(--ink);background:var(--surface);box-shadow:none}
 :root[data-design="bright"] .btn.btn-soft::before{content:"";width:8px;height:8px;border-radius:50%;background:#FF6A3D;margin-right:2px}
 :root[data-design="bright"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:0!important;color:#fff!important;background:linear-gradient(115deg,#2F7BE5 0 55%,#0FA3B1 55% 100%)!important;box-shadow:0 3px 8px -4px rgba(47,123,229,.7)!important}
@@ -2912,12 +2912,12 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
 :root[data-design="wongoji"] .chip.conn{border:1.5px solid var(--brand);border-radius:0;color:var(--brand);background:var(--surface);box-shadow:none}
 /* 황금 들녘 (2026-10-27): 밤하늘 별 단추가 그대로 나오던 것 → 가운데 일기 쓰기 단추처럼 황금빛 + 아래 볏짚색 두께 · 진갈색 글씨 */
 :root[data-design="harvest"] :is(.btn.btn-primary,.btn.btn-accent){border:0!important;border-radius:14px;color:#4A2E12!important;font-weight:700;
-  background:linear-gradient(160deg,#F7C860,#E9A93A 55%,#E0962B)!important;background-size:auto!important;box-shadow:0 4px 0 -1px #9A5E14,0 10px 16px -10px rgba(154,94,20,.7),inset 0 1px 0 rgba(255,255,255,.4)!important}
+  background:linear-gradient(160deg,#F7C860,#E9A93A 55%,#E0962B)!important;background-size:auto!important;box-shadow:0 10px 16px -10px rgba(154,94,20,.7),inset 0 1px 0 rgba(255,255,255,.4)!important}
 :root[data-design="harvest"] :is(.btn.btn-primary,.btn.btn-accent) .ic{color:#4A2E12}
 :root[data-design="harvest"] .btn.btn-soft{border:2px dashed #E8C98A;border-radius:14px;color:var(--ink);background:var(--surface);box-shadow:none}
-:root[data-design="harvest"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:0!important;color:#FFD487!important;background:#4A2E12!important;box-shadow:0 3px 0 -1px #9A5E14!important}
+:root[data-design="harvest"] :is(.seg:has(input[name="theme"]) input:checked+span,.seg:has(input[name="scope"]) input:checked+span,.ws-seg input:checked+span){border:0!important;color:#FFD487!important;background:#4A2E12!important;box-shadow:none!important}
 :root[data-design="harvest"] .chip.conn{border:1.5px solid color-mix(in srgb,var(--sage) 45%,var(--line));color:var(--sage);background:var(--sage-soft);box-shadow:none}
-:root[data-design="harvest"] .btn.pill2{background:linear-gradient(180deg,var(--surface),#FBF0D6) padding-box,linear-gradient(135deg,#F7C860,#C97A1C) border-box;box-shadow:0 3px 0 rgba(201,122,28,.35),0 6px 12px -6px rgba(201,122,28,.6)}
+:root[data-design="harvest"] .btn.pill2{background:linear-gradient(180deg,var(--surface),#FBF0D6) padding-box,linear-gradient(135deg,#F7C860,#C97A1C) border-box;box-shadow:0 6px 12px -6px rgba(201,122,28,.6)}
 :root[data-design="harvest"] .pill2 > i{background:linear-gradient(160deg,#F7C860,#E0962B 50%,#C97A1C);color:#4A2E12;text-shadow:none}
 :root[data-design="harvest"] .pill2 > span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#6E4A24}
 /* 🎨 디자인마다 다른 꾸밈 (2026-10-10): 밤하늘 느낌으로 칠해 둔 곳(초대 코드 · 주소 상자 · 내 일기 연속 띠 · 알림 띠 · AI 챗봇 단추와 창 ·
@@ -2955,16 +2955,16 @@ fieldset.seg:has(input[name="scope"]) legend{position:absolute;top:-1.5em;left:2
 html.is-app:root .a-fab:not(.save){position:relative;transition:transform .15s}
 html.is-app:root .a-fab:not(.save):active{transform:scale(.93)}
 html.is-app:root[data-design="fresh"] .a-fab:not(.save){color:#fff;background:radial-gradient(circle at 72% 26%,#fff 0 2px,rgba(255,255,255,.45) 3px,transparent 5px),linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,0) 55%),linear-gradient(130deg,#FF8DB0,#E4507F 55%,#F07A5A);box-shadow:0 10px 20px -8px rgba(228,80,127,.75),inset 0 0 0 2px rgba(255,255,255,.3)}
-html.is-app:root[data-design="warm"] .a-fab:not(.save){color:var(--coral-ink);background:radial-gradient(circle at 74% 24%,var(--butter,#F6C945) 0 3.5px,transparent 4px),var(--surface);border:2.5px dashed var(--coral);box-shadow:0 4px 0 -1px color-mix(in srgb,var(--coral) 28%,transparent),0 8px 16px -10px rgba(90,46,69,.4)}
+html.is-app:root[data-design="warm"] .a-fab:not(.save){color:var(--coral-ink);background:radial-gradient(circle at 74% 24%,var(--butter,#F6C945) 0 3.5px,transparent 4px),var(--surface);border:2.5px dashed var(--coral);box-shadow:0 8px 16px -10px rgba(90,46,69,.4)}
 html.is-app:root[data-design="clean"] .a-fab:not(.save){color:var(--accent);background:var(--surface);border:2px solid var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 12%,transparent),0 8px 16px -10px rgba(31,79,216,.5)}
 html.is-app:root[data-design="clean"] .a-fab:not(.save):active{color:#fff;background:var(--accent)}
-html.is-app:root[data-design="bright"] .a-fab:not(.save){color:#fff;background:linear-gradient(125deg,#FF6A3D 0 52%,#FFC23D 52% 100%);box-shadow:0 5px 0 -1px #E0A21E,0 12px 18px -10px rgba(255,106,61,.85)}
+html.is-app:root[data-design="bright"] .a-fab:not(.save){color:#fff;background:linear-gradient(125deg,#FF6A3D 0 52%,#FFC23D 52% 100%);box-shadow:0 12px 18px -10px rgba(255,106,61,.85)}
 html.is-app:root[data-design="bright"] .a-fab:not(.save) .ic{filter:drop-shadow(0 1px 1px rgba(120,50,0,.35))}
 html.is-app:root[data-design="wongoji"] .a-fab:not(.save){border-radius:4px;width:56px;height:56px;margin-top:-22px;color:var(--brand);border:2px solid var(--brand);
   background:linear-gradient(color-mix(in srgb,var(--brand) 18%,transparent),color-mix(in srgb,var(--brand) 18%,transparent)) center/100% 1px no-repeat,linear-gradient(90deg,color-mix(in srgb,var(--brand) 18%,transparent),color-mix(in srgb,var(--brand) 18%,transparent)) center/1px 100% no-repeat,var(--surface);
   box-shadow:inset 4px 0 0 var(--brand),3px 3px 0 color-mix(in srgb,var(--brand) 25%,transparent)}
 html.is-app:root[data-design="night"] .a-fab:not(.save){color:#FFF6DA;border:2.5px solid transparent;background:var(--nightbase) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box;background-size:100% 100%,100% 100%,100% 100%,100% 100%,300% 100%;box-shadow:0 8px 20px -6px rgba(91,141,239,.55)}
-html.is-app:root[data-design="harvest"] .a-fab:not(.save){border-radius:18px;color:#4A2E12;background:linear-gradient(160deg,#F7C860,#E0962B 60%,#C97A1C);box-shadow:0 5px 0 -1px #9A5E14,0 12px 18px -10px rgba(224,150,43,.8)}
+html.is-app:root[data-design="harvest"] .a-fab:not(.save){border-radius:18px;color:#4A2E12;background:linear-gradient(160deg,#F7C860,#E0962B 60%,#C97A1C);box-shadow:0 12px 18px -10px rgba(224,150,43,.8)}
 html.is-app:root[data-design="night"] .a-fab:not(.save)::after{content:"✦";position:absolute;top:7px;right:9px;font-size:11px;line-height:1;color:#F4BE45}
 @media (prefers-reduced-motion:no-preference){ html.is-app:root[data-design="night"] .a-fab:not(.save){animation:fabAurora 7s linear infinite} @keyframes fabAurora{from{background-position:0 0,0 0,0 0,0 0,0 0}to{background-position:0 0,0 0,0 0,0 0,300% 0}} }
 /* 위 막대 🎨 · 가 단추 (알림 왼쪽, 2026-10-16) */
@@ -2992,7 +2992,7 @@ html.is-app:root[data-design="night"] .ashell .ah-pf{background:var(--surface2)}
 :root[data-design="fresh"] .av.corona{color:#2E2433!important;box-shadow:0 0 0 max(2px,.06em) var(--c),0 4px 10px -4px color-mix(in srgb,var(--c) 70%,transparent)}
 :root[data-design="warm"] .av.corona{color:#5A2E45!important;box-shadow:none;outline:max(2px,.06em) dashed var(--c);outline-offset:1px}
 :root[data-design="clean"] .av.corona{color:#16213A!important;box-shadow:0 0 0 max(1.5px,.05em) var(--c),0 2px 6px -3px rgba(22,33,58,.25)}
-:root[data-design="bright"] .av.corona{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 0 0 max(2px,.06em) #fff,0 3px 0 max(1.5px,.05em) color-mix(in srgb,var(--c) 70%,#000 10%)}
+:root[data-design="bright"] .av.corona{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 0 0 max(2px,.06em) #fff}
 :root[data-design="wongoji"] .av.corona{color:var(--c)!important;box-shadow:0 0 0 max(1.5px,.05em) #1E1E24,max(2px,.06em) max(2px,.06em) 0 #1E1E24}
 :root:is([data-design="warm"],[data-design="clean"],[data-design="bright"],[data-design="wongoji"]) .av.corona::after{display:none}
 :root[data-design="fresh"] .av.corona::after{width:18%;height:18%;right:8%;top:10%}
