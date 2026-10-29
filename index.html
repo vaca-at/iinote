@@ -3010,6 +3010,35 @@ html.is-app:root[data-design="night"] .ashell .ah-pf{background:var(--surface2)}
   padding:3px 7px;border-radius:3px;background:#FFFFFF;color:#1F1F1F;border:1px solid #9A9A9A;box-shadow:1px 2px 4px rgba(0,0,0,.18);
   font:400 12px/1.3 'Segoe UI','Malgun Gothic','맑은 고딕',system-ui,sans-serif;letter-spacing:0;white-space:nowrap;pointer-events:none}
 @media (max-width:760px){ .wb-tabs{display:none} .wb-write span,.wb-me span,.wb-me small{display:none} .wb-me{padding:0 4px} .wb-l b{font-size:16px} .wb-l{margin-right:auto} }
+/* 👤 누가 쓸까요? 단추 · 창 (2026-10-30): 아이도 바로 찾게 이름 + '⇄ 바꾸기' + 가족 얼굴 겹쳐 보이기 */
+.wbar .wb-me{height:44px;padding:0 10px 0 5px;gap:8px;border:1.5px solid var(--accent,#B8306A);background:var(--accent-soft,#FDE3EC)}
+.wbar .wb-me.on,.wbar .wb-me:hover{background:var(--surface)}
+.wb-me .wbm-n{display:grid;line-height:1.1;text-align:left}
+.wb-me .wbm-n b{font-size:14px;font-weight:700;white-space:nowrap}
+.wb-me .wbm-n small{font-size:11px;color:var(--accent,#B8306A);font-weight:700}
+.wb-stack{display:flex;margin-left:2px}
+.wb-stack .av{box-shadow:0 0 0 2px var(--surface)}
+.wb-stack .av+.av{margin-left:-8px}
+.ah-me{position:relative}
+.ah-sw{position:absolute;right:-3px;bottom:-3px;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--accent,#B8306A);color:#fff;font-size:11px;font-style:normal;line-height:1;box-shadow:0 0 0 2px var(--surface)}
+.me-pop{width:min(380px,calc(100vw - 24px))}
+.mm-q{margin:2px 4px 10px;font-size:18px;font-weight:700;color:var(--ink)}
+.mm-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mm-t{display:flex;flex-direction:column;gap:4px}
+.me-pop .mm-tb{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:12px 4px 10px;border-radius:16px;border:1px solid var(--line);background:var(--surface);text-align:center}
+.me-pop .mm-tb:hover{border-color:var(--accent,#B8306A)}
+.me-pop .mm-t.on .mm-tb{border:1.5px solid var(--accent,#B8306A);background:var(--accent-soft,#FDE3EC)}
+.me-pop .mm-tb b{font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me-pop .mm-tb small{font-size:12px;color:var(--ink3)}
+.me-pop .mm-t.on .mm-tb small{color:var(--accent,#B8306A);font-weight:700}
+.me-pop .mm-tb:disabled{opacity:.45;cursor:default}
+.me-pop .mm-t .mm-w{display:flex;align-items:center;justify-content:center;gap:4px;height:34px;border-radius:10px;background:var(--surface2);font-size:12px;color:var(--ink)}
+.me-pop .mm-t .mm-w .ic{width:14px;height:14px}
+.mm-links{display:flex;flex-direction:column;margin-top:12px;padding-top:8px;border-top:1px solid var(--line)}
+.me-pop .mm-links button{display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:10px;font-size:14px}
+.me-pop .mm-links button:hover{background:var(--paper)}
+.me-pop .mm-links .ic{width:18px;height:18px;color:var(--ink3)}
+@media (max-width:760px){ .wbar .wb-me .wbm-n,.wb-stack{display:none} }
 /* AI 챗봇 창: 질문 칩 · 닫기 */
 :root:not([data-design="night"]) .hq{border:1.5px solid color-mix(in srgb,var(--dx-acc) 55%,var(--line))!important;color:var(--dx-acc)!important;background:var(--surface)!important;box-shadow:none!important}
 :root:not([data-design="night"]) .hq.rep{border-color:transparent!important;color:var(--dx-ic-fg)!important;background:var(--dx-ic)!important}
@@ -4427,14 +4456,20 @@ const needParentPin = p =>p?.type==="parent" && !!p.pin && S.me?.type==="child";
 const myParentProfile = () => S.profiles.find(p=>p.type==="parent" && isMine(p));
 // (2026-10-09) 휴대폰 웹: 위쪽 내 얼굴을 누르면 작은 창 — 내 프로필 · 프로필 바꾸기(아이는 ✏️ 바로 쓰기) · 로그아웃
 // 그래서 휴대폰 웹에서는 보호자 화면의 '아이가 쓰기' 줄을 숨겨요 (아이로 쓰는 중의 '돌아가기' 줄은 그대로)
+/* 👤 누가 쓸까요? (2026-10-30): 내 프로필 · 프로필 관리 · 프로필 바꾸기를 한 창에. 아이가 쉽게 찾게 얼굴을 크게 · 지금 쓰는 사람은 "지금" */
 function viewMeMenu(){
-  const others=sortedProfiles().filter(p=>p.id!==S.me.id);
-  const row=p=>{ const ok=canUse(p), lock=(p.type==="child"&&p.pin)||needParentPin(p);
-    return `<li><button class="mm-p" data-act="me-pick" data-id="${esc(p.id)}" ${ok?"":"disabled"}>${av(p,36)}<span><b>${esc(p.name)}</b><small>${p.type==="child"?esc(gradeName(p.grade)||"어린이"):ok?"나":"본인 계정으로 접속"}${lock?" · 🔒":""}</small></span></button>${ok&&isParent()&&p.type==="child"?`<button class="mm-w" data-act="kid-write" data-id="${esc(p.id)}" aria-label="${esc(p.name)}${ro(p.name)} 바꿔서 일기 쓰기">${ic("pen")}쓰기</button>`:""}</li>`; };
-  return `<div class="news-bg" data-act="me-menu" aria-hidden="true"></div><div class="me-pop" role="dialog" aria-label="내 프로필 · 프로필 바꾸기">
-    <button class="mm-me" data-act="prof-open" data-v="${esc(S.me.id)}">${av(S.me,48)}<span><b>${esc(S.me.name)}</b><small>내 프로필 보기 ›</small></span></button>
-    ${others.length?`<p class="mm-h">프로필 바꾸기</p><ul class="mm-list">${others.map(row).join("")}</ul>`:""}
-    <button class="mm-out" data-act="signout">${ic("out")}로그아웃</button></div>`;
+  const all=sortedProfiles();
+  const tile=p=>{ const me=p.id===S.me.id, ok=me||canUse(p), lock=!me&&((p.type==="child"&&p.pin)||needParentPin(p));
+    const sub=me?"지금":p.type==="child"?(gradeName(p.grade)||"어린이"):ok?"어른":"본인 계정";
+    return `<li class="mm-t ${me?"on":""}"><button class="mm-tb" ${me?`data-act="prof-open" data-v="${esc(p.id)}"`:`data-act="me-pick" data-id="${esc(p.id)}"`} ${ok?"":"disabled"} aria-label="${esc(p.name)}${me?" · 지금 쓰는 사람 · 내 프로필 보기":ok?ro(p.name)+" 바꾸기":" · 본인 계정으로만"}">${av(p,52)}<b>${esc(p.name)}</b><small>${sub}${lock?" 🔒":""}</small></button>${!me&&ok&&isParent()&&p.type==="child"?`<button class="mm-w" data-act="kid-write" data-id="${esc(p.id)}" aria-label="${esc(p.name)}${ro(p.name)} 바꿔서 바로 쓰기">${ic("pen")}바로 쓰기</button>`:""}</li>`; };
+  return `<div class="news-bg" data-act="me-menu" aria-hidden="true"></div><div class="me-pop" role="dialog" aria-label="누가 쓸까요? · 프로필 바꾸기">
+    <p class="mm-q">누가 쓸까요?</p>
+    <ul class="mm-grid">${all.map(tile).join("")}</ul>
+    <div class="mm-links">
+      <button data-act="prof-open" data-v="${esc(S.me.id)}">${ic("people")}내 프로필 보기</button>
+      ${isParent()?`<button data-act="me-family">${ic("gear")}가족 · 프로필 관리</button>`:""}
+      <button data-act="signout">${ic("out")}로그아웃</button>
+    </div></div>`;
 }
 // 창을 내 얼굴 단추 바로 아래에 붙여요 (맨 위 띠 · 휴대폰 위쪽 여백이 있어도)
 function meMenuPlace(){ const b=document.querySelector(".me-m"), pop=document.querySelector(".me-pop"); if(!b||!pop) return; const r=b.getBoundingClientRect(); if(r.height) pop.style.top=Math.max(8,r.bottom+8)+"px"; }
@@ -4482,13 +4517,14 @@ function viewAppShell(){
       <header class="ah">
         <button class="ah-l" data-act="tab" data-v="home" aria-label="홈으로">${logo(30)}<span class="ah-t">${esc(S.group.name)}</span></button>
         ${ahPrefBtns()}${newsBell()}
-        <button class="ah-me" data-act="prof-open" data-v="${esc(S.me.id)}" aria-label="내 프로필 · ${esc(S.me.name)}">${av(S.me,36)}</button>
+        <button class="ah-me me-m" data-act="me-menu" aria-expanded="${!!S.meMenu}" aria-label="지금 ${esc(S.me.name)} · 누가 쓸까요? 프로필 바꾸기">${av(S.me,36)}<i class="ah-sw" aria-hidden="true">⇄</i></button>
       </header>
       ${home && S.design==="harvest" ? (d=>`<div class="hv-hero"><small>${d.getMonth()+1}월 ${d.getDate()}일 ${"일월화수목금토"[d.getDay()]}요일</small><b>가을이<br>노랗게 익어 가요</b></div>`)(new Date()) : ""}
       ${home?`<nav class="hp-chips ${hpages().length>4?"many":""}" aria-label="홈 쪽">${hpages().map(([k,l,c])=>`<button class="hp-chip ${k===pg[0]?"on":""}" style="--c:${c}" data-act="hpage" data-v="${k}" ${k===pg[0]?'aria-current="page"':""}><u></u>${l}</button>`).join("")}</nav>`:""}
     </div>
     ${S.me.type==="child"?kidBar():""}
     ${S.newsOpen?viewNews():""}
+    ${S.meMenu?viewMeMenu():""}
     <main class="a-main ${home?"is-home":""}" id="main">${noticeBar()}${dupBanner()}${body}</main>
     ${home?`<button class="a-help" data-act="help-open" aria-label="AI 챗봇 상담">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
     ${`<nav class="a-nav" aria-label="메뉴">
@@ -4651,6 +4687,7 @@ function webBar(){
   if(S.me.type==="child") menu.push(["quiz","받아쓰기 퀴즈","quiz"]);
   menu.push(["family","우리 가족 설정","people"],["settings","설정","gear"]);
   const kids = isParent() ? sortedProfiles().filter(p=>p.type==="child") : [];
+  const others = sortedProfiles().filter(p=>p.id!==S.me.id && canUse(p));
   return `<header class="wbar">
       <button class="wb-l" data-act="tab" data-v="home" title="홈으로">${logo(30)}<b>${esc(S.group.name)} 일기장</b></button>
       <nav class="wb-tabs" aria-label="화면">${WEB_TABS.map(([k,l])=>`<button class="wb-tab ${S.tab===k&&!S.sub?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}<button class="wb-tab ${S.webMenu||inMenu?"on":""}" data-act="web-menu" aria-expanded="${!!S.webMenu}">메뉴</button></nav>
@@ -4660,7 +4697,7 @@ function webBar(){
         <button class="wb-ic ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 꾸미기 · 디자인 · 글씨" title="화면 꾸미기"><i class="dsw ${S.design}"></i></button>
         ${newsBell()}
         <button class="wb-ic ${S.tab==="chat"?"on":""}" data-act="tab" data-v="chat" aria-label="가족 채팅${un?` · 새 메시지 ${un}개`:""}" title="가족 채팅">${ic("talk")}${un?`<i class="cdot">${un>9?"9+":un}</i>`:""}</button>
-        <button class="wb-me ${S.meMenu?"on":""}" data-act="me-menu" aria-expanded="${!!S.meMenu}" aria-label="${esc(S.me.name)} · 프로필 바꾸기">${av(S.me,30)}<span>${esc(S.me.name)}</span><small aria-hidden="true">▾</small></button>
+        <button class="wb-me me-m ${S.meMenu?"on":""}" data-act="me-menu" aria-expanded="${!!S.meMenu}" aria-label="지금 ${esc(S.me.name)} · 누가 쓸까요? 프로필 바꾸기">${av(S.me,30)}<span class="wbm-n"><b>${esc(S.me.name)}</b><small>⇄ 바꾸기</small></span>${others.length?`<span class="wb-stack" aria-hidden="true">${others.slice(0,3).map(p=>av(p,22)).join("")}</span>`:""}</button>
         <button class="btn btn-primary wb-write" data-act="write">${ic("pen")}<span>일기 쓰기</span></button>
       </div>
     </header>
@@ -7011,7 +7048,8 @@ const acts = {
   "kid-pin-clear": el => guard(async()=>{ const p=prof(el.dataset.id); if(!p || !isParent()) return; if(!confirm(`${kidN(p)}의 비밀번호를 없앨까요? 누구나 ${p.name} 프로필로 들어갈 수 있게 돼요.`)) return;
     await savePin(p,""); S.pinEdit=null; render(); toast(`${kidN(p)}의 비밀번호를 없앴어요`); }),
   "parent-pin-clear": () =>guard(async()=>{ if(!confirm("부모 비밀번호를 없앨까요?")) return; await B.update(S.gid,"profiles",S.me.id,{pin:""}); S.me.pin=""; const p=prof(S.me.id); if(p) p.pin=""; render(); toast("부모 비밀번호를 없앴어요"); }),
-  "me-menu": () => { S.meMenu=!S.meMenu; render(); },
+  "me-menu": () => { S.meMenu=!S.meMenu; S.favPop=false; S.prefsOpen=false; S.webMenu=false; S.newsOpen=false; render(); },
+  "me-family": () => { S.meMenu=false; S.tab="family"; S.sub=null; render(); window.scrollTo(0,0); },
   "me-pick": el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
     if((p.type==="child" && p.pin) || needParentPin(p)){ S.phase="picker"; S.pinFor=p.id; S.afterPin=null; S.sub=null; render(); return; }
     enterAs(p); toast(`${p.name}${ro(p.name)} 바꿨어요`); },
