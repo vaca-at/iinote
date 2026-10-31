@@ -29,7 +29,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bill-links .pill{text-decoration:none;color:inherit}
 .pill{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 14px;font-size:17px;transition:background .15s,border-color .15s}
 .pill:hover{background:var(--soft);border-color:var(--sub)}
-.card{background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:16px;box-shadow:0 2px 0 var(--line)}
+.card{background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:16px}
 .login{max-width:420px;margin:12vh auto 0;text-align:center}
 .login .btn{width:100%;margin-top:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .g-logo{width:24px;height:24px;flex:none;background:#fff;border-radius:50%;padding:3px;box-sizing:border-box}
@@ -132,6 +132,44 @@ td.src-w,td.src-a{color:var(--sub)}
 .acct>div.unk{background:var(--soft)}
 .acct .note{grid-column:1/-1;margin:2px 2px 0}
 @media (max-width:560px){.vsum{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:25px}.visit .track s{max-width:110px}}
+/* 📱 앱 출시 이후 (2026-10-31): 핵심 숫자 · 웹/앱 추이 · 일기 추이 · 가족 성장 · 활동 단계 · 학년 · 기능 사용
+   차트 색: 웹 = 파랑, 앱 = 코랄 (밝게 · 어둡게 따로 골라 색약 검사 통과), 한 줄짜리는 보라 · 초록 */
+:root{--c-web:#3F73D1;--c-app:#E0663F;--c-one:#7A5BC7;--c-grow:#2F8C6B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c-web:#5C8DE6;--c-app:#E06A40;--c-one:#9C80E0;--c-grow:#4FA27E}}
+:root[data-theme="dark"]{--c-web:#5C8DE6;--c-app:#E06A40;--c-one:#9C80E0;--c-grow:#4FA27E}
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:10px}
+.kpi div{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
+.kpi b{display:block;font-size:34px;line-height:1.1}
+.kpi span{font-size:16px;color:var(--sub)}
+.kpi small{display:block;font-size:14px;color:var(--sub);margin-top:2px}
+.kpi .up{color:var(--ok)}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.links a{text-decoration:none;color:inherit}
+.grid2{display:grid;grid-template-columns:1fr;gap:0 16px}
+@media (min-width:900px){.grid2{grid-template-columns:1fr 1fr}}
+.ch-wrap{position:relative;padding-top:18px}
+.ch{display:flex;align-items:flex-end;gap:3px;height:150px;border-bottom:1.5px solid var(--line);position:relative}
+.ch::before{content:"";position:absolute;left:0;right:0;top:0;border-top:1.5px dashed var(--line)}
+.ch-max{position:absolute;top:0;left:0;font-size:13px;color:var(--sub);line-height:1}
+.ch .col{flex:1;min-width:0;height:100%;display:flex;flex-direction:column-reverse;gap:2px;border-radius:4px 4px 0 0;cursor:default}
+.ch .col:hover{background:var(--soft)}
+.ch .seg{flex:none;min-height:0}
+.ch .col .seg:last-child{border-radius:4px 4px 0 0}
+.ch .s-web{background:var(--c-web)}.ch .s-app{background:var(--c-app)}.ch .s-one{background:var(--c-one)}.ch .s-grow{background:var(--c-grow)}
+.ch-x{display:flex;gap:3px;margin-top:4px}
+.ch-x span{flex:1;min-width:0;text-align:center;font-size:13px;color:var(--sub);white-space:nowrap;overflow:visible}
+.ch-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:16px;color:var(--sub);margin:0 0 6px}
+.ch-leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.ch-leg b{color:var(--ink)}
+.stack{display:flex;gap:2px;height:22px;border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.stack i{display:block;min-width:0}
+.lv0,.hb s i.lv0{background:var(--g4)}.lv1,.hb s i.lv1{background:var(--g3)}.lv2,.hb s i.lv2{background:var(--g1)}.lv3,.hb s i.lv3{background:var(--g0);outline:1px solid var(--line);outline-offset:-1px}
+.hb{display:grid;grid-template-columns:minmax(90px,auto) 1fr auto;gap:6px 10px;align-items:center;font-size:17px}
+.hb s{display:block;height:10px;border-radius:99px;background:var(--soft);text-decoration:none;overflow:hidden}
+.hb s i{display:block;height:100%;border-radius:99px;background:var(--c-grow)}
+.hb .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hb em{font-style:normal;color:var(--sub);font-size:15px;font-variant-numeric:tabular-nums}
+#tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--paper);font-size:15px;line-height:1.4;padding:6px 10px;border-radius:10px;white-space:pre;display:none}
 </style>
 </head>
 <body>
@@ -241,10 +279,15 @@ async function load(){
   const idxErrs=new Set();
   const fams=await Promise.all(groups.map(async g=>{
     const dcol=F.collection(db,"groups",g.id,"diaries");
-    const [profiles,total,today_,w,m]=await Promise.all([
-      F.getDocs(F.collection(db,"groups",g.id,"profiles")).then(s=>s.docs.map(d=>{ const p=d.data(); return {id:d.id,type:p.type,grade:p.grade,linked:!!p.uid}; /* 이름은 쓰지 않아요 */ })),
+    const [profiles,total,today_,w,m,days]=await Promise.all([
+      // 이름 · 글은 쓰지 않아요. 기능을 썼는지(있다 · 없다)만 봐요
+      F.getDocs(F.collection(db,"groups",g.id,"profiles")).then(s=>s.docs.map(d=>{ const p=d.data();
+        return {id:d.id,type:p.type,grade:p.grade,linked:!!p.uid,
+          f:{char:!!p.char,photo:!!p.photo,cover:!!p.cover,msg:!!p.msg,birthday:!!p.birthday,tt:!!p.tt,pin:!!p.pin}}; })),
       count(dcol), count(F.query(dcol,F.where("date","==",today))),
-      count(F.query(dcol,F.where("date",">=",d7))), count(F.query(dcol,F.where("date",">=",d30)))]);
+      count(F.query(dcol,F.where("date",">=",d7))), count(F.query(dcol,F.where("date",">=",d30))),
+      // 최근 14일 날짜별 일기 수 (일기 추이)
+      Promise.all(TREND_DAYS().map(d=>count(F.query(dcol,F.where("date","==",d)))))]);
     const members=await Promise.all(profiles.map(async p=>{
       const mine=F.query(dcol,F.where("profileId","==",p.id));
       const [all,sub,pen]=await Promise.all([count(mine), count(F.query(dcol,F.where("profileId","==",p.id),F.where("status","==","submitted"))),
@@ -253,9 +296,75 @@ async function load(){
       let week=null; try{ week=await count(F.query(dcol,F.where("profileId","==",p.id),F.where("date",">=",d7))); }catch(e){ const u=String(e.message||"").match(/https:\/\/console\.firebase\.google\.com\S+/); if(u) idxErrs.add(u[0]); }
       return {...p,all,sub,pen,week};
     }));
-    return {...g,members,total,today:today_,w,m};
+    return {...g,members,total,today:today_,w,m,days};
   }));
   render(fams,users,[...idxErrs],usage,stats,kinds);
+}
+
+/* ---------- 📱 앱 출시 이후 (2026-10-31) ----------
+   이미 있는 권한(가족 · 프로필 읽기, 일기 · 계정 개수 세기, stats · statsSrc 읽기)만 써요. 새 규칙은 필요 없어요 */
+const PLAY_URL = "https://play.google.com/store/apps/details?id=kr.co.iinote.app";
+const APP_SINCE = "2026-10-08";   // 웹 · 앱 따로 세기 시작한 날
+const TREND_DAYS = () => [...Array(14)].map((_,i)=>daysAgo(13-i));   // 오래된 날 → 오늘
+const md = d => `${+d.slice(5,7)}/${+d.slice(8)}`;
+const pct = (a,b) => b ? Math.round(a/b*100) : 0;
+// 세로 막대 차트 (HTML): cols = [{label, tip, segs:[[class,value],…]}], 맨 위 막대만 둥글게, 칸 사이 2px
+function colChart(cols, every=1){
+  const max=Math.max(1,...cols.map(c=>c.segs.reduce((s,[,v])=>s+v,0)));
+  return `<div class="ch-wrap"><span class="ch-max">${max}</span><div class="ch">${cols.map(c=>`<div class="col" data-tip="${esc(c.tip)}">${c.segs.filter(([,v])=>v>0).map(([k,v])=>`<i class="seg ${k}" style="height:${v/max*100}%"></i>`).join("")}</div>`).join("")}</div>
+    <div class="ch-x">${cols.map((c,i)=>`<span>${(cols.length-1-i)%every===0?esc(c.label):""}</span>`).join("")}</div></div>`;
+}
+function launchSection(fams,stats,ms){
+  const now=Date.now(), wk=7*864e5, kids=ms.filter(p=>p.type==="child");
+  const newFam=fams.filter(f=>(f.createdAt||0)>=now-wk).length;
+  const active=fams.filter(f=>f.w>0).length;
+  const by=Object.fromEntries((stats||[]).map(s=>[s.day,s]));
+  const last=n=>[...Array(n)].map((_,i)=>daysAgo(n-1-i));
+  const w7=last(7).reduce((s,d)=>s+(by[d]?.src?.visitors_web||0),0), a7=last(7).reduce((s,d)=>s+(by[d]?.src?.visitors_app||0),0);
+  const perFam=fams.length?(ms.length/fams.length).toFixed(1):"0";
+  const kpi=`<div class="kpi">
+    <div><b>${fams.length}</b><span>가족</span><small>${newFam?`<span class="up">▲ ${newFam}</span> 최근 7일 새 가족`:"최근 7일 새 가족 없음"}</small></div>
+    <div><b>${pct(active,fams.length)}%</b><span>이번 주 일기 쓴 가족</span><small>${active} / ${fams.length} 가족</small></div>
+    <div><b>${pct(a7,w7+a7)}%</b><span>최근 7일 방문 중 앱</span><small>앱 ${a7} · 웹 ${w7} 기기</small></div>
+    <div><b>${perFam}</b><span>가족당 사람 수</span><small>보호자 ${ms.length-kids.length} · 아이 ${kids.length}</small></div></div>
+    <div class="links"><a class="pill" href="${PLAY_URL}" target="_blank" rel="noopener">▶ 플레이스토어 페이지</a><a class="pill" href="https://play.google.com/console" target="_blank" rel="noopener">📊 Play Console (설치 · 평점 · 비정상 종료)</a><a class="pill" href="https://console.firebase.google.com/project/iinote/overview" target="_blank" rel="noopener">🔥 파이어베이스</a></div>`;
+  // 📱 웹 · 앱 방문 추이 (30일, 따로 세기 시작한 날부터)
+  const d30=last(30).filter(d=>d>=APP_SINCE);
+  const wa=d30.map(d=>{ const s=by[d]?.src||{}, w=s.visitors_web||0, a=s.visitors_app||0; return {label:md(d),tip:`${md(d)}\n웹 ${w} · 앱 ${a}`,segs:[["s-web",w],["s-app",a]]}; });
+  const sw=d30.reduce((s,d)=>s+(by[d]?.src?.visitors_web||0),0), sa=d30.reduce((s,d)=>s+(by[d]?.src?.visitors_app||0),0);
+  const waCard=`<div class="card"><h2>📱 웹 · 앱 방문 추이</h2>
+    <div class="ch-leg"><span><i style="background:var(--c-web)"></i>웹 <b>${sw}</b></span><span><i style="background:var(--c-app)"></i>앱 <b>${sa}</b></span><span>${d30.length}일 합계 (기기 수)</span></div>
+    ${stats&&d30.length?colChart(wa,5):'<p class="z">아직 숫자가 없어요.</p>'}
+    <p class="note">하루 한 기기를 한 번만 세요. 막대에 마우스를 올리면 그날 숫자가 보여요.</p></div>`;
+  // 📒 일기 추이 (14일)
+  const td=TREND_DAYS(), dsum=td.map((d,i)=>fams.reduce((s,f)=>s+(f.days?.[i]||0),0));
+  const dCard=`<div class="card"><h2>📒 날짜별 일기 (14일)</h2>
+    <div class="ch-leg"><span><i style="background:var(--c-one)"></i>일기 <b>${dsum.reduce((a,b)=>a+b,0)}</b>편</span><span>하루 평균 <b>${(dsum.reduce((a,b)=>a+b,0)/14).toFixed(1)}</b></span></div>
+    ${colChart(td.map((d,i)=>({label:md(d),tip:`${md(d)} (${"일월화수목금토"[new Date(d+"T00:00").getDay()]})\n일기 ${dsum[i]}편`,segs:[["s-one",dsum[i]]]})),3)}
+    <p class="note">일기에 적힌 날짜 기준이에요 (지난 날짜로 쓴 일기도 그날에 세요).</p></div>`;
+  // 🌱 가족 성장 (13주, 주마다 새 가족)
+  const weeks=[...Array(13)].map((_,i)=>{ const end=now-(12-i)*wk, start=end-wk; return {start,end,n:fams.filter(f=>(f.createdAt||0)>start&&(f.createdAt||0)<=end).length,total:fams.filter(f=>(f.createdAt||0)<=end).length}; });
+  const gCard=`<div class="card"><h2>🌱 새 가족 (13주)</h2>
+    <div class="ch-leg"><span><i style="background:var(--c-grow)"></i>주마다 새로 만든 가족</span><span>지금 모두 <b>${fams.length}</b></span></div>
+    ${colChart(weeks.map(x=>{ const a=new Date(x.start+864e5), lab=`${a.getMonth()+1}/${a.getDate()}`; return {label:lab,tip:`${lab} 주\n새 가족 ${x.n} · 누적 ${x.total}`,segs:[["s-grow",x.n]]}; }),3)}</div>`;
+  // 💤 가족 활동 단계
+  const lv=[["이번 주 씀",fams.filter(f=>f.w>0).length],["30일 안에 씀",fams.filter(f=>!f.w&&f.m>0).length],["30일 넘게 쉼",fams.filter(f=>!f.m&&f.total>0).length],["아직 한 편도 없음",fams.filter(f=>!f.total).length]];
+  const nF=Math.max(1,fams.length);
+  const aCard=`<div class="card"><h2>💤 가족 활동 단계</h2>
+    <div class="stack">${lv.map(([l,n],i)=>n?`<i class="lv${i}" style="flex:${n}" data-tip="${esc(l)}\n${n}가족 · ${pct(n,nF)}%"></i>`:"").join("")}</div>
+    <div class="hb">${lv.map(([l,n],i)=>`<span><i class="sw lv${i}"></i>${l}</span><s><i class="lv${i}" style="width:${pct(n,nF)}%"></i></s><em>${n} · ${pct(n,nF)}%</em>`).join("")}</div>
+    <p class="note">‘30일 넘게 쉼’ 가족에게는 공지 띠나 알림으로 다시 불러 볼 만해요.</p></div>`;
+  // 🧒 아이 학년
+  const gm=new Map(); kids.forEach(p=>{ const k=gradeName(p.grade)||"모름"; gm.set(k,(gm.get(k)||0)+1); });
+  const order=g=>g==="모름"?99:/세$/.test(g)?parseInt(g)-10:g[0]==="초"?+g.slice(1):g[0]==="중"?6+ +g.slice(1):9+ +g.slice(1);
+  const gl=[...gm].sort((a,b)=>order(a[0])-order(b[0])), gMax=Math.max(1,...gl.map(x=>x[1]));
+  const kCard=`<div class="card"><h2>🧒 아이 학년</h2>${gl.length?`<div class="hb">${gl.map(([g,n])=>`<span>${esc(g)}</span><s><i style="width:${n/gMax*100}%"></i></s><em>${n}명</em>`).join("")}</div>`:'<p class="z">아직 아이 프로필이 없어요.</p>'}</div>`;
+  // 🧩 기능 사용 (프로필 기준, 있다 · 없다만)
+  const feats=[["char","🐾 캐릭터 고름",ms],["photo","🙂 얼굴 사진",ms],["cover","🖼️ 배경 사진",ms],["msg","💬 하고 싶은 말",ms],["birthday","🎂 생일",ms],["tt","📅 시간표",kids],["pin","🔒 아이 비밀번호",kids]];
+  const fCard=`<div class="card"><h2>🧩 기능 사용 (프로필)</h2><div class="hb">${feats.map(([k,l,list])=>{ const n=list.filter(p=>p.f?.[k]).length; return `<span>${l}</span><s><i style="width:${pct(n,list.length)}%"></i></s><em>${n} / ${list.length}</em>`; }).join("")}
+    <span>📲 자기 기기 쓰는 아이</span><s><i style="width:${pct(kids.filter(p=>p.linked).length,kids.length)}%"></i></s><em>${kids.filter(p=>p.linked).length} / ${kids.length}</em></div>
+    <p class="note">시간표 · 비밀번호 · 자기 기기는 아이 프로필 중에서, 나머지는 모든 프로필 중에서 센 숫자예요. 이름과 내용은 보지 않아요.</p></div>`;
+  return `<div class="group-h">📱 앱 출시 이후</div>${kpi}<div class="grid2">${waCard}${dCard}${gCard}${aCard}${kCard}${fCard}</div>`;
 }
 
 // 접속 잔디: 13주(일~토 한 줄씩), 이번 주가 맨 오른쪽. 앞으로 올 날은 빈칸
@@ -340,6 +449,7 @@ function render(fams,users,idx,usage,stats,kinds){
   $app.innerHTML = `<header><h1>📊 아이아이노트 운영 현황</h1><span class="when">${new Date().toLocaleString("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"})}</span>
       <button class="pill" data-act="reload">🔄 새로고침</button><button class="pill" data-act="logout">로그아웃</button></header>
     <div class="card" id="inbox"><h2>💌 문의함</h2><p class="sub">불러오는 중…</p></div>
+    ${launchSection(fams,stats,ms)}
     <div class="card" id="notice"><h2>📢 전체 공지 띠</h2><p class="sub">불러오는 중…</p></div>
     <div class="group-h">👨‍👩‍👧 사람 · 가족</div>
     <div class="tiles people">
@@ -434,6 +544,11 @@ document.addEventListener("click", async e => {
   if(act==="inbox-open") loadInbox(b.dataset.v);
   if(act==="toggle") document.querySelectorAll(`tr.mem[data-g="${b.dataset.v}"]`).forEach(r=>r.hidden=!r.hidden);
 });
+// 차트 말풍선: data-tip 이 있는 막대에 마우스를 올리거나 누르면 그 숫자를 보여 줘요
+const tipEl=document.createElement("div"); tipEl.id="tip"; tipEl.setAttribute("role","tooltip"); document.body.appendChild(tipEl);
+document.addEventListener("pointerover", e=>{ const t=e.target.closest?.("[data-tip]"); if(!t){ tipEl.style.display="none"; return; } tipEl.textContent=t.dataset.tip; tipEl.style.display="block"; });
+document.addEventListener("pointermove", e=>{ if(tipEl.style.display!=="block") return; const w=tipEl.offsetWidth, x=Math.min(innerWidth-w-8,Math.max(8,e.clientX-w/2)); tipEl.style.left=x+"px"; tipEl.style.top=Math.max(8,e.clientY-tipEl.offsetHeight-14)+"px"; });
+document.addEventListener("scroll", ()=>{ tipEl.style.display="none"; }, true);
 let msg="";
 AU.onAuthStateChanged(auth, async u => {
   if(!u){ $app.innerHTML=loginHTML(msg); msg=""; return; }
