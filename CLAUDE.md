@@ -22,6 +22,8 @@
 - 모두: 녹음 · 소리 파일(최대 3분), #태그(본문 #낱말 자동 추출), 태그 · 검색으로 모아 보기
 - 핵심 강조점: 휴대폰 · 아이패드는 앱으로, 컴퓨터는 쉬운 주소(iinote.co.kr)로 같은 일기장에 접속
 
+- 🏠 웹 첫 화면 (2026-11-04, viewLanding2): 단추만 남긴 간단한 화면. PC(901px 이상) = 흰 칸(로고 · 언즈체 제목 · 구글/카카오 로그인 · 카톡 공유 · 링크 복사 네모 단추 4개) + 남색 칸(Google Play QR img/play-qr.svg · Play 단추), 휴대폰 · 아이패드 세로(900px 이하) = 주소창 모양 상자 + 동그란 바로가기 5개(구글 · 카카오 · 앱 받기 NEW · 카톡 공유 · 링크 복사, 아이폰 · 아이패드는 앱 받기 대신 홈 화면에 추가). 예전의 기능 설명 · 체크 칩 · AI 예시 카드 · 기기 그림 · 데모 단추는 뺐어요. 언즈체 글자는 fonts/unz-s.woff2 에 담겨 있어서 첫 화면 글자를 바꾸면 iinote-app 에서 npm run fonts
+
 ## 파일
 - index.html: 앱 전체 (HTML+CSS+JS 한 파일, script type="module")
 - icon.png: 앱 아이콘 (두 개의 i + 모눈 노트)
@@ -35,7 +37,7 @@
 - 파이어베이스 프로젝트: iinote (Authentication 구글 로그인, Firestore 서울, Storage는 Blaze 전환 후 사용 예정)
 - 배포: 깃허브 저장소 github.com/vaca-at/iinote (루트에 index.html · icon.png · privacy.html · CNAME) → https://iinote.co.kr. 로컬 복제본: Downloads\iinote-repo
 - 예전 주소 jsun.site/iinote (저장소 vaca-at/jsun 의 iinote 폴더, 로컬 Downloads\jsun)는 옮기기 전 버전
-- FIREBASE_CONFIG의 apiKey가 "여기에"로 시작하면 localStorage로 도는 체험 모드. 👀 로그인 없이 둘러보기(2026-10-03): 첫 화면 단추(act tour) 또는 iinote.co.kr/?demo → sessionStorage iinote-tour 가 있으면 TOUR=DEMO (예시 가족, 엄마로 바로 들어감, 맨 위 .tour-bar '진짜로 시작하기'=tour-exit, 둘러보기 중 로그아웃도 tour-exit). 로그인된 기기(ls iinote-login)에서 ?demo 로 오면 TOUR_ASK → '로그아웃하고 둘러볼까요?' 창(tour-logout · tour-no), 실제로는 로그아웃 상태면 바로 둘러보기. 검색 로봇용: #app 안에 정적 소개 글(.seo-intro, 앱이 뜨면 바뀜) + JSON-LD WebApplication
+- FIREBASE_CONFIG의 apiKey가 "여기에"로 시작하면 localStorage로 도는 체험 모드. 👀 로그인 없이 둘러보기(2026-10-03): (2026-11-04부터 웹 첫 화면 단추는 뺐어요) iinote.co.kr/?demo · 앱 로그인 화면의 ‘먼저 둘러볼게요’(act tour) → sessionStorage iinote-tour 가 있으면 TOUR=DEMO (예시 가족, 엄마로 바로 들어감, 맨 위 .tour-bar '진짜로 시작하기'=tour-exit, 둘러보기 중 로그아웃도 tour-exit). 로그인된 기기(ls iinote-login)에서 ?demo 로 오면 TOUR_ASK → '로그아웃하고 둘러볼까요?' 창(tour-logout · tour-no), 실제로는 로그아웃 상태면 바로 둘러보기. 검색 로봇용: #app 안에 정적 소개 글(.seo-intro, 앱이 뜨면 바뀜) + JSON-LD WebApplication
 - 데이터: users/{uid}, invites/{code}, groups/{gid} 아래 profiles(homeStyle 포함), diaries, comments, schedules, links, quizWords, aiReports(이상한 AI 답변 신고)
 - 🎙 이야기로 일기 쓰기 (5~7세, 2026-09-28): 아이 일기 쓰기 위 칸(talkOK). 엄마 · 아빠와 대화 녹음(최대 3분, recStart(true)) → 녹음은 d.audio 로 일기에 남음 → toWav16k 로 16kHz WAV → 워커 POST /transcribe (Workers AI @cf/openai/whisper-large-v3-turbo, 워커에 AI 바인딩 필요) → 워커 mode "talk" (Claude, TALK_BASE: 아이가 한 말만으로 "나는~" 일기, dialog · diary · mood · note) → 일기 칸에 넣고 부모가 고쳐 제출. diaries.talk = {transcript, dialog, note, diary, made}. 이야기 일기는 글자 수 · 다홍펜 조건 없이 제출. 일기당 만들기 3번(TALK_MAX_MAKE)
 - 날씨 · 기분 (2026-09-29): 일기 쓰기 위에 날씨 7(WEATHERS: 맑음 · 구름 조금 · 흐림 · 비 · 천둥 번개 · 눈 · 무지개 → diaries.weather) · 기분 7(MOODS: 좋아요 · 신나요 · 행복해요 · 그저 그래요 · 속상해요 · 화나요 · 피곤해요, 예전 5개 키 그대로) 이모지로 고르기. moodChip(mood, weather)

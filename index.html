@@ -133,6 +133,49 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .logo-wrap svg{display:block;width:100%;height:100%}
 
 /* ============ 첫 화면(로그인 전) ============ */
+/* 🏠 웹 첫 화면 (2026-11-04, viewLanding2): PC = 흰 칸 + 남색 QR 칸, 휴대폰 · 아이패드 세로(900px 이하) = 동그란 바로가기 */
+.lp{min-height:100dvh;display:grid;place-items:center;padding:40px 20px calc(40px + env(safe-area-inset-bottom));background:var(--paper)}
+.lp .lp-h{font-family:UnzS,var(--diary),sans-serif;font-weight:400;letter-spacing:0;color:var(--ink)}
+.lp .lp-lead{color:var(--ink2);font-size:18px;margin:0}
+.lp .ic{width:24px;height:24px}.lp .g-logo{width:26px;height:26px}.lp .lp-pl{width:30px;height:30px}
+.lp-brand{display:flex;align-items:center;gap:10px;font-family:UnzS,var(--diary),sans-serif;font-size:26px;color:var(--ink)}
+.lp-foot{display:flex;gap:14px;margin:22px 0 0;font-size:14px}.lp-foot a{color:var(--ink3)}
+.lp .keep-login{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:start;margin:16px 0 0;font-size:14px;color:var(--ink2);text-align:left}.lp .keep-login small{grid-column:2;margin-top:2px;font-size:12px;color:var(--ink3)}
+.lp .inapp-note,.lp .kid-first{margin:16px 0 0}
+.lp-card{display:grid;grid-template-columns:1fr 1fr;width:980px;max-width:100%;border-radius:32px;overflow:hidden;background:var(--surface);border:1.5px solid var(--line)}
+.lp-a{padding:48px 44px}
+.lp-a .lp-h{font-size:56px;line-height:1.15;margin:26px 0 14px}
+.lp-a .lp-lead{margin-bottom:28px}
+.lp-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lp-bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:92px;padding:16px 8px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.lp-bt:hover{border-color:var(--ink3)}
+.lp-bt.k{background:#FEE500;border-color:#FEE500;color:#191919}
+.lp-b{background:#1F2A44;color:#fff;padding:48px 36px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.lp-b h2{font-family:UnzS,var(--diary),sans-serif;font-weight:400;font-size:36px;margin:14px 0 8px;color:#fff}
+.lp-b p{color:#B9C0D4;font-size:16px;margin:0 0 22px}
+.lp-qr{display:block;width:178px;height:178px;padding:14px;border-radius:18px;background:#fff}
+.lp-play{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:12px 22px;border-radius:14px;background:#fff;color:#1F2A44;font-weight:700;font-size:17px;text-decoration:none}
+.lp-play .play-logo{width:22px;height:22px}
+.lp-b small{margin-top:16px;color:#8E97B0;font-size:13px}
+.lp-m{display:none}
+@media (max-width:900px){
+  .lp{place-items:start center;padding-top:44px}
+  .lp-pc{display:none}
+  .lp-m{display:flex;flex-direction:column;align-items:center;width:100%;max-width:420px;text-align:center}
+  .lp-m .lp-h{font-size:40px;line-height:1.1;margin:0}
+  .lp-addr{display:flex;align-items:center;gap:12px;width:100%;margin:24px 0 12px;padding:10px 18px 10px 12px;border:3px solid var(--coral);border-radius:999px;background:var(--surface)}
+  .lp-addr b{font-family:UnzS,var(--diary),sans-serif;font-weight:400;font-size:24px;color:var(--ink);flex:1;text-align:left}
+  .lp-addr span{font-size:14px;color:var(--ink3)}
+  .lp-m .lp-lead{font-size:16px}
+  .lp-row{list-style:none;margin:30px 0 0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:18px 0;width:100%}.lp-row li{width:33.33%}
+  .lp-sc{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;padding:0;border:0;background:none;color:var(--ink);font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer}
+  .lp-o{width:72px;height:72px;border-radius:24px;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--surface);font-size:30px}
+  .lp-sc.k .lp-o{background:#FEE500;border-color:#FEE500;color:#191919}
+  .lp-sc.p .lp-o{background:#1F2A44;border-color:#1F2A44}
+  .lp-sc.s .lp-o{background:var(--surface2)}
+  .lp-new{position:absolute;top:-6px;left:calc(50% + 18px);padding:2px 7px;border-radius:8px;background:var(--coral);color:#fff;font-size:11px;font-style:normal;font-weight:700}
+  .lp .keep-login{margin-top:28px}
+}
 .landing{min-height:100dvh;display:grid;justify-items:center;align-items:start;padding:clamp(40px,8vh,96px) 20px calc(40px + env(safe-area-inset-bottom))}
 .land{width:100%;max-width:1040px;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
 .land-brand{display:flex;align-items:center;gap:14px;font-weight:800;font-size:20px;letter-spacing:-.3px}
@@ -4260,18 +4303,6 @@ const moodChip = (k,w) => { const m=MOODS.find(x=>x[0]===k), we=weatherOf(w);
   return (m||we)?`<span class="mood-chip">${we?`<b class="emo-i" title="${we[1]}">${we[2]}</b>`:""}${m?`<b class="emo-i">${m[3]}</b>${m[1]}`:we[1]}</span>`:"<span></span>"; };
 const addrBox = () => `<div class="addr"><span class="addr-t"><small>휴대폰 · 아이패드 · 컴퓨터 · 노트북 모두 이 주소로</small><strong>${esc(SITE_ADDRESS)}</strong></span><button class="btn btn-ghost sm" data-act="copy" data-v="https://${esc(SITE_ADDRESS)}">${ic("copy")}복사</button></div>`;
 const kakaoBtn = (sm) => `<div class="share-row"><button class="btn btn-kakao ${sm?"sm":""}" data-act="kakao-share">${ic("talk")}카카오톡 공유하기</button><button class="btn btn-ghost ${sm?"sm":""}" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button></div>`;
-const devicesArt = () => `<svg class="devices" viewBox="0 0 400 210" aria-hidden="true" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round">
-  <rect x="14" y="30" width="206" height="136" rx="10" fill="var(--paper)"/><path d="M2 176h230l-12 14H14z" fill="var(--surface2)"/>
-  <line x1="44" y1="30" x2="44" y2="166" stroke="var(--margin)" stroke-width="2"/>
-  <g stroke="var(--rule)" stroke-width="2"><line x1="54" y1="84" x2="200" y2="84"/><line x1="54" y1="108" x2="200" y2="108"/><line x1="54" y1="132" x2="170" y2="132"/></g>
-  <circle cx="66" cy="56" r="8" fill="var(--coral)" stroke="none"/><circle cx="88" cy="62" r="8" fill="var(--butter)" stroke="none"/>
-  <rect x="236" y="44" width="104" height="148" rx="12" fill="var(--paper)"/>
-  <g stroke="var(--rule)" stroke-width="2"><line x1="252" y1="96" x2="324" y2="96"/><line x1="252" y1="118" x2="324" y2="118"/><line x1="252" y1="140" x2="304" y2="140"/></g>
-  <circle cx="264" cy="70" r="7" fill="var(--coral)" stroke="none"/><circle cx="283" cy="75" r="7" fill="var(--butter)" stroke="none"/>
-  <rect x="330" y="96" width="58" height="104" rx="12" fill="var(--paper)"/>
-  <g stroke="var(--rule)" stroke-width="2"><line x1="340" y1="140" x2="378" y2="140"/><line x1="340" y1="158" x2="378" y2="158"/><line x1="340" y1="176" x2="366" y2="176"/></g>
-  <circle cx="349" cy="118" r="6" fill="var(--coral)" stroke="none"/><circle cx="364" cy="122" r="6" fill="var(--butter)" stroke="none"/>
-</svg>`;
 
 /* =========================================================
    7. 화면들
@@ -4300,62 +4331,61 @@ function viewLanding(){
       <p style="margin-top:16px"><button class="link-btn" data-act="not-kid">${esc(n)}${hasBatchim(n)?"이가":"가"} 아니에요 · 처음 화면으로</button></p>
     </div></main>`; }
   if(IS_APP) return viewAppLogin();
-  return `${tourBar()}<main class="landing"><div class="land">
-    <section>
-      <div class="land-brand">${logo(44)}<span>아이아이노트</span></div>
-      <h1>가족이 함께 쓰고,<br>서로 읽어 주는 일기장</h1>
-      <p class="land-lead"><strong>아이의 일기는 AI 다홍펜 선생님이 맞춤법을 봐 주고 칭찬과 응원을 해 줘요.</strong><br>엄마 아빠와 아이 모두 휴대폰 · 아이패드 · 컴퓨터에서 쉽게 일기를 쓰고 서로 댓글을 남길 수 있어요.</p>
-      <a class="app-play" href="${PLAY_URL}" target="_blank" rel="noopener">${PLAY_LOGO}<span><b>안드로이드 앱이 나왔어요!</b> Google Play에서 ‘아이아이노트’를 받아 보세요. 아이폰 · 아이패드 · 컴퓨터는 지금처럼 웹으로 써요.</span><i aria-hidden="true">›</i></a>
-      <ul class="land-badges" aria-label="아이아이노트의 약속">
-        <li>${ic("check")}광고 없음</li><li>${ic("check")}아이는 계정 없이</li><li>${ic("check")}아이는 붙여넣기 없이 직접 타이핑</li><li>${ic("check")}휴대폰 · 아이패드 · 컴퓨터 함께</li><li>${ic("check")}가족 채팅</li><li>${ic("check")}가족 사진첩</li>
-      </ul>
-      <ul class="land-feats">
-        <li><span class="dot" style="background:var(--coral)"></span>아이 일기는 AI 선생님이 맞춤법 검사해주고 피드백해줘요</li>
-        <li><span class="dot" style="background:var(--butter)"></span>자주 틀리는 맞춤법은 퀴즈로 쉽게 학습해요</li>
-        <li><span class="dot" style="background:var(--sage)"></span>가족의 일기를 읽고 댓글과 답글로 이야기 나눠요</li>
-        <li><span class="dot" style="background:var(--sky)"></span>칭찬 스티커판과 성장 기록으로 커 가는 모습을 한눈에</li>
-        <li><span class="dot" style="background:var(--ink)"></span>사진 추가, 장소와 태그 추가하여 하루를 더욱 풍성하게</li>
-      </ul>
-      ${INAPP?`<p class="inapp-note" role="alert">📱 지금은 <b>앱 안의 브라우저</b>로 열려 있어서 로그인이 안 될 수 있어요. ${INAPP==="ios"?"··· (또는 공유) 단추를 눌러 <b>'Safari로 열기'</b>를 골라 주세요.":"로그인 단추를 누르면 <b>크롬 · 기본 브라우저</b>로 열어 드려요."}</p>`:""}
-      <div class="land-cta">
-        <button class="btn btn-primary" data-act="signin"><span class="cta-t"><span class="cta-h">${G_LOGO}구글 계정으로 시작하기</span><small>Google 로그인</small></span></button>
-        <button class="btn btn-kakao" data-act="signin-kakao"><span class="cta-t"><span class="cta-h">${ic("talk")}카카오로 시작하기</span><small>카카오 로그인</small></span></button>
-        <div class="tour-box"><button class="tour-main" data-act="tour" title="예시 가족 일기장을 로그인 없이 마음껏 눌러 봐요"><span class="cta-t"><span class="cta-h">👀 데모 버전 둘러보기</span></span></button><span class="tour-addr"><a href="/?demo">iinote.co.kr/?demo</a><button type="button" class="link-btn" data-act="copy-demo">복사</button></span></div>
-        ${/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1)   // 아이폰 · 아이패드는 앱이 없어서 예전처럼 홈 화면에 추가
-          ? `<button class="btn a2hs-btn" data-act="a2hs"><span class="cta-t"><span class="cta-h">📲 홈 화면에 추가</span><small>앱처럼 아이콘으로 바로</small></span></button>`
-          : `<a class="btn play-btn" href="${PLAY_URL}" target="_blank" rel="noopener"><span class="cta-t"><span class="cta-h">${PLAY_LOGO}Google Play에서 받기</span><small>안드로이드 앱</small></span></a>`}
-      </div>
-      ${S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:""}
-      ${keepBox()}
-      <p class="demo-note one">구글 · 카카오는 따로 가입돼요. 둘 다 쓰려면 로그인 뒤 ‘설정 → 계정’에서 연결해 주세요.</p>
-      ${kakaoBtn()}
-      <p class="demo-note"><a href="terms.html">이용약관</a> · <a href="privacy.html">개인정보처리방침</a></p>
-      ${S.a2hs?a2hsBox():""}
-      ${DEMO?`<p class="demo-note">지금은 체험 모드예요. 예시 가족으로 모든 기능을 눌러 볼 수 있고, 내용은 이 기기에만 저장돼요.</p>`:""}
-    </section>
-    <div class="land-side">
-    <figure class="ai-sample" aria-label="AI 다홍펜 선생님 피드백 예시">
-      <figcaption class="ais-tag">👩‍🏫 AI 다홍펜 선생님 · 이런 피드백을 받아요</figcaption>
-      <div class="ais-top"><span class="ais-av">하</span>하랑 · 4학년<span class="ais-date">9월 28일</span></div>
-      <p class="ais-text">오늘 운동회 연습을 했다. 이어달리기에서 2등을 해서 기분이 <mark class="ais-ok">좋았다</mark>. 내일은 꼭 1등을 <mark class="ais-fix">할꺼다</mark>.</p>
-      <div class="ais-stamp">참 잘했어요</div>
-      <div class="ais-pen">
-        <p><b>👏 칭찬</b>"기분이 좋았다"라는 말에 마음이 잘 담겼어요! 이어달리기 장면이 눈에 그려져요.</p>
-        <p><b>🖍 고칠 곳</b><s>할꺼다</s> → <strong>할 거다</strong> · '거'는 앞말과 띄어 써요. 한 번만 더 볼까요?</p>
-        <p><b>💪 응원</b>한 군데만 고치면 완벽한 일기예요!</p>
-      </div>
-      <p class="ais-heart">❤️ 엄마 · 아빠</p>
-    </figure>
-    <section class="anywhere" aria-labelledby="any-h">
-      <h2 id="any-h">휴대폰, 아이패드, 컴퓨터 어디서든</h2>
-      <p>휴대폰에서 쓰던 일기를 컴퓨터에서는 주소 하나로 그대로 열어요.</p>
-      ${devicesArt()}
-      ${addrBox()}
-    </section>
-    </div>
-  </div></main>`;
+  return viewLanding2();
 }
-
+/* 🏠 웹 첫 화면 (2026-11-04): 단추만 남긴 간단한 첫 화면. PC = 왼쪽 흰 칸(로그인 단추) + 오른쪽 남색 칸(Google Play QR),
+   휴대폰 = 주소창 모양 상자 + 동그란 바로가기 5개(포털 바로가기처럼). 데모 둘러보기 단추는 뺐어요 (iinote.co.kr/?demo 로는 그대로 열려요).
+   아이폰 · 아이패드는 앱이 없어서 Play 자리에 '홈 화면에 추가' */
+function viewLanding2(){
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const brand = `<div class="lp-brand">${logo(40)}<span>아이아이노트</span></div>`;
+  const inapp = INAPP?`<p class="inapp-note" role="alert">📱 지금은 <b>앱 안의 브라우저</b>로 열려 있어서 로그인이 안 될 수 있어요. ${INAPP==="ios"?"··· (또는 공유) 단추를 눌러 <b>'Safari로 열기'</b>를 골라 주세요.":"로그인 단추를 누르면 <b>크롬 · 기본 브라우저</b>로 열어 드려요."}</p>`:"";
+  const kid = S.kidId && !S.joinCode?`<p class="kid-first">📒 공부방에서 왔어요! 이 기기에서 처음 쓰는 거라면, <b>엄마 · 아빠가 보내 준 '휴대폰 연결 링크'</b>를 한 번만 눌러 주세요. 그다음부터는 공부방 일기 단추만 누르면 바로 쓸 수 있어요.</p>`:"";
+  const foot = `<p class="lp-foot"><a href="terms.html">이용약관</a><a href="privacy.html">개인정보처리방침</a></p>`;
+  const extra = `${keepBox()}${S.a2hs?a2hsBox():""}${DEMO?`<p class="demo-note">지금은 체험 모드예요. 예시 가족으로 모든 기능을 눌러 볼 수 있고, 내용은 이 기기에만 저장돼요.</p>`:""}`;
+  const PLAY_BIG = PLAY_LOGO.replace('class="play-logo"','class="play-logo lp-pl"');
+  // 휴대폰: 동그란 바로가기
+  const sc = (act, cls, icon, label, more="") => `<li><${act.href?`a href="${act.href}" target="_blank" rel="noopener"`:`button type="button" data-act="${act.a}"${act.v?` data-v="${act.v}"`:""}`} class="lp-sc ${cls}"><span class="lp-o">${icon}</span>${label}${more}</${act.href?"a":"button"}></li>`;
+  const mobile = `<div class="lp-m">
+      <h1 class="lp-h">우리 가족 일기장</h1>
+      <div class="lp-addr">${logo(40)}<b>아이아이노트</b><span>iinote.co.kr</span></div>
+      <p class="lp-lead">엄마 아빠 아이가 함께 쓰고, AI 선생님이 맞춤법을 봐 줘요</p>
+      ${inapp}
+      <ul class="lp-row" aria-label="시작하기">
+        ${sc({a:"signin"},"g",G_LOGO,"구글 로그인")}
+        ${sc({a:"signin-kakao"},"k",ic("talk"),"카카오 로그인")}
+        ${ios?sc({a:"a2hs"},"p","📲","홈 화면에 추가"):sc({href:PLAY_URL},"p",PLAY_BIG,"앱 받기",'<i class="lp-new">NEW</i>')}
+        ${sc({a:"kakao-share"},"s",ic("talk"),"카톡 공유")}
+        ${sc({a:"copy",v:SHARE_URL},"s",ic("link"),"링크 복사")}
+      </ul>
+      ${kid}${extra}${foot}
+    </div>`;
+  // PC: 흰 칸 + 남색 QR 칸
+  const pc = `<div class="lp-pc"><div class="lp-card">
+      <section class="lp-a">
+        ${brand}
+        <h1 class="lp-h">가족이 함께 쓰는<br>일기장</h1>
+        <p class="lp-lead">아이 일기는 AI 선생님이 맞춤법까지 봐 줘요</p>
+        ${inapp}
+        <div class="lp-btns">
+          <button type="button" class="lp-bt" data-act="signin">${G_LOGO}구글로 시작</button>
+          <button type="button" class="lp-bt k" data-act="signin-kakao">${ic("talk")}카카오로 시작</button>
+          <button type="button" class="lp-bt" data-act="kakao-share">${ic("talk")}카톡 공유</button>
+          <button type="button" class="lp-bt" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button>
+        </div>
+        ${kid}${extra}${foot}
+      </section>
+      <aside class="lp-b" aria-label="안드로이드 앱">
+        ${PLAY_BIG}
+        <h2>휴대폰은 앱으로</h2>
+        <p>휴대폰 카메라로 찍으면<br>Google Play로 바로 가요</p>
+        <img class="lp-qr" src="img/play-qr.svg" width="150" height="150" alt="Google Play 아이아이노트 QR 코드">
+        <a class="lp-play" href="${PLAY_URL}" target="_blank" rel="noopener">${PLAY_LOGO}Google Play</a>
+        <small>아이폰 · 아이패드 · 컴퓨터는 이 웹으로 써요</small>
+      </aside>
+    </div></div>`;
+  return `${tourBar()}<main class="lp">${pc}${mobile}</main>`;
+}
 function viewOnboard(){
   return `<main class="center-page"><div class="onb">
     ${logo(48)}
@@ -7024,7 +7054,6 @@ const acts = {
     S.a2hs=true; render(); document.querySelector(".a2hs-box .btn")?.focus();
   },
   "a2hs-close": () => { S.a2hs=false; render(); },
-  "copy-demo": async () => { try{ await navigator.clipboard.writeText("https://iinote.co.kr/?demo"); toast("데모 버전 주소를 복사했어요"); }catch(e){ toast("iinote.co.kr/?demo"); } },
   signin: () => TOUR ? acts["tour-exit"]() : INAPP ? inappHelp() : guard(()=>B.signIn()),
   "signin-kid": () => guard(()=>B.signInKid()),
   "not-kid": () => { ls.del("iinote-kidlink"); S.joinCode=""; S.kidId=""; S.kidName=""; history.replaceState(null,"",location.pathname); render(); },
