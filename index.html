@@ -8195,23 +8195,31 @@ function profChar(blob){ charEdOpen(); if(blob) charEdLoad(blob); }
 document.addEventListener("paste", e=>{ if(!S.prof || !S.profEdit || CE.el) return;
   const f=[...(e.clipboardData?.items||[])].find(i=>i.kind==="file" && /^image\//.test(i.type))?.getAsFile(); if(!f) return;
   e.preventDefault(); profChar(f); });
+// 프로필 사진 파일 올리기: 기본 저장소가 막히면(storage/unauthorized) 사진첩 저장소로 (시간표 · 캐릭터 그림과 같은 방법)
+async function profUpload(p,name,blob,where){
+  if(where==="album") return {...await B.uploadMedia(`groups/${S.gid}/album/prof_${p.id}_${name}.jpg`,blob,"album"),where:"album"};
+  try{ return await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/${name}.jpg`,blob); }
+  catch(e1){ console.warn("프로필 사진 기본 저장소 실패 → 사진첩 저장소",e1); return profUpload(p,name,blob,"album"); }
+}
 // 얼굴 · 배경 사진 올리기: 고르면 바로 올리고 바꿔요 (예전 사진 파일은 지워요)
 async function profPhoto(input){
   if(input.dataset.kind==="char"){ const f=input.files?.[0]; input.value=""; return profChar(f); }
   const p=prof(S.prof), f=input.files?.[0], kind=input.dataset.kind==="cover"?"cover":"photo"; input.value="";
   if(!p || !f || !(kind==="cover"?canDecorProf(p):canEditProf(p))) return upProg();
+  let step="사진 읽기";   // 어디서 막혔는지 오류 기록에 남겨요
   try{
     upProg(kind==="cover"?"🖼️ 배경 사진을 올리는 중…":"🙂 얼굴 사진을 올리는 중…");
-    const {big,thumb}=await makePhotoPair(f), id=rid(), base=`groups/${S.gid}/profiles/${p.id}`;
-    const r=await B.uploadMedia(`${base}/${id}.jpg`,big.blob);
+    const {big,thumb}=await makePhotoPair(f), id=rid();
+    step="사진 올리기"; const r=await profUpload(p,id,big.blob), at=r.where?{where:r.where}:{};
     let data;
-    if(kind==="cover") data={cover:{url:r.url,path:r.path}};
-    else { const th=thumb?.blob?await B.uploadMedia(`${base}/${id}_t.jpg`,thumb.blob):null; data={photo:{url:r.url,path:r.path,thumb:th?.url||r.url,thumbPath:th?.path||""}}; }
+    if(kind==="cover") data={cover:{url:r.url,path:r.path,...at}};
+    else { const th=thumb?.blob?await profUpload(p,id+"_t",thumb.blob,r.where):null; data={photo:{url:r.url,path:r.path,thumb:th?.url||r.url,thumbPath:th?.path||"",...at}}; }
     const old=p[kind];
-    await B.update(S.gid,"profiles",p.id,data);
-    if(old){ B.deleteMedia(old.path).catch(()=>{}); if(old.thumbPath) B.deleteMedia(old.thumbPath).catch(()=>{}); }
+    step="저장"; await B.update(S.gid,"profiles",p.id,data);
+    if(old){ B.deleteMedia(old.path,old.where||undefined).catch(()=>{}); if(old.thumbPath) B.deleteMedia(old.thumbPath,old.where||undefined).catch(()=>{}); }
     await reload("profiles"); upProg(); buzz("ok"); render(); toast(kind==="cover"?"배경 사진을 바꿨어요":"얼굴 사진을 바꿨어요");
-  }catch(e){ console.error(e); upProg(); toast("사진을 올리지 못했어요. 다시 해 주세요"); }
+  }catch(e){ console.error(e); upProg(); const why=e?.code||e?.message||"알 수 없음"; try{ reportError(`프로필 사진 · ${step}: ${why}`,"profPhoto"); }catch(_){}
+    toast(step==="사진 읽기"?(e?.message||"사진을 불러올 수 없어요"):`사진을 올리지 못했어요 (${step}: ${why})`); }
 }
 Object.assign(acts,{
   "prof-open": el => { S.prof=el.dataset.v; S.profEdit=false; S.moreOpen=false; S.newsOpen=false; render(); },
@@ -8223,7 +8231,7 @@ Object.assign(acts,{
     if(IS_APP) go(()=>{ S.tab="home"; S.sub=null; S.hpage="diary"; S.hwho=id; }); else go(()=>{ S.tab="day"; S.sub=null; }); },
   "prof-rm": el => guard(async()=>{ const p=prof(S.prof), k=el.dataset.v; if(!(k==="cover"?canDecorProf(p):canEditProf(p)) || !p[k]) return;
     const old=p[k]; await B.update(S.gid,"profiles",p.id,{[k]:null});
-    B.deleteMedia(old.path).catch(()=>{}); if(old.thumbPath) B.deleteMedia(old.thumbPath).catch(()=>{});
+    B.deleteMedia(old.path,old.where||undefined).catch(()=>{}); if(old.thumbPath) B.deleteMedia(old.thumbPath,old.where||undefined).catch(()=>{});
     await reload("profiles"); render(); toast(k==="cover"?"배경 사진을 뺐어요":"얼굴 사진을 뺐어요"); }),
 });
 forms.prof = (fd,f) => guard(async()=>{
