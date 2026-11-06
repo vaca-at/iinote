@@ -1880,6 +1880,16 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .al-by .chip{padding:0 14px}
 .al-sec{margin:0 0 24px}
 .al-h{display:flex;align-items:center;gap:8px;font-size:17px;margin:0 0 10px}
+/* 📸 앱 사진첩: 위쪽을 줄여 사진이 더 많이 보이게 (제목 한 줄 · 설명 빼기 · 칩은 옆으로 넘기는 한 줄) */
+html.is-app .al-top{margin:0 0 8px;padding:0;align-items:center}
+html.is-app .al-top h1{font-size:20px;margin:0}
+html.is-app .al-top .btn{min-height:0;padding:6px 12px;font-size:13px}
+html.is-app .al-intro{display:none}
+html.is-app .al-by{flex-wrap:nowrap;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px;scrollbar-width:none}
+html.is-app .al-by::-webkit-scrollbar{display:none}
+html.is-app .al-by .chip{flex:none;white-space:nowrap;padding:0 11px;font-size:13px}
+html.is-app .al-h{font-size:14px;margin:0 0 6px}
+
 .al-avs{display:inline-flex}
 .al-avs>*{margin-right:-6px;box-shadow:0 0 0 2px var(--surface);border-radius:50%}
 .al-avs>*:last-child{margin-right:4px}
@@ -5504,7 +5514,7 @@ function drawArea(st,key){
 }
 function viewAlbum(){
   const pick=(cls,label)=>`<label class="btn ${cls} al-pick">${label}<input type="file" class="al-files sr" accept="image/*" multiple></label>`;
-  const head=`<div class="page-h"><h1>📸 사진첩</h1>${pick("btn-primary",ic("image")+"사진 올리기")}</div>`;
+  const head=`<div class="page-h al-top"><h1>📸 사진첩</h1>${pick("btn-primary",ic("image")+"사진 올리기")}</div>`;
   if(!S.albumReady){
     if(!S.albumLoading){ S.albumLoading=true; loadAlbum().then(()=>{ S.albumLoading=false; if((S.tab==="album" || (IS_APP && (!S.tab||S.tab==="home") && hpage()==="album")) && !S.sub) render(); }); }
     return head+`<p class="empty">사진첩을 펼치는 중이에요…</p>`;
