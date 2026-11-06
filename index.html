@@ -2073,6 +2073,10 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .pk-d{margin:0 0 8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px}
 .pk-d summary{font-weight:600;cursor:pointer}
 .pk-d p{margin:8px 0 0;color:var(--ink2)}
+.pg-c{max-width:none;max-height:none;overflow:visible;border-radius:var(--r-lg,20px);padding:16px}
+.pg-c h3{margin:14px 0 8px;font-size:16px}
+.pg-code{font-size:15px}.pg-code b{font-size:22px;letter-spacing:.06em;margin-left:6px;color:var(--ink)}
+.pg-w{width:100%;justify-content:center;min-height:48px;margin-top:8px}
 .pk-x{width:100%;justify-content:center;min-height:48px;margin-top:4px}
 /* 📱 PDF 미리 보기 (일기책 · 상장): 위 닫기 · 가운데 미리 보기 · 아래 저장/보내기 */
 .docv{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;background:var(--paper);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
@@ -2293,6 +2297,8 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .hp-chip.on u{background:#fff}
 .a-main{padding:12px 14px 20px}
 .a-main .page-h{margin-top:4px}
+.a-back{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 10px 0 2px;border:0;background:none;color:var(--ink2);font:inherit;font-size:15px;cursor:pointer}
+.a-back .ic{width:20px;height:20px}
 .a-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:start;padding:8px 0 calc(10px + env(safe-area-inset-bottom));background:var(--surface);box-shadow:0 -2px 12px rgba(46,36,51,.08)}
 .an-it{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;color:var(--ink3);font:inherit;font-size:12.5px;cursor:pointer;padding:2px 0}
 .an-it .ic{width:24px;height:24px}
@@ -2344,23 +2350,34 @@ html.is-app .set-page .set-sub{padding:0;border:0;background:none}
 .hp-cal{padding:14px 8px!important}
 .hc-top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
 .hc-top h2{flex:1;margin:0;text-align:center;font-family:'OngleipUnz',var(--diary);font-size:22px;font-weight:400}
-.hp-cal .hp-arw{background:#FFF6DC;color:#8A6300}
+/* 달력 색은 디자인을 따라가요 (2026-11-06): --cal 하나만 정하면 칸 · 오늘 · 일정이 같이 바뀌어요 */
+:root{--cal:var(--accent,#C98A00);--cal-on:#fff}
+[data-design="wongoji"]{--cal:var(--brand)}
+[data-design="warm"]{--cal:var(--coral)}
+[data-design="harvest"]{--cal:#E0962B;--cal-on:#3A2A00}
+[data-design="night"]{--cal:#FFD36E;--cal-on:#1C2252}
+[data-theme="dark"]{--cal-on:#141A28}
+.hp-cal .hp-arw{background:color-mix(in srgb,var(--cal) 14%,var(--surface));color:color-mix(in srgb,var(--cal) 70%,var(--ink))}
 .hc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
 .hc-w{font-size:12px;color:var(--ink3);padding-bottom:2px}
 .hc-w.red,.hc-d.red span{color:#D9534F}
 .hc-w.blue,.hc-d.blue span{color:#3F73D1}
 .hc-d{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:3px;min-width:0;min-height:74px;padding:5px 2px 4px;border:0;border-radius:10px;background:none;font:inherit;font-size:15px;color:var(--ink);cursor:pointer;overflow:hidden}
 .hc-d > span{text-align:center;line-height:1.1}
-.hc-d.has{background:#FFF8E3}
-.hc-d.today{background:#FFD966;font-weight:700}
+.hc-d.has{background:color-mix(in srgb,var(--cal) 9%,var(--surface))}
+.hc-d.today{background:var(--cal);color:var(--cal-on);font-weight:700}
+.hc-d.today > span{color:var(--cal-on)}
+.hc-d.today em u{box-shadow:0 0 0 1px var(--surface)}
+:root[data-design="wongoji"] .hc-grid{gap:0}
+:root[data-design="wongoji"] .hc-d{border-radius:0;box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--brand) 35%,transparent)}
 .hc-d.fut{cursor:default}
 .hc-d.fut > span,.hc-d.fut em{opacity:.55}
 .hc-d em{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;min-height:6px}
 .hc-d em u{width:6px;height:6px;border-radius:50%}
 /* 날짜 칸 안 일정 제목 (두 개까지 + 더 있으면 +n) */
 .hc-evs{display:flex;flex-direction:column;gap:2px;min-width:0}
-.hc-ev{display:block;min-width:0;padding:1px 3px;border-radius:5px;background:#FFE9B0;color:#6B4A00;font-size:10.5px;font-weight:600;line-height:1.35;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hc-d.today .hc-ev{background:#FFF6DC}
+.hc-ev{display:block;min-width:0;padding:1px 3px;border-radius:5px;background:color-mix(in srgb,var(--cal) 20%,var(--surface));color:color-mix(in srgb,var(--cal) 50%,var(--ink));font-size:10.5px;font-weight:600;line-height:1.35;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-d.today .hc-ev{background:color-mix(in srgb,var(--surface) 88%,transparent);color:var(--ink)}
 .hc-ev.more{background:none;padding:0 3px;color:var(--ink3)}
 /* 다가오는 일정: 휴대폰은 화면 1/4 높이 안에서 스크롤, 넓은 화면은 달력 3 : 일정 1 로 나란히 */
 .hp-calwrap .sc-scroll{max-height:25vh;overflow-y:auto}
@@ -4562,7 +4579,7 @@ const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? 
 /* ---------- 📱 앱 화면 뼈대 (2026-10-05, 앱에서만 · 웹은 아래 viewShell 그대로) ----------
    머리 한 줄(로고 · 가족 이름 · 🔔 · 내 얼굴) · 아래 메뉴 5칸(홈 · 내 일기 · ✏️ 쓰기 · 채팅 · 더보기) · 더보기 판 · 도움 단추
    홈은 칩을 누르거나 옆으로 밀어 넘기는 네 쪽: 일기장 · 달력 · 사진첩 · 소식 (쪽마다 색) */
-const HPAGES = [["cal","달력","#C98A00","#FFF0C2"],["diary","하루","#D63E70","#FFE1EA"],["album","사진첩","#3F73D1","#DCE9FF"]];   // (2026-10-09) 홈은 늘 달력부터: 첫 칩 · 처음 열 때 · 다른 메뉴에서 홈으로 올 때   // 소식은 2026-10-07부터 위쪽 🔔 팝업으로 (viewNews)
+const HPAGES = [["cal","달력","var(--cal)","color-mix(in srgb,var(--cal) 18%,var(--surface))"],["diary","하루","#D63E70","#FFE1EA"],["album","사진첩","#3F73D1","#DCE9FF"]];   // (2026-10-09) 홈은 늘 달력부터: 첫 칩 · 처음 열 때 · 다른 메뉴에서 홈으로 올 때   // 소식은 2026-10-07부터 위쪽 🔔 팝업으로 (viewNews)
 // 네 번째 쪽 (2026-10-07): 보호자는 AI 리포트, 아이는 받아쓰기 퀴즈
 const hpages = () => [...HPAGES, ...(isParent()?[["report","AI 리포트","#2F8C6B","#DAF2E5"]]:S.me?.type==="child"?[["quiz","받아쓰기","#2F8C6B","#DAF2E5"]]:[]), ["fav","즐겨찾기","#7A5BC7","#ECE3F6"]];   // ⭐ 즐겨찾기는 다섯 번째 쪽 (2026-10-08)
 const hpage = () => hpages().some(x=>x[0]===S.hpage) ? S.hpage : "cal";
@@ -4579,17 +4596,21 @@ function openSheet(title,say,inner){
   document.body.appendChild(el); return el;
 }
 // kind: dz 디자인 · ft 글씨 · all 둘 다 (환경 설정)
+// 디자인 · 글씨 고르는 줄: 고르는 창과 환경 설정 페이지가 같이 써요
+const pickDz = h => `${h?"<h3>디자인</h3>":""}${DESIGNS.map(([k,l])=>`<button type="button" class="pk-o ${S.design===k?"on":""}" data-act="pick-set" data-g="dz" data-k="${k}"><i class="dsw ${k}"></i><span><b>${esc(l)}</b><small>${DESIGN_SAY[k]||""}</small></span></button>`).join("")}`;
+const pickFt = h => `${h?"<h3>글씨</h3>":""}${DFONTS.map(([k,l,f])=>`<button type="button" class="pk-o ${S.dfont===k?"on":""}" data-act="pick-set" data-g="ft" data-k="${k}"><span><b style="font-family:${f}">${esc(l)} · 오늘도 우리 가족 일기장</b><small>${DFONT_SAY[k]||""}</small></span></button>`).join("")}`;
 function openPick(kind){
-  const dz=`${kind==="all"?"<h3>디자인</h3>":""}${DESIGNS.map(([k,l])=>`<button type="button" class="pk-o ${S.design===k?"on":""}" data-g="dz" data-k="${k}"><i class="dsw ${k}"></i><span><b>${esc(l)}</b><small>${DESIGN_SAY[k]||""}</small></span></button>`).join("")}`;
-  const ft=`${kind==="all"?"<h3>글씨</h3>":""}${DFONTS.map(([k,l,f])=>`<button type="button" class="pk-o ${S.dfont===k?"on":""}" data-g="ft" data-k="${k}"><span><b style="font-family:${f}">${esc(l)} · 오늘도 우리 가족 일기장</b><small>${DFONT_SAY[k]||""}</small></span></button>`).join("")}`;
-  const title=kind==="dz"?"디자인 고르기":kind==="ft"?"글씨 고르기":"환경 설정";
-  const el=openSheet(title,`${kind==="dz"?"화면의 색과 분위기가 바뀌어요.":kind==="ft"?"앱에 보이는 글씨가 바뀌어요.":"화면의 색과 글씨를 골라요."} 눌러 보고 마음에 드는 것으로 고르세요. 이 기기에만 적용돼요.`,(kind==="ft"?"":dz)+(kind==="dz"?"":ft));
-  el.addEventListener("click",e=>{ const o=e.target.closest(".pk-o"); if(!o) return; const k=o.dataset.k, isDz=o.dataset.g==="dz";
-    if(isDz){ S.design=k; ls.set("iinote-design",k); } else { S.dfont=k; ls.set("iinote-dfont",k); } applyPrefs(); render(); if(isDz) syncWidget();
-    el.querySelectorAll(`.pk-o[data-g="${o.dataset.g}"]`).forEach(x=>x.classList.toggle("on",x===o)); });
+  const title=kind==="dz"?"디자인 고르기":"글씨 고르기";
+  const el=openSheet(title,`${kind==="dz"?"화면의 색과 분위기가 바뀌어요.":"앱에 보이는 글씨가 바뀌어요."} 눌러 보고 마음에 드는 것으로 고르세요. 이 기기에만 적용돼요.`,kind==="dz"?pickDz():pickFt());
+  el.addEventListener("click",e=>{ const o=e.target.closest(".pk-o"); if(o) el.querySelectorAll(`.pk-o[data-g="${o.dataset.g}"]`).forEach(x=>x.classList.toggle("on",x===o)); });
 }
-// 사용설명서: 자주 묻는 질문을 펼쳐 봐요 (챗봇이 읽는 글과 같은 FAQ)
-function openManual(){ openSheet("사용설명서","궁금한 것을 눌러 보세요. 더 궁금하면 '개발자와 상담'으로 물어보세요.",FAQ.map(([q,a])=>`<details class="pk-d"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")); }
+// 더보기의 페이지들 (2026-11-06, 예전엔 팝업)
+const pageBox = (t,say,inner) => `<div class="page-h"><h1>${t}</h1></div><div class="pk-c pg-c"><p>${say}</p>${inner}</div>`;
+const viewEnv = () => pageBox("환경 설정","화면의 색과 글씨를 골라요. 이 기기에만 적용돼요.",pickDz(true)+pickFt(true));
+const viewManual = () => pageBox("사용설명서","궁금한 것을 눌러 보세요. 더 궁금하면 '개발자와 상담'으로 물어보세요.",FAQ.map(([q,a])=>`<details class="pk-d"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join(""));
+const viewBackup = () => pageBox("PDF · 백업","일기를 책으로 만들거나, 파일로 받아 둘 수 있어요.",`<button type="button" class="pk-o" data-act="tab" data-v="shelf"><span><b>📄 PDF 일기책</b><small>기간과 사람을 골라 일기책을 만들어요</small></span></button>${isParent()?`<button type="button" class="pk-o" data-act="backup-go"><span><b>💾 백업 (엑셀 파일)</b><small>일기와 댓글을 이 기기에 저장해요</small></span></button>`:""}`);
+function viewInvite(){ const c=S.group?.inviteCode||"", url=`https://${SITE_ADDRESS}/?join=${c}`;
+  return pageBox("가족 초대하기","초대 주소를 받은 가족은 바로 우리 일기장에 들어와요.",`<p class="pg-code">초대 코드 <b>${esc(c)}</b></p><button type="button" class="btn btn-primary pg-w" data-act="invite-share">초대 보내기</button><button type="button" class="btn btn-ghost pg-w" data-act="copy" data-v="${esc(url)}">초대 주소 복사</button>`); }
 function ahPrefBtns(){
   const dn=DESIGNS.find(x=>x[0]===S.design)?.[1]||"", f=DFONTS.find(x=>x[0]===S.dfont)||DFONTS[0];
   return `<button class="ah-pf" data-act="ah-dz" aria-label="화면 꾸미기 바꾸기 · 지금 ${esc(dn)}"><i class="dsw ${S.design}"></i></button>`
@@ -4621,7 +4642,7 @@ function viewAppShell(){
     ${S.me.type==="child"?kidBar():""}
     ${S.newsOpen?viewNews():""}
     ${S.meMenu?viewMeMenu():""}
-    <main class="a-main ${home?"is-home":""}" id="main">${noticeBar()}${dupBanner()}${body}</main>
+    <main class="a-main ${home?"is-home":""}" id="main">${!S.sub && S.tab && !["home","mine","chat"].includes(S.tab)?`<button type="button" class="a-back" data-act="app-back">${ic("back")}뒤로</button>`:""}${noticeBar()}${dupBanner()}${body}</main>
     ${""/* 상담 단추는 홈 달력을 가려서 뺐어요 (2026-11-06) → 더보기 › 도움 */}
     ${`<nav class="a-nav" aria-label="메뉴">
       ${nb("home","홈","home")}${nb("mine","내 일기","lay-diary")}
@@ -4644,9 +4665,9 @@ function viewMore(){
   const kid=S.me.type==="child";
   // (2026-11-06) 3줄: 내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 우리 아이 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담
   const it=[["settings","내 설정","gear","#E5ECFF","#3F5FB8"],["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["env","환경 설정","lay-quad","#E3F4EC","#2F7A56"],
-    ...(isParent()?[["kids","아이들 현황","spark","#FFF0C2","#8A6300"]]:[]),["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"],["pdf","PDF · 백업","book","#F0E6FF","#6B47B8"],
+    ...(isParent()?[["kids","아이들 현황","spark","#FFF0C2","#8A6300"]]:[]),["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"],["backup","PDF · 백업","book","#F0E6FF","#6B47B8"],
     ...(isParent()?[["invite","가족 초대하기","heart","#FFE1EA","#C2366A"]]:[]),["manual","사용설명서","help","#FFF0C2","#8A6300"],["help","개발자와 상담","talk","#E3F4EC","#2F7A56"]];
-  const ACT={help:"help-open",env:"more-env",pdf:"more-pdf",invite:"more-invite",manual:"more-manual"};
+  const ACT={help:"help-open"};   // 상담은 전체 화면, 나머지는 모두 페이지 (2026-11-06)
   const box=([k,l,i,bg,fg])=>`<button class="more-it" ${ACT[k]?`data-act="${ACT[k]}"`:`data-act="more-go" data-v="${k}"`} style="--mb:${bg};--mf:${fg}"><span>${ic(i)}</span>${l}</button>`;
   return `<div class="more-bg" data-act="app-more" aria-hidden="true"></div>
   <section class="more" role="dialog" aria-modal="true" aria-labelledby="more-h"><i class="more-grip" aria-hidden="true"></i>
@@ -4844,7 +4865,7 @@ function viewMain(){
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
   if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+greenBanners()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
-  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,cal:viewHomeCalendar,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow}[S.tab]||viewHome)();
+  return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,cal:viewHomeCalendar,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow,env:viewEnv,manual:viewManual,backup:viewBackup,invite:viewInvite}[S.tab]||viewHome)();
 }
 
 /* ---------- 홈 (다이어리) ---------- */
@@ -6954,7 +6975,7 @@ document.addEventListener("input", e=>{ const f=e.target.closest?.('form[data-fo
 /* ---------- 주소와 뒤로 가기 ----------
    / 홈 · /mine 내 일기 · /chat · /kids · /day(?date=) · /shelf · /album 사진첩 · /report · /quiz · /family, 일기 읽기는 ?d=일기id, 쓰기는 /write, PDF는 /pdf.
    화면이 바뀌면 주소를 쌓아서(pushState) 브라우저 뒤로 가기가 앱 안의 이전 화면으로 가요 */
-const ROUTE_TABS = ["mine","chat","kids","cal","day","shelf","album","report","quiz","family","settings","grow"];
+const ROUTE_TABS = ["mine","chat","kids","cal","day","shelf","album","report","quiz","family","settings","grow","env","manual","backup","invite"];
 function urlOf(){
   let u = ROUTE_TABS.includes(S.tab) ? "/"+S.tab : "/";
   if(S.sub?.type==="diary") return u+"?d="+encodeURIComponent(S.sub.id);
@@ -6969,7 +6990,7 @@ function applyUrl(){
   if(seg==="write"){ if(!(S.sub?.type==="write" && S.draft)) loadDraft(date||todayStr()); S.sub={type:"write"}; return; }
   if(seg==="pdf"){ S.tab="shelf"; S.sub={type:"pdf"}; S.draft=null; return; }
   S.tab = ROUTE_TABS.includes(seg) ? seg : "home";
-  if((S.tab==="quiz" && S.me?.type!=="child") || (["kids","report"].includes(S.tab) && S.me?.type==="child")) S.tab="home";
+  if((S.tab==="quiz" && S.me?.type!=="child") || (["kids","report","invite"].includes(S.tab) && S.me?.type==="child")) S.tab="home";
   if(S.tab==="day") S.dayView=date||todayStr();
   S.draft=null; S.sub = d && S.diaries.some(x=>x.id===d) ? {type:"diary",id:d} : null;
 }
@@ -8753,6 +8774,8 @@ if(IS_APP){
     "doc-send": ()=>guard(async()=>{ const f=await docFile(); outAt=Date.now();
       await plug("Share").share({title:docCur?.name||"아이아이노트", files:[f.uri], dialogTitle:"PDF 보내기"}).catch(e=>{ if(!/cancel/i.test(e?.message||"")) throw e; }); }),
     "app-unlock": ()=>unlock(),
+    // 화면 위 뒤로 단추 (2026-11-06): 아이폰은 기기 뒤로 단추가 없어요. 안드로이드 뒤로 버튼과 같은 길
+    "app-back": ()=>{ if(history.state?.iinote && history.length>1) history.back(); else go(()=>{ S.sub=null; S.tab="home"; }); },
     "np-open": ()=>{ S.npOpen=!S.npOpen; render(); },
     // 홈 네 쪽 · 누구 일기 · 달력 날짜 → 그날 일기장
     hpage: el => { const k=el.dataset.v; if(k==="news"){ S.newsSeenBefore=Number(ls.get(newsSeenKey(),"0")); ls.set(newsSeenKey(),String(Date.now())); }
@@ -8762,13 +8785,10 @@ if(IS_APP){
     // 더보기 판
     "app-more": () => { S.moreOpen=!S.moreOpen; S.morePrefs=false; S.newsOpen=false; render(); },
     "more-go": el => { S.moreOpen=false; acts.tab(el); },
-    "more-env": () => { S.moreOpen=false; render(); openPick("all"); },
-    "more-manual": () => { S.moreOpen=false; render(); openManual(); },
-    // PDF · 백업: 어느 쪽인지 고르는 창
-    "more-pdf": () => { S.moreOpen=false; render(); const el=openSheet("PDF · 백업","일기를 책으로 만들거나, 파일로 받아 둘 수 있어요.",`<button type="button" class="pk-o" data-go="shelf"><span><b>📄 PDF 일기책</b><small>기간과 사람을 골라 일기책을 만들어요</small></span></button>${isParent()?`<button type="button" class="pk-o" data-go="family"><span><b>💾 백업 (엑셀 파일)</b><small>일기와 댓글을 이 기기에 저장해요</small></span></button>`:""}`);
-      el.addEventListener("click",e=>{ const b=e.target.closest("[data-go]"); if(!b) return; el.remove(); if(b.dataset.go==="family") S.famOpen="h-bak"; b.dataset.v=b.dataset.go; acts.tab(b); }); },
-    // 가족 초대: 공유 창으로 초대 주소를 보내요
-    "more-invite": () => { S.moreOpen=false; render(); const c=S.group?.inviteCode||"", url=`https://${SITE_ADDRESS}/?join=${c}`; outAt=Date.now();
+    // 더보기 페이지의 단추들
+    "pick-set": el => { const k=el.dataset.k, isDz=el.dataset.g==="dz"; if(isDz){ S.design=k; ls.set("iinote-design",k); } else { S.dfont=k; ls.set("iinote-dfont",k); } applyPrefs(); render(); if(isDz) syncWidget(); },
+    "backup-go": el => { S.famOpen="h-bak"; el.dataset.v="family"; acts.tab(el); },
+    "invite-share": () => { const c=S.group?.inviteCode||"", url=`https://${SITE_ADDRESS}/?join=${c}`; outAt=Date.now();
       plug("Share")?.share({title:"아이아이노트 가족 초대", text:`우리 가족 일기장에 초대해요. 초대 코드: ${c}`, url, dialogTitle:"가족 초대하기"}).catch(()=>{}); },
     "more-prefs": () => { S.morePrefs=!S.morePrefs; render(); },
     // 위 막대 🎨 · 가: 탭탭 누르면 차례로 바뀌고, 마지막 것을 기억해요 (2026-10-16)
