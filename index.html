@@ -2059,11 +2059,27 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .ptr.go:not(.spin) svg{transform:rotate(180deg)}
 .ptr.spin svg{animation:ptr-spin .8s linear infinite}
 @keyframes ptr-spin{to{transform:rotate(360deg)}}
+/* 🎨 디자인 · 글씨 고르기 창 */
+.pk{position:fixed;inset:0;z-index:85;display:flex;align-items:flex-end;justify-content:center;background:rgba(20,26,40,.45)}
+.pk-c{width:100%;max-width:480px;max-height:82vh;overflow:auto;background:var(--surface);color:var(--ink);border-radius:20px 20px 0 0;padding:18px 16px calc(14px + env(safe-area-inset-bottom))}
+.pk-c h2{margin:0 0 4px;font-size:18px}
+.pk-c p{margin:0 0 12px;font-size:13px;color:var(--ink3)}
+.pk-o{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;margin:0 0 8px;padding:8px 12px;border:1.5px solid var(--line);border-radius:14px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.pk-o .dsw{flex:none;width:28px;height:28px;min-width:28px}
+.pk-o b{display:block;font-size:15px}
+.pk-o small{display:block;font-size:12px;color:var(--ink3)}
+.pk-o.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.pk-c h3{margin:14px 0 8px;font-size:15px}
+.pk-d{margin:0 0 8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px}
+.pk-d summary{font-weight:600;cursor:pointer}
+.pk-d p{margin:8px 0 0;color:var(--ink2)}
+.pk-x{width:100%;justify-content:center;min-height:48px;margin-top:4px}
 /* 📱 PDF 미리 보기 (일기책 · 상장): 위 닫기 · 가운데 미리 보기 · 아래 저장/보내기 */
 .docv{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;background:var(--paper);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 .docv-top{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
 .docv-top b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
 .docv-x{display:grid;place-items:center;width:44px;height:44px;flex:none;border:0;border-radius:50%;background:none;color:var(--ink);cursor:pointer}
+.docv-sw{flex:none;margin-left:auto}
 .docv-f{flex:1;min-height:0;width:100%;border:0;background:#E9EBF0}
 .docv-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 4px}
 .docv-btns .btn{justify-content:center;min-height:50px}
@@ -4545,7 +4561,29 @@ const HPAGES = [["cal","달력","#C98A00","#FFF0C2"],["diary","일기장","#D63E
 const hpages = () => [...HPAGES, ...(isParent()?[["report","AI 리포트","#2F8C6B","#DAF2E5"]]:S.me?.type==="child"?[["quiz","받아쓰기","#2F8C6B","#DAF2E5"]]:[]), ["fav","즐겨찾기","#7A5BC7","#ECE3F6"]];   // ⭐ 즐겨찾기는 다섯 번째 쪽 (2026-10-08)
 const hpage = () => hpages().some(x=>x[0]===S.hpage) ? S.hpage : "cal";
 const APP_TONE = {mine:"#E0663F",chat:"#3F73D1",kids:"#C98A00",day:"#2F8C6B",shelf:"#6B47B8",diary:"#6B47B8",album:"#3F73D1",report:"#2F8C6B",quiz:"#2F8C6B",family:"#C2366A",settings:"#3F5FB8",grow:"#B5532B"};
-// 🎨 · 가 (2026-10-16, 앱 위 막대 알림 왼쪽): 누를 때마다 다음 디자인 · 다음 글씨 (더보기 › 화면 꾸미기와 같은 값)
+// 🎨 · 가 (앱 위 막대 알림 왼쪽): 누르면 안내와 함께 고르는 창 (2026-11-06, 더보기 › 화면 꾸미기와 같은 값)
+const DESIGN_SAY={wongoji:"빨간 원고지 느낌",fresh:"밝고 새로운 색",warm:"포근한 종이 일기장",clean:"흰 카드로 단정하게",bright:"색 카드로 산뜻하게",night:"어두운 밤하늘 색",harvest:"노란 들녘 색"};
+const DFONT_SAY={unz:"또박또박 쓴 손글씨",pen:"펜으로 쓴 글씨",gothic:"반듯하고 읽기 쉬운 글씨",dodum:"동글동글한 글씨"};
+// 아래에서 올라오는 창 (디자인 · 글씨 · 사용설명서 · PDF · 백업)
+function openSheet(title,say,inner){
+  document.querySelector(".pk")?.remove();
+  const el=document.createElement("div"); el.className="pk"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label",title);
+  el.innerHTML=`<div class="pk-c"><h2>${esc(title)}</h2>${say?`<p>${esc(say)}</p>`:""}${inner}<button type="button" class="btn btn-primary pk-x">닫기</button></div>`;
+  el.addEventListener("click",e=>{ if(e.target===el || e.target.closest(".pk-x")) el.remove(); });
+  document.body.appendChild(el); return el;
+}
+// kind: dz 디자인 · ft 글씨 · all 둘 다 (환경 설정)
+function openPick(kind){
+  const dz=`${kind==="all"?"<h3>디자인</h3>":""}${DESIGNS.map(([k,l])=>`<button type="button" class="pk-o ${S.design===k?"on":""}" data-g="dz" data-k="${k}"><i class="dsw ${k}"></i><span><b>${esc(l)}</b><small>${DESIGN_SAY[k]||""}</small></span></button>`).join("")}`;
+  const ft=`${kind==="all"?"<h3>글씨</h3>":""}${DFONTS.map(([k,l,f])=>`<button type="button" class="pk-o ${S.dfont===k?"on":""}" data-g="ft" data-k="${k}"><span><b style="font-family:${f}">${esc(l)} · 오늘도 우리 가족 일기장</b><small>${DFONT_SAY[k]||""}</small></span></button>`).join("")}`;
+  const title=kind==="dz"?"디자인 고르기":kind==="ft"?"글씨 고르기":"환경 설정";
+  const el=openSheet(title,`${kind==="dz"?"화면의 색과 분위기가 바뀌어요.":kind==="ft"?"앱에 보이는 글씨가 바뀌어요.":"화면의 색과 글씨를 골라요."} 눌러 보고 마음에 드는 것으로 고르세요. 이 기기에만 적용돼요.`,(kind==="ft"?"":dz)+(kind==="dz"?"":ft));
+  el.addEventListener("click",e=>{ const o=e.target.closest(".pk-o"); if(!o) return; const k=o.dataset.k, isDz=o.dataset.g==="dz";
+    if(isDz){ S.design=k; ls.set("iinote-design",k); } else { S.dfont=k; ls.set("iinote-dfont",k); } applyPrefs(); render(); if(isDz) syncWidget();
+    el.querySelectorAll(`.pk-o[data-g="${o.dataset.g}"]`).forEach(x=>x.classList.toggle("on",x===o)); });
+}
+// 사용설명서: 자주 묻는 질문을 펼쳐 봐요 (챗봇이 읽는 글과 같은 FAQ)
+function openManual(){ openSheet("사용설명서","궁금한 것을 눌러 보세요. 더 궁금하면 '개발자와 상담'으로 물어보세요.",FAQ.map(([q,a])=>`<details class="pk-d"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")); }
 function ahPrefBtns(){
   const dn=DESIGNS.find(x=>x[0]===S.design)?.[1]||"", f=DFONTS.find(x=>x[0]===S.dfont)||DFONTS[0];
   return `<button class="ah-pf" data-act="ah-dz" aria-label="화면 꾸미기 바꾸기 · 지금 ${esc(dn)}"><i class="dsw ${S.design}"></i></button>`
@@ -4598,9 +4636,12 @@ function viewMore(){
   //  + 아래에 작게: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침
   // 사진첩 · AI 리포트(아이는 받아쓰기)는 홈 쪽에, 하루 펼쳐보기는 홈 일기장 쪽과 겹쳐서 뺐어요
   const kid=S.me.type==="child";
-  const it=[["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["settings","앱 설정","gear","#E5ECFF","#3F5FB8"],["help","AI 챗봇 상담","help","#E3F4EC","#2F7A56"],
-    ...(isParent()?[["kids","아이들 현황","spark","#FFF0C2","#8A6300"]]:[]),["shelf","책장 · PDF","book","#F0E6FF","#6B47B8"],["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"]];
-  const box=([k,l,i,bg,fg])=>`<button class="more-it" ${k==="help"?'data-act="help-open"':`data-act="more-go" data-v="${k}"`} style="--mb:${bg};--mf:${fg}"><span>${ic(i)}</span>${l}</button>`;
+  // (2026-11-06) 3줄: 내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 우리 아이 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담
+  const it=[["settings","내 설정","gear","#E5ECFF","#3F5FB8"],["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["env","환경 설정","lay-quad","#E3F4EC","#2F7A56"],
+    ...(isParent()?[["kids","아이들 현황","spark","#FFF0C2","#8A6300"]]:[]),["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"],["pdf","PDF · 백업","book","#F0E6FF","#6B47B8"],
+    ...(isParent()?[["invite","가족 초대하기","heart","#FFE1EA","#C2366A"]]:[]),["manual","사용설명서","help","#FFF0C2","#8A6300"],["help","개발자와 상담","talk","#E3F4EC","#2F7A56"]];
+  const ACT={help:"help-open",env:"more-env",pdf:"more-pdf",invite:"more-invite",manual:"more-manual"};
+  const box=([k,l,i,bg,fg])=>`<button class="more-it" ${ACT[k]?`data-act="${ACT[k]}"`:`data-act="more-go" data-v="${k}"`} style="--mb:${bg};--mf:${fg}"><span>${ic(i)}</span>${l}</button>`;
   return `<div class="more-bg" data-act="app-more" aria-hidden="true"></div>
   <section class="more" role="dialog" aria-modal="true" aria-labelledby="more-h"><i class="more-grip" aria-hidden="true"></i>
     <div class="more-head"><h2 id="more-h">더보기</h2><button class="link-btn" data-act="app-more">닫기</button></div>
@@ -4699,7 +4740,7 @@ function hpNews(){
 // 💬 AI 챗봇 상담 (웹 · 앱 공통, 2026-10-07 '도움 · 문의'에서 이름 바꿈): 자주 묻는 질문은 바로 답하고, 그 밖의 것은 상담원에게 (앱은 답장이 푸시로 와요)
 const FAQ = [
   ["아이 휴대폰 연결하기","우리 가족 설정에서 아이 프로필의 '휴대폰 연결 링크'를 아이 휴대폰으로 보내 주세요. 아이는 그 링크를 한 번만 누르면 계정 없이 바로 들어와요."],
-  ["PDF 일기책 만들기", IS_APP ? "더보기 › 책장 · PDF에서 기간과 사람을 고르고 'PDF 만들기'를 누르세요. 미리 보기에서 'PDF 저장'이나 '보내기'(카카오톡 · 드라이브 · 문자)를 고르면 돼요."
+  ["PDF 일기책 만들기", IS_APP ? "더보기 › PDF · 백업에서 기간과 사람을 고르고 'PDF 만들기'를 누르세요. 미리 보기에서 'PDF 저장'이나 '보내기'(카카오톡 · 드라이브 · 문자)를 고르면 돼요."
     : "책장 탭 위의 '📄 PDF로 저장'에서 기간 · 사람 · 쪽 모양을 고르고 만들기를 누르세요. 새 창의 인쇄 화면에서 'PDF로 저장'을 고르면 돼요."],
   ["알림이 안 와요", IS_APP ? "휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림이 켜져 있는지 봐 주세요. 설정 › 앱 설정의 '가족 소식 알림'도 함께 확인해 주세요."
     : "알림은 휴대폰 앱에서 받을 수 있어요. 웹에서는 위쪽 🔔 새 소식에서 가족 소식을 모아 볼 수 있어요."],
@@ -4828,7 +4869,7 @@ const TIPS = [
   ["🏆","한 달 내내 쓰면 개근상, 20일 넘게 쓰면 성실상을 받아요","mine","",""],
   ["🌙","하루 펼쳐보기에서 같은 날 가족 일기를 나란히 읽어 보세요","day","",""],
   ["🗓","일정은 '가족 모두' 또는 '나만 보기'로 나눠 넣을 수 있어요","","",""],
-  ["🎨",IS_APP?"위 막대의 🎨 · 가 단추를 눌러 디자인 · 글씨체를 바꿔 보세요":"화면 꾸미기에서 디자인 · 글씨체를 내 마음대로 골라 보세요",IS_APP?"":"settings","",""],
+  ["🎨",IS_APP?"위 막대의 🎨 · 가 단추를 눌러 디자인 · 글씨체를 골라 보세요":"화면 꾸미기에서 디자인 · 글씨체를 내 마음대로 골라 보세요",IS_APP?"":"settings","",""],
   ["💌","가족 일기에 하트와 댓글을 남겨 보세요. 보호자는 칭찬 도장도 찍어 줄 수 있어요","day","",""],
   ["🔔","위쪽 종을 누르면 내 일기에 달린 댓글 · 하트 · 도장을 모아 볼 수 있어요","","",""],
   ["🧩","홈 화면에 달력 · 사진 등 다양한 위젯을 두고 활용해 보세요","","","app"],
@@ -5112,17 +5153,17 @@ function ddayRow(){
     return `<button class="dd-chip ${n===0?"today":n<=7?"soon":""}" role="listitem" data-act="dd-open" data-v="${s.date}" title="${esc(fmtLong(s.date))}"><b>${s.icon?s.icon+" ":""}${ddLabel(s.date)}</b><span>${esc(s.title)}</span></button>`; }).join("")}</div>`;
 }
 // 하루 일정 목록 (list 는 bySch 로 정렬된 것). 아래 '순서 · 고치기'를 누르면 그날(S.schEdit) 일정마다 ▲▼ · 고치기 · 지우기
-function schList(d,list){
-  const edit=S.schEdit===d;
+function schList(d,list,ro){   // ro = 보기만 (다가오는 일정)
+  const edit=!ro && S.schEdit===d;
   const item=(s,i)=>{ const own=s.profileId===S.me.id || isParent();
     if(edit && own && S.schEditId===s.id) return `<li class="sc-item sc-editing"><form class="sch-line" data-form="sch-edit" data-id="${s.id}">
       <label class="sr" for="sce-${s.id}">일정 고치기</label><input id="sce-${s.id}" name="title" required maxlength="40" value="${esc((s.time?s.time+" ":"")+s.title)}" autocomplete="off">
       <div class="seg sch-scope" role="radiogroup" aria-label="누가 볼 일정인가요"><label><input type="radio" name="scope" value="family" ${s.scope==="family"?"checked":""}><span>가족</span></label><label><input type="radio" name="scope" value="personal" ${s.scope==="family"?"":"checked"}><span>나만</span></label></div>
       <label class="dd-chk"><input type="checkbox" name="dday" value="1" ${s.dday?"checked":""}><span>⏳ 디데이</span></label>
       <button class="btn btn-primary sm">저장</button><button type="button" class="btn btn-ghost sm" data-act="sch-edit" data-id="">취소</button></form></li>`;
-    return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span>${s.dday?`<span class="dd-tag">${ddLabel(s.date)}</span>`:""}<span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${edit?`<span class="sc-move"><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="-1" ${i?"":"disabled"} aria-label="${esc(s.title)} 위로">▲</button><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="1" ${i<list.length-1?"":"disabled"} aria-label="${esc(s.title)} 아래로">▼</button></span>${own?`<button class="icon-btn" data-act="sch-edit" data-id="${s.id}" aria-label="${esc(s.title)} 일정 고치기">${ic("pen")}</button>`:""}`:""}${own?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; };
+    return `<li class="sc-item"><span class="sc-time">${s.time?esc(s.time):"하루 종일"}</span><span class="sc-title">${esc(s.title)}</span>${s.dday?`<span class="dd-tag">${ddLabel(s.date)}</span>`:""}<span class="tag ${s.scope}">${s.scope==="family"?"가족":"나만"}</span>${edit?`<span class="sc-move"><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="-1" ${i?"":"disabled"} aria-label="${esc(s.title)} 위로">▲</button><button class="icon-btn" data-act="sch-move" data-id="${s.id}" data-v="1" ${i<list.length-1?"":"disabled"} aria-label="${esc(s.title)} 아래로">▼</button></span>${own?`<button class="icon-btn" data-act="sch-edit" data-id="${s.id}" aria-label="${esc(s.title)} 일정 고치기">${ic("pen")}</button>`:""}`:""}${own&&!ro?`<button class="icon-btn" data-act="del-schedule" data-id="${s.id}" aria-label="${esc(s.title)} 일정 삭제">${ic("x")}</button>`:""}</li>`; };
   return `<ul class="sc-list">${list.map(item).join("")}</ul>
-    <div class="sc-tools"><button class="link-btn" data-act="sch-edit-mode" data-v="${d}" aria-expanded="${edit}">${edit?"✓ 다 했어요":"↕ 순서 · 고치기"}</button></div>`;
+    ${ro?"":`<div class="sc-tools"><button class="link-btn" data-act="sch-edit-mode" data-v="${d}" aria-expanded="${edit}">${edit?"✓ 다 했어요":"↕ 순서 · 고치기"}</button></div>`}`;
 }
 // 달력 카드 안의 일정: 고른 날(안 고르면 오늘)의 일정 목록 + 일정 추가 (달력과 한 세트)
 function viewCalSchedule(d){
@@ -5156,20 +5197,9 @@ function viewSchedules(){
   const list=S.schedules.filter(s=>s.date>=t && s.date<=end && (s.scope==="family" || s.profileId===S.me.id))
     .sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:bySch(a,b));
   const days=[...new Set(list.map(s=>s.date))];
-  const body = days.length ? days.map(d=>`<div class="sc-day"><h3>${d===t?"오늘":d===addDays(t,1)?"내일":fmtShort(d)}</h3>${schList(d,list.filter(s=>s.date===d))}</div>`).join("")
-    : `<p class="empty">앞으로 2주 동안 잡힌 일정이 없어요. 가족 일정이나 나만 보는 일정을 추가해 보세요.</p>`;
-  return `<section class="block sc-block" aria-labelledby="h-sc"><div class="block-h"><h2 id="h-sc">다가오는 일정</h2><span class="muted">2주</span></div><div class="sc-scroll">${body}</div>
-    <details class="add"><summary>${ic("plus")}일정 추가</summary>
-      <form class="form-grid" data-form="schedule">
-        <label>날짜<input type="date" name="date" value="${t}" required></label>
-        <label>시간 (선택)<input type="time" name="time"></label>
-        <label class="span2">할 일<input name="title" required maxlength="40" placeholder="예: 태권도 승급 심사"></label>
-        <fieldset class="seg span2"><legend>누구와 볼 일정인가요?</legend>
-          <label><input type="radio" name="scope" value="family" checked><span>가족 모두</span></label>
-          <label><input type="radio" name="scope" value="personal"><span>나만 보기</span></label></fieldset>
-        <label class="dd-chk span2"><input type="checkbox" name="dday" value="1"><span>⏳ 디데이로 세기 <small>홈 · 위젯에 D-12 처럼 남은 날을 보여 줘요</small></span></label>
-        <button class="btn btn-primary span2">일정 추가</button>
-      </form></details></section>`;
+  const body = days.length ? days.map(d=>`<div class="sc-day"><h3>${d===t?"오늘":d===addDays(t,1)?"내일":fmtShort(d)}</h3>${schList(d,list.filter(s=>s.date===d),true)}</div>`).join("")
+    : `<p class="empty">앞으로 2주 동안 잡힌 일정이 없어요. [수정]을 눌러 일정을 넣어 보세요.</p>`;
+  return `<section class="block sc-block" aria-labelledby="h-sc"><div class="block-h"><h2 id="h-sc">다가오는 일정</h2><button class="btn btn-ghost sm" data-act="sch-manage">수정</button></div><div class="sc-scroll">${body}</div></section>`;
 }
 
 /* ⭐ 앱 홈 다섯 번째 쪽: 즐겨찾기 (2026-10-08). 윈도우 탐색기 '보기'처럼 모양 네 가지(FAV_VIEWS, 이 기기에 기억 ls iinote-fav-view).
@@ -5893,36 +5923,48 @@ function awardBanner(){
   return `<div class="aw-banner" role="note"><span class="aw-b-i" aria-hidden="true">🏆</span><p><b>${monthName(m)} 상장이 나왔어요!</b><br>${got.map(x=>`${esc(x.p.name)} · ${awardName(x.a)} (${x.a.n}일)`).join("<br>")}</p>
     <div class="aw-b-btns">${got.map(x=>`<button class="btn btn-primary sm" data-act="award" data-id="${x.p.id}" data-v="${m}">${got.length>1?esc(x.p.name)+" ":""}상장 보기</button>`).join("")}<button class="btn btn-ghost sm" data-act="award-seen" data-v="${m}">닫기</button></div></div>`;
 }
-function openAward(pid, m){
-  const p=prof(pid), a=p && awardsOf(p).find(x=>x.m===m); if(!a){ toast("상장을 찾지 못했어요"); return; }
-  const w=IS_APP?null:window.open("","_blank"); if(!IS_APP && !w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }   // 📱 앱은 새 창 대신 appDoc 미리 보기
-  const [y,mm]=m.split("-").map(Number), nd=new Date(y,mm,1), full=a.kind==="full", fam=S.group?.name||"우리집";
-  const body = full ? `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>하루도 빠짐없이</b> 일기를 써서<br>${a.last}일 모두 마음을 글로 남겼습니다.<br>그 꾸준함과 성실함을 칭찬하여 이 상장을 드립니다.`
-                     : `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>${a.n}일</b> 일기를 써서<br>날마다 마음을 글로 남기려고 힘썼습니다.<br>그 성실함을 칭찬하여 이 상장을 드립니다.`;
-  const docName=`${p.name} ${monthName(m)} ${awardName(a)}`;
-  const html=(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>${esc(docName)}</title>
+// 상장 번호: 가족마다 1호부터, 달 순서대로 (같은 달은 먼저 가입한 아이부터). 계산만 하고 저장하지 않아요
+function awardNo(p,a){
+  const all=S.profiles.filter(x=>x.type==="child"||x.id===p.id).flatMap(x=>awardsOf(x).map(y=>({id:x.id,c:x.createdAt||0,m:y.m})))
+    .sort((x,y)=>x.m.localeCompare(y.m)||x.c-y.c||String(x.id).localeCompare(String(y.id)));
+  return all.findIndex(x=>x.id===p.id&&x.m===a.m)+1;
+}
+// 상장 한 장 HTML: land = true 가로형 · false 세로형. 앱의 PDF · 웹의 인쇄가 같은 그림을 써요
+function awardHTML(p,a,m,land){
+  const [y,mm]=m.split("-").map(Number), nd=new Date(y,mm,1), full=a.kind==="full", fam=S.group?.name||"우리집", W=land?1123:794, H=land?794:1123;
+  const body = full ? `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>하루도 빠짐없이</b> 일기를 써서 <br>${a.last}일 모두 마음을 글로 남겼습니다. <br>그 꾸준함과 성실함을 칭찬하여 이 상장을 드립니다.`
+                     : `위 어린이는 ${y}년 ${mm}월 한 달 동안 <b>${a.n}일</b> 일기를 써서 <br>날마다 마음을 글로 남기려고 힘썼습니다. <br>그 성실함을 칭찬하여 이 상장을 드립니다.`;
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(p.name)} ${monthName(m)} ${awardName(a)}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
-<style>@page{size:A4 landscape;margin:0}*{box-sizing:border-box}html,body{margin:0;background:#F3EEE6;font-family:'Gowun Batang',serif;color:#2B2A33}
-.bar{display:flex;gap:8px;justify-content:center;padding:14px;font-family:system-ui,sans-serif}.bar button{font:inherit;font-size:15px;padding:10px 18px;border-radius:999px;border:0;background:#1F2A44;color:#fff;cursor:pointer}.bar button.g{background:#fff;color:#1F2A44;border:1.5px solid #1F2A44}
-.page{width:297mm;height:210mm;margin:0 auto 20px;background:#FFFDF8;position:relative;padding:14mm;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+<style>@page{size:A4 ${land?"landscape":"portrait"};margin:0}*{box-sizing:border-box}html,body{margin:0;background:#F3EEE6;font-family:'Gowun Batang',serif;color:#2B2A33}
+.bar{display:flex;gap:8px;justify-content:center;padding:10px;font-family:system-ui,sans-serif}.bar button{font:inherit;font-size:15px;padding:10px 18px;border-radius:999px;border:0;background:#1F2A44;color:#fff;cursor:pointer}.bar button.g{background:#fff;color:#1F2A44;border:1.5px solid #1F2A44}
+.page{width:${land?"297mm":"210mm"};height:${land?"210mm":"297mm"};margin:0 auto;background:#FFFDF8;position:relative;padding:14mm;box-shadow:0 6px 24px rgba(0,0,0,.12);overflow:hidden}
 .frame{position:absolute;inset:10mm;border:3mm double ${full?"#C9963A":"#5E8F7A"};border-radius:4mm}
 .frame:after{content:"";position:absolute;inset:3mm;border:.6mm solid ${full?"#E6C27A":"#A9CBB9"};border-radius:2mm}
-.in{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30mm}
+.in{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 ${land?"30mm":"14mm"};word-break:keep-all}
 .no{position:absolute;top:8mm;left:12mm;font-size:12pt;color:#8A8577}
-.medal{font-size:30pt;line-height:1}
-h1{font-size:46pt;letter-spacing:18pt;margin:2mm 0 8mm;padding-left:18pt;color:${full?"#8A5A12":"#2F5E4B"}}
-.name{font-size:24pt;margin:0 0 9mm}.name b{font-size:30pt;letter-spacing:4pt;border-bottom:.6mm solid #C9C2B0;padding:0 4mm}
-.body{font-size:17pt;line-height:2;margin:0}.body b{color:${full?"#B0731A":"#3F7F70"}}
-.date{font-size:14pt;margin:10mm 0 3mm}.from{font-size:18pt;font-weight:700;letter-spacing:2pt}
-.seal{position:absolute;right:30mm;bottom:22mm;width:30mm;height:30mm;border-radius:50%;border:1mm solid #D4583F;color:#D4583F;display:grid;place-items:center;font-size:12pt;line-height:1.2;transform:rotate(-8deg);opacity:.85}
-@media print{.bar{display:none}html,body{background:#fff}.page{margin:0;box-shadow:none}}</style></head><body>
-<div class="bar"><button onclick="print()">🖨️ 인쇄 · PDF로 저장</button><button class="g" onclick="close()">닫기</button></div>
-<div class="page"><div class="frame"></div><div class="in"><span class="no">제 ${y}-${pad(mm)} 호</span><div class="medal">${full?"🏆":"🎖️"}</div><h1>${awardName(a)}</h1>
+.medal{font-size:${land?30:44}pt;line-height:1}
+h1{font-size:${land?46:50}pt;letter-spacing:${land?18:14}pt;margin:${land?"2mm 0 8mm":"6mm 0 16mm"};padding-left:${land?18:14}pt;color:${full?"#8A5A12":"#2F5E4B"}}
+.name{font-size:24pt;margin:0 0 ${land?9:18}mm}.name b{font-size:30pt;letter-spacing:4pt;border-bottom:.6mm solid #C9C2B0;padding:0 4mm}
+.body{font-size:${land?17:18}pt;line-height:2;margin:0}.body b{color:${full?"#B0731A":"#3F7F70"}}${land?"":".body br{display:none}"}
+.date{font-size:14pt;margin:${land?"10mm 0 3mm":"24mm 0 4mm"}}.from{font-size:18pt;font-weight:700;letter-spacing:2pt}
+.seal{position:absolute;right:${land?"30mm":"16mm"};bottom:${land?"22mm":"26mm"};width:30mm;height:30mm;border-radius:50%;border:1mm solid #D4583F;color:#D4583F;display:grid;place-items:center;font-size:12pt;line-height:1.2;transform:rotate(-8deg);opacity:.85}
+@media print{.bar{display:none}html,body{background:#fff}.page{margin:0;box-shadow:none;zoom:1!important}}</style></head><body>
+<div class="bar"><button onclick="print()">🖨️ 인쇄 · PDF로 저장</button><button class="g" id="swap">${land?"세로형으로":"가로형으로"}</button><button class="g" onclick="close()">닫기</button></div>
+<div class="page"><div class="frame"></div><div class="in"><span class="no">제 ${awardNo(p,a)} 호</span><div class="medal">${full?"🏆":"🎖️"}</div><h1>${awardName(a)}</h1>
 <p class="name"><b>${esc(p.name)}</b></p><p class="body">${body}</p>
 <p class="date">${nd.getFullYear()}년 ${nd.getMonth()+1}월 ${nd.getDate()}일</p><p class="from">${esc(fam)} 가족 · 아이아이노트</p>
-<div class="seal">참<br>잘했어요</div></div></div></body></html>`);
-  if(IS_APP){ appDoc(html,{name:docName,landscape:true}); return; }
-  w.document.write(html); w.document.close();
+<div class="seal">참<br>잘했어요</div></div></div>
+<script>function f(){var b=document.querySelector(".bar").offsetHeight;document.querySelector(".page").style.zoom=Math.min(1,innerWidth/${W},(innerHeight-b)/${H})}addEventListener("resize",f);f()<\/script></body></html>`;
+}
+// 상장을 누르면 세로형을 화면에 꽉 차게 먼저 보여 주고, 단추로 가로형과 바꿔 봐요
+function openAward(pid, m, land=false){
+  const p=prof(pid), a=p && awardsOf(p).find(x=>x.m===m); if(!a){ toast("상장을 찾지 못했어요"); return; }
+  const name=`${p.name} ${monthName(m)} ${awardName(a)}`;
+  if(IS_APP){ appDoc(awardHTML(p,a,m,land),{name,landscape:land,fit:true,swap:{label:land?"세로형으로":"가로형으로",go:()=>openAward(pid,m,!land)}}); return; }
+  const w=window.open("","_blank"); if(!w){ toast("새 창이 막혔어요. 팝업을 허용해 주세요"); return; }
+  const show=l=>{ w.document.open(); w.document.write(awardHTML(p,a,m,l)); w.document.close(); w.document.getElementById("swap").onclick=()=>show(!l); };
+  show(land);
 }
 function viewMyDiary(){
   const list=S.diaries.filter(d=>d.profileId===S.me.id).sort((a,b)=>b.date.localeCompare(a.date));
@@ -6804,13 +6846,13 @@ function viewFamily(){
    앱 설정(알림 · 잠금) · 화면 설정 · 어디서든 접속하기 · 계정(프로필 바꾸기 · 로그아웃 · 로그인 연결 · 비밀번호 · 계정 지우기) */
 function viewSettings(){
   const g=S.group, groups=(S.userDoc?.groupIds||[]);
-  return `<div class="page-h"><h1>${IS_APP?"앱 설정":"설정"}</h1></div>
+  return `<div class="page-h"><h1>${IS_APP?"내 설정":"설정"}</h1></div>
   <div class="fam-grid set-page">
     <div class="col">
       ${IS_APP?appSettings():""}
       <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
         <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
-        <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추를 누를 때마다 바뀌어요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
+        <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추나 더보기 › 환경 설정에서 골라요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
       </section>
       <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
         <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. ${IS_APP?"":`안드로이드 휴대폰은 <a href="${PLAY_URL}" target="_blank" rel="noopener">Google Play 앱</a>으로, 아이폰은 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들어 쓸 수 있어요.`}</p>${addrBox()}${kakaoBtn(true)}
@@ -7194,6 +7236,8 @@ const acts = {
   backup: el => { if(!isParent()) return; try{ backup(el.dataset.v); }catch(e){ console.error(e); toast("파일을 만들지 못했어요. 다시 눌러 주세요"); } },
   grow: el => { S.growId=el.dataset.v; render(); },
   // 일정 순서 · 고치기: 그날 목록을 고치는 모드로 (다시 누르면 끝)
+  // 다가오는 일정 [수정]: 일정을 넣고 고치는 달력 화면으로
+  "sch-manage": el => { el.dataset.v="cal"; S.calDay=S.calDay||todayStr(); acts.tab(el); setTimeout(()=>document.querySelector(".cal-sch")?.scrollIntoView({behavior:"smooth",block:"center"}),120); },
   "sch-edit-mode": el => { const d=el.dataset.v; S.schEdit = S.schEdit===d ? null : d; S.schEditId=null; render(); },
   "sch-edit": el => { S.schEditId=el.dataset.id||null; render(); document.getElementById("sce-"+S.schEditId)?.focus(); },
   // ▲▼: 바로 위 · 아래 일정과 순서 값을 바꿔요 (같은 값이면 1 차이 나게)
@@ -7862,7 +7906,7 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden) autoLogo
 const keepBox = () => DEMO || IS_APP ? "" : `<label class="keep-login"><input type="checkbox" data-pref="keep" ${keepLogin()?"checked":""}> 이 기기에서 로그인 유지 <small>(${KEEP_DAYS}일 · 내 휴대폰이나 집 컴퓨터일 때만 켜 주세요. 끄면 ${IDLE_MIN}분 동안 안 쓰면 로그아웃돼요)</small></label>`;
 
 /* ---------- 📱 당겨서 새로고침 (앱 · 홈 화면에 추가한 웹, 2026-10-05 · 홈 화면은 2026-10-09) ----------
-   화면 맨 위에서 아래로 끌어내렸다 놓으면 화면 코드와 가족 일기 · 댓글 · 일정을 모두 새로 받아 앱을 다시 열어요.
+   화면 맨 위에서 아래로 끌어내렸다 놓으면 가족 일기 · 댓글 · 일정만 새로 받아요 (2026-11-06: 앱을 다시 열지 않아서 로딩 화면이 안 나와요. 고친 화면 코드는 다음에 앱을 열 때).
    일기 쓰는 중 · 사진 크게 보기 · 채팅처럼 안쪽 칸을 스크롤할 때는 하지 않아요 */
 if(IS_APP || STANDALONE){   // 홈 화면 아이콘으로 연 웹은 주소창 · 새로고침 단추가 없어서 같이 켜요
   const ARROW=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 12l6 6 6-6"/></svg>`, SPIN=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>`;
@@ -7878,13 +7922,10 @@ if(IS_APP || STANDALONE){   // 홈 화면 아이콘으로 연 웹은 주소창 �
   addEventListener("touchend", async ()=>{ if(y0===null) return; y0=null;
     if(dy<GO){ hide(); return; }
     busy=true; ptr.classList.add("spin"); ptr.innerHTML=SPIN; ptr.style.transition="transform .2s"; ptr.style.transform="translate(-50%,16px)";
-    // 2026-10-08: 화면 코드(index.html)까지 새로 받아서 앱을 다시 열어요 → 고친 화면이 바로 보여요. 인터넷이 안 되면 예전처럼 내용만 다시 받아요
-    try{ await fetch(location.href,{cache:"reload"}); try{ sessionStorage.setItem("iinote-ptr-hp", S.hpage||""); }catch(e){} location.reload(); return; }
-    catch(e){ console.warn("새 화면 받기",e); }
+    fetch(location.href,{cache:"reload"}).catch(()=>{});   // 고친 화면 코드는 받아만 두고, 다음에 앱을 열 때 보여요
     try{ await Promise.all([reloadAll(), wait(600)]); render(); }catch(e){ console.warn("새로고침",e); toast("새로 불러오지 못했어요. 인터넷 연결을 확인해 주세요"); }
     hide();
   });
-  try{ const hp=sessionStorage.getItem("iinote-ptr-hp"); if(hp!==null){ sessionStorage.removeItem("iinote-ptr-hp"); if(hp) S.hpage=hp; } }catch(e){}   // 새로고침 전에 보던 홈 쪽 그대로
 }
 
 /* =========================================================
@@ -8380,10 +8421,13 @@ async function setRemind(time){ const L=plug("LocalNotifications"); if(!L) retur
 //  받을 소식을 끈 종류는 서버가 아예 안 보내요. 이 기기 기억: iinote-npref
 const NPREF_DEF={sound:true, vib:true, pop:false, chat:true, comment:true, stamp:true, diary:true};
 function npref(){ let o={}; try{ o=JSON.parse(ls.get("iinote-npref","{}"))||{}; }catch(e){} return {...NPREF_DEF, ...o}; }
-const FAM_CH={ "fam-pop-v":[4,1,"소리 · 진동 · 화면 위에 잠깐"], "fam-pop-n":[4,0,"소리 · 화면 위에 잠깐"], "fam-snd-v":[3,1,"소리 · 진동"], "fam-snd-n":[3,0,"소리만"], "fam-quiet":[2,0,"조용히 (알림 줄에만)"] };
-const famCh = p => !p.sound ? "fam-quiet" : `fam-${p.pop?"pop":"snd"}-${p.vib?"v":"n"}`;
+const FAM_CH={ "fam-pop-v":[4,1,"소리 · 진동 · 화면 위에 잠깐"], "fam-pop-n":[4,0,"소리 · 화면 위에 잠깐"], "fam-snd-v":[3,1,"소리 · 진동"], "fam-snd-n":[3,0,"소리만"], "fam-mute-pop-v":[4,1,"진동 · 화면 위에 잠깐"], "fam-mute-pop":[4,0,"화면 위에 잠깐"], "fam-mute-v":[3,1,"진동만"], "fam-quiet":[2,0,"조용히 (알림 줄에만)"] };
+// 소리 · 진동 · 띄우기는 따로따로 (2026-11-06). 소리만 끈 채널은 무음 소리(silence)를 넣어야 진동 · 띄우기가 살아요
+// NP_SPLIT: 서버 함수(CHANNELS 에 fam-mute-*)를 배포한 뒤에 true 로 바꿔요. 그전에 켜면 소리를 끈 사람에게 소리가 나요
+const NP_SPLIT=false;
+const famCh = p => !NP_SPLIT && !p.sound ? "fam-quiet" : p.sound ? `fam-${p.pop?"pop":"snd"}-${p.vib?"v":"n"}` : p.pop ? (p.vib?"fam-mute-pop-v":"fam-mute-pop") : p.vib ? "fam-mute-v" : "fam-quiet";
 async function famChannel(P,p){ const id=famCh(p), [imp,v,desc]=FAM_CH[id];
-  await P.createChannel({id,name:"가족 소식",description:`일기 · 댓글 · 도장 · 채팅 — ${desc}`,importance:imp,visibility:0,vibration:!!v,lights:imp>2}).catch(()=>{});
+  await P.createChannel({id,name:"가족 소식",description:`일기 · 댓글 · 도장 · 채팅 — ${desc}`,importance:imp,visibility:0,vibration:!!v,lights:imp>2,...(id.startsWith("fam-mute")?{sound:"silence.wav"}:{})}).catch(()=>{});
   for(const k of Object.keys(FAM_CH)) if(k!==id) await P.deleteChannel?.({id:k}).catch(()=>{});   // 휴대폰 설정에 '가족 소식'이 하나만 보이게
   return id; }
 async function savePrefs(p){ ls.set("iinote-npref",JSON.stringify(p)); const P=plug("PushNotifications"); if(!P || !S.user || DEMO) return;
@@ -8447,15 +8491,17 @@ let docCur=null;
 function appDoc(html,opt){
   closeDoc();
   const clean=html.replace(/<script>[\s\S]*?<\/script>/g,"").replace("</head>","<style>.bar{display:none!important}</style></head>");
-  docCur={html:clean, name:opt.name||"아이아이노트", landscape:!!opt.landscape, file:null};
-  const z=Math.min(1,(innerWidth-20)/(opt.landscape?1123:794));
+  docCur={html:clean, name:opt.name||"아이아이노트", landscape:!!opt.landscape, file:null, swap:opt.swap?.go};
+  const W=opt.landscape?1123:794, H=opt.landscape?794:1123;
   const el=document.createElement("div"); el.className="docv"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label","PDF 미리 보기");
-  el.innerHTML=`<div class="docv-top"><button type="button" class="docv-x" data-act="doc-close" aria-label="닫기">${ic("x")}</button><b>${esc(docCur.name)}</b></div>
+  el.innerHTML=`<div class="docv-top"><button type="button" class="docv-x" data-act="doc-close" aria-label="닫기">${ic("x")}</button><b>${esc(docCur.name)}</b>${opt.swap?`<button type="button" class="btn btn-ghost sm docv-sw" data-act="doc-swap">${esc(opt.swap.label)}</button>`:""}</div>
     <iframe class="docv-f" title="PDF 미리 보기"></iframe>
     <div class="docv-btns"><button type="button" class="btn btn-ghost" data-act="doc-save">${ic("download")}PDF 저장</button><button type="button" class="btn btn-primary" data-act="doc-send">${ic("link")}보내기</button></div>
-    <p class="docv-hint">보내기를 누르면 카카오톡 · 구글 드라이브 · 문자 · 메일 중에서 골라 보낼 수 있어요</p>`;
+    <p class="docv-hint">${IS_IOS?"누르면 공유 창이 열려요. 카카오톡 · 메시지 · 메일 · 파일에 저장 중에서 골라요":"보내기를 누르면 카카오톡 · 구글 드라이브 · 문자 · 메일 중에서 골라 보낼 수 있어요"}</p>`;
   document.body.appendChild(el);
-  el.querySelector("iframe").srcdoc=clean.replace("</head>",`<style>html{zoom:${z.toFixed(3)}}</style></head>`);
+  // opt.fit: 한 장을 화면에 꽉 차게 (상장). 아니면 너비에 맞춰 아래로 넘겨 봐요 (일기책)
+  const fr=el.querySelector("iframe"), z=opt.fit?Math.min(fr.clientWidth/W,fr.clientHeight/H):Math.min(1,(innerWidth-20)/W);
+  fr.srcdoc=clean.replace("</head>",`<style>html{zoom:${z.toFixed(3)}}${opt.fit?"html,body{overflow:hidden}.page{margin:0 auto;box-shadow:none}":""}</style></head>`);
   document.body.style.overflow="hidden"; }
 function closeDoc(){ document.querySelector(".docv")?.remove(); docCur=null; document.body.style.overflow=S.lb?"hidden":""; }
 async function docFile(){ if(docCur.file) return docCur.file;
@@ -8584,10 +8630,14 @@ function openAppUrl(url){
 // 🔔 알림 세부 옵션 줄
 function npRows(){ const p=npref(), sw=(id,on,t,sub,dis)=>`<div class="set-row np-row"><label class="app-sw" for="np-${id}"><input type="checkbox" id="np-${id}" ${on?"checked":""} ${dis?"disabled":""}><span>${t}${sub?`<small class="set-sub">${sub}</small>`:""}</span></label></div>`;
   const kind=(k,t)=>`<label class="np-k"><input type="checkbox" id="np-${k}" ${p[k]?"checked":""}><span>${t}</span></label>`;
-  return `${sw("sound",p.sound,"알림 소리","끄면 소리 · 진동 없이 알림 줄에만 조용히 와요")}
-    ${sw("vib",p.vib&&p.sound,"알림 진동","",!p.sound)}
-    ${sw("pop",p.pop&&p.sound,"화면 위에 잠깐 띄우기","끄면 위에 띄우지 않고 알림 줄에만 와요 (쓰는 화면을 가리지 않아요)",!p.sound)}
-    <div class="set-row np-row"><span>받을 소식<small class="set-sub">끈 소식은 알림이 오지 않아요 (앱 안에서는 그대로 보여요)</small><span class="np-kinds">${kind("chat","💬 채팅")}${kind("comment","✍️ 댓글 · 답글")}${kind("stamp","💮 도장")}${kind("diary","📒 가족 일기")}</span></span></div>`; }
+  const kinds=`<div class="set-row np-row"><span>받을 소식<small class="set-sub">끈 소식은 알림이 오지 않아요 (앱 안에서는 그대로 보여요)</small><span class="np-kinds">${kind("diary","📒 가족 일기")}${kind("comment","✍️ 댓글 · 답글")}${kind("chat","💬 채팅")}${kind("stamp","💮 도장")}</span></span></div>`;
+  // 아이폰은 소리 · 진동 · 배너를 앱이 아니라 휴대폰 설정에서 정해요
+  if(IS_IOS) return `<div class="set-row np-row"><span>소리 · 진동 · 배너<small class="set-sub">아이폰은 설정 앱 › 알림 › 아이아이노트에서 정해요</small></span></div>${kinds}`;
+  const off=!NP_SPLIT && !p.sound;
+  return `${sw("sound",p.sound,"알림 소리","")}
+    ${sw("vib",p.vib&&!off,"알림 진동","",off)}
+    ${sw("pop",p.pop&&!off,"화면 위에 잠깐 띄우기","다른 앱을 쓰고 있어도 화면 맨 위에 알림 글이 잠깐 내려와요. 끄면 알림 줄에만 쌓여요",off)}
+    ${kinds}`; }
 // 앱 설정 (우리 가족 화면)
 function appSettings(){
   const rt=ls.get("iinote-remind",""), lk=lockOn();
@@ -8687,7 +8737,9 @@ if(IS_APP){
   Object.assign(acts,{
     "kakao-share": ()=>{ outAt=Date.now(); plug("Share")?.share({title:"아이아이노트", text:"가족이 함께 쓰고 서로 읽어 주는 일기장, 아이아이노트", url:SHARE_URL, dialogTitle:"아이아이노트 알리기"}).catch(()=>{}); },
     "doc-close": ()=>closeDoc(),
-    "doc-save": ()=>guard(async()=>{ const f=await docFile(); const r=await plug("Iinote").saveToDownloads({path:f.path}); buzz("ok"); toast(`${r.folder} 폴더에 저장했어요`); }),
+    "doc-swap": ()=>docCur?.swap?.(),
+    // 아이폰은 공유 창의 '파일에 저장'으로
+    "doc-save": ()=>IS_IOS ? acts["doc-send"]() : guard(async()=>{ const f=await docFile(); const r=await plug("Iinote").saveToDownloads({path:f.path}); buzz("ok"); toast(`${r.folder} 폴더에 저장했어요`); }),
     "doc-send": ()=>guard(async()=>{ const f=await docFile(); outAt=Date.now();
       await plug("Share").share({title:docCur?.name||"아이아이노트", files:[f.uri], dialogTitle:"PDF 보내기"}).catch(e=>{ if(!/cancel/i.test(e?.message||"")) throw e; }); }),
     "app-unlock": ()=>unlock(),
@@ -8699,10 +8751,18 @@ if(IS_APP){
     // 더보기 판
     "app-more": () => { S.moreOpen=!S.moreOpen; S.morePrefs=false; S.newsOpen=false; render(); },
     "more-go": el => { S.moreOpen=false; acts.tab(el); },
+    "more-env": () => { S.moreOpen=false; render(); openPick("all"); },
+    "more-manual": () => { S.moreOpen=false; render(); openManual(); },
+    // PDF · 백업: 어느 쪽인지 고르는 창
+    "more-pdf": () => { S.moreOpen=false; render(); const el=openSheet("PDF · 백업","일기를 책으로 만들거나, 파일로 받아 둘 수 있어요.",`<button type="button" class="pk-o" data-go="shelf"><span><b>📄 PDF 일기책</b><small>기간과 사람을 골라 일기책을 만들어요</small></span></button>${isParent()?`<button type="button" class="pk-o" data-go="family"><span><b>💾 백업 (엑셀 파일)</b><small>일기와 댓글을 이 기기에 저장해요</small></span></button>`:""}`);
+      el.addEventListener("click",e=>{ const b=e.target.closest("[data-go]"); if(!b) return; el.remove(); if(b.dataset.go==="family") S.famOpen="h-bak"; b.dataset.v=b.dataset.go; acts.tab(b); }); },
+    // 가족 초대: 공유 창으로 초대 주소를 보내요
+    "more-invite": () => { S.moreOpen=false; render(); const c=S.group?.inviteCode||"", url=`https://${SITE_ADDRESS}/?join=${c}`; outAt=Date.now();
+      plug("Share")?.share({title:"아이아이노트 가족 초대", text:`우리 가족 일기장에 초대해요. 초대 코드: ${c}`, url, dialogTitle:"가족 초대하기"}).catch(()=>{}); },
     "more-prefs": () => { S.morePrefs=!S.morePrefs; render(); },
     // 위 막대 🎨 · 가: 탭탭 누르면 차례로 바뀌고, 마지막 것을 기억해요 (2026-10-16)
-    "ah-dz": () => { const i=DESIGNS.findIndex(x=>x[0]===S.design), n=DESIGNS[(i+1)%DESIGNS.length]; S.design=n[0]; ls.set("iinote-design",n[0]); applyPrefs(); render(); syncWidget(); },   // 디자인 이름 알림(토스트)은 띄우지 않아요 (2026-10-16)
-    "ah-ft": () => { const i=DFONTS.findIndex(x=>x[0]===S.dfont), n=DFONTS[(i+1)%DFONTS.length]; S.dfont=n[0]; ls.set("iinote-dfont",n[0]); applyPrefs(); render(); },   // 글씨 이름 알림(토스트)도 띄우지 않아요 (2026-10-16)
+    "ah-dz": () => openPick("dz"),
+    "ah-ft": () => openPick("ft"),
     // 일기 쓰기 날씨 · 기분: 단추를 누르면 그 줄만 펼쳐요
     "wm-open": el => { S.wmOpen = S.wmOpen===el.dataset.v ? null : el.dataset.v; render(); },
     // 하루 펼쳐보기: 누른 사람 칸을 넓게 (빈 값이면 다시 나란히)
