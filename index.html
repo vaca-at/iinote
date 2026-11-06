@@ -4536,6 +4536,7 @@ function favRow(){
 // 받침에 따라 "로" · "으로" (ㄹ 받침은 "로")
 // 아이 이름 부르기: 받침이 있으면 '이'를 붙여요 (서준 → 서준이의 · 지아 → 지아의). 어른 이름은 그대로
 const kidN = p => { const n=String(p?.name||""); if(p?.type!=="child") return n; const c=n.slice(-1).charCodeAt(0)-0xAC00; return c>=0&&c<11172&&c%28 ? n+"이" : n; };
+const eun = w => { const c=String(w||"").slice(-1).charCodeAt(0)-0xAC00; return c>=0&&c<11172&&c%28?"은":"는"; };   // 아빠는 · 이안은
 const ro = w => { const c=String(w||"").slice(-1).charCodeAt(0)-0xAC00; const j=c>=0&&c<11172?c%28:0; return j&&j!==8?"으로":"로"; };
 // 아이 프로필로 쓰던 기기에서 부모 프로필로 넘어갈 때만 부모 비밀번호를 물어요 (처음 로그인해 들어올 때는 안 물어요)
 // 아이 비밀번호 바꾸기: 부모는 가족 구성원에서 아이마다 (지금 비밀번호 없이), 아이는 계정에서 스스로 (지금 비밀번호를 먼저 확인)
@@ -4720,7 +4721,7 @@ function hpDiary(){
     <div class="hp-day block">
       <button class="hp-arw" data-act="home-day" data-v="-1" aria-label="전날">${ic("left")}</button>
       <div class="hp-dt"><p><b>${fmtLong(hd)}</b>${tag?`<span class="hp-tag">${tag}</span>`:""}</p>
-        <small>${done.length?`가족 일기 ${done.length}편`:"아직 올라온 일기가 없어요"}${done.length&&yet.length?` · ${yet.map(p=>esc(p.name)).join(" · ")}은 아직`:""}</small></div>
+        <small>${done.length?`가족 일기 ${done.length}편`:"아직 올라온 일기가 없어요"}${done.length&&yet.length?` · ${yet.map(p=>esc(p.name)).join(" · ")}${eun(yet[yet.length-1].name)} 아직`:""}</small></div>
       <button class="hp-arw" data-act="home-day" data-v="1" aria-label="다음 날" ${hd>=t?"disabled":""}>${ic("right")}</button>
     </div>
     <div class="hp-list">${cta}${shown.map(x=>hpCard(x.d,x.p)).join("") || (cta?"":`<p class="empty">이날 ${who==="all"?"가족":esc(prof(who)?.name||"")} 일기가 없어요</p>`)}</div>`;
