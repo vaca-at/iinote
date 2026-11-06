@@ -7900,6 +7900,27 @@ document.addEventListener("keydown", e => {
   let tyT; const set=on=>{ clearTimeout(tyT); if(on) document.documentElement.classList.add("typing"); else tyT=setTimeout(()=>{ if(!isField(document.activeElement)) document.documentElement.classList.remove("typing"); },120); };
   document.addEventListener("focusin",e=>{ if(isField(e.target)) set(true); });
   document.addEventListener("focusout",()=>set(false)); }
+/* ✏️ 일기 칸 커서 지키기 (2026-11-06): 키보드가 뜨면 안드로이드 웹뷰가 키 큰 글 칸 전체를 맞추느라 페이지를 내려서, 첫 줄(커서)이 고정된 위 막대 뒤로 숨었어요.
+   키보드가 뜨는 잠깐 동안만 커서 줄이 위 막대와 키보드 사이에 있는지 보고, 벗어났으면 글 칸 첫머리를 위 막대 바로 아래로 되돌려요 (안 되면 커서 줄이 보이게) */
+{ const caretTop=ta=>{ const c=getComputedStyle(ta), m=document.createElement("div"), k=document.createElement("span");
+    for(const p of ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordSpacing","wordBreak","overflowWrap","tabSize","paddingTop","paddingLeft","paddingRight","borderTopWidth","borderLeftWidth","borderRightWidth","borderStyle","boxSizing"]) m.style[p]=c[p];
+    Object.assign(m.style,{position:"fixed",left:"-9999px",top:"0",visibility:"hidden",whiteSpace:"pre-wrap",width:ta.offsetWidth+"px"});
+    m.textContent=ta.value.slice(0,ta.selectionStart??0); k.textContent="​"; m.appendChild(k); document.body.appendChild(m);
+    const y=k.offsetTop-ta.scrollTop; m.remove(); return y; };
+  const fit=()=>{ const ta=document.activeElement; if(ta?.id!=="w-text") return;
+    const vv=window.visualViewport, vt=vv?.offsetTop||0, vh=vv?.height||innerHeight, lh=parseFloat(getComputedStyle(ta).lineHeight)||32;
+    const bars=[...document.querySelectorAll(".a-top,.top,.tour-bar")].map(b=>b.getBoundingClientRect()).filter(r=>r.height&&r.top<=vt+1).map(r=>r.bottom);
+    const top=Math.max(vt,...bars)+8, bot=vt+vh-8, r=ta.getBoundingClientRect(), c=r.top+caretTop(ta);
+    if(c>=top && c+lh<=bot) return;
+    let d=r.top-top; if(c-d+lh>bot) d=c+lh*2-bot; if(c-d<top) d=c-top;
+    window.scrollBy(0,d); };
+  let until=0, tm, lastH=window.visualViewport?.height||innerHeight;
+  const watch=()=>{ until=Date.now()+1500; [60,250,600,1000,1400].forEach(ms=>setTimeout(()=>{ if(Date.now()<until) fit(); },ms)); };
+  document.addEventListener("focusin",e=>{ if(e.target.id==="w-text") watch(); });
+  const onSize=()=>{ const h=window.visualViewport?.height||innerHeight, shrank=h<lastH-40; lastH=h;
+    if(shrank && document.activeElement?.id==="w-text") watch();   // 뒤로 가기로 키보드만 내렸다가 다시 눌렀을 때도
+    if(Date.now()<until){ clearTimeout(tm); tm=setTimeout(fit,90); } };
+  addEventListener("resize",onSize); window.visualViewport?.addEventListener("resize",onSize); }
 let touchX=null;
 // 옆으로 밀어 넘기기: 크게 보기 사진, 사진첩 올리기의 큰 사진 (고치는 칸 안에서는 넘기지 않아요)
 document.addEventListener("touchstart", e => { touchX = (S.lb && !e.target.closest(".lb-edit")) || e.target.closest(".al-swipe") ? e.touches[0].clientX : null; }, {passive:true});

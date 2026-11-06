@@ -27,6 +27,8 @@
 - 📱 (2026-11-06) 아이폰 앱: iinote-mobile/ios (Firebase iOS 앱 등록, GoogleService-Info.plist). 우리 앱 전용 부품 ios/App/App/Iinote.swift = 상장 · 일기책 PDF(makePdf). 푸시 · TestFlight 는 Apple Developer 승인 뒤. 시험 설치는 번들 kr.co.iinote.app.test (정식 주소는 유료 팀용으로 비워 둠)
 - (2026-11-06) 상장: 세로형이 먼저(awardHTML land), 번호는 가족마다 1호부터(awardNo). 당겨서 새로고침은 내용만 다시 받음(로딩 화면 없음, 화면 코드는 다음 실행 때). 다가오는 일정은 보기만, [수정]은 달력 화면으로(sch-manage). 🎨 · 가 = 고르는 창(openPick). 더보기 3줄(내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담). 알림 소리 · 진동 · 띄우기는 따로(NP_SPLIT=true, 무음 채널 fam-mute-*, res/raw/silence.wav 는 다음 AAB부터)
 
+- ✏️ (2026-11-06) 일기 칸 커서 지키기: 키보드가 뜨면 안드로이드 웹뷰가 키 큰 #w-text 전체를 맞추느라 페이지를 내려 첫 줄이 고정된 위 막대(.a-top · .top) 뒤로 숨었음(이용자 문의, 블루스택 화면 높이를 줄여 재현). focusin · 키보드 크기 변화 뒤 1.5초 동안만 커서 줄이 위 막대와 키보드 사이인지 보고 벗어나면 글 칸 첫머리를 위 막대 아래로 되돌림(index.html 의 caretTop · fit)
+
 ## 파일
 - index.html: 앱 전체 (HTML+CSS+JS 한 파일, script type="module")
 - icon.png: 앱 아이콘 (두 개의 i + 모눈 노트)
