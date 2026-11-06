@@ -7911,14 +7911,18 @@ document.addEventListener("keydown", e => {
     const vv=window.visualViewport, vt=vv?.offsetTop||0, vh=vv?.height||innerHeight, lh=parseFloat(getComputedStyle(ta).lineHeight)||32;
     const bars=[...document.querySelectorAll(".a-top,.top,.tour-bar")].map(b=>b.getBoundingClientRect()).filter(r=>r.height&&r.top<=vt+1).map(r=>r.bottom);
     const top=Math.max(vt,...bars)+8, bot=vt+vh-8, r=ta.getBoundingClientRect(), c=r.top+caretTop(ta);
-    if(c>=top && c+lh<=bot) return;
-    let d=r.top-top; if(c-d+lh>bot) d=c+lh*2-bot; if(c-d<top) d=c-top;
+    let d=r.top-top; const seen=c>=top && c+lh<=bot, fits=c-d+lh<=bot;
+    if(seen && (d>=0 || !fits)) return;   // 커서가 보이고, 글 칸 첫머리가 안 가렸거나 맞추면 커서가 가려지면 그대로
+    if(!fits) d=c+lh*2-bot; if(c-d<top) d=c-top;
     window.scrollBy(0,d); };
   let until=0, tm, lastH=window.visualViewport?.height||innerHeight;
   const watch=()=>{ until=Date.now()+1500; [60,250,600,1000,1400].forEach(ms=>setTimeout(()=>{ if(Date.now()<until) fit(); },ms)); };
   document.addEventListener("focusin",e=>{ if(e.target.id==="w-text") watch(); });
-  const onSize=()=>{ const h=window.visualViewport?.height||innerHeight, shrank=h<lastH-40; lastH=h;
-    if(shrank && document.activeElement?.id==="w-text") watch();   // 뒤로 가기로 키보드만 내렸다가 다시 눌렀을 때도
+  document.addEventListener("touchmove",()=>{ until=0; },{passive:true});   // 손으로 움직이기 시작하면 맞추지 않아요
+  const onSize=()=>{ const h=window.visualViewport?.height||innerHeight, shrank=h<lastH-40, grew=h>lastH+40; lastH=h;
+    if(shrank && document.activeElement?.id==="w-text") watch();
+    // 뒤로 가기로 키보드만 내리면 글 칸에 입력 상태가 남아 아래 메뉴 · 저장 단추가 안 돌아왔어요 → 입력 상태를 풀어요
+    if(grew && matchMedia("(pointer:coarse)").matches && document.activeElement?.matches?.("textarea,input:not([type=checkbox]):not([type=radio])")) document.activeElement.blur();
     if(Date.now()<until){ clearTimeout(tm); tm=setTimeout(fit,90); } };
   addEventListener("resize",onSize); window.visualViewport?.addEventListener("resize",onSize); }
 let touchX=null;
