@@ -609,7 +609,7 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .cal-w{font-family:var(--diary);font-size:15px}
 .cal-dots i{background:var(--surface);border:1.2px solid var(--ink);opacity:.55;box-sizing:border-box}   /* 안 쓴 날: 얇은 검정 테두리 + 흰 바탕 */
 .cal-dots i.on{background:var(--c);border-color:var(--c);opacity:1}
-/* 일기 탭의 하위 탭 (내 일기 · 아이들 현황 · 하루 펼쳐보기 · 책장 · 리포트) */
+/* 일기 탭의 하위 탭 (내 일기 · 아이들 현황 · 하루 · 책장 · 리포트) */
 .dtabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 18px}
 .dtab{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:700;font-size:15px}
 .dtab:hover{border-color:var(--dc)}
@@ -628,11 +628,11 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .kc-d.today{box-shadow:0 0 0 2px var(--coral)}
 .kc-d:disabled{opacity:.45}
 .kc-d i{position:absolute;right:-3px;top:-6px;font-style:normal;font-size:12px}
-/* 하루 펼쳐보기 */
+/* 하루 */
 .day-nav{display:flex;align-items:center;gap:10px;margin:0 0 16px}
 .day-nav h1{font-family:var(--diary);font-size:clamp(24px,3.4vw,32px);margin:0}
 .day-nav .flip .ic{transform:scaleX(-1)}
-.day-cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));align-items:start}
+.day-cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:start}
 .day-col{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:0 1px 2px rgba(31,42,68,.04),0 8px 20px rgba(31,42,68,.06)}
 /* 칭찬 도장: 본문 위 오른쪽에 동그랗게 쾅 (가족일기장처럼) */
 .day-stamp{position:absolute;right:14px;top:50px;z-index:1;transform:rotate(-12deg);width:78px;height:78px;border-radius:50%;border:3px double var(--coral);color:var(--coral-ink);background:color-mix(in srgb,var(--surface) 72%,transparent);display:grid;place-items:center;text-align:center;font-family:var(--diary);font-weight:700;font-size:14px;line-height:1.1;padding:6px;pointer-events:none}
@@ -2569,7 +2569,7 @@ span.pf-av{cursor:default}
 .chatting .chat .page-h{display:none}
 .chatting .chat-list{flex:1;height:auto;min-height:0;margin:0;border:0;border-radius:0;background:transparent;padding:12px 14px}
 .chatting .chat-in{margin:0;padding:10px 12px;background:var(--surface);box-shadow:0 -2px 12px rgba(46,36,51,.08)}
-/* 5. 하루 펼쳐보기: 가로로 나란히, 누르면 그 칸만 넓게 */
+/* 5. 하루: 가로로 나란히, 누르면 그 칸만 넓게 */
 .app-day .day-nav{margin-bottom:4px}
 .day-tip{margin:0 0 8px;text-align:center;font-size:12.5px;color:var(--ink3)}
 .app-day .day-cols{gap:6px;transition:grid-template-columns .25s}
@@ -3100,6 +3100,8 @@ html.is-app:root[data-design="night"] .ashell .ah-pf{background:var(--surface2)}
 .wbm-it{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:78px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
 .wbm-it:hover,.wbm-it.on{border-color:var(--accent,#B8306A);color:var(--accent,#B8306A)}
 .wbm-it .ic{width:22px;height:22px}
+/* 웹 작은 글씨는 13px 까지 (2026-11-06) */
+html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-day span,legend span,.rx b,.nav-item){font-size:13px}
 .wbm-kids{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .wbm-kids b{font-size:13px;color:var(--ink2);margin-right:4px}
 .wbm-out{margin-top:10px}
@@ -3113,8 +3115,8 @@ html.is-app:root[data-design="night"] .ashell .ah-pf{background:var(--surface2)}
 @media (max-width:760px){ .wb-tabs{display:none} .wb-write span{display:none} .wb-me{padding:0 4px} .wb-l b{font-size:16px} .wb-l{margin-right:auto} }
 /* 👤 누가 쓸까요? 단추 · 창 (2026-10-30): 아이도 바로 찾게 이름 + '⇄ 바꾸기' + 가족 얼굴 겹쳐 보이기 */
 /* 위쪽 단추에 커서를 올리면 짧은 설명 (2026-11-06). 좁은 웹 화면은 이름 글자를 줄여 탭과 겹치지 않게 */
-@media (hover:hover){ .wbar [data-tip]{position:relative}
-  .wbar [data-tip]:hover::after,.wbar [data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);z-index:60;padding:5px 9px;border-radius:8px;background:var(--ink);color:var(--surface);font-size:13px;font-weight:400;line-height:1.3;white-space:nowrap;pointer-events:none} }
+@media (hover:hover){ :is(.wbar,.wb-pop) [data-tip]{position:relative}
+  :is(.wbar,.wb-pop) [data-tip]:hover::after,:is(.wbar,.wb-pop) [data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);z-index:60;padding:5px 9px;border-radius:8px;background:var(--ink);color:var(--surface);font-size:13px;font-weight:400;line-height:1.3;white-space:nowrap;pointer-events:none} }
 @media (min-width:761px) and (max-width:1120px){ .wb-l b,.wb-me .wbm-n,.wb-write span{display:none} .wb-tab{padding:0 10px} .wb-tabs{flex:none} }
 .wbar .wb-me{height:44px;padding:0 10px 0 5px;gap:8px;border:1.5px solid var(--accent,#B8306A);background:var(--accent-soft,#FDE3EC)}
 .wbar .wb-me.on,.wbar .wb-me:hover{background:var(--surface)}
@@ -4140,7 +4142,7 @@ function newsItems(){
 }
 function famNewsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return famNews().filter(x=>x.at>seen).length; }
 function newsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return newsItems().filter(x=>x.at>seen).length; }
-const newsBell = () => { const n=IS_APP ? famNewsUnread() : newsUnread(); /* 디데이 · 생일은 새 소식 창 안에만, 숫자에는 안 세요 (2026-10-09) */ return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}" data-tip="가족 새 소식">${IS_APP?ic("bell"):"🔔"}${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
+const newsBell = () => { const n=IS_APP ? famNewsUnread() : newsUnread(); /* 디데이 · 생일은 새 소식 창 안에만, 숫자에는 안 세요 (2026-10-09) */ return `<button class="bell ${S.newsOpen?"on":""}" data-act="news-open" aria-expanded="${!!S.newsOpen}" aria-label="새 소식${n?` ${n}개`:""}" data-tip="가족 새 소식">${ic("bell")}${n?`<i class="cdot">${n>9?"9+":n}</i>`:""}</button>`; };
 const newsDd = () => { const r=ddayRow(); return r?`<div class="news-dd"><small>⏳ 다가오는 날</small>${r}</div>`:""; };
 function viewNews(){
   // 앱: 가족 소식 전체(famNews · hpNews)를 팝업으로 — 예전 홈 '소식' 쪽 (2026-10-07)
@@ -4637,7 +4639,7 @@ function viewAppShell(){
   // 일기 쓰기 · 채팅에서도 아래 메뉴는 그대로 보여요 (2026-10-07). 쓰는 중엔 가운데 ✏️ 가 저장 단추로 바뀌어요
   const writing=S.sub?.type==="write", chatting=S.tab==="chat" && !S.sub;
   const saveLabel = !writing||!S.draft ? "" : S.draft.status==="submitted" ? "고친 내용 저장" : kidUI() ? "다 썼어요" : S.me.type==="child" ? "제출하기" : "올리기";
-  // 다른 화면: 제목 앞 큰 이모지는 빼고(아이콘을 선 모양 하나로), 하루 펼쳐보기 · 우리 가족 설정은 휴대폰 배치로
+  // 다른 화면: 제목 앞 큰 이모지는 빼고(아이콘을 선 모양 하나로), 하루 · 우리 가족 설정은 휴대폰 배치로
   let body = home ? viewHomePages() : viewMain().replace(/(<div class="page-h"><h1>)\s*(?:\p{Extended_Pictographic}️?\s*)+/u,"$1");
   if(!S.sub && S.tab==="day") body=`<div class="app-day">${body}</div>`;
   if(!S.sub && (S.tab==="family" || S.tab==="settings")) body=`<div class="fam-menu">${body}</div>`;
@@ -4675,7 +4677,7 @@ function viewAppShell(){
 function viewMore(){
   // (2026-10-07) 더보기 = 상자 6개(1줄: 우리 가족 설정 · 앱 설정 · AI 챗봇 상담 / 2줄: 아이들 현황 · 책장 PDF · 우리 아이 그래프)
   //  + 아래에 작게: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침
-  // 사진첩 · AI 리포트(아이는 받아쓰기)는 홈 쪽에, 하루 펼쳐보기는 홈 일기장 쪽과 겹쳐서 뺐어요
+  // 사진첩 · AI 리포트(아이는 받아쓰기)는 홈 쪽에, 하루는 홈 일기장 쪽과 겹쳐서 뺐어요
   const kid=S.me.type==="child";
   // (2026-11-06) 3줄: 내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 우리 아이 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담
   const it=[["settings","내 설정","gear","#E5ECFF","#3F5FB8"],["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["env","환경 설정","lay-quad","#E3F4EC","#2F7A56"],
@@ -4812,6 +4814,7 @@ function viewHelp(){
 }
 /* 🧭 웹 맨 위 한 줄 (2026-10-27, 시안 ⑩): 예전 5줄(제목 · 프로필/알림/즐겨찾기 · 아이가 쓰기 · 탭 9개 · 디자인 고르기)을 60px 한 줄로.
    로고 · 가족 이름 | 오늘 · 달력 · 사진첩 · 메뉴 | ★ 즐겨찾기 · 🎨 꾸미기 · 🔔 · 💬 · [나 ▾] · 일기 쓰기. 나머지는 단추를 누르면 팝업 */
+const WEB_TIP = {home:"오늘 한눈에 보기",day:"가족 일기 모아 보기",cal:"달력과 일정",album:"가족 사진",mine:"내가 쓴 일기",shelf:"지난 일기 · PDF",report:"아이 글 돌아보기",quiz:"받아쓰기 연습",family:"가족 · 초대 관리",settings:"내 계정 · 화면",help:"궁금한 것 묻기"};
 const WEB_TABS = [["home","홈"],["day","하루"],["cal","달력"],["album","사진첩"]];   // (2026-11-06) 하루를 메뉴 안에서 꺼냈어요
 function webBar(){
   const inMenu = !WEB_TABS.some(([k])=>k===S.tab) && S.tab!=="chat";
@@ -4823,11 +4826,11 @@ function webBar(){
   const kids = isParent() ? sortedProfiles().filter(p=>p.type==="child") : [];
   const others = sortedProfiles().filter(p=>p.id!==S.me.id && canUse(p));
   return `<header class="wbar">
-      <button class="wb-l" data-act="tab" data-v="home" title="홈으로">${logo(30)}<b>${esc(S.group.name)} 일기장</b></button>
-      <nav class="wb-tabs" aria-label="화면">${WEB_TABS.map(([k,l])=>`<button class="wb-tab ${S.tab===k&&!S.sub?"on":""}" data-act="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}<button class="wb-tab ${S.webMenu||inMenu?"on":""}" data-act="web-menu" aria-expanded="${!!S.webMenu}">메뉴</button></nav>
+      <button class="wb-l" data-act="tab" data-v="home" data-tip="홈으로">${logo(30)}<b>${esc(S.group.name)} 일기장</b></button>
+      <nav class="wb-tabs" aria-label="화면">${WEB_TABS.map(([k,l])=>`<button class="wb-tab ${S.tab===k&&!S.sub?"on":""}" data-act="tab" data-v="${k}" data-tip="${WEB_TIP[k]}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}<button class="wb-tab ${S.webMenu||inMenu?"on":""}" data-tip="다른 메뉴 열기" data-act="web-menu" aria-expanded="${!!S.webMenu}">메뉴</button></nav>
       <div class="wb-r">
         <button class="wb-ic ${S.favPop?"on":""}" data-act="fav-pop" aria-expanded="${!!S.favPop}" aria-label="즐겨찾기" data-tip="즐겨찾기 · 자주 가는 링크"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg></button>
-        <button class="wb-ic wb-tt ${S.ttOpen?"on":""}" data-act="tt-open" aria-expanded="${!!S.ttOpen}" aria-label="시간표" data-tip="시간표 보기"><span aria-hidden="true">📅</span></button>
+        <button class="wb-ic wb-tt ${S.ttOpen?"on":""}" data-act="tt-open" aria-expanded="${!!S.ttOpen}" aria-label="시간표" data-tip="시간표 보기">${ic("cal")}</button>
         <button class="wb-ic ${S.prefsOpen?"on":""}" data-act="prefs-open" aria-expanded="${!!S.prefsOpen}" aria-label="화면 꾸미기 · 디자인 · 글씨" data-tip="디자인 · 글씨 바꾸기"><i class="dsw ${S.design}"></i></button>
         ${newsBell()}
         <button class="wb-ic ${S.tab==="chat"?"on":""}" data-act="tab" data-v="chat" aria-label="가족 채팅${un?` · 새 메시지 ${un}개`:""}" data-tip="가족 채팅">${ic("talk")}${un?`<i class="cdot">${un>9?"9+":un}</i>`:""}</button>
@@ -4838,21 +4841,20 @@ function webBar(){
     ${S.favPop?`<div class="news-bg" data-act="fav-pop" aria-hidden="true"></div><div class="wb-pop wb-fav" role="dialog" aria-label="즐겨찾기">${favRow()}</div>`:""}
     ${S.prefsOpen?`<div class="news-bg" data-act="prefs-open" aria-hidden="true"></div><div class="wb-pop wb-prefs" role="dialog" aria-label="화면 꾸미기">${prefGroups(true)}</div>`:""}
     ${S.webMenu?`<div class="news-bg" data-act="web-menu" aria-hidden="true"></div><div class="wb-pop wb-menu" role="dialog" aria-label="메뉴">
-      <div class="wbm-grid">${menu.map(([k,l,i])=>`<button class="wbm-it ${S.tab===k?"on":""}" data-act="web-go" data-v="${k}">${ic(i)}<span>${l}</span></button>`).join("")}<button class="wbm-it" data-act="web-go" data-v="help">${ic("help")}<span>AI 챗봇 상담</span></button></div>
+      <div class="wbm-grid">${menu.map(([k,l,i])=>`<button class="wbm-it ${S.tab===k?"on":""}" data-act="web-go" data-v="${k}" data-tip="${WEB_TIP[k]}">${ic(i)}<span>${l}</span></button>`).join("")}<button class="wbm-it" data-act="web-go" data-v="help" data-tip="${WEB_TIP.help}">${ic("help")}<span>AI 챗봇 상담</span></button></div>
       ${kids.length?`<div class="wbm-kids"><b>아이가 쓰기</b>${kids.map(k=>`<button class="kq" data-act="kid-write" data-id="${k.id}">${av(k,26)}<span>${esc(k.name)}</span>${k.pin?"<small>🔒</small>":""}</button>`).join("")}</div>`:""}
       ${isParent()?`<button class="link-btn wbm-out" data-act="signout">${ic("out")}로그아웃</button>`:""}
     </div>`:""}`;
 }
+// 메뉴 창은 누른 단추 곁에 (2026-11-06): 위 줄 단추면 바로 아래, 휴대폰 아래 메뉴면 그 위에
+function webMenuPlace(){ const p=document.querySelector(".wb-menu"); if(!p) return; const b=[...document.querySelectorAll('.wb-tab[data-act="web-menu"],.nav-item[data-act="web-menu"]')].find(x=>x.offsetParent); if(!b) return;
+  const r=b.getBoundingClientRect(), w=p.offsetWidth; p.style.right="auto"; p.style.left=Math.max(12,Math.min(r.left,innerWidth-w-12))+"px";
+  if(b.classList.contains("nav-item")){ p.style.top="auto"; p.style.bottom=(innerHeight-r.top+8)+"px"; } else p.style.top=(r.bottom+8)+"px"; }
 function viewShell(){
   if(IS_APP) return viewAppShell();
-  // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
+  // 위쪽 폴더 탭: 홈 · 내 일기 · 아이들 현황(부모) · 하루 · 책장 · AI 리포트(부모) · (아이는 받아쓰기 퀴즈) · 우리 가족 설정
   if(S.tab==="diary") S.tab="shelf";   // 예전 '일기' 탭 → 책장
-  const tabs=[["home","홈","home"],["mine","내 일기","pen"],["chat","가족 채팅","talk"]];
-  tabs.push(["cal","달력","lay-calendar"]);   // (2026-10-09) 아이들 현황 자리에 달력, 아이들 현황은 4분할 홈 칸으로
-  tabs.push(["day","하루 펼쳐보기","cal"],["shelf","책장","book"],["album","사진첩","image"]);
-  if(isParent()) tabs.push(["report","AI 리포트","chart"]);
-  if(S.me.type==="child") tabs.push(["quiz","받아쓰기 퀴즈","quiz"]);
-  tabs.push(["family","우리 가족 설정","people"],["settings","설정","gear"]);
+  const tabs=[["home","홈","home"],["day","하루","cal"],["cal","달력","lay-calendar"],["album","사진첩","image"]];   // 휴대폰 웹 아래 메뉴는 다섯 칸, 나머지는 메뉴 안에 (2026-11-06)
   const tone=TAB_TONE[S.tab]||TAB_TONE.home;
   return `${tourBar()}<div class="shell${S.sub?.type==="write"?" w-mode":""}">
     <div class="frame">
@@ -4864,7 +4866,7 @@ function viewShell(){
       <div class="body-row ${chatSideOpen()?"":"side-closed"}"><main class="sheet" id="main" style="--tl:${tone[1]}">${noticeBar()}${dupBanner()}${viewMain()}</main>${viewChatSide()}</div>
     </div>
     <nav class="nav" aria-label="메뉴">
-      <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}</div>
+      <div class="nav-items">${tabs.map(([k,l,i])=>`<button class="nav-item ${S.tab===k?"on":""}" data-act="tab" data-v="${k}" aria-label="${l}" ${S.tab===k?'aria-current="page"':""}>${ic(i)}<span class="nl">${l}</span><span class="ns" aria-hidden="true">${NAV_SHORT[k]||l}</span></button>`).join("")}<button class="nav-item ${S.webMenu?"on":""}" data-act="web-menu" aria-label="메뉴" aria-expanded="${!!S.webMenu}">${ic("lay-quad")}<span class="nl">메뉴</span><span class="ns" aria-hidden="true">메뉴</span></button></div>
     </nav>
     ${S.helpOpen?viewHelp():""}
     ${S.prof?viewProfile():""}
@@ -4878,7 +4880,7 @@ function viewMain(){
   if(S.sub?.type==="quiz") return viewQuizRun();
   if(S.sub?.type==="pdf") return viewPdf();
   // 홈 맨 아래: 카카오톡 공유 · 링크 복사 · 이용약관 · 개인정보처리방침 (로그인한 뒤에도 보이게)
-  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+greenBanners()+viewHome()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
+  if(!S.tab || S.tab==="home") return wipBanner()+consentBanner()+awardBanner()+viewHome()+greenBanners()+`<footer class="home-foot">${kakaoBtn(true)}<span class="links"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span></footer>`;
   return ({home:viewHome,chat:viewChat,mine:viewMyDiary,kids:viewKidsStatus,cal:viewHomeCalendar,day:viewDayOpen,shelf:viewDiaryList,diary:viewDiaryList,album:viewAlbum,report:viewReport,quiz:viewQuizHome,family:viewFamily,settings:viewSettings,grow:viewGrow,env:viewEnv,manual:viewManual,backup:viewBackup,invite:viewInvite}[S.tab]||viewHome)();
 }
 
@@ -4908,7 +4910,7 @@ const TIPS = [
   ["📊","AI 리포트에서 아이 일기의 이번 주 · 이번 달 총평을 받아 보세요","report","p",""],
   ["📝","AI 다홍펜이 고쳐 준 낱말로 받아쓰기 퀴즈가 저절로 만들어져요","quiz","",""],
   ["🏆","한 달 내내 쓰면 개근상, 20일 넘게 쓰면 성실상을 받아요","mine","",""],
-  ["🌙","하루 펼쳐보기에서 같은 날 가족 일기를 나란히 읽어 보세요","day","",""],
+  ["🌙","하루에서 같은 날 가족 일기를 나란히 읽어 보세요","day","",""],
   ["🗓","일정은 '가족 모두' 또는 '나만 보기'로 나눠 넣을 수 있어요","","",""],
   ["🎨",IS_APP?"위 막대의 🎨 · 가 단추를 눌러 디자인 · 글씨체를 골라 보세요":"화면 꾸미기에서 디자인 · 글씨체를 내 마음대로 골라 보세요",IS_APP?"":"settings","",""],
   ["💌","가족 일기에 하트와 댓글을 남겨 보세요. 보호자는 칭찬 도장도 찍어 줄 수 있어요","day","",""],
@@ -4945,7 +4947,7 @@ function tipBanner(){
   return `<div class="pen-ask tip-ask" role="note" title="${esc(text)}"><span class="pen-ask-i" aria-hidden="true">${ic1}</span><p><b>오늘의 기능</b> ${esc(text)}</p>${to?`<button class="btn pill2 sm" data-act="tip-go" data-v="${i}"><i aria-hidden="true">›</i><span>보기</span></button>`:""}<button class="link-btn pen-ask-x" data-act="tip-x" aria-label="오늘은 그만 보기">✕</button></div>`;
 }
 // 초록 띠는 많아야 두 줄: 해야 할 설정(다홍펜 · 꺼 둔 기능)이 먼저, 남는 자리에 오늘의 기능
-const greenBanners = () => [penAskBanner(), featAskBanner(), tipBanner()].filter(Boolean).slice(0,IS_APP?1:2).join("");   // 앱은 달력 아래 한 줄만 (2026-11-06)
+const greenBanners = () => [penAskBanner(), featAskBanner(), tipBanner()].filter(Boolean).slice(0,1).join("");   // 앱 · 웹 모두 본문 아래 한 줄만 (2026-11-06)
 // 다홍펜 띠: 한 번 "고르기"를 누르면 이 기기에서는 다시 안 떠요 (설정 자리를 알게 됐으니까)
 const penAskKey = () => `iinote-penask-${S.gid}`;
 function penAskBanner(){
@@ -5050,7 +5052,7 @@ function viewHomeCalendar(){
 function viewHomeQuad(){
   return `<div class="quad">${quadCal()}${isParent()?quadKids():quadNews()}${quadGrowth()}${quadAlbum()}</div>`;   // (2026-10-09) 보호자는 2칸에 아이들 현황
 }
-// 1. 달력 미니: 한 달 칸에 가족 색 점(그날 쓴 사람) · 일정 점. 날짜를 누르면 그날 하루 펼쳐보기
+// 1. 달력 미니: 한 달 칸에 가족 색 점(그날 쓴 사람) · 일정 점. 날짜를 누르면 그날 하루
 function quadCal(){
   const t=todayStr(), ps=sortedProfiles(), month=S.calMonth||t.slice(0,7), [yy,mm]=month.split("-").map(Number);
   const lead=toDate(`${month}-01`).getDay(), days=new Date(yy,mm,0).getDate(), rows=Math.ceil((lead+days)/7), sch=mySchedules();
@@ -5876,9 +5878,9 @@ const PDF_CSS_LAND = `@page{size:A4 landscape;margin:0}
 .side-tx .d-text{font-size:12pt;line-height:8.5mm;background-image:repeating-linear-gradient(transparent 0,transparent calc(8.5mm - .3mm),var(--line) calc(8.5mm - .3mm),var(--line) 8.5mm)}
 .cover .b1{right:-20mm}`;
 /* ---------- 일기 탭: 예전 가족일기장처럼 하위 탭 5개 ----------
-   내 일기 · 아이들 현황(부모) · 하루 펼쳐보기 · 책장(가족 일기 목록) · 리포트(부모) */
+   내 일기 · 아이들 현황(부모) · 하루 · 책장(가족 일기 목록) · 리포트(부모) */
 function diaryTabs(){
-  const t=[["mine","📔","내 일기","var(--butter)"],["kids","👧","아이들 현황","var(--coral)"],["day","📖","하루 펼쳐보기","var(--sage)"],["shelf","📚","책장","var(--sky)"],["report","📈","리포트","var(--lilac)"]];
+  const t=[["mine","📔","내 일기","var(--butter)"],["kids","👧","아이들 현황","var(--coral)"],["day","📖","하루","var(--sage)"],["shelf","📚","책장","var(--sky)"],["report","📈","리포트","var(--lilac)"]];
   return t.filter(([k])=>isParent() || !["kids","report"].includes(k));
 }
 function viewDiaryTab(){
@@ -6046,7 +6048,7 @@ function viewKidsStatus(){
       ${viewStickers(p,true)}${awardList(p)}
     </section>`; }).join("")}</div>`;
 }
-// 📖 하루 펼쳐보기: 한 날짜의 가족 일기를 나란히
+// 📖 하루: 한 날짜의 가족 일기를 나란히
 function viewDayOpen(){
   const t=todayStr(), seen=y=>y.status==="submitted" || y.profileId===S.me.id;
   // (2026-10-10) 날짜를 안 골랐는데 오늘 쓴 일기가 없으면, 일기가 있었던 가장 최근 날로 (그날을 고른 것으로 해서 ‹ › 도 그날부터)
@@ -6065,7 +6067,7 @@ function viewDayOpen(){
   }
   return nav+`<div class="day-cols">${list.map(({p,x})=>dayCard(p,x)).join("")}</div>`;
 }
-// 하루 펼쳐보기 카드 (가족일기장처럼): 도장은 본문 위에 쾅, 아이 일기는 다홍펜 고친 곳 · 칭찬, 댓글 · 답글 다 보이고 바로 쓰기
+// 하루 카드 (가족일기장처럼): 도장은 본문 위에 쾅, 아이 일기는 다홍펜 고친 곳 · 칭찬, 댓글 · 답글 다 보이고 바로 쓰기
 const DAY_HOW = {self:"👍 스스로", hint:"💡 힌트 보고", ai:"🖍 AI가 고쳐 줌", other:"✏️ 다른 말로", kept:"🙆 이대로 둠", left:"⏳ 아직", ref:"📘 참고"};
 // 본문에서 찾은 낱말에 표시 (겹치지 않게 앞에서부터)
 function markWords(text, words, cls){
@@ -6958,6 +6960,7 @@ function render(){
     keepStrip(stripX);
     if(S.sub?.type==="write") penHL();
     if(S.meMenu) meMenuPlace();
+    if(S.webMenu) webMenuPlace();
     if(cmtRestore()){ render(); return; }   // 쓰던 답글이 있으면 그 답글 칸을 열고 한 번 더 그려요
     afterChatRender(chatY);
     if(syncUrl()==="again"){ render(); return; }
@@ -8347,7 +8350,7 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && S.ttOpen && !S.
 //  화면 · 디자인 고칠 곳(design) · 오류(bug) · 사람이 봐야 할 것(human)은 상담원에게도 알림이 가요. AI 가 안 되면 예전처럼 상담원에게만
 const helpGuide = () => [...FAQ.map(([q,a])=>`Q. ${q}\nA. ${a}`), ...TIPS.filter(t=>!t[4] || (t[4]==="app")===IS_APP).map(t=>`- ${t[1]}`),
   IS_APP?"- 이 사람은 안드로이드 앱을 쓰고 있어요. 아래 메뉴: 홈 · 내 일기 · 가운데 ✏️ 쓰기 · 채팅 · 더보기(우리 가족 설정 · 앱 설정 · AI 챗봇 상담 · 아이들 현황 · 책장 PDF · 그래프). 디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추를 누를 때마다 바뀌어요"
-    :"- 이 사람은 웹(iinote.co.kr)을 쓰고 있어요. 위쪽 탭: 홈 · 내 일기 · 가족 채팅 · 달력 · 하루 펼쳐보기 · 책장 · 사진첩 · AI 리포트 · 우리 가족 설정 · 설정. 디자인 · 글씨는 오른쪽 위 🎨 화면 꾸미기"].join("\n");
+    :"- 이 사람은 웹(iinote.co.kr)을 쓰고 있어요. 위쪽 탭: 홈 · 내 일기 · 가족 채팅 · 달력 · 하루 · 책장 · 사진첩 · AI 리포트 · 우리 가족 설정 · 설정. 디자인 · 글씨는 오른쪽 위 🎨 화면 꾸미기"].join("\n");
 // AI 챗봇 답에서 글만 꺼내요 (2026-10-09): 워커가 글 대신 {reply|text|response…} 묶음 · 배열로 줄 때가 있어 [object Object] 가 보였어요
 const aiText = (x,d=0) => { if(x==null || d>4) return ""; if(typeof x==="string") return x.trim(); if(typeof x==="number") return String(x);
   if(Array.isArray(x)) return x.map(v=>aiText(v,d+1)).filter(Boolean).join("\n");
@@ -8847,7 +8850,7 @@ if(IS_APP){
     "ah-ft": () => openPick("ft"),
     // 일기 쓰기 날씨 · 기분: 단추를 누르면 그 줄만 펼쳐요
     "wm-open": el => { S.wmOpen = S.wmOpen===el.dataset.v ? null : el.dataset.v; render(); },
-    // 하루 펼쳐보기: 누른 사람 칸을 넓게 (빈 값이면 다시 나란히)
+    // 하루: 누른 사람 칸을 넓게 (빈 값이면 다시 나란히)
     "day-focus": el => { S.dayFocus = el.dataset.v || null; render(); },
     "app-push": ()=>guard(async()=>{ const r=await pushSetup(true); S.pushState=r; render();
       toast(r==="on"?"가족 소식이 오면 알려 줄게요":"알림이 꺼져 있어요. 휴대폰 설정 › 애플리케이션 › 아이아이노트 › 알림에서 켜 주세요"); }),
