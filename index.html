@@ -1157,7 +1157,7 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .rx-e{width:30px;height:30px;border:0;border-radius:50%;background:none;font-size:18px;cursor:pointer}
 .rx-e:hover{background:var(--butter-soft)}
 .chat-ta-l{flex:1;display:flex;min-width:0}
-.chat-ta-l textarea{flex:1}
+.chat-ta-l textarea{flex:1;overflow-y:hidden}
 /* 컴퓨터(넓은 화면): 종이 판 오른쪽 바깥의 좁은 채팅 기둥. 좁은 화면은 '가족 채팅' 탭으로 */
 .chat-side{display:none}
 @media (min-width:1100px){
@@ -4077,9 +4077,11 @@ function onChats(){
   if(chatBoxes().length) markChatSeen(); else chatDots();
   if(IS_APP && window.appReady) syncWidget();   // 💬 가족 채팅 위젯도 새 메시지로 (2026-10-09)
 }
-function afterChatRender(){
+function afterChatRender(prev=[]){
   // 채팅을 처음 열 때만 맨 아래로 (사진 크게 보기를 열고 닫아도 보던 자리 그대로)
   const boxes=chatBoxes(); if(!boxes.length){ chatDots(); return; }
+  const all=[...$app.querySelectorAll(".chat-list")];
+  if(prev.length===all.length) all.forEach((b,i)=>{ b.scrollTop=prev[i]; }); else S.chatJump=true;   // 일기 쓰기 등에서 뒤로 돌아오면 맨 처음 글이 보이던 것
   fitChat();
   if(S.chatJump){ boxes.forEach(b=>{ b.scrollTop=b.scrollHeight; chatStickBottom(b); }); S.chatJump=false; }
   markChatSeen(); cleanOldChats();
@@ -4233,7 +4235,7 @@ async function sendChat(file, ta){
       data.photo={url:r.url,path:r.path,thumb:th?.url||"",thumbPath:th?.path||"",w:big.w||0,h:big.h||0};
     }
     await B.add(S.gid,"chats",data);
-    if(ta && ta.value.trim()===text){ ta.value=""; ta.style.height=""; S.chatDraft=""; }
+    if(ta && ta.value.trim()===text){ ta.value=""; ta.style.height=""; ta.style.overflowY=""; S.chatDraft=""; }
     if(rp && S.chatReply===rp){ S.chatReply=null; document.querySelectorAll(".chat-rp").forEach(x=>x.remove()); }
   }catch(e){ console.error(e); toast(e.message?.includes("사진")?e.message:"보내지 못했어요. 다시 눌러 주세요"); }
   finally{ S.chatBusy=false; document.querySelectorAll(".chat-send").forEach(b=>{ b.disabled=false; b.textContent="보내기"; }); if(ta?.isConnected) ta.focus(); }
@@ -6949,6 +6951,7 @@ function render(){
     // 공부방 일기 단추 등에서 ?write 로 들어오면: 프로필이 정해진 뒤 바로 오늘 일기 쓰는 칸으로
     if(S.wantWrite && S.phase==="app" && S.me && !S.sub){ S.wantWrite=false; loadDraft(todayStr()); S.sub={type:"write"}; S.routed=true; history.replaceState({iinote:1},"","/write"); }
     const scTop=$app.querySelector(".sc-scroll")?.scrollTop;   // 다가오는 일정 칸 안 스크롤 위치는 다시 그려도 그대로
+    const chatY=[...$app.querySelectorAll(".chat-list")].map(b=>b.scrollTop);   // 💬 다시 그려도 보던 자리 그대로 (없던 목록이 새로 나타나면 맨 아래로)
     const stripX=$app.querySelector(".al-strip")?.scrollLeft;   // 사진첩 올리기의 작은 사진 줄도 (맨 앞으로 돌아가지 않게)
     $app.innerHTML=viewShell();
     if(scTop){ const sc=$app.querySelector(".sc-scroll"); if(sc) sc.scrollTop=scTop; }
@@ -6956,7 +6959,7 @@ function render(){
     if(S.sub?.type==="write") penHL();
     if(S.meMenu) meMenuPlace();
     if(cmtRestore()){ render(); return; }   // 쓰던 답글이 있으면 그 답글 칸을 열고 한 번 더 그려요
-    afterChatRender();
+    afterChatRender(chatY);
     if(syncUrl()==="again"){ render(); return; }
   }
   document.body.style.overflow = S.lb || document.querySelector(".docv") ? "hidden" : "";
@@ -7848,7 +7851,7 @@ const KID_MAX_BURST = 10, KID_TYPE_MSG = "아이 일기는 직접 손으로 써�
 const kidField = t => S.me?.type==="child" && S.draft && (t.id==="w-text"||t.id==="w-title");
 ["paste","drop"].forEach(ev=>document.addEventListener(ev, e => { if(kidField(e.target)){ e.preventDefault(); toast(KID_TYPE_MSG); } }));
 document.addEventListener("input", e => {
-  if(e.target.classList?.contains("chat-ta")){ S.chatDraft=e.target.value; e.target.style.height="auto"; e.target.style.height=Math.min(140,e.target.scrollHeight)+"px"; return; }
+  if(e.target.classList?.contains("chat-ta")){ S.chatDraft=e.target.value; e.target.style.height="auto"; e.target.style.height=Math.min(140,e.target.scrollHeight)+"px"; e.target.style.overflowY=e.target.scrollHeight>140?"auto":"hidden"; return; }
   if(e.target.dataset?.alf){ const key=e.target.closest("[data-alrow]")?.dataset.alrow, st=alState(key), f=e.target.dataset.alf; if(!st) return;
     st[f]=e.target.value; if(f==="area"){ st.areaManual=!!e.target.value.trim(); st.areaMsg=""; } if(f==="place" && st.areaManual && !st.area?.trim()) st.areaManual=false; return; }
   if(e.target.id==="q"){ S.search=e.target.value; const w=document.getElementById("feed-wrap"); if(w) w.innerHTML=viewFeed(); return; }
