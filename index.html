@@ -2287,6 +2287,11 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .a-fab .ic{width:28px;height:28px}
 .a-help{position:fixed;right:16px;bottom:calc(98px + env(safe-area-inset-bottom));z-index:25;display:grid;place-items:center;width:52px;height:52px;border:0;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:0 4px 14px rgba(46,36,51,.2);cursor:pointer}
 .a-help .cdot{position:absolute;top:-2px;right:-2px}
+.np-row{padding-left:14px}.np-row .app-sw input:disabled+span{opacity:.45}
+.np-kinds{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.np-k{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid var(--line,#ddd);font-size:14px;cursor:pointer}
+.np-k:has(input:checked){border-color:var(--tc,#EF6F53);background:color-mix(in srgb,var(--tc,#EF6F53) 10%,transparent)}
+.np-k input{margin:0}
 /* 홈 1쪽 일기장 */
 .hp-who{display:flex;gap:8px;overflow-x:auto;margin:0 -14px;padding:2px 14px 10px;scrollbar-width:none}
 .hp-who::-webkit-scrollbar{display:none}
@@ -3678,6 +3683,7 @@ async function makeFirebase(){
     async getIdToken(){ return auth.currentUser ? auth.currentUser.getIdToken() : ""; },
     async getUser(uid){ const s=await F.getDoc(F.doc(db,"users",uid)); return s.exists()?s.data():null; },
     // 📱 앱 푸시 알림: 이 휴대폰의 알림 주소(FCM 토큰)를 내 계정에 적어 두면, 가족 소식이 생길 때 서버(iinote-app/firebase)가 보내요
+    async savePushPrefs(uid,p){ await F.setDoc(F.doc(db,"users",uid),{pushPrefs:p},{merge:true}); },
     async savePushToken(uid,token,on=true){ await F.setDoc(F.doc(db,"users",uid),{pushTokens:on?F.arrayUnion(token):F.arrayRemove(token)},{merge:true}); },
     // 서버 함수 부르기 (AI 챗봇 상담 · 신고: supportSend · supportList · supportAdmin, iinote-app/firebase/functions)
     async callFn(name,data){ const FN=await import(`https://www.gstatic.com/firebasejs/${V}/firebase-functions.js`);
@@ -4572,13 +4578,13 @@ function viewAppShell(){
     ${S.newsOpen?viewNews():""}
     ${S.meMenu?viewMeMenu():""}
     <main class="a-main ${home?"is-home":""}" id="main">${noticeBar()}${dupBanner()}${body}</main>
-    ${home?`<button class="a-help" data-act="help-open" aria-label="AI 챗봇 상담">${ic("help")}${S.helpNew?'<i class="cdot">N</i>':""}</button>`:""}
+    ${""/* 상담 단추는 홈 달력을 가려서 뺐어요 (2026-11-06) → 더보기 › 도움 */}
     ${`<nav class="a-nav" aria-label="메뉴">
       ${nb("home","홈","home")}${nb("mine","내 일기","lay-diary")}
       ${writing && S.draft ? `<button class="a-fab save" data-act="save-diary" data-v="submitted" aria-label="${esc(saveLabel)}">${ic("check")}<b>${esc(saveLabel)}</b></button>`   // 쓰는 중에는 가운데 단추가 저장 (2026-10-07)
         : `<button class="a-fab" data-act="write" aria-label="오늘 일기 쓰기">${ic("pen")}</button>`}
       ${nb("chat","채팅","talk")}
-      <button class="an-it ${S.moreOpen?"on":""}" data-act="app-more" aria-expanded="${!!S.moreOpen}">${ic("lay-quad")}<span>더보기</span></button>
+      <button class="an-it ${S.moreOpen?"on":""}" data-act="app-more" aria-expanded="${!!S.moreOpen}">${ic("lay-quad")}<span>더보기</span>${S.helpNew?'<i class="cdot">N</i>':""}</button>
     </nav>`}
     ${S.moreOpen?viewMore():""}
     ${S.helpOpen?viewHelp():""}
@@ -8316,10 +8322,11 @@ document.addEventListener("beforeinput", e=>{ if(e.target?.id!=="help-in" || e.i
    ========================================================= */
 function plug(n){ return IS_APP ? (window.Capacitor?.Plugins?.[n] || null) : null; }   // 함수라서 이 아래가 실행되기 전에 불러도 괜찮아요
 
-// 진동: 하트 · 아래 메뉴는 가볍게, 도장은 조금 세게, 일기를 올리면 '됐다' 진동
-function buzz(kind){ const H=plug("Haptics"); if(!H) return;
+// 진동 (2026-11-06 가볍게): 아래 탭 · 밀어 넘기기 · 채팅 반응엔 진동 없음. 하트는 가볍게, 도장은 조금 세게, 일기를 올리면 '됐다' 진동
+//  앱 설정의 '누를 때 진동'을 끄면 하나도 안 울려요 (iinote-buzz = "0")
+function buzz(kind){ const H=plug("Haptics"); if(!H || ls.get("iinote-buzz","1")==="0") return;
   try{ kind==="ok" ? H.notification({type:"SUCCESS"}) : H.impact({style:kind==="mid"?"MEDIUM":"LIGHT"}); }catch(e){} }
-const BUZZ = { heart:"light", stamp:"mid", tab:"light", "chat-react":"light", "save-diary":"light" };
+const BUZZ = { heart:"light", stamp:"mid" };
 
 // 쓰던 일기 지키기: 쓰는 동안 이 기기에 글을 계속 보관 → 인터넷이 끊기거나 앱이 꺼져도, 웹에서 다른 메뉴 · 다른 창을 눌러 나가도 다시 열면 그 자리에 (2026-10-07 웹에서도)
 function wipKey(d){ return `iinote-wip-${S.gid}-${S.me?.id}-${d?.date}`; }
@@ -8368,17 +8375,50 @@ async function setRemind(time){ const L=plug("LocalNotifications"); if(!L) retur
   else ls.del("iinote-remind");
   await planRemind(); return true; }
 
+// 🔔 알림 세부 설정 (2026-11-06): 소리 · 진동 · 화면 위에 띄우기 · 받을 소식(채팅 · 댓글 · 도장 · 일기)
+//  안드로이드는 소리 · 진동 · 띄우기를 '알림 채널'로 정해요 → 고른 조합의 채널 하나만 만들어 두고, 서버(functions)가 users/{uid}.pushPrefs.ch 채널로 보내요
+//  받을 소식을 끈 종류는 서버가 아예 안 보내요. 이 기기 기억: iinote-npref
+const NPREF_DEF={sound:true, vib:true, pop:false, chat:true, comment:true, stamp:true, diary:true};
+function npref(){ let o={}; try{ o=JSON.parse(ls.get("iinote-npref","{}"))||{}; }catch(e){} return {...NPREF_DEF, ...o}; }
+const FAM_CH={ "fam-pop-v":[4,1,"소리 · 진동 · 화면 위에 잠깐"], "fam-pop-n":[4,0,"소리 · 화면 위에 잠깐"], "fam-snd-v":[3,1,"소리 · 진동"], "fam-snd-n":[3,0,"소리만"], "fam-quiet":[2,0,"조용히 (알림 줄에만)"] };
+const famCh = p => !p.sound ? "fam-quiet" : `fam-${p.pop?"pop":"snd"}-${p.vib?"v":"n"}`;
+async function famChannel(P,p){ const id=famCh(p), [imp,v,desc]=FAM_CH[id];
+  await P.createChannel({id,name:"가족 소식",description:`일기 · 댓글 · 도장 · 채팅 — ${desc}`,importance:imp,visibility:0,vibration:!!v,lights:imp>2}).catch(()=>{});
+  for(const k of Object.keys(FAM_CH)) if(k!==id) await P.deleteChannel?.({id:k}).catch(()=>{});   // 휴대폰 설정에 '가족 소식'이 하나만 보이게
+  return id; }
+async function savePrefs(p){ ls.set("iinote-npref",JSON.stringify(p)); const P=plug("PushNotifications"); if(!P || !S.user || DEMO) return;
+  const ch=await famChannel(P,p), body={ch, kinds:{chat:!!p.chat, comment:!!p.comment, stamp:!!p.stamp, diary:!!p.diary}};
+  const sig=JSON.stringify(body); if(ls.get("iinote-npref-sent","")===sig+S.user.uid) return;
+  await B.savePushPrefs?.(S.user.uid,body).then(()=>ls.set("iinote-npref-sent",sig+S.user.uid)).catch(e=>console.warn("알림 설정 저장",e)); }
+
+// ✋ 화면 그대로 (2026-11-06): 앱을 보고 있을 때 소식이 와도 일기 · 댓글을 쓰는 중이면 화면을 다시 그리지 않아요
+//  (예전엔 알림마다 전체를 다시 불러와 다시 그려서, 쓰던 화면이 위아래로 흔들리거나 나가졌어요)
+//  채팅은 원래 실시간으로 들어오니 다시 불러올 필요 없어요. 다른 소식은 손을 멈췄을 때 조용히 받아 스크롤 자리 그대로 다시 그려요
+function busyNow(){ const a=document.activeElement;
+  if(a?.matches?.('textarea,select,[contenteditable],input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit])')) return true;
+  if(S.sub?.type==="write" || S.draft || S.helpOpen || S.moreOpen || S.meMenu || document.querySelector("dialog[open],.applock")) return true;
+  return [...document.querySelectorAll("textarea")].some(x=>x.value.trim()); }
+let staleT=0;
+function softRefresh(wait=1500){ S.stale=true; clearTimeout(staleT); staleT=setTimeout(async()=>{
+  if(!S.stale || S.phase!=="app" || !S.gid) return;
+  if(busyNow() || document.hidden){ softRefresh(4000); return; }
+  S.stale=false; try{ await reloadAll(); }catch(e){ return; }
+  if(busyNow()) return;   // 받는 동안 쓰기 시작했으면 다음에 그릴 때 새 소식이 보여요
+  const y=scrollY; render(); if(Math.abs(scrollY-y)>1) scrollTo(0,y); }, wait); }
+function onPushIn(n){ const url=n?.data?.url||""; if(S.phase!=="app" || !S.gid || url==="/chat" || url==="help") return; softRefresh(); }
+
 // 푸시 알림 (가족 소식): 알림 주소(FCM 토큰)를 내 계정에 적어 두면 서버가 보내요. 알림을 누르면 그 일기 · 채팅으로
 async function pushSetup(ask){ const P=plug("PushNotifications"); if(!P || !S.user || DEMO) return "none";
   let st=await P.checkPermissions().catch(()=>({receive:"denied"}));
   if(st.receive!=="granted"){ if(st.receive==="denied" && !ask) return "denied"; st=await P.requestPermissions().catch(()=>({receive:"denied"})); }
   if(st.receive!=="granted") return "denied";
   if(!pushSetup.on){ pushSetup.on=true;
-    await P.createChannel({id:"family",name:"가족 소식",description:"가족 일기 · 댓글 · 도장 · 채팅",importance:4,visibility:0,vibration:true,lights:true}).catch(()=>{});
+    await P.createChannel({id:"family",name:"가족 소식 (예전)",description:"예전 앱 알림",importance:3,visibility:0,vibration:true,lights:true}).catch(()=>{});   // 새 설정이 서버에 닿기 전까지만
+    savePrefs(npref());
     P.addListener("registration",t=>{ ls.set("iinote-push",t.value); if(S.user) B.savePushToken?.(S.user.uid,t.value).catch(e=>console.warn("알림 주소 저장",e)); });
     P.addListener("registrationError",e=>console.warn("알림 등록",e));
     P.addListener("pushNotificationActionPerformed",a=>openAppUrl(a.notification?.data?.url||"/"));
-    P.addListener("pushNotificationReceived",()=>{ if(S.phase==="app" && S.gid) reloadAll().then(()=>render()).catch(()=>{}); });   // 앱을 보고 있을 때 온 소식은 바로 화면에
+    P.addListener("pushNotificationReceived",onPushIn);   // 앱을 보고 있을 때 온 소식: 쓰는 중이면 기다렸다가 조용히
   }
   await P.register().catch(e=>console.warn("알림 등록",e)); return "on"; }
 // 앱 아이콘 숫자 · 알림 줄: 앱을 열면 다 읽은 걸로
@@ -8541,12 +8581,21 @@ function openAppUrl(url){
   else { try{ history.replaceState(null,"",p); }catch(e){} }   // 아직 여는 중이면 주소만 바꿔 두면 들어간 뒤 그 화면으로 가요
 }
 
+// 🔔 알림 세부 옵션 줄
+function npRows(){ const p=npref(), sw=(id,on,t,sub,dis)=>`<div class="set-row np-row"><label class="app-sw" for="np-${id}"><input type="checkbox" id="np-${id}" ${on?"checked":""} ${dis?"disabled":""}><span>${t}${sub?`<small class="set-sub">${sub}</small>`:""}</span></label></div>`;
+  const kind=(k,t)=>`<label class="np-k"><input type="checkbox" id="np-${k}" ${p[k]?"checked":""}><span>${t}</span></label>`;
+  return `${sw("sound",p.sound,"알림 소리","끄면 소리 · 진동 없이 알림 줄에만 조용히 와요")}
+    ${sw("vib",p.vib&&p.sound,"알림 진동","",!p.sound)}
+    ${sw("pop",p.pop&&p.sound,"화면 위에 잠깐 띄우기","끄면 위에 띄우지 않고 알림 줄에만 와요 (쓰는 화면을 가리지 않아요)",!p.sound)}
+    <div class="set-row np-row"><span>받을 소식<small class="set-sub">끈 소식은 알림이 오지 않아요 (앱 안에서는 그대로 보여요)</small><span class="np-kinds">${kind("chat","💬 채팅")}${kind("comment","✍️ 댓글 · 답글")}${kind("stamp","💮 도장")}${kind("diary","📒 가족 일기")}</span></span></div>`; }
 // 앱 설정 (우리 가족 화면)
 function appSettings(){
   const rt=ls.get("iinote-remind",""), lk=lockOn();
   return `<section class="block" aria-labelledby="h-app"><div class="block-h"><h2 id="h-app">앱 설정</h2></div>
     <div class="set-row"><span>가족 소식 알림<small class="set-sub">일기 · 댓글 · 도장 · 채팅이 오면 알려 주고 앱 아이콘에 숫자가 떠요</small></span><button type="button" class="btn btn-ghost sm" data-act="app-push">${S.pushState==="on"?"켜져 있어요":"알림 켜기"}</button></div>
+    ${S.pushState==="on"?npRows():""}
     <div class="set-row"><label class="app-sw" for="app-remind"><input type="checkbox" id="app-remind" ${rt?"checked":""}><span>일기 쓰기 알림<small class="set-sub">정한 시간에 "오늘 일기 썼나요?" 하고 알려 줘요. 오늘 이미 썼으면 내일부터</small></span></label><label class="sr" for="app-remind-time">알림 시간</label><input type="time" id="app-remind-time" class="app-time" value="${esc(rt||"20:00")}" ${rt?"":"disabled"}></div>
+    <div class="set-row"><label class="app-sw" for="app-buzz"><input type="checkbox" id="app-buzz" ${ls.get("iinote-buzz","1")!=="0"?"checked":""}><span>누를 때 진동<small class="set-sub">하트 · 도장 · 일기 올리기에서만 살짝 (아래 메뉴는 진동 없어요)</small></span></label></div>
     <div class="set-row"><label class="app-sw" for="app-lock"><input type="checkbox" id="app-lock" ${lk?"checked":""}><span>앱 잠금<small class="set-sub">앱을 열 때 지문 · 얼굴 · 휴대폰 잠금으로 확인해요 (30초 넘게 나갔다 오면 다시)</small></span></label></div>
   </section>`; }
 
@@ -8589,7 +8638,7 @@ if(IS_APP){
     if(!isActive){ leftAt=Date.now(); return; }
     clearBadge();
     if(lockOn() && leftAt && Date.now()-leftAt>30000 && leftAt-outAt>5000) showLock();
-    if(S.phase==="app" && S.gid && leftAt && Date.now()-leftAt>60000) reloadAll().then(()=>render()).catch(()=>{});
+    if(S.phase==="app" && S.gid && leftAt && Date.now()-leftAt>60000) softRefresh(300);   // 쓰던 중이면 화면은 그대로
   });
   // 바로가기 · 위젯 · 알림으로 열기
   AP?.addListener("appUrlOpen", e=>openAppUrl(e.url));
@@ -8622,6 +8671,9 @@ if(IS_APP){
     if(t.id==="app-remind"){ const tm=document.getElementById("app-remind-time"); const ok=await setRemind(t.checked?(tm?.value||"20:00"):"");
       if(!ok) t.checked=false; if(tm) tm.disabled=!t.checked; if(ok) toast(t.checked?`매일 ${tm?.value||"20:00"}에 일기 쓰기를 알려 줄게요`:"일기 쓰기 알림을 껐어요"); }
     if(t.id==="app-remind-time" && ls.get("iinote-remind","")){ await setRemind(t.value||"20:00"); toast(`매일 ${t.value}에 알려 줄게요`); }
+    if(t.id==="app-buzz"){ ls.set("iinote-buzz",t.checked?"1":"0"); if(t.checked) buzz("light"); }
+    if(t.id?.startsWith("np-")){ const p=npref(); p[t.id.slice(3)]=t.checked; await savePrefs(p); render();
+      toast(t.id==="np-sound"&&!t.checked?"알림이 조용히 와요":"알림 설정을 바꿨어요"); }
     if(t.id==="app-lock"){ const NB=plug("NativeBiometric"); const want=t.checked; t.checked=!want;
       if(!NB){ toast("앱을 새로 설치하면 앱 잠금을 쓸 수 있어요"); return; }
       const av=await NB.isAvailable({useFallback:true}).catch(()=>({isAvailable:false}));
@@ -8669,9 +8721,9 @@ if(IS_APP){
   document.addEventListener("touchend", e=>{ if(sx===null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null;
     if(Math.abs(dx)<70 || Math.abs(dy)>Math.abs(dx)*.6) return;
     const P=hpages(), i=P.findIndex(x=>x[0]===hpage()), j=i+(dx<0?1:-1); if(j<0 || j>=P.length) return;
-    buzz("light"); acts.hpage({dataset:{v:P[j][0]}}); }, {passive:true});
+    acts.hpage({dataset:{v:P[j][0]}}); }, {passive:true});
   // 운영자 답장 알림이 앱을 보고 있을 때 오면: 도움 단추에 표시
-  plug("PushNotifications")?.addListener("pushNotificationReceived", n=>{ if(n?.data?.url==="help"){ S.helpNew=true; if(S.helpOpen) acts["help-open"](); else render(); } });
+  plug("PushNotifications")?.addListener("pushNotificationReceived", n=>{ if(n?.data?.url==="help"){ S.helpNew=true; if(S.helpOpen) acts["help-open"](); else if(!busyNow()) render(); } });
   // 인터넷이 끊겼을 때 올리기를 누르면: 기다리지 않고 안내 (글은 휴대폰에 보관돼 있어요)
   const saveAct=acts["save-diary"];
   acts["save-diary"]=el=>{ if(!navigator.onLine || document.documentElement.classList.contains("offline")){ saveWip(); toast("인터넷이 연결되면 다시 눌러 주세요. 쓰던 일기는 이 휴대폰에 보관돼 있어요"); return; } return saveAct(el); };
