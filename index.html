@@ -2303,6 +2303,8 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .a-fab .ic{width:28px;height:28px}
 .a-help{position:fixed;right:16px;bottom:calc(98px + env(safe-area-inset-bottom));z-index:25;display:grid;place-items:center;width:52px;height:52px;border:0;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:0 4px 14px rgba(46,36,51,.2);cursor:pointer}
 .a-help .cdot{position:absolute;top:-2px;right:-2px}
+html.is-app .set-page .set-sub{padding:0;border:0;background:none}
+.np-more{display:block;margin:0 0 8px 14px}
 .np-row{padding-left:14px}.np-row .app-sw input:disabled+span{opacity:.45}
 .np-kinds{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .np-k{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid var(--line,#ddd);font-size:14px;cursor:pointer}
@@ -4560,7 +4562,7 @@ const tourBar = () => (S.tourAsk && S.phase==="app" ? tourAsk() : "") + (TOUR ? 
 /* ---------- 📱 앱 화면 뼈대 (2026-10-05, 앱에서만 · 웹은 아래 viewShell 그대로) ----------
    머리 한 줄(로고 · 가족 이름 · 🔔 · 내 얼굴) · 아래 메뉴 5칸(홈 · 내 일기 · ✏️ 쓰기 · 채팅 · 더보기) · 더보기 판 · 도움 단추
    홈은 칩을 누르거나 옆으로 밀어 넘기는 네 쪽: 일기장 · 달력 · 사진첩 · 소식 (쪽마다 색) */
-const HPAGES = [["cal","달력","#C98A00","#FFF0C2"],["diary","일기장","#D63E70","#FFE1EA"],["album","사진첩","#3F73D1","#DCE9FF"]];   // (2026-10-09) 홈은 늘 달력부터: 첫 칩 · 처음 열 때 · 다른 메뉴에서 홈으로 올 때   // 소식은 2026-10-07부터 위쪽 🔔 팝업으로 (viewNews)
+const HPAGES = [["cal","달력","#C98A00","#FFF0C2"],["diary","하루","#D63E70","#FFE1EA"],["album","사진첩","#3F73D1","#DCE9FF"]];   // (2026-10-09) 홈은 늘 달력부터: 첫 칩 · 처음 열 때 · 다른 메뉴에서 홈으로 올 때   // 소식은 2026-10-07부터 위쪽 🔔 팝업으로 (viewNews)
 // 네 번째 쪽 (2026-10-07): 보호자는 AI 리포트, 아이는 받아쓰기 퀴즈
 const hpages = () => [...HPAGES, ...(isParent()?[["report","AI 리포트","#2F8C6B","#DAF2E5"]]:S.me?.type==="child"?[["quiz","받아쓰기","#2F8C6B","#DAF2E5"]]:[]), ["fav","즐겨찾기","#7A5BC7","#ECE3F6"]];   // ⭐ 즐겨찾기는 다섯 번째 쪽 (2026-10-08)
 const hpage = () => hpages().some(x=>x[0]===S.hpage) ? S.hpage : "cal";
@@ -4666,7 +4668,7 @@ function viewGrow(){
 function viewHomePages(){
   const k=hpage();
   const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="report" ? viewReport() : k==="quiz" ? viewQuizHome() : k==="fav" ? viewFavPage() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"||k==="cal"?wipBanner()+consentBanner()+awardBanner()+greenBanners():""}${body}</div>`;   // 상장 · 다홍펜 안내 · 디데이는 홈 첫 쪽(달력)과 일기장 쪽에
+  return `<div class="hp" data-hp="${k}">${k==="diary"||k==="cal"?wipBanner()+consentBanner()+awardBanner()+(k==="diary"?greenBanners():""):""}${body}${k==="cal"?greenBanners():""}</div>`;   // 상장 · 다홍펜 안내 · 디데이는 홈 첫 쪽(달력)과 일기장 쪽에
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -4908,7 +4910,7 @@ function tipBanner(){
   return `<div class="pen-ask tip-ask" role="note" title="${esc(text)}"><span class="pen-ask-i" aria-hidden="true">${ic1}</span><p><b>오늘의 기능</b> ${esc(text)}</p>${to?`<button class="btn pill2 sm" data-act="tip-go" data-v="${i}"><i aria-hidden="true">›</i><span>보기</span></button>`:""}<button class="link-btn pen-ask-x" data-act="tip-x" aria-label="오늘은 그만 보기">✕</button></div>`;
 }
 // 초록 띠는 많아야 두 줄: 해야 할 설정(다홍펜 · 꺼 둔 기능)이 먼저, 남는 자리에 오늘의 기능
-const greenBanners = () => [penAskBanner(), featAskBanner(), tipBanner()].filter(Boolean).slice(0,2).join("");
+const greenBanners = () => [penAskBanner(), featAskBanner(), tipBanner()].filter(Boolean).slice(0,IS_APP?1:2).join("");   // 앱은 달력 아래 한 줄만 (2026-11-06)
 // 다홍펜 띠: 한 번 "고르기"를 누르면 이 기기에서는 다시 안 떠요 (설정 자리를 알게 됐으니까)
 const penAskKey = () => `iinote-penask-${S.gid}`;
 function penAskBanner(){
@@ -8453,7 +8455,9 @@ function softRefresh(wait=1500){ S.stale=true; clearTimeout(staleT); staleT=setT
   S.stale=false; try{ await reloadAll(); }catch(e){ return; }
   if(busyNow()) return;   // 받는 동안 쓰기 시작했으면 다음에 그릴 때 새 소식이 보여요
   const y=scrollY; render(); if(Math.abs(scrollY-y)>1) scrollTo(0,y); }, wait); }
-function onPushIn(n){ const url=n?.data?.url||""; if(S.phase!=="app" || !S.gid || url==="/chat" || url==="help") return; softRefresh(); }
+// 앱을 보는 중에 온 소식은 시스템 알림 대신 종에 점만 (화면은 그대로, 다음에 그릴 때 진짜 숫자로 바뀌어요)
+function bellPing(){ const b=document.querySelector(".bell"); if(!b || b.querySelector(".cdot")) return; const i=document.createElement("i"); i.className="cdot"; i.textContent="N"; b.appendChild(i); }
+function onPushIn(n){ const url=n?.data?.url||""; if(S.phase!=="app" || !S.gid || url==="/chat" || url==="help") return; bellPing(); softRefresh(); }
 
 // 푸시 알림 (가족 소식): 알림 주소(FCM 토큰)를 내 계정에 적어 두면 서버가 보내요. 알림을 누르면 그 일기 · 채팅으로
 async function pushSetup(ask){ const P=plug("PushNotifications"); if(!P || !S.user || DEMO) return "none";
@@ -8647,10 +8651,11 @@ function appSettings(){
   const rt=ls.get("iinote-remind",""), lk=lockOn();
   return `<section class="block" aria-labelledby="h-app"><div class="block-h"><h2 id="h-app">앱 설정</h2></div>
     <div class="set-row"><span>가족 소식 알림<small class="set-sub">일기 · 댓글 · 도장 · 채팅이 오면 알려 주고 앱 아이콘에 숫자가 떠요</small></span><button type="button" class="btn btn-ghost sm" data-act="app-push">${S.pushState==="on"?"켜져 있어요":"알림 켜기"}</button></div>
-    ${S.pushState==="on"?npRows():""}
+    ${S.pushState==="on"?`<button type="button" class="link-btn np-more" data-act="np-open" aria-expanded="${!!S.npOpen}">알림 세부 설정 ${S.npOpen?"접기 ▴":"열기 ▾"}</button>${S.npOpen?npRows():""}`:""}
     <div class="set-row"><label class="app-sw" for="app-remind"><input type="checkbox" id="app-remind" ${rt?"checked":""}><span>일기 쓰기 알림<small class="set-sub">정한 시간에 "오늘 일기 썼나요?" 하고 알려 줘요. 오늘 이미 썼으면 내일부터</small></span></label><label class="sr" for="app-remind-time">알림 시간</label><input type="time" id="app-remind-time" class="app-time" value="${esc(rt||"20:00")}" ${rt?"":"disabled"}></div>
     <div class="set-row"><label class="app-sw" for="app-buzz"><input type="checkbox" id="app-buzz" ${ls.get("iinote-buzz","1")!=="0"?"checked":""}><span>누를 때 진동<small class="set-sub">하트 · 도장 · 일기 올리기에서만 살짝 (아래 메뉴는 진동 없어요)</small></span></label></div>
     <div class="set-row"><label class="app-sw" for="app-lock"><input type="checkbox" id="app-lock" ${lk?"checked":""}><span>앱 잠금<small class="set-sub">앱을 열 때 지문 · 얼굴 · 휴대폰 잠금으로 확인해요 (30초 넘게 나갔다 오면 다시)</small></span></label></div>
+    <div class="set-row"><span>앱 버전</span><span id="app-ver" class="muted"></span></div>
   </section>`; }
 
 // 화면을 그린 뒤: 처음 들어왔을 때 알림 · 알림 맞추기, 위젯 글
@@ -8659,6 +8664,7 @@ function appAfterRender(){
   if(appAfterRender.uid!==S.user?.uid){ appAfterRender.uid=S.user?.uid; clearBadge(); planRemind();
     pushSetup(false).then(r=>{ S.pushState=r; }).catch(()=>{});
     if(S.wantHelp){ S.wantHelp=false; setTimeout(()=>acts["help-open"](),0); } }
+  const av=document.getElementById("app-ver"); if(av) plug("App")?.getInfo?.().then(i=>{ if(i?.version) av.textContent=`${i.version} (${i.build})`; }).catch(()=>{});
   const hl=document.getElementById("help-list"); if(hl) hl.scrollTop=hl.scrollHeight;   // 도우미 채팅은 늘 맨 아래(새 말)부터
   famMenu();
   syncWidget(); }
@@ -8747,6 +8753,7 @@ if(IS_APP){
     "doc-send": ()=>guard(async()=>{ const f=await docFile(); outAt=Date.now();
       await plug("Share").share({title:docCur?.name||"아이아이노트", files:[f.uri], dialogTitle:"PDF 보내기"}).catch(e=>{ if(!/cancel/i.test(e?.message||"")) throw e; }); }),
     "app-unlock": ()=>unlock(),
+    "np-open": ()=>{ S.npOpen=!S.npOpen; render(); },
     // 홈 네 쪽 · 누구 일기 · 달력 날짜 → 그날 일기장
     hpage: el => { const k=el.dataset.v; if(k==="news"){ S.newsSeenBefore=Number(ls.get(newsSeenKey(),"0")); ls.set(newsSeenKey(),String(Date.now())); }
       S.hpage=k; S.newsOpen=false; render(); window.scrollTo(0,0); },
