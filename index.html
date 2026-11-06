@@ -1881,9 +1881,9 @@ html.is-app .seo-intro, html.has-login .seo-intro{display:none}
 .al-sec{margin:0 0 24px}
 .al-h{display:flex;align-items:center;gap:8px;font-size:17px;margin:0 0 10px}
 /* 📸 앱 사진첩: 위쪽을 줄여 사진이 더 많이 보이게 (제목 한 줄 · 설명 빼기 · 칩은 옆으로 넘기는 한 줄) */
-html.is-app .al-by .al-pick{flex:none;min-height:0;padding:0 11px;font-size:13px;border-radius:999px}
-html.is-app .al-by:has(.chip.on[data-v="all"]) ~ .al-sec .al-h{display:none}
-html.is-app .al-cell{aspect-ratio:6/5}
+html.is-app .al-top{margin:0 0 8px;padding:0;align-items:center}
+html.is-app .al-top h1{font-size:20px;margin:0}
+html.is-app .al-top .btn{min-height:0;padding:6px 12px;font-size:13px}
 html.is-app .al-intro{display:none}
 html.is-app .al-by{flex-wrap:nowrap;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px;scrollbar-width:none}
 html.is-app .al-by::-webkit-scrollbar{display:none}
@@ -5548,17 +5548,16 @@ function viewAlbum(){
   const groups=albumGroups(), movable=groups.filter(g=>g.k);
   const ordBtn = S.albumBy==="with" && isParent() && movable.length>1 && !S.alWithEdit ? `<button class="btn btn-ghost sm al-ord-btn" data-act="al-ord">↕ 순서 바꾸기</button>` : "";
   const by=`<p class="muted al-intro">우리 가족만 보는 사진첩이에요 · 사진 ${S.album.length}장</p>
-    <div class="al-by" role="group" aria-label="모아 보기">${IS_APP?pick("btn-primary",ic("image")+"올리기"):""}${BY.map(([k,l])=>`<button class="chip ${S.albumBy===k?"on":""}" data-act="al-by" data-v="${k}" aria-pressed="${S.albumBy===k}">${l}</button>`).join("")}${ordBtn}</div>`;
+    <div class="al-by" role="group" aria-label="모아 보기">${BY.map(([k,l])=>`<button class="chip ${S.albumBy===k?"on":""}" data-act="al-by" data-v="${k}" aria-pressed="${S.albumBy===k}">${l}</button>`).join("")}${ordBtn}</div>`;
   // ↕ 순서 바꾸기: 묶음을 한 줄씩 → ☰ 를 잡고 위아래로 끌거나 ▲▼
-  const top=IS_APP?"":head;   // 앱은 제목 줄 없이 칩 줄에 올리기 단추 (사진이 더 많이 보이게)
-  if(S.alWithEdit) return top+upForm+edForm+by+`<div class="card al-ord-card"><h2>↕ 함께 찍은 사진 순서 바꾸기</h2>
+  if(S.alWithEdit) return head+upForm+edForm+by+`<div class="card al-ord-card"><h2>↕ 함께 찍은 사진 순서 바꾸기</h2>
       <p class="muted">☰ 를 꾹 잡고 위아래로 끌어 보세요. ▲▼ 로 한 칸씩 옮길 수도 있어요. 가족 모두에게 같은 순서로 보여요.</p>
       <div class="al-ord">${movable.map((g,i)=>`<div class="al-ord-row" data-k="${esc(g.k)}"><span class="al-grip" aria-hidden="true">☰</span>
         <div class="al-ord-h al-h">${g.h} <small>${g.l.length}장</small></div>
         <span class="al-ord-th">${g.l.slice(0,3).map(a=>`<img src="${esc(a.thumb||a.url)}" alt="">`).join("")}</span>
         <button type="button" class="btn btn-ghost sm" data-act="al-ord-move" data-k="${esc(g.k)}" data-v="-1" aria-label="위로" ${i?"":"disabled"}>▲</button><button type="button" class="btn btn-ghost sm" data-act="al-ord-move" data-k="${esc(g.k)}" data-v="1" aria-label="아래로" ${i<movable.length-1?"":"disabled"}>▼</button></div>`).join("")}</div>
       <div class="row"><button class="btn btn-primary" data-act="al-ord-save">저장</button><button type="button" class="btn btn-ghost" data-act="al-ord-cancel">취소</button></div></div>`;
-  return top+upForm+edForm+by+`
+  return head+upForm+edForm+by+`
     ${groups.map((g,gi)=>`<section class="al-sec"><h2 class="al-h">${g.h} <small>${g.l.length}장</small></h2><div class="al-grid">${g.l.map((a,i)=>`<button class="al-cell" data-act="al-open" data-g="${gi}" data-i="${i}" aria-label="${esc(albumCap(a))} 크게 보기"><img src="${esc(a.thumb||a.url)}" alt="" loading="lazy"></button>`).join("")}</div></section>`).join("")}`;
 }
 async function albumPick(files){
