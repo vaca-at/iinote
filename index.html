@@ -2315,8 +2315,8 @@ html.is-app .al-h{font-size:14px;margin:0 0 6px}
 .an-it.on{color:var(--ink)}
 .an-it.on span{font-weight:700}
 .an-it .cdot{position:absolute;top:0;left:calc(50% + 6px)}
-.a-fab{justify-self:center;display:grid;place-items:center;width:60px;height:60px;margin-top:-4px;border:0;border-radius:50%;background:var(--ink);color:var(--surface);box-shadow:0 6px 16px rgba(46,36,51,.3);cursor:pointer}
-.a-fab .ic{width:28px;height:28px}
+.a-fab{justify-self:center;align-self:center;display:grid;place-items:center;width:50px;height:50px;margin-top:0;border:0;border-radius:50%;background:var(--ink);color:var(--surface);box-shadow:0 6px 16px rgba(46,36,51,.3);cursor:pointer}
+.a-fab .ic{width:25px;height:25px}
 .a-help{position:fixed;right:16px;bottom:calc(98px + env(safe-area-inset-bottom));z-index:25;display:grid;place-items:center;width:52px;height:52px;border:0;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:0 4px 14px rgba(46,36,51,.2);cursor:pointer}
 .a-help .cdot{position:absolute;top:-2px;right:-2px}
 html.is-app .set-page .set-sub{padding:0;border:0;background:none}
@@ -2547,7 +2547,7 @@ span.pf-av{cursor:default}
 /* 일기 쓰기: 아래 메뉴는 그대로, 저장 단추들은 글 아래(제자리) + 가운데 단추가 저장 (2026-10-07) */
 .writing .w-acts{flex-wrap:nowrap}
 .writing .w-acts .btn{flex:1;justify-content:center;min-height:50px}
-.a-fab.save{position:relative;margin-top:-26px;background:var(--coral,#EF6F53)}
+.a-fab.save{position:relative;width:60px;height:60px;margin-top:-26px;background:var(--coral,#EF6F53)}
 .a-fab.save b{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:5px;font-size:11.5px;font-weight:700;white-space:nowrap;color:var(--ink)}
 .w-top{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
 .w-top input[type=date]{flex:none;width:auto;min-width:0;max-width:170px;padding:8px 10px;font-size:15px}   /* 2026-10-27 날짜 칸이 줄 끝까지 늘어나던 것 → 글자만큼만 */
@@ -3061,7 +3061,7 @@ html.is-app:root[data-design="clean"] .a-fab:not(.save){color:var(--accent);back
 html.is-app:root[data-design="clean"] .a-fab:not(.save):active{color:#fff;background:var(--accent)}
 html.is-app:root[data-design="bright"] .a-fab:not(.save){color:#fff;background:linear-gradient(125deg,#FF6A3D 0 52%,#FFC23D 52% 100%);box-shadow:0 12px 18px -10px rgba(255,106,61,.85)}
 html.is-app:root[data-design="bright"] .a-fab:not(.save) .ic{filter:drop-shadow(0 1px 1px rgba(120,50,0,.35))}
-html.is-app:root[data-design="wongoji"] .a-fab:not(.save){border-radius:50%;width:56px;height:56px;margin-top:-2px;color:var(--brand);border:2px solid var(--brand);
+html.is-app:root[data-design="wongoji"] .a-fab:not(.save){border-radius:50%;color:var(--brand);border:2px solid var(--brand);
   background:linear-gradient(color-mix(in srgb,var(--brand) 18%,transparent),color-mix(in srgb,var(--brand) 18%,transparent)) center/100% 1px no-repeat,linear-gradient(90deg,color-mix(in srgb,var(--brand) 18%,transparent),color-mix(in srgb,var(--brand) 18%,transparent)) center/1px 100% no-repeat,var(--surface);
   box-shadow:none}
 html.is-app:root[data-design="night"] .a-fab:not(.save){color:#FFF6DA;border:2.5px solid transparent;background:var(--nightbase) padding-box,linear-gradient(120deg,#E4507F,#F4BE45,#6FD3A0,#5B8DEF,#9B7BE8,#E4507F) border-box;background-size:100% 100%,100% 100%,100% 100%,100% 100%,300% 100%;box-shadow:0 8px 20px -6px rgba(91,141,239,.55)}
@@ -3544,10 +3544,10 @@ function seedDemo(){
     e2:D("mom",y2,"love","partly","주말에 다녀온 제주 바다 사진을 이제야 정리했다. 곽지 해변 물빛이 하늘보다 더 파랬다. 하랑이와 이안이는 모래성을 쌓다가 파도에 무너지면 깔깔 웃었다. 이 웃음소리를 오래 기억하고 싶다. #바다여행 #제주",{photos:demoPh("sea"),location:{name:"제주 곽지 해변"}}),
     e3:D("dad",y2,"love","sunny","오후에 가족이랑 공원 산책을 했다. 단풍이 한창이라 어디를 찍어도 그림 같았다. 이안이가 낙엽 왕관을 쓰고 깔깔 웃는 모습에 하루 피로가 다 풀렸다. 이런 날이 오래오래 기억에 남았으면 좋겠다. #가족나들이",{hearts:{mom:now-30*H,k2:now-29*H}}),
     // 어제
-    d1:D("k1",y,"great","sunny","오늘 운동회 연습을 했다. 이어달리기에서 2등을 해서 기분이 좋았다. 마지막 바퀴에서 한 명을 제쳤을 때 친구들이 내 이름을 크게 불러 줬다. 다음 주 진짜 운동회에서는 꼭 1등을 할 거다! #운동회",{photos:demoPh("track"),aiChecked:true,aiResult:ai("달리기할 때의 설렘이 문장마다 느껴져요!","틀린 낱말 1개를 찾았어요. 고쳐 쓴 것도 정말 잘했어요.",[["할꺼다","할 거다","\'할 거다\'는 띄어 쓰고 \'거\'로 써요."]]),stamp:"최고예요",stampBy:"mom",stampAt:now-20*H,hearts:{mom:now-20*H,dad:now-18*H}}),
-    d2:D("mom",y,"good","sunny","저녁을 먹으며 하랑이가 운동회 연습 이야기를 한참 했다. 2등을 했다는데 표정은 1등이었다. 나도 어릴 때 이어달리기를 제일 좋아했던 기억이 났다. 운동회 날엔 김밥을 싸 가야지. #운동회 #가족",{location:{name:"학교 운동장"}}),
-    e4:D("dad",y,"tired","cloudy","회사 일이 많아 늦게 들어왔다. 아이들은 벌써 자고 있었는데 식탁 위에 \'아빠 힘내세요\' 쪽지가 있었다. 이안이 글씨가 삐뚤빼뚤해서 더 귀여웠다."),
-    e5:D("k2",y,"love","cloudy","아빠가 늦게 와서 쪽지를 써 놓았다. 아빠 힘내세요 라고 썼다. 아침에 아빠가 쪽지 고마워 하고 꼭 안아 주었다. 기분이 좋았다.",{aiChecked:true,aiResult:ai("아빠를 생각하는 마음이 쪽지에 가득 담겼어요!","틀린 곳 없이 잘 썼어요."),stamp:"참 잘했어요",stampBy:"dad",stampAt:now-10*H}),
+    d1:D("k1",y,"great","sunny","오늘 운동회 연습을 했다. 이어달리기에서 2등을 해서 기분이 좋았다. 마지막 바퀴에서 한 명을 제쳤을 때 친구들이 내 이름을 크게 불러 줬다. 다음 주 진짜 운동회에서는 꼭 1등을 할 거다! #운동회",{photos:demoPh("track"),aiChecked:true,aiResult:ai("달리기할 때의 설렘이 문장마다 느껴져요!","틀린 낱말 2개를 찾았어요. 어려운 낱말까지 고쳐 쓴 것이 정말 대단해요.",[["제첬을","제쳤을","\'제치다\'에 \'었\'이 붙으면 \'제쳤을\'이 돼요."],["할꺼다","할 거다","\'할 거다\'는 띄어 쓰고 \'거\'로 써요."]]),stamp:"최고예요",stampBy:"mom",stampAt:now-20*H,hearts:{mom:now-20*H,dad:now-18*H}}),
+    d2:D("dad",y,"good","sunny","저녁을 먹으며 하랑이가 운동회 연습 이야기를 한참 했다. 2등을 했다는데 표정은 1등이었다. 나도 어릴 때 이어달리기를 제일 좋아했던 기억이 났다. 운동회 날엔 온 가족이 목이 쉬도록 응원해야지. #운동회 #가족",{location:{name:"학교 운동장"}}),
+    e4:D("mom",y,"tired","cloudy","회사 일이 많아 늦게 들어왔다. 아이들은 벌써 자고 있었는데 식탁 위에 \'엄마 힘내세요\' 쪽지가 있었다. 이안이 글씨가 삐뚤빼뚤해서 더 귀여웠다."),
+    e5:D("k2",y,"love","cloudy","엄마가 늦게 와서 쪽지를 써 놓았다. 엄마 힘내세요 라고 썼다. 아침에 엄마가 쪽지 고마워 하고 꼭 안아 주었다. 기분이 좋았다.",{aiChecked:true,aiResult:ai("엄마를 생각하는 마음이 쪽지에 가득 담겼어요!","틀린 곳 없이 잘 썼어요."),stamp:"참 잘했어요",stampBy:"dad",stampAt:now-10*H}),
     // 오늘
     d4:D("dad",t,"tired","sunny","퇴근하고 가족이랑 김치찌개를 끓여 먹었다. 이안이가 두부를 제일 많이 먹었다. #저녁메뉴 #김치찌개 #우리가족사랑해",{photos:demoPh("kimchi")}),
     e6:D("mom",t,"great","sunny","오늘은 하루 종일 아이들 웃음소리가 가득했다. 하랑이는 계주 연습 이야기를, 이안이는 학교에서 받은 칭찬 이야기를 쉬지 않고 했다. 이렇게 같이 일기를 쓰니 서로의 하루가 더 잘 보인다."),
@@ -3555,8 +3555,8 @@ function seedDemo(){
     e8:D("k2",t,"great","sunny","오늘 받아쓰기에서 백 점을 받았다. 며칠 전에 틀린 며칠을 이번에는 맞혔다. 엄마가 꼭 안아 주셨다. 저녁에 김치찌개 두부를 제일 많이 먹었다.",{aiChecked:true,aiResult:ai("틀렸던 낱말을 다시 맞힌 것, 정말 대단해요!","틀린 곳 없이 잘 썼어요.")})
   };
   // 그 전 2주: 아이들 일기 (날이 갈수록 글이 길어지는 모습)
-  const K1 = ["학교에서 줄넘기를 했다. 재미있었다.","오늘은 비가 왔다. 우산을 쓰고 학교에 갔다. 신발이 젖었다.","친구랑 도서관에 갔다. 공룡 책을 빌렸다. 티라노사우루스가 제일 멋있다.","수학 시험을 봤다. 어려운 문제가 하나 있었지만 끝까지 풀었다. 다 맞았으면 좋겠다.","할머니 댁에 갔다. 할머니가 해 주신 잡채가 정말 맛있었다. 할머니가 우리 하랑이 많이 컸네 하셔서 기분이 좋았다.","학교에서 과학 실험을 했다. 식초에 달걀을 넣었더니 껍데기가 녹았다. 신기해서 집에 와서 엄마한테 바로 이야기했다. 엄마도 처음 알았다고 하셨다.","동생이랑 레고로 성을 만들었다. 이안이가 탑을 자꾸 무너뜨려서 처음엔 화가 났다. 그런데 같이 다시 쌓으니까 더 높은 탑이 됐다. 다음엔 다리도 만들어 볼 거다.","오늘 체육 시간에 계주 선수로 뽑혔다. 우리 반에서 네 명만 뽑히는데 내가 들어가서 너무 기뻤다. 선생님이 바통을 잘 넘기는 연습을 하자고 하셨다. 집에 와서 엄마 아빠한테 자랑했더니 박수를 쳐 주셨다.","책을 읽다가 모르는 낱말이 나와서 사전을 찾아봤다. 어휘라는 말이 낱말이라는 뜻이었다. 일기에 새로 배운 낱말을 써 보면 좋겠다는 생각이 들었다. 오늘 배운 낱말은 어휘, 조마조마, 뿌듯하다이다. 다 쓰고 나니 뿌듯하다."];
-  const K2 = ["놀이터에 갔다. 재미있었다.","엄마랑 빵을 만들었다. 맛있었다.","학교에서 그림을 그렸다. 우리 가족을 그렸다.","형아랑 레고를 했다. 탑이 무너졌다. 다시 쌓았다.","받아쓰기를 했다. 두 개 틀렸다. 다음에는 다 맞을 거다.","비가 와서 장화를 신었다. 물웅덩이에서 첨벙첨벙 뛰었다. 엄마가 웃었다.","학교에서 달팽이를 봤다. 달팽이는 아주 천천히 갔다. 나는 달팽이 이름을 느림보라고 지었다."];
+  const K1 = ["학교에서 줄넘기를 했다. 재미있었다.","오늘은 비가 왔다. 우산을 쓰고 학교에 갔다. 신발이 젖었다.","친구랑 도서관에 갔다. 공룡 책을 빌렸다. 티라노사우루스가 제일 멋있다.","수학 시험을 봤다. 어려운 문제가 하나 있었지만 끝까지 풀었다. 다 맞았으면 좋겠다.","할아버지 댁에 갔다. 할아버지가 해 주신 잡채가 정말 맛있었다. 할아버지가 우리 하랑이 많이 컸네 하셔서 기분이 좋았다.","학교에서 과학 실험을 했다. 식초에 달걀을 넣었더니 껍데기가 녹았다. 신기해서 집에 와서 엄마한테 바로 이야기했다. 엄마도 처음 알았다고 하셨다.","동생이랑 레고로 성을 만들었다. 이안이가 탑을 자꾸 무너뜨려서 처음엔 화가 났다. 그런데 같이 다시 쌓으니까 더 높은 탑이 됐다. 다음엔 다리도 만들어 볼 거다.","오늘 체육 시간에 계주 선수로 뽑혔다. 우리 반에서 네 명만 뽑히는데 내가 들어가서 너무 기뻤다. 선생님이 바통을 잘 넘기는 연습을 하자고 하셨다. 집에 와서 엄마 아빠한테 자랑했더니 박수를 쳐 주셨다.","책을 읽다가 모르는 낱말이 나와서 사전을 찾아봤다. 어휘라는 말이 낱말이라는 뜻이었다. 일기에 새로 배운 낱말을 써 보면 좋겠다는 생각이 들었다. 오늘 배운 낱말은 어휘, 조마조마, 뿌듯하다이다. 다 쓰고 나니 뿌듯하다."];
+  const K2 = ["놀이터에 갔다. 재미있었다.","아빠랑 빵을 만들었다. 맛있었다.","학교에서 그림을 그렸다. 우리 가족을 그렸다.","형아랑 레고를 했다. 탑이 무너졌다. 다시 쌓았다.","받아쓰기를 했다. 두 개 틀렸다. 다음에는 다 맞을 거다.","비가 와서 장화를 신었다. 물웅덩이에서 첨벙첨벙 뛰었다. 엄마가 웃었다.","학교에서 달팽이를 봤다. 달팽이는 아주 천천히 갔다. 나는 달팽이 이름을 느림보라고 지었다."];
   K1.forEach((txt,i)=>{ const dt=addDays(t,-(3+(K1.length-1-i)*1.6|0)); s.diaries["h1_"+i]=D("k1",dt,["good","great","calm","love"][i%4],["sunny","partly","rain","cloudy"][i%4],txt,{aiChecked:i>3,aiResult:i>3?ai("글이 점점 길고 자세해지고 있어요!","틀린 곳 없이 잘 썼어요."):null}); });
   K2.forEach((txt,i)=>{ const dt=addDays(t,-(3+(K2.length-1-i)*2)); s.diaries["h2_"+i]=D("k2",dt,["good","great","love","calm"][i%4],["sunny","partly","cloudy","rain"][i%4],txt,{aiChecked:i>2,aiResult:i>2?ai("하루를 차근차근 잘 적었어요!","틀린 곳 없이 잘 썼어요."):null}); });
   // AI 선생님 총평 (가장 최근에 끝난 주 · 달, 리포트 맨 위 💌 에 바로 보여요. 주는 일요일, 달은 말일에 끝나요)
@@ -3570,7 +3570,7 @@ function seedDemo(){
     [mk]:R("이번 달 하랑이의 일기는 양도, 내용도 눈에 띄게 자랐어요. 평균 글자 수가 달 초보다 두 배 가까이 늘었고, 새로 배운 낱말을 일기에 써 보는 등 스스로 공부하는 모습도 보였어요. \'할꺼다\'처럼 소리 나는 대로 쓰던 실수는 거의 사라졌어요. 가족의 칭찬 도장과 댓글이 큰 힘이 된 한 달이었어요.","계주 선수로 뽑혀 가족에게 자랑한 날의 일기에 기쁨과 뿌듯함이 고스란히 담겼어요.","다음 달에는 일주일에 한 번, 책이나 영화를 보고 느낀 점을 일기로 써 보는 것을 추천해요.")
   });
   Object.assign(s.profiles.k2, {
-    [wk]:R("이안이는 이번 주에 매일 일기를 쓰며 하루를 차근차근 적는 힘이 자라고 있어요. 아빠에게 쓴 쪽지, 가족과 함께한 공원 나들이처럼 마음이 따뜻해지는 장면을 잘 골랐어요. 짧은 문장으로 시작했지만 이제 네 문장 넘게 이어서 쓸 수 있어요. 틀렸던 \'며칠\'을 받아쓰기에서 다시 맞힌 것도 큰 성장이에요.","\'형이 내 머리에 낙엽 왕관을 씌워 줬다\'는 문장에서 가족과 함께한 즐거움이 그대로 느껴져요.","오늘 있었던 일 가운데 \'가장 기억에 남는 한 가지\'를 먼저 고르고 그 이야기를 길게 써 보도록 도와주세요."),
+    [wk]:R("이안이는 이번 주에 매일 일기를 쓰며 하루를 차근차근 적는 힘이 자라고 있어요. 엄마에게 쓴 쪽지, 가족과 함께한 공원 나들이처럼 마음이 따뜻해지는 장면을 잘 골랐어요. 짧은 문장으로 시작했지만 이제 네 문장 넘게 이어서 쓸 수 있어요. 틀렸던 \'며칠\'을 받아쓰기에서 다시 맞힌 것도 큰 성장이에요.","\'형이 내 머리에 낙엽 왕관을 씌워 줬다\'는 문장에서 가족과 함께한 즐거움이 그대로 느껴져요.","오늘 있었던 일 가운데 \'가장 기억에 남는 한 가지\'를 먼저 고르고 그 이야기를 길게 써 보도록 도와주세요."),
     [mk]:R("이번 달 이안이는 일기를 쓰는 날이 꾸준히 늘었어요. 처음엔 \'재미있었다\'로 끝나던 글이 이제는 무엇을 했고 누구와 함께했는지까지 담겨요. 받아쓰기에서 틀린 낱말을 다시 공부해 맞히는 모습도 보였어요. 칭찬받은 경험이 쓰는 즐거움으로 이어지고 있어요.","받아쓰기 백 점을 받은 날의 일기에서 스스로 해낸 자랑스러움이 잘 느껴져요.","\'왜 그런 마음이 들었는지\'를 한 문장 덧붙이는 연습을 함께 해 보세요.")
   });
   s.comments = {
@@ -3582,7 +3582,7 @@ function seedDemo(){
   s.schedules = {
     s1:{date:addDays(t,2),time:"09:00",title:"하랑 운동회",scope:"family",profileId:"mom",createdAt:now,dday:true},
     s2:{date:addDays(t,5),time:"",title:"할머니 댁 방문",scope:"family",profileId:"dad",createdAt:now},
-    s3:{date:addDays(t,1),time:"16:00",title:"학부모 상담",scope:"personal",profileId:"mom",createdAt:now},
+    s3:{date:addDays(t,1),time:"16:00",title:"학부모 상담",scope:"personal",profileId:"dad",createdAt:now},
     s4:{date:addDays(t,24),time:"",title:"제주 가족 여행",scope:"family",profileId:"mom",createdAt:now,dday:true}
   };
   // 예시 사진첩: 지난해 여름 제주 · 운동회 · 공원 · 김치찌개
@@ -3602,6 +3602,7 @@ function seedDemo(){
     q2:{profileId:"k2",wrong:"몇일",right:"며칠",explain:"날짜를 셀 때는 '며칠'로 써요.",context:"방학이 ____ 남았을까?",wrongCount:1,correctStreak:3,createdAt:now},
     q3:{profileId:"k2",wrong:"할께",right:"할게",explain:"'-ㄹ게'는 '께'가 아니라 '게'로 써요.",context:"내가 먼저 ____.",wrongCount:1,correctStreak:0,createdAt:now},
     q4:{profileId:"k1",wrong:"할꺼다",right:"할 거다",explain:"'할 거다'는 띄어 쓰고 '거'로 써요.",context:"꼭 1등을 ____!",wrongCount:1,correctStreak:0,createdAt:now},
+    q6:{profileId:"k1",wrong:"제첬을",right:"제쳤을",explain:"'제치다'에 '었'이 붙으면 '제쳤을'이 돼요.",context:"마지막 바퀴에서 한 명을 ____ 때",wrongCount:1,correctStreak:0,createdAt:now},
     q5:{profileId:"k1",wrong:"어떻해",right:"어떡해",explain:"'어떻게 해'를 줄이면 '어떡해'예요.",context:"숙제를 두고 왔는데 ____?",wrongCount:2,correctStreak:0,createdAt:now},
     q6:{profileId:"k1",wrong:"금새",right:"금세",explain:"'금시에'가 줄어서 '금세'예요.",context:"아이스크림이 ____ 녹았다.",wrongCount:1,correctStreak:1,createdAt:now}
   };
