@@ -25,7 +25,7 @@
 - 🏠 웹 첫 화면 (2026-11-04, viewLanding2): 단추만 남긴 간단한 화면. PC(901px 이상) = 흰 칸(로고 · 언즈체 제목 · 구글/카카오 로그인 · 카톡 공유 · 링크 복사 네모 단추 4개) + 남색 칸(Google Play QR img/play-qr.svg · Play 단추), 휴대폰 · 아이패드 세로(900px 이하) = 주소창 모양 상자 + 동그란 바로가기 5개(구글 · 카카오 · 앱 받기 NEW · 카톡 공유 · 링크 복사, 아이폰 · 아이패드는 앱 받기 대신 홈 화면에 추가). 예전의 기능 설명 · 체크 칩 · AI 예시 카드 · 기기 그림 · 데모 단추는 뺐어요. 언즈체 글자는 fonts/unz-s.woff2 에 담겨 있어서 첫 화면 글자를 바꾸면 iinote-app 에서 npm run fonts
 
 - 📱 (2026-11-06) 아이폰 앱: iinote-mobile/ios (Firebase iOS 앱 등록, GoogleService-Info.plist). 우리 앱 전용 부품 ios/App/App/Iinote.swift = 상장 · 일기책 PDF(makePdf). 푸시 · TestFlight 는 Apple Developer 승인 뒤. 시험 설치는 번들 kr.co.iinote.app.test (정식 주소는 유료 팀용으로 비워 둠)
-- (2026-11-06) 상장: 세로형이 먼저(awardHTML land), 번호는 가족마다 1호부터(awardNo). 당겨서 새로고침은 내용만 다시 받음(로딩 화면 없음, 화면 코드는 다음 실행 때). 다가오는 일정은 보기만, [수정]은 달력 화면으로(sch-manage). 🎨 · 가 = 고르는 창(openPick). 더보기 3줄(내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담). 알림 소리 · 진동 · 띄우기 분리는 NP_SPLIT(함수 배포 뒤 true, 무음 채널 fam-mute-*, res/raw/silence.wav 는 다음 AAB부터)
+- (2026-11-06) 상장: 세로형이 먼저(awardHTML land), 번호는 가족마다 1호부터(awardNo). 당겨서 새로고침은 내용만 다시 받음(로딩 화면 없음, 화면 코드는 다음 실행 때). 다가오는 일정은 보기만, [수정]은 달력 화면으로(sch-manage). 🎨 · 가 = 고르는 창(openPick). 더보기 3줄(내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담). 알림 소리 · 진동 · 띄우기는 따로(NP_SPLIT=true, 무음 채널 fam-mute-*, res/raw/silence.wav 는 다음 AAB부터)
 
 ## 파일
 - index.html: 앱 전체 (HTML+CSS+JS 한 파일, script type="module")

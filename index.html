@@ -8424,7 +8424,7 @@ function npref(){ let o={}; try{ o=JSON.parse(ls.get("iinote-npref","{}"))||{}; 
 const FAM_CH={ "fam-pop-v":[4,1,"소리 · 진동 · 화면 위에 잠깐"], "fam-pop-n":[4,0,"소리 · 화면 위에 잠깐"], "fam-snd-v":[3,1,"소리 · 진동"], "fam-snd-n":[3,0,"소리만"], "fam-mute-pop-v":[4,1,"진동 · 화면 위에 잠깐"], "fam-mute-pop":[4,0,"화면 위에 잠깐"], "fam-mute-v":[3,1,"진동만"], "fam-quiet":[2,0,"조용히 (알림 줄에만)"] };
 // 소리 · 진동 · 띄우기는 따로따로 (2026-11-06). 소리만 끈 채널은 무음 소리(silence)를 넣어야 진동 · 띄우기가 살아요
 // NP_SPLIT: 서버 함수(CHANNELS 에 fam-mute-*)를 배포한 뒤에 true 로 바꿔요. 그전에 켜면 소리를 끈 사람에게 소리가 나요
-const NP_SPLIT=false;
+const NP_SPLIT=true;
 const famCh = p => !NP_SPLIT && !p.sound ? "fam-quiet" : p.sound ? `fam-${p.pop?"pop":"snd"}-${p.vib?"v":"n"}` : p.pop ? (p.vib?"fam-mute-pop-v":"fam-mute-pop") : p.vib ? "fam-mute-v" : "fam-quiet";
 async function famChannel(P,p){ const id=famCh(p), [imp,v,desc]=FAM_CH[id];
   await P.createChannel({id,name:"가족 소식",description:`일기 · 댓글 · 도장 · 채팅 — ${desc}`,importance:imp,visibility:0,vibration:!!v,lights:imp>2,...(id.startsWith("fam-mute")?{sound:"silence.wav"}:{})}).catch(()=>{});
