@@ -2064,12 +2064,11 @@ html.is-app .al-h{font-size:14px;margin:0 0 6px}
 .alog-C .alog-tour{font-size:21px;color:#B8452D}
 #app .alog-C .alog-legal{font-family:"Gowun Dodum",sans-serif}
 /* 📱 당겨서 새로고침 동그라미 */
-.ptr{position:fixed;top:calc(env(safe-area-inset-top) + 8px);left:50%;z-index:60;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.18);transform:translate(-50%,-56px);opacity:0;pointer-events:none}
-.ptr svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
-.ptr.go{background:var(--butter);color:#1F2A44}
-.ptr.go:not(.spin) svg{transform:rotate(180deg)}
-.ptr.spin svg{animation:ptr-spin .8s linear infinite}
-@keyframes ptr-spin{to{transform:rotate(360deg)}}
+.ptr{position:fixed;top:calc(env(safe-area-inset-top) + 8px);left:50%;z-index:60;display:grid;place-items:center;width:30px;height:30px;color:#8E8E93;transform:translate(-50%,-56px);opacity:0;pointer-events:none}
+.ptr svg{width:30px;height:30px;fill:currentColor}
+.ptr.spin rect{opacity:1!important;animation:ptr-fade 1s linear infinite;animation-delay:calc(var(--i)*(1s/12) - 1s)}
+@keyframes ptr-fade{from{opacity:1}to{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.ptr.spin rect{animation-duration:2.4s;animation-delay:calc(var(--i)*(2.4s/12) - 2.4s)}}
 /* 🎨 디자인 · 글씨 고르기 창 */
 .pk{position:fixed;inset:0;z-index:85;display:flex;align-items:flex-end;justify-content:center;background:rgba(20,26,40,.45)}
 .pk-c{width:100%;max-width:480px;max-height:82vh;overflow:auto;background:var(--surface);color:var(--ink);border-radius:20px 20px 0 0;padding:18px 16px calc(14px + env(safe-area-inset-bottom))}
@@ -7998,19 +7997,21 @@ const keepBox = () => DEMO || IS_APP ? "" : `<label class="keep-login"><input ty
    화면 맨 위에서 아래로 끌어내렸다 놓으면 가족 일기 · 댓글 · 일정만 새로 받아요 (2026-11-06: 앱을 다시 열지 않아서 로딩 화면이 안 나와요. 고친 화면 코드는 다음에 앱을 열 때).
    일기 쓰는 중 · 사진 크게 보기 · 채팅처럼 안쪽 칸을 스크롤할 때는 하지 않아요 */
 if(IS_APP || STANDALONE){   // 홈 화면 아이콘으로 연 웹은 주소창 · 새로고침 단추가 없어서 같이 켜요
-  const ARROW=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 12l6 6 6-6"/></svg>`, SPIN=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>`;
-  const ptr=document.createElement("div"); ptr.className="ptr"; ptr.setAttribute("aria-hidden","true"); ptr.innerHTML=ARROW; document.body.appendChild(ptr);
+  // 아이폰처럼 살 12개 스피너: 당기는 만큼 살이 하나씩 나타나고, 놓으면 돌아요 (2026-11-07)
+  const WHEEL=`<svg viewBox="0 0 24 24" aria-hidden="true">${Array.from({length:12},(_,i)=>`<rect x="11" y="2.5" width="2" height="6" rx="1" transform="rotate(${i*30} 12 12)" style="--i:${i}"/>`).join("")}</svg>`;
+  const ptr=document.createElement("div"); ptr.className="ptr"; ptr.setAttribute("aria-hidden","true"); ptr.innerHTML=WHEEL; document.body.appendChild(ptr); const spokes=[...ptr.querySelectorAll("rect")];
   const MAX=110, GO=70; let y0=null, dy=0, busy=false;
   const ok = e => !busy && window.scrollY<=0 && S.phase==="app" && !S.lb && S.sub?.type!=="write" && !e.target.closest(".chat-list,.sc-scroll,.al-strip,textarea,input,select");
-  const show = d => { ptr.style.transform=`translate(-50%,${Math.min(d,MAX)-56}px)`; ptr.style.opacity=Math.min(1,d/GO);
+  const show = d => { ptr.style.transform=`translate(-50%,${Math.min(d,MAX)-56}px)`; ptr.style.opacity=d>0?1:0;
+    spokes.forEach((r,i)=>{ r.style.opacity = i/12 < d/GO ? .95-.5*(i/12) : 0; });
     if(d>=GO && !ptr.classList.contains("go")) buzz("light");   // 놓으면 새로고침되는 지점에서 톡
     ptr.classList.toggle("go", d>=GO); };
-  const hide = () => { ptr.style.transition="transform .2s,opacity .2s"; show(0); setTimeout(()=>{ ptr.style.transition=""; ptr.classList.remove("spin"); ptr.innerHTML=ARROW; busy=false; },220); };
+  const hide = () => { ptr.style.transition="transform .2s,opacity .2s"; show(0); setTimeout(()=>{ ptr.style.transition=""; ptr.classList.remove("spin"); busy=false; },220); };
   addEventListener("touchstart", e=>{ y0 = e.touches.length===1 && ok(e) ? e.touches[0].clientY : null; dy=0; }, {passive:true});
   addEventListener("touchmove", e=>{ if(y0===null) return; dy=Math.max(0,(e.touches[0].clientY-y0)*.5); if(window.scrollY>0) dy=0; show(dy); }, {passive:true});
   addEventListener("touchend", async ()=>{ if(y0===null) return; y0=null;
     if(dy<GO){ hide(); return; }
-    busy=true; ptr.classList.add("spin"); ptr.innerHTML=SPIN; ptr.style.transition="transform .2s"; ptr.style.transform="translate(-50%,16px)";
+    busy=true; ptr.classList.add("spin"); ptr.style.transition="transform .2s"; ptr.style.transform="translate(-50%,16px)";
     fetch(location.href,{cache:"reload"}).catch(()=>{});   // 고친 화면 코드는 받아만 두고, 다음에 앱을 열 때 보여요
     try{ await Promise.all([reloadAll(), wait(600)]); render(); }catch(e){ console.warn("새로고침",e); toast("새로 불러오지 못했어요. 인터넷 연결을 확인해 주세요"); }
     hide();
