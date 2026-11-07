@@ -2042,6 +2042,7 @@ html.is-app .al-h{font-size:14px;margin:0 0 6px}
 .alog-k .ic{fill:currentColor;stroke:none}
 .alog-g{background:#FFFDF9;color:#1F2A44;box-shadow:inset 0 0 0 1.5px #E7DDCD}
 .alog-k{background:#FEE500;color:#191919}
+.alog-a{background:#000;color:#fff}
 .alog-B .alog-btns button{border-radius:28px}
 .alog-B .alog-g{background:#1F2A44;color:#FBF6EE;box-shadow:none}
 .alog-B .alog-g .g-logo{width:28px;height:28px;padding:6px;box-sizing:border-box;border-radius:50%;background:#fff}
@@ -3627,6 +3628,7 @@ function makeDemo(){
     async signIn(){ signed=true; ls.set("iinote-demo-signed","1"); cb && cb(user); },
     async signInKid(){ return api.signIn(); },
     async signInKakao(){ return api.signIn(); },
+    async signInApple(){ return api.signIn(); },
     async setKeep(){},
     providers(){ return signed ? ["google.com"] : []; },
     async link(){ throw new Error("체험 모드에서는 계정 연결을 할 수 없어요."); },
@@ -3677,6 +3679,10 @@ async function makeFirebase(){
     return AU.GoogleAuthProvider.credential(c.idToken, c.accessToken||null); };
   // 📱 앱 카카오 로그인 (2026-10-05): 휴대폰 로그인 창(OpenID Connect oidc.kakao)에서 받은 토큰을 웹 로그인에 넘겨요.
   // 아이디 토큰(+nonce)이 안 받아지면 액세스 토큰으로 한 번 더 시도해요
+  // 🍎 앱 애플 로그인 (2026-11-07, 아이폰만): 휴대폰 애플 로그인 창에서 받은 토큰 + nonce 를 웹 로그인에 넘겨요
+  const appAppleCred = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 로그인 부품을 찾지 못했어요");
+    const r=await FA.signInWithApple({skipNativeAuth:true}).catch(e=>{ throw /1001|cancel/i.test(`${e?.code||""} ${e?.message||""}`) ? Object.assign(new Error("Apple 로그인을 닫았어요"),{code:"auth/popup-closed-by-user"}) : e; }), c=r?.credential; if(!c?.idToken) throw new Error("Apple 로그인을 하지 못했어요. 다시 눌러 주세요");
+    return new AU.OAuthProvider("apple.com").credential({idToken:c.idToken, rawNonce:c.nonce}); };
   const appKakaoCreds = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 로그인 부품을 찾지 못했어요");
     const r=await FA.signInWithOpenIdConnect({providerId:"oidc.kakao", skipNativeAuth:true}), c=r?.credential||{};
     const L=[]; if(c.idToken) L.push({idToken:c.idToken, ...(c.nonce?{rawNonce:c.nonce}:{}), ...(c.accessToken?{accessToken:c.accessToken}:{})}); if(c.accessToken) L.push({accessToken:c.accessToken});
@@ -3701,19 +3707,22 @@ async function makeFirebase(){
     // 카카오 로그인: 파이어베이스 로그인 방법에 OpenID Connect(oidc.kakao)로 등록해 둠
     async signInKakao(){ if(IS_APP){ await withKakao(c=>AU.signInWithCredential(auth,c)); return; }
       const pv=new AU.OAuthProvider("oidc.kakao"); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
+    async signInApple(){ await AU.signInWithCredential(auth, await appAppleCred()); },
     // 로그인은 늘 이 브라우저에 기억해요(새 탭 · 공부방 링크에서도 그대로). 로그아웃 시간은 autoLogoutCheck 가 정해요
     async setKeep(){},
     // 한 계정에 구글 · 카카오 둘 다 연결: 어느 쪽으로 로그인해도 같은 계정(uid)
     providers(){ const u=auth.currentUser; return u&&!u.isAnonymous ? u.providerData.map(p=>p.providerId) : []; },
-    async link(kind){ if(IS_APP){ if(kind==="kakao") await withKakao(c=>AU.linkWithCredential(auth.currentUser,c)); else await AU.linkWithCredential(auth.currentUser, await appGoogleCred()); return; }
+    async link(kind){ if(kind==="apple"){ await AU.linkWithCredential(auth.currentUser, await appAppleCred()); return; }
+      if(IS_APP){ if(kind==="kakao") await withKakao(c=>AU.linkWithCredential(auth.currentUser,c)); else await AU.linkWithCredential(auth.currentUser, await appGoogleCred()); return; }
       await AU.linkWithPopup(auth.currentUser, kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     // 연결하려는 계정이 이미 따로 가입돼 있으면, 오류 안에 든 로그인 정보로 그 계정을 확인할 수 있어요
-    credFromError(kind,e){ try{ return kind==="kakao" ? AU.OAuthProvider.credentialFromError(e) : AU.GoogleAuthProvider.credentialFromError(e); }catch(x){ return null; } },
+    credFromError(kind,e){ try{ return kind==="google" ? AU.GoogleAuthProvider.credentialFromError(e) : AU.OAuthProvider.credentialFromError(e); }catch(x){ return null; } },
     // 다른 로그인(구글 ↔ 카카오)을 잠깐 따로 열어 확인해요. 지금 로그인은 그대로예요
     async otherLogin(kind,cred){
       const app2=A.getApps().find(a=>a.name==="other") || A.initializeApp(FIREBASE_CONFIG,"other");
       const a2=AU.getAuth(app2), db2=F.getFirestore(app2);
       if(cred) await AU.signInWithCredential(a2,cred);
+      else if(kind==="apple") await AU.signInWithCredential(a2, await appAppleCred());
       else if(IS_APP){ if(kind==="kakao") await withKakao(c=>AU.signInWithCredential(a2,c)); else await AU.signInWithCredential(a2, await appGoogleCred()); }   // 앱은 팝업 대신 휴대폰 로그인 창
       else { const p=kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider(); if(kind!=="kakao") p.setCustomParameters({prompt:"select_account"}); await AU.signInWithPopup(a2,p); }
       const uid=a2.currentUser.uid;
@@ -3787,7 +3796,8 @@ async function makeFirebase(){
     async deleteUserDoc(uid){ await F.deleteDoc(F.doc(db,"users",uid)); },
     // 계정 삭제 전 본인 확인: 구글 계정은 로그인 창을 한 번 더 띄워요 (익명 계정은 필요 없음)
     async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return;
-      const kakao=u.providerData.some(p=>p.providerId==="oidc.kakao");
+      const kakao=u.providerData.some(p=>p.providerId==="oidc.kakao"), apple=u.providerData.some(p=>p.providerId==="apple.com"), google=u.providerData.some(p=>p.providerId==="google.com");
+      if(apple && !google && !kakao){ if(!IS_APP) throw new Error("Apple로 만든 계정은 아이폰 앱에서 지워 주세요"); await AU.reauthenticateWithCredential(u, await appAppleCred()); return; }
       if(IS_APP){ if(kakao) throw new Error("앱에서는 카카오 계정 확인이 아직 안 돼요. 웹(iinote.co.kr)에서 지워 주세요"); await AU.reauthenticateWithCredential(u, await appGoogleCred()); return; }
       await AU.reauthenticateWithPopup(u,kakao?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     async deleteAccount(){ if(auth.currentUser) await AU.deleteUser(auth.currentUser); }
@@ -4369,6 +4379,7 @@ const kakaoBtn = (sm) => `<div class="share-row"><button class="btn btn-kakao ${
    ========================================================= */
 // 📱 앱 로그인 화면 (2026-10-05): 웹 첫 화면처럼 글이 많지 않게 로고 · 이름 · 단추만. 켤 때마다 네 가지(A~D) 중 하나
 const ALOG = "ABCD".charAt(Math.floor(Math.random()*4));
+const APPLE_LOGO = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>`;
 function viewAppLogin(){
   const logo = `<div class="bl"><span class="bl-i"><i class="bl-dot"></i><i class="bl-bar"></i></span><span class="bl-i bl-r"><i class="bl-dot"></i><i class="bl-bar"></i></span></div>`;
   const top = ALOG==="C" ? `${logo}<div class="alog-head">오늘 일기,<br>같이 써 볼까요?</div><p class="alog-tag">아이아이노트 · 가족이 함께 쓰는 일기장</p>`
@@ -4376,7 +4387,7 @@ function viewAppLogin(){
     : `${logo}<h1 class="alog-name">아이아이노트</h1><p class="alog-tag">가족이 함께 쓰는 일기장</p>`;
   return `<main class="alog alog-${ALOG}"><div class="alog-top">${top}</div>
     <div class="alog-bottom">
-      <div class="alog-btns"><button type="button" class="alog-g" data-act="signin">${G_LOGO}구글로 시작하기</button><button type="button" class="alog-k" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button></div>
+      <div class="alog-btns"><button type="button" class="alog-g" data-act="signin">${G_LOGO}구글로 시작하기</button><button type="button" class="alog-k" data-act="signin-kakao">${ic("talk")}카카오로 시작하기</button>${IS_IOS?`<button type="button" class="alog-a" data-act="signin-apple">${APPLE_LOGO}Apple로 로그인</button>`:""}</div>
       <div class="alog-links"><button type="button" class="alog-tour" data-act="tour">먼저 둘러볼게요</button><span class="alog-legal"><a href="terms.html">이용약관</a> · <a href="privacy.html">개인정보처리방침</a></span></div>
     </div></main>`;
 }
@@ -4471,9 +4482,9 @@ function viewOnboard(){
         <button class="btn btn-accent wide">가족에 들어가기</button>
       </form>
     </div>
-    ${!DEMO&&S.user&&!S.user.isAnonymous?(k=>`<div class="card" style="margin-top:16px"><h2>전에 ${loginName(k)}로 가족에 들어온 적 있나요?</h2>
+    ${!DEMO&&S.user&&!S.user.isAnonymous?(myKind()==="apple"?["google","kakao"]:[myKind()==="kakao"?"google":"kakao"]).map(k=>`<div class="card" style="margin-top:16px"><h2>전에 ${loginName(k)}로 가족에 들어온 적 있나요?</h2>
       <p>${loginName(k)} 로그인을 한 번 확인하면 새 프로필을 만들지 않고 예전 내 프로필로 들어가요. 같은 사람이 둘로 보이지 않아요.</p>
-      <button class="btn ${k==="kakao"?"btn-kakao":"btn-ghost"}" data-act="join-existing" data-v="${k}">${k==="kakao"?ic("talk"):""}${loginName(k)}로 확인하고 예전 프로필로 들어가기</button></div>`)(myKind()==="kakao"?"google":"kakao"):""}
+      <button class="btn ${k==="kakao"?"btn-kakao":"btn-ghost"}" data-act="join-existing" data-v="${k}">${k==="kakao"?ic("talk"):""}${loginName(k)}로 확인하고 예전 프로필로 들어가기</button></div>`).join(""):""}
     ${S.group?`<p style="margin-top:20px"><button class="link-btn" data-act="cancel-onboard">${ic("back")}지금 가족으로 돌아가기</button></p>`:""}
     <p style="margin-top:12px"><button class="link-btn" data-act="signout">${ic("out")}로그아웃</button></p>
   </div></main>`;
@@ -6786,10 +6797,10 @@ function loginLinkRow(){
   if(!isMine(S.me)) return "";
   const pv=B.providers(); if(!pv.length) return "";
   const item=(id,name,kind)=>pv.includes(id)||(S.me.mergedKinds||[]).includes(kind)?`<span class="chip conn"><i aria-hidden="true">✓</i>${name} 연결됨</span>`:`<button class="btn ${kind==="kakao"?"btn-kakao":"btn-ghost"} sm" data-act="link-login" data-v="${kind}">${kind==="kakao"?ic("talk"):""}${name}도 연결하기</button>`;
-  return `<div class="login-link set-sub" style="margin-top:16px"><p class="muted" style="font-size:14px;margin:0 0 8px">로그인 방법 · 연결해 두면 구글이나 카카오 어느 쪽으로 들어와도 같은 일기장이 열려요.</p>
-    <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}</div>
+  return `<div class="login-link set-sub" style="margin-top:16px"><p class="muted" style="font-size:14px;margin:0 0 8px">로그인 방법 · 연결해 두면 어느 쪽으로 들어와도 같은 일기장이 열려요.</p>
+    <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}${(IS_APP&&IS_IOS)||pv.includes("apple.com")||(S.me.mergedKinds||[]).includes("apple")?item("apple.com","Apple","apple"):""}</div>
     ${S.mergeKind?`<p style="margin:10px 0 0"><button class="btn btn-primary sm" data-act="merge-login" data-v="${S.mergeKind}">${loginName(S.mergeKind)}로 만든 프로필과 합치기</button></p>`:""}
-    <p class="muted" style="font-size:13px;margin:8px 0 0">구글 · 카카오로 따로 들어와서 같은 사람이 둘로 보이면, 한쪽으로 로그인해 다른 쪽 '연결하기'를 눌러 하나로 합쳐 주세요.</p></div>`;
+    <p class="muted" style="font-size:13px;margin:8px 0 0">로그인 방법을 달리해 따로 들어와서 같은 사람이 둘로 보이면, 한쪽으로 로그인해 다른 쪽 '연결하기'를 눌러 하나로 합쳐 주세요.</p></div>`;
 }
 /* ---------- 이름이 같은 어른 프로필 하나로 합치기 ----------
    구글 · 카카오로 따로 들어와 '아빠'가 둘이 되면, 가족의 어른 누구나 한 번 눌러 합쳐요 (다른 쪽 로그인 확인 없이).
@@ -6806,7 +6817,7 @@ async function mergeSameName(name){
   const cnt=p=>S.diaries.filter(d=>d.profileId===p.id).length;
   const keep=[...same].sort((a,b)=>cnt(b)-cnt(a)||(a.createdAt||0)-(b.createdAt||0))[0], others=same.filter(p=>p.id!==keep.id);
   const moved=others.reduce((s,o)=>s+cnt(o),0);
-  if(!confirm(`'${name}' 프로필 ${same.length}개를 하나로 합칠까요?\n\n· 따로 있던 일기 ${moved}편과 댓글 · 일정 · 하트가 '${name}' 프로필 하나로 모여요. 같은 날 쓴 일기는 한 편으로 이어 붙여요.\n· 앞으로 구글 · 카카오 어느 쪽으로 들어와도 같은 '${name}' 프로필이 열려요.\n· 합친 뒤에는 되돌릴 수 없어요.`)) return;
+  if(!confirm(`'${name}' 프로필 ${same.length}개를 하나로 합칠까요?\n\n· 따로 있던 일기 ${moved}편과 댓글 · 일정 · 하트가 '${name}' 프로필 하나로 모여요. 같은 날 쓴 일기는 한 편으로 이어 붙여요.\n· 앞으로 어느 로그인으로 들어와도 같은 '${name}' 프로필이 열려요.\n· 합친 뒤에는 되돌릴 수 없어요.`)) return;
   const uids=[...new Set([...(keep.uids||[]), ...others.flatMap(o=>[o.uid,...(o.uids||[])])])].filter(x=>x && x!==keep.uid);
   const kinds=[...new Set([...(keep.mergedKinds||[]), ...others.flatMap(o=>o.mergedKinds||[])])];
   await B.update(S.gid,"profiles",keep.id,{uids,mergedKinds:kinds});
@@ -7156,6 +7167,10 @@ const acts = {
   "signin-kakao": () => TOUR ? acts["tour-exit"]() : INAPP ? inappHelp() : guard(async()=>{ try{ await B.signInKakao(); }catch(e){
     if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '설정 → 계정'에서 카카오를 연결해 주세요.");
     if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
+    throw e; } }),
+  "signin-apple": () => TOUR ? acts["tour-exit"]() : guard(async()=>{ try{ await B.signInApple(); }catch(e){
+    if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 다른 방법으로 가입되어 있어요. 처음 가입한 방법으로 로그인한 뒤 '설정 → 계정'에서 Apple을 연결해 주세요.");
+    if(/popup-closed/.test(e.code||"")) return;   // 애플 로그인 창을 닫았을 때
     throw e; } }),
   "link-login": el => guard(async()=>{
     const kind=el.dataset.v;
@@ -7533,7 +7548,7 @@ async function wipeProfiles(gid,pids,all){
 /* ---------- 구글 · 카카오 로그인 하나로 합치기 ----------
    같은 사람이 구글과 카카오로 따로 가입하면 파이어베이스 계정이 둘이라 프로필도 둘이 돼요.
    다른 쪽 로그인을 확인한 뒤, 그 계정도 지금 프로필을 쓰게 하고(uids) 기록은 지금 프로필로 옮겨요. */
-const loginName = kind => kind==="kakao" ? "카카오" : "구글";
+const loginName = kind => kind==="kakao" ? "카카오" : kind==="apple" ? "Apple" : "구글";
 async function mergeOtherLogin(kind,cred){
   if(DEMO){ toast("체험 모드에서는 로그인을 합칠 수 없어요"); return; }
   const o=await B.otherLogin(kind,cred);
@@ -7544,7 +7559,7 @@ async function mergeOtherLogin(kind,cred){
     if(other && other.type!==me.type) throw new Error("어른 프로필과 아이 프로필은 합칠 수 없어요. 아이 프로필은 '우리 가족 설정'에서 지워 주세요.");
     const cnt=c=>S[c].filter(x=>x.profileId===other?.id).length;
     const msg = other
-      ? `'${other.name}'(${loginName(kind)}로 들어온 프로필)을 지금의 '${me.name}'과 하나로 합칠까요?\n\n· ${kidN(other)}의 일기 ${cnt("diaries")}편, 댓글 ${cnt("comments")}개, 일정 ${cnt("schedules")}개가 '${me.name}'으로 옮겨져요.\n· 앞으로 구글 · 카카오 어느 쪽으로 들어와도 같은 '${me.name}'이에요.\n· 합친 뒤에는 되돌릴 수 없어요.`
+      ? `'${other.name}'(${loginName(kind)}로 들어온 프로필)을 지금의 '${me.name}'과 하나로 합칠까요?\n\n· ${kidN(other)}의 일기 ${cnt("diaries")}편, 댓글 ${cnt("comments")}개, 일정 ${cnt("schedules")}개가 '${me.name}'으로 옮겨져요.\n· 앞으로 어느 로그인으로 들어와도 같은 '${me.name}'이에요.\n· 합친 뒤에는 되돌릴 수 없어요.`
       : `${loginName(kind)}로 들어와도 '${me.name}' 프로필이 열리게 할까요?`;
     if(!confirm(msg)) return;
     const uids=[...new Set([...(me.uids||[]), o.uid, ...(other?[other.uid,...(other.uids||[])]:[])])].filter(x=>x && x!==me.uid);
@@ -7602,7 +7617,7 @@ async function joinWithOtherLogin(kind){
   await enterGroup(gid); toast("예전 프로필로 들어왔어요. 이제 어느 쪽으로 로그인해도 같은 프로필이에요");
 }
 const F_arrayAdd = (arr,v) => [...new Set([...(arr||[]),v].filter(Boolean))];
-const myKind = () => (B.providers?.()||[]).includes("oidc.kakao") ? "kakao" : "google";
+const myKind = () => { const p=B.providers?.()||[]; return p.includes("oidc.kakao") ? "kakao" : p.includes("google.com") ? "google" : p.includes("apple.com") ? "apple" : "google"; };
 function deleteMyAccount(){
   const word=prompt("내 계정과 기록을 지우면 되돌릴 수 없어요.\n\n· 내 프로필, 내가 쓴 일기 · 사진 · 소리 · 댓글 · 일정 · 즐겨찾기가 지워져요.\n· 가족 그룹에서 나가요.\n· 가족에 나 혼자 남아 있었다면 그 가족의 기록이 모두 지워져요.\n\n계속하려면 '지우기'라고 써 주세요.");
   if(word===null) return;
