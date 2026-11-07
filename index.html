@@ -3705,8 +3705,10 @@ async function makeFirebase(){
   // 📱 앱 카카오 로그인 (2026-10-05): 휴대폰 로그인 창(OpenID Connect oidc.kakao)에서 받은 토큰을 웹 로그인에 넘겨요.
   // 아이디 토큰(+nonce)이 안 받아지면 액세스 토큰으로 한 번 더 시도해요
   // 🍎 앱 애플 로그인 (2026-11-07, 아이폰만): 휴대폰 애플 로그인 창에서 받은 토큰 + nonce 를 웹 로그인에 넘겨요
+  let appleCode="";   // 탈퇴할 때 애플 연결을 끊는 데 쓰는 일회용 코드 (5분 안에 한 번)
   const appAppleCred = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 로그인 부품을 찾지 못했어요");
     const r=await FA.signInWithApple({skipNativeAuth:true}).catch(e=>{ throw /1001|cancel/i.test(`${e?.code||""} ${e?.message||""}`) ? Object.assign(new Error("Apple 로그인을 닫았어요"),{code:"auth/popup-closed-by-user"}) : e; }), c=r?.credential; if(!c?.idToken) throw new Error("Apple 로그인을 하지 못했어요. 다시 눌러 주세요");
+    appleCode=c.authorizationCode||"";
     return new AU.OAuthProvider("apple.com").credential({idToken:c.idToken, rawNonce:c.nonce}); };
   const appKakaoCreds = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 로그인 부품을 찾지 못했어요");
     const r=await FA.signInWithOpenIdConnect({providerId:"oidc.kakao", skipNativeAuth:true}), c=r?.credential||{};
@@ -3820,11 +3822,15 @@ async function makeFirebase(){
     async leaveGroup(gid,uid){ await F.updateDoc(F.doc(db,"groups",gid),{memberUids:F.arrayRemove(uid)}); },
     async deleteUserDoc(uid){ await F.deleteDoc(F.doc(db,"users",uid)); },
     // 계정 삭제 전 본인 확인: 구글 계정은 로그인 창을 한 번 더 띄워요 (익명 계정은 필요 없음)
-    async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return;
+    async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return; appleCode="";
       const kakao=u.providerData.some(p=>p.providerId==="oidc.kakao"), apple=u.providerData.some(p=>p.providerId==="apple.com"), google=u.providerData.some(p=>p.providerId==="google.com");
       if(apple && !google && !kakao){ if(!IS_APP) throw new Error("Apple로 만든 계정은 아이폰 앱에서 지워 주세요"); await AU.reauthenticateWithCredential(u, await appAppleCred()); return; }
       if(IS_APP){ if(kakao) await withKakao(c=>AU.reauthenticateWithCredential(u,c)); else await AU.reauthenticateWithCredential(u, await appGoogleCred()); return; }   // 앱 안에서 탈퇴: 앱스토어 규칙 (2026-11-07)
       await AU.reauthenticateWithPopup(u,kakao?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
+    // 탈퇴 전에 애플 연결 끊기 (아이폰 앱, 2026-11-07). 애플을 연결만 해 둔 계정은 여기서 애플 확인을 한 번 더 받아요. 실패해도 탈퇴는 이어가요
+    async revokeApple(){ const u=auth.currentUser; if(!IS_APP || !IS_IOS || !u?.providerData.some(p=>p.providerId==="apple.com")) return;
+      try{ if(!appleCode) await appAppleCred(); if(appleCode) await api.callFn("appleRevoke",{code:appleCode}); }catch(e){ console.warn("애플 연결 끊기",e); reportError(`appleRevoke ${e?.code||""} ${e?.message||""}`,"delete"); }
+      appleCode=""; },
     async deleteAccount(){ if(auth.currentUser) await AU.deleteUser(auth.currentUser); }
   };
   return api;
@@ -7660,6 +7666,7 @@ function deleteMyAccount(){
   if(word.trim()!=="지우기"){ toast("'지우기'라고 써야 지워져요"); return; }
   guard(async()=>{
     await B.reauth();
+    await B.revokeApple?.();
     toast("지우고 있어요. 잠시만 기다려 주세요");
     const uid=S.user.uid, gids=[...new Set([...(S.userDoc?.groupIds||[]),S.gid].filter(Boolean))];
     for(const gid of gids){
