@@ -3187,7 +3187,8 @@ html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-d
     var on=false; try{ on=!!localStorage.getItem("iinote-login"); }catch(e){}
     if(on){ document.documentElement.classList.add("has-login");
       // 가로 화면용 로딩 네 가지(A 모눈 공책 · B 아이보리 가운데 · C 줄 공책 인사 · D 밤 남색) 중 하나가 무작위로 (2026-10-07). 오른쪽 i 가 차오르기만 하고 숫자는 없어요
-      var WV="ABCD".charAt(Math.floor(Math.random()*4));
+      var SA=false; try{ SA=navigator.standalone===true || matchMedia("(display-mode: standalone)").matches; }catch(e){}
+      var WV=SA ? "D" : "ABCD".charAt(Math.floor(Math.random()*4));   // 홈 화면에 추가한 웹은 늘 남색 D (2026-11-07, 앱과 구분)
       var lg='<div class="wl-bl"><span><i class="d"></i><i class="b"></i></span><span class="r"><i class="d"></i><i class="b"><b></b></i></span></div>';
       var nm='<div class="wl-name">아이아이노트</div>', st='<div class="wl-step">가족 일기장을 펼치고 있어요</div>';
       var w=document.createElement("div"); w.id="webload"; w.className="wl-"+WV; w.setAttribute("role","status"); w.setAttribute("aria-label","아이아이노트를 여는 중");
@@ -3798,7 +3799,7 @@ async function makeFirebase(){
     async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return;
       const kakao=u.providerData.some(p=>p.providerId==="oidc.kakao"), apple=u.providerData.some(p=>p.providerId==="apple.com"), google=u.providerData.some(p=>p.providerId==="google.com");
       if(apple && !google && !kakao){ if(!IS_APP) throw new Error("Apple로 만든 계정은 아이폰 앱에서 지워 주세요"); await AU.reauthenticateWithCredential(u, await appAppleCred()); return; }
-      if(IS_APP){ if(kakao) throw new Error("앱에서는 카카오 계정 확인이 아직 안 돼요. 웹(iinote.co.kr)에서 지워 주세요"); await AU.reauthenticateWithCredential(u, await appGoogleCred()); return; }
+      if(IS_APP){ if(kakao) await withKakao(c=>AU.reauthenticateWithCredential(u,c)); else await AU.reauthenticateWithCredential(u, await appGoogleCred()); return; }   // 앱 안에서 탈퇴: 앱스토어 규칙 (2026-11-07)
       await AU.reauthenticateWithPopup(u,kakao?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     async deleteAccount(){ if(auth.currentUser) await AU.deleteUser(auth.currentUser); }
   };
