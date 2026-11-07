@@ -7979,14 +7979,18 @@ document.addEventListener("keydown", e => {
     if(seen && (d>=0 || !fits)) return;   // 커서가 보이고, 글 칸 첫머리가 안 가렸거나 맞추면 커서가 가려지면 그대로
     if(!fits) d=c+lh*2-bot; if(c-d<top) d=c-top;
     window.scrollBy(0,d); };
-  let until=0, tm, lastH=window.visualViewport?.height||innerHeight;
+  let until=0, tm, lastH=window.visualViewport?.height||innerHeight, fullH=lastH, fullW=innerWidth;
   const watch=()=>{ until=Date.now()+1500; [60,250,600,1000,1400].forEach(ms=>setTimeout(()=>{ if(Date.now()<until) fit(); },ms)); };
   document.addEventListener("focusin",e=>{ if(e.target.id==="w-text") watch(); });
   document.addEventListener("touchmove",()=>{ until=0; },{passive:true});   // 손으로 움직이기 시작하면 맞추지 않아요
   const onSize=()=>{ const h=window.visualViewport?.height||innerHeight, shrank=h<lastH-40, grew=h>lastH+40; lastH=h;
+    if(innerWidth!==fullW){ fullW=innerWidth; fullH=h; }   // 화면을 돌리면 '키보드 없는 높이'를 새로 재요
+    fullH=Math.max(fullH,h);
     if(shrank && document.activeElement?.id==="w-text") watch();
     // 뒤로 가기로 키보드만 내리면 글 칸에 입력 상태가 남아 아래 메뉴 · 저장 단추가 안 돌아왔어요 → 입력 상태를 풀어요
-    if(grew && matchMedia("(pointer:coarse)").matches && document.activeElement?.matches?.("textarea,input:not([type=checkbox]):not([type=radio])")) document.activeElement.blur();
+    // ⚠ 키보드가 정말 내려가 화면이 거의 다 돌아왔을 때만 (2026-11-08): 글을 쓰는 동안 자판 위 추천 단어 줄이 생겼다 사라지며
+    //   높이가 40~50px 늘 때도 풀어 버려서, 키보드가 올라갔다가 바로 사라져 일기를 쓸 수 없었어요
+    if(grew && h>=fullH-100 && matchMedia("(pointer:coarse)").matches && document.activeElement?.matches?.("textarea,input:not([type=checkbox]):not([type=radio])")) document.activeElement.blur();
     if(Date.now()<until){ clearTimeout(tm); tm=setTimeout(fit,90); } };
   addEventListener("resize",onSize); window.visualViewport?.addEventListener("resize",onSize); }
 let touchX=null;
