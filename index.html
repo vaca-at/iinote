@@ -3662,6 +3662,7 @@ function makeDemo(){
     async getUser(uid){ return db.users[uid] || null; },
     async addUserGroup(uid,gid){ const u=db.users[uid]||(db.users[uid]={groupIds:[]}); if(!u.groupIds.includes(gid)) u.groupIds.push(gid); u.lastGroupId=gid; save(); },
     async setLastGroup(uid,gid){ const u=db.users[uid]||(db.users[uid]={groupIds:[]}); u.lastGroupId=gid; save(); },
+    async setBlock(uid,key,on){ const u=db.users[uid]||(db.users[uid]={groupIds:[]}), b=new Set(u.blocked||[]); on?b.add(key):b.delete(key); u.blocked=[...b]; save(); },
     async getGroup(gid){ const g=db.groups[gid]; return g?{id:gid,...g}:null; },
     async updateGroup(gid,data){ Object.assign(db.groups[gid],data); save(); },
     async createGroup(name,u,myName){ const gid="g_"+rid(); let code=makeCode(); while(db.invites[code]) code=makeCode();
@@ -3778,6 +3779,8 @@ async function makeFirebase(){
       const r=await FN.httpsCallable(FN.getFunctions(app,"asia-northeast3"),name)(data||{}); return r.data; },
     async addUserGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{groupIds:F.arrayUnion(gid),lastGroupId:gid,kind:kindOf()},{merge:true}); },
     async setLastGroup(uid,gid){ await F.setDoc(F.doc(db,"users",uid),{lastGroupId:gid},{merge:true}); },
+    // 🚫 차단 목록: users/{uid}.blocked = ["가족id:프로필id", …] (나만 보는 내 계정 문서, 상대에게 알리지 않아요)
+    async setBlock(uid,key,on){ await F.setDoc(F.doc(db,"users",uid),{blocked:on?F.arrayUnion(key):F.arrayRemove(key)},{merge:true}); },
     // 예전 계정 · 나중에 카카오를 연결한 계정도 들어올 때 종류를 맞춰 둬요 (가족에 들어간 계정만)
     async markKind(uid,ud){ const k=kindOf(); if(k && ud?.groupIds && ud.kind!==k) await F.setDoc(F.doc(db,"users",uid),{kind:k},{merge:true}); },
     async getGroup(gid){ const s=await F.getDoc(F.doc(db,"groups",gid)); return s.exists()?{id:gid,...s.data()}:null; },
@@ -4032,6 +4035,11 @@ function applyPrefs(){ document.documentElement.dataset.theme=S.design==="night"
 applyPrefs();
 
 const prof = id => S.profiles.find(p=>p.id===id);
+// 🚫 차단 (2026-11-08, 앱스토어 규칙 1.2): 차단한 가족의 일기 · 댓글 · 채팅 · 사진첩 사진을 내 화면에서 숨겨요. 내 계정에만 적고 상대에게는 알리지 않아요
+const blockKey = pid => `${S.gid}:${pid}`;
+const isBlocked = pid => !!pid && pid!==S.me?.id && (S.userDoc?.blocked||[]).includes(blockKey(pid));
+const unBlocked = list => (S.userDoc?.blocked||[]).length ? list.filter(x=>!isBlocked(x.profileId||x.by)) : list;
+const blkBtn = pid => `<button class="link-btn rep-btn" data-act="block-toggle" data-v="${esc(pid)}">${ic("x")}차단</button>`;
 // 🌌 밤하늘 색 (2026-10-08, 사용자가 고른 B '별빛 파스텔'): 얼굴 동그라미 빛무리 = 밝은 색, 달력 작은 점 = 한 단계 진한 색.
 //    가족 순서대로 여덟 색을 나눠 줘서 서로 겹치지 않아요 (예전 프로필 색 p.color 는 그대로 두고 화면에서만 바꿔요)
 const NIGHT = ["#FFB59E","#C9B6FF","#9FD4FF","#FFE39A","#FF9EC4","#B6F0E0","#A9B8FF","#F5C6FF"];
@@ -4087,6 +4095,7 @@ async function reload(c){ S[c] = safeList(c, await B.list(S.gid,c)); if(c==="pro
 // 프로필 색은 style 속성에 그대로 들어가니, 색 모양(#abc · #aabbcc · var(--이름))이 아니면 기본색으로
 function safeList(c,list){
   if(c==="profiles") list.forEach(p=>{ if(!/^(#[0-9a-f]{3,8}|var\(--[a-z0-9-]+\))$/i.test(String(p.color||""))) p.color=COLORS[0]; });
+  if(c==="diaries"||c==="comments") return unBlocked(list);
   return list;
 }
 
@@ -4095,7 +4104,7 @@ function safeList(c,list){
    사진은 일기 사진과 같은 곳(groups/{gid}/diaries/chat/…)에 올려서 저장소 규칙을 바꾸지 않아도 돼요 */
 function startChat(){
   S.chatUnsub?.(); S.chats=[]; S.chatReady=false; S.chatJump=true;
-  S.chatUnsub=B.watchChats(S.gid,list=>{ S.chats=list; S.chatReady=true; onChats(); });
+  S.chatUnsub=B.watchChats(S.gid,list=>{ S.chatsRaw=list; S.chats=unBlocked(list); S.chatReady=true; onChats(); });
 }
 const chatSeenKey = () => `iinote-chatseen-${S.gid}-${S.me?.id}`;
 function chatUnread(){
@@ -4217,7 +4226,7 @@ function chatRxBar(m){
 function chatMenu(m, canDel){
   if(S.cmFor!==m.id) return "";
   return `<div class="cm-menu" role="group" aria-label="메시지 메뉴">
-    <button type="button" class="cm-mi" data-act="chat-reply" data-id="${esc(m.id)}">답장</button>${m.text?`<button type="button" class="cm-mi" data-act="chat-copy" data-id="${esc(m.id)}">복사</button>`:""}${canDel?`<button type="button" class="cm-mi del" data-act="chat-del" data-id="${esc(m.id)}">지우기</button>`:""}</div>`;
+    <button type="button" class="cm-mi" data-act="chat-reply" data-id="${esc(m.id)}">답장</button>${m.text?`<button type="button" class="cm-mi" data-act="chat-copy" data-id="${esc(m.id)}">복사</button>`:""}${canDel?`<button type="button" class="cm-mi del" data-act="chat-del" data-id="${esc(m.id)}">지우기</button>`:""}${m.profileId!==S.me.id?`<button type="button" class="cm-mi del" data-act="help-open" data-rep="불편한 글 · 댓글" data-ref="${esc(`${kidN(prof(m.profileId))||"가족"}의 채팅`)}">신고</button><button type="button" class="cm-mi del" data-act="block-toggle" data-v="${esc(m.profileId)}">차단</button>`:""}</div>`;
 }
 function drawReplyBars(){ document.querySelectorAll(".chat-rp").forEach(x=>x.remove()); document.querySelectorAll("form.chat-in").forEach(f=>f.insertAdjacentHTML("beforebegin",chatReplyBar())); }
 // 채팅 목록만 다시 그리기 (보던 자리 그대로, 쓰던 글 그대로)
@@ -5493,7 +5502,7 @@ function viewDiaryList(){
    연도는 사진 속 찍은 날로 저절로, 사람 · 장소는 올릴 때 골라요(전에 쓴 장소는 눌러서 다시). 가족 모두 보고 올려요. 고치기 · 지우기는 올린 사람 · 부모
    사진첩 탭을 처음 열 때만 불러와요 (읽기 횟수를 아끼려고) */
 const ALBUM_MAX_PICK = 30;
-async function loadAlbum(){ try{ S.album=await B.list(S.gid,"album"); }catch(e){ console.warn("사진첩",e); S.album=[]; } S.albumReady=true; }
+async function loadAlbum(){ try{ S.album=unBlocked(await B.list(S.gid,"album")); }catch(e){ console.warn("사진첩",e); S.album=[]; } S.albumReady=true; }
 const alById = id => S.album.find(a=>a.id===id);
 const albumCanEdit = a => !!a && (isParent() || a.by===S.me?.id);
 const albumSorted = () => [...S.album].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.createdAt||0)-(a.createdAt||0));
@@ -6340,7 +6349,7 @@ function viewDiaryDetail(){
     ${d.talk?.dialog?.length?`<details class="talk-log"><summary>🎙 엄마 · 아빠와 나눈 이야기로 쓴 일기예요 · 이야기 보기</summary>${talkLines(d.talk.dialog)}</details>`:""}
     ${(d.hand||[]).length?`<section class="hand-att" aria-label="첨부파일"><h3>📝 종이 일기장에 손으로 쓴 일기예요 · 첨부파일 ${d.hand.length}개</h3>${handFiles(d.hand,false)}</section>`:""}
     ${viewReact(d,mine)}
-    ${mine?"":`<p class="ai-report">${repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(d.date)} 일기`)}</p>`}
+    ${mine?"":`<p class="ai-report">${repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(d.date)} 일기`)}${p?blkBtn(p.id):""}</p>`}
     ${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
@@ -6361,7 +6370,7 @@ function renderThread(cs,parent,depth){
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
-        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)}</div>`}
+        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)+(p?blkBtn(p.id):"")}</div>`}
       ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
@@ -6970,6 +6979,7 @@ function viewSettings(){
         ${S.me.type==="child"?`<div class="my-pin" style="margin-top:16px">${pinForm("my-pin",S.me,true)}</div>`:""}
         ${S.user&&!S.user.isAnonymous&&isMine(S.me)&&keepBox()?`<div class="set-sub" style="margin-top:14px">${keepBox()}</div>`:""}
         ${groups.length>1&&isParent()?`<label style="margin-top:16px">내 가족 그룹<select data-pref="group">${groups.map(id=>`<option value="${esc(id)}" ${id===S.gid?"selected":""}>${id===S.gid?esc(g.name):"다른 가족 ("+esc(id.slice(0,6))+")"}</option>`).join("")}</select></label>`:""}
+        ${(()=>{ const bl=S.profiles.filter(p=>isBlocked(p.id)); return bl.length?`<div class="set-sub" style="margin-top:14px"><b>차단한 가족</b><p class="muted" style="margin:2px 0 6px">이 가족의 일기 · 댓글 · 채팅이 내 화면에 보이지 않아요.</p>${bl.map(p=>`<div class="row" style="gap:8px;margin:4px 0">${av(p,28)}<span>${esc(p.name)}</span><button class="btn btn-ghost sm" data-act="block-toggle" data-v="${esc(p.id)}">차단 풀기</button></div>`).join("")}</div>`:""; })()}
         <div class="acc-foot">
           ${isParent()||isMine(S.me)?`<button class="btn btn-ghost sm danger" data-act="delete-account">${ic("trash")}내 계정과 기록 지우기</button>`:""}
           <span class="row" style="gap:4px 14px"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span>
@@ -8111,6 +8121,7 @@ function viewProfile(){
       <button class="pf-act" data-act="prof-diary" data-v="${esc(p.id)}"><span style="background:#FFE1EA;color:#C2366A">${ic("lay-diary")}</span>일기 보기</button>
       ${isParent() && p.type==="child"?`<button class="pf-act" data-act="kid-write" data-id="${esc(p.id)}"><span>${ic("pen")}</span>${esc(p.name)}${ro(p.name)} 쓰기</button>`:""}
       ${isMine(p)?`<button class="pf-act" data-act="switch-profile"><span>${ic("people")}</span>프로필 바꾸기</button>`:""}
+      ${p.id!==S.me.id?`<button class="pf-act" data-act="block-toggle" data-v="${esc(p.id)}"><span style="background:#F1E4E4;color:#A33">${ic("x")}</span>${isBlocked(p.id)?"차단 풀기":"차단"}</button>`:""}
     </div>
     ${can?`<button class="btn btn-primary pf-editbtn" data-act="prof-edit">${ic("pen")}프로필 편집</button>`:""}`;
   const form = `<form class="pf-form" data-form="prof" data-id="${esc(p.id)}">
@@ -8330,6 +8341,13 @@ async function profPhoto(input){
 Object.assign(acts,{
   "prof-open": el => { S.prof=el.dataset.v; S.profEdit=false; S.moreOpen=false; S.newsOpen=false; render(); },
   "prof-close": () => { S.prof=null; S.profEdit=false; render(); },
+  "block-toggle": el => { const pid=el.dataset.v, p=prof(pid); if(!p || pid===S.me?.id || !S.user) return; const on=!isBlocked(pid), nm=p.name;
+    if(on && !confirm(`${nm} 님을 차단할까요?\n\n· ${nm} 님의 일기 · 댓글 · 채팅 · 사진이 내 화면에 보이지 않아요.\n· ${nm} 님에게는 알리지 않아요.\n· 환경 설정 › 계정에서 언제든 풀 수 있어요.\n\n불편한 글이 있었다면 '신고'로 함께 알려 주세요.`)) return;
+    guard(async()=>{ const k=blockKey(pid); await B.setBlock(S.user.uid,k,on);
+      const b=new Set(S.userDoc?.blocked||[]); on?b.add(k):b.delete(k); S.userDoc={...(S.userDoc||{}),blocked:[...b]};
+      await Promise.all([reload("diaries"),reload("comments"),loadAlbum()]); S.chats=unBlocked(S.chatsRaw||S.chats); S.cmFor=null;
+      if(on){ S.prof=null; if(S.sub?.type==="diary" && !S.diaries.some(d=>d.id===S.sub.id)) S.sub=null; }
+      toast(on?`${nm} 님을 차단했어요`:`${nm} 님 차단을 풀었어요`); render(); }); },
   "prof-edit": () => { S.profEdit=true; render(); },
   "prof-edit-off": () => { S.profEdit=false; render(); },
   "prof-char-ed": () => charEdOpen(),
