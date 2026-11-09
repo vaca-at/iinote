@@ -155,6 +155,7 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .lp-bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:92px;padding:16px 8px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
 .lp-bt:hover{border-color:var(--ink3)}
 .lp-bt.k{background:#FEE500;border-color:#FEE500;color:#191919}
+.lp-bt.ap{grid-column:1/-1;flex-direction:row;min-height:58px;background:#000;border-color:#000;color:#fff}.lp-bt.ap svg{width:22px;height:22px}
 .lp-b{background:#1F2A44;color:#fff;padding:48px 36px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .lp-b h2{font-family:UnzS,var(--diary),sans-serif;font-weight:400;font-size:36px;margin:14px 0 8px;color:#fff}
 .lp-b p{color:#B9C0D4;font-size:16px;margin:0 0 22px}
@@ -184,6 +185,7 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
   .lp-sc{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;padding:0;border:0;background:none;color:var(--ink);font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer}
   .lp-o{width:72px;height:72px;border-radius:24px;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--surface);font-size:30px}
   .lp-sc.k .lp-o{background:#FEE500;border-color:#FEE500;color:#191919}
+  .lp-sc.ap .lp-o{background:#000;border-color:#000;color:#fff}.lp-sc.ap .lp-o svg{width:30px;height:30px}
   .lp-sc.p .lp-o{background:#1F2A44;border-color:#1F2A44}
   .lp-sc.s .lp-o{background:var(--surface2)}
   .lp-new{position:absolute;top:-6px;left:calc(50% + 18px);padding:2px 7px;border-radius:8px;background:var(--coral);color:#fff;font-size:11px;font-style:normal;font-weight:700}
@@ -3724,6 +3726,9 @@ async function makeFirebase(){
     const r=await FA.signInWithApple({skipNativeAuth:true}).catch(e=>{ throw /1001|cancel/i.test(`${e?.code||""} ${e?.message||""}`) ? Object.assign(new Error("Apple 로그인을 닫았어요"),{code:"auth/popup-closed-by-user"}) : e; }), c=r?.credential; if(!c?.idToken) throw new Error("Apple 로그인을 하지 못했어요. 다시 눌러 주세요");
     appleCode=c.authorizationCode||"";
     return new AU.OAuthProvider("apple.com").credential({idToken:c.idToken, rawNonce:c.nonce}); };
+  // 🍎 웹 애플 로그인 (2026-11-10): 이메일 · 이름을 함께 받아요 (처음 한 번만 와요), 화면은 한국어
+  const webApple = () => { const p=new AU.OAuthProvider("apple.com"); p.addScope("email"); p.addScope("name"); p.setCustomParameters({locale:"ko"}); return p; };
+  let appleWebToken="";   // 웹에서 탈퇴할 때 애플 연결을 끊는 데 쓰는 애플 액세스 토큰 (다시 로그인 확인 때 받아요)
   const appKakaoCreds = async () => { const FA=window.Capacitor?.Plugins?.FirebaseAuthentication; if(!FA) throw new Error("앱의 로그인 부품을 찾지 못했어요");
     const r=await FA.signInWithOpenIdConnect({providerId:"oidc.kakao", skipNativeAuth:true}), c=r?.credential||{};
     const L=[]; if(c.idToken) L.push({idToken:c.idToken, ...(c.nonce?{rawNonce:c.nonce}:{}), ...(c.accessToken?{accessToken:c.accessToken}:{})}); if(c.accessToken) L.push({accessToken:c.accessToken});
@@ -3748,12 +3753,14 @@ async function makeFirebase(){
     // 카카오 로그인: 파이어베이스 로그인 방법에 OpenID Connect(oidc.kakao)로 등록해 둠
     async signInKakao(){ if(IS_APP){ await withKakao(c=>AU.signInWithCredential(auth,c)); return; }
       const pv=new AU.OAuthProvider("oidc.kakao"); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
-    async signInApple(){ await AU.signInWithCredential(auth, await appAppleCred()); },
+    // 🍎 애플 로그인: 아이폰 앱은 휴대폰 애플 창, 웹은 팝업(홈 화면 앱은 페이지 넘기기) — 웹용 서비스 ID kr.co.iinote.web (2026-11-10)
+    async signInApple(){ if(IS_APP){ await AU.signInWithCredential(auth, await appAppleCred()); return; }
+      const pv=webApple(); if(redirectLogin) return AU.signInWithRedirect(auth,pv); await AU.signInWithPopup(auth,pv); },
     // 로그인은 늘 이 브라우저에 기억해요(새 탭 · 공부방 링크에서도 그대로). 로그아웃 시간은 autoLogoutCheck 가 정해요
     async setKeep(){},
     // 한 계정에 구글 · 카카오 둘 다 연결: 어느 쪽으로 로그인해도 같은 계정(uid)
     providers(){ const u=auth.currentUser; return u&&!u.isAnonymous ? u.providerData.map(p=>p.providerId) : []; },
-    async link(kind){ if(kind==="apple"){ await AU.linkWithCredential(auth.currentUser, await appAppleCred()); return; }
+    async link(kind){ if(kind==="apple"){ if(IS_APP) await AU.linkWithCredential(auth.currentUser, await appAppleCred()); else await AU.linkWithPopup(auth.currentUser, webApple()); return; }
       if(IS_APP){ if(kind==="kakao") await withKakao(c=>AU.linkWithCredential(auth.currentUser,c)); else await AU.linkWithCredential(auth.currentUser, await appGoogleCred()); return; }
       await AU.linkWithPopup(auth.currentUser, kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     // 연결하려는 계정이 이미 따로 가입돼 있으면, 오류 안에 든 로그인 정보로 그 계정을 확인할 수 있어요
@@ -3763,7 +3770,7 @@ async function makeFirebase(){
       const app2=A.getApps().find(a=>a.name==="other") || A.initializeApp(FIREBASE_CONFIG,"other");
       const a2=AU.getAuth(app2), db2=F.getFirestore(app2);
       if(cred) await AU.signInWithCredential(a2,cred);
-      else if(kind==="apple") await AU.signInWithCredential(a2, await appAppleCred());
+      else if(kind==="apple"){ if(IS_APP) await AU.signInWithCredential(a2, await appAppleCred()); else await AU.signInWithPopup(a2, webApple()); }
       else if(IS_APP){ if(kind==="kakao") await withKakao(c=>AU.signInWithCredential(a2,c)); else await AU.signInWithCredential(a2, await appGoogleCred()); }   // 앱은 팝업 대신 휴대폰 로그인 창
       else { const p=kind==="kakao"?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider(); if(kind!=="kakao") p.setCustomParameters({prompt:"select_account"}); await AU.signInWithPopup(a2,p); }
       const uid=a2.currentUser.uid;
@@ -3838,13 +3845,19 @@ async function makeFirebase(){
     async leaveGroup(gid,uid){ await F.updateDoc(F.doc(db,"groups",gid),{memberUids:F.arrayRemove(uid)}); },
     async deleteUserDoc(uid){ await F.deleteDoc(F.doc(db,"users",uid)); },
     // 계정 삭제 전 본인 확인: 구글 계정은 로그인 창을 한 번 더 띄워요 (익명 계정은 필요 없음)
-    async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return; appleCode="";
+    async reauth(){ const u=auth.currentUser; if(!u || u.isAnonymous) return; appleCode=""; appleWebToken="";
       const kakao=u.providerData.some(p=>p.providerId==="oidc.kakao"), apple=u.providerData.some(p=>p.providerId==="apple.com"), google=u.providerData.some(p=>p.providerId==="google.com");
-      if(apple && !google && !kakao){ if(!IS_APP) throw new Error("Apple로 만든 계정은 아이폰 앱에서 지워 주세요"); await AU.reauthenticateWithCredential(u, await appAppleCred()); return; }
+      if(apple && !google && !kakao){ if(IS_APP){ await AU.reauthenticateWithCredential(u, await appAppleCred()); return; }
+        const r=await AU.reauthenticateWithPopup(u, webApple()); appleWebToken=AU.OAuthProvider.credentialFromResult(r)?.accessToken||""; return; }
       if(IS_APP){ if(kakao) await withKakao(c=>AU.reauthenticateWithCredential(u,c)); else await AU.reauthenticateWithCredential(u, await appGoogleCred()); return; }   // 앱 안에서 탈퇴: 앱스토어 규칙 (2026-11-07)
       await AU.reauthenticateWithPopup(u,kakao?new AU.OAuthProvider("oidc.kakao"):new AU.GoogleAuthProvider()); },
     // 탈퇴 전에 애플 연결 끊기 (아이폰 앱, 2026-11-07). 애플을 연결만 해 둔 계정은 여기서 애플 확인을 한 번 더 받아요. 실패해도 탈퇴는 이어가요
-    async revokeApple(){ const u=auth.currentUser; if(!IS_APP || !IS_IOS || !u?.providerData.some(p=>p.providerId==="apple.com")) return;
+    async revokeApple(){ const u=auth.currentUser; if(!u?.providerData.some(p=>p.providerId==="apple.com")) return;
+      // 웹: 애플 액세스 토큰으로 파이어베이스가 애플 연결을 끊어요 (애플을 연결만 해 둔 계정은 애플 확인을 한 번 더). 실패해도 탈퇴는 이어가요
+      if(!IS_APP){ try{ if(!appleWebToken){ const r=await AU.reauthenticateWithPopup(u, webApple()); appleWebToken=AU.OAuthProvider.credentialFromResult(r)?.accessToken||""; }
+          if(appleWebToken) await AU.revokeAccessToken(auth, appleWebToken); }catch(e){ console.warn("애플 연결 끊기(웹)",e); reportError(`appleRevokeWeb ${e?.code||""} ${e?.message||""}`,"delete"); }
+        appleWebToken=""; return; }
+      if(!IS_IOS) return;
       try{ if(!appleCode) await appAppleCred(); if(appleCode) await api.callFn("appleRevoke",{code:appleCode}); }catch(e){ console.warn("애플 연결 끊기",e); reportError(`appleRevoke ${e?.code||""} ${e?.message||""}`,"delete"); }
       appleCode=""; },
     async deleteAccount(){ if(auth.currentUser) await AU.deleteUser(auth.currentUser); }
@@ -4490,6 +4503,7 @@ function viewLanding2(){
       <ul class="lp-row" aria-label="시작하기">
         ${sc({a:"signin"},"g",G_LOGO,"구글 로그인")}
         ${sc({a:"signin-kakao"},"k",ic("talk"),"카카오 로그인")}
+        ${sc({a:"signin-apple"},"ap",APPLE_LOGO,"Apple 로그인")}
         ${ios?sc({href:APPSTORE_URL},"p a",AS_LOGO,"앱 받기",'<i class="lp-new">NEW</i>'):sc({href:PLAY_URL},"p",PLAY_BIG,"앱 받기",'<i class="lp-new">NEW</i>')}
         ${sc({a:"kakao-share"},"s",ic("talk"),"카톡 공유")}
         ${sc({a:"copy",v:SHARE_URL},"s",ic("link"),"링크 복사")}
@@ -4506,6 +4520,7 @@ function viewLanding2(){
         <div class="lp-btns">
           <button type="button" class="lp-bt" data-act="signin">${G_LOGO}구글로 시작</button>
           <button type="button" class="lp-bt k" data-act="signin-kakao">${ic("talk")}카카오로 시작</button>
+          <button type="button" class="lp-bt ap" data-act="signin-apple">${APPLE_LOGO}Apple로 시작</button>
           <button type="button" class="lp-bt" data-act="kakao-share">${ic("talk")}카톡 공유</button>
           <button type="button" class="lp-bt" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button>
         </div>
@@ -6864,7 +6879,7 @@ function loginLinkRow(){
   const pv=B.providers(); if(!pv.length) return "";
   const item=(id,name,kind)=>pv.includes(id)||(S.me.mergedKinds||[]).includes(kind)?`<span class="chip conn"><i aria-hidden="true">✓</i>${name} 연결됨</span>`:`<button class="btn ${kind==="kakao"?"btn-kakao":"btn-ghost"} sm" data-act="link-login" data-v="${kind}">${kind==="kakao"?ic("talk"):""}${name}도 연결하기</button>`;
   return `<div class="login-link set-sub" style="margin-top:16px"><p class="muted" style="font-size:14px;margin:0 0 8px">로그인 방법 · 연결해 두면 어느 쪽으로 들어와도 같은 일기장이 열려요.</p>
-    <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}${(IS_APP&&IS_IOS)||pv.includes("apple.com")||(S.me.mergedKinds||[]).includes("apple")?item("apple.com","Apple","apple"):""}</div>
+    <div class="row">${item("google.com","구글","google")}${item("oidc.kakao","카카오","kakao")}${!IS_APP||IS_IOS||pv.includes("apple.com")||(S.me.mergedKinds||[]).includes("apple")?item("apple.com","Apple","apple"):""}</div>
     ${S.mergeKind?`<p style="margin:10px 0 0"><button class="btn btn-primary sm" data-act="merge-login" data-v="${S.mergeKind}">${loginName(S.mergeKind)}로 만든 프로필과 합치기</button></p>`:""}
     <p class="muted" style="font-size:13px;margin:8px 0 0">로그인 방법을 달리해 따로 들어와서 같은 사람이 둘로 보이면, 한쪽으로 로그인해 다른 쪽 '연결하기'를 눌러 하나로 합쳐 주세요.</p></div>`;
 }
@@ -7235,9 +7250,9 @@ const acts = {
     if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 구글로 가입되어 있어요. 구글로 로그인한 뒤 '설정 → 계정'에서 카카오를 연결해 주세요.");
     if(/popup-closed|cancelled-popup/.test(e.code||"")) return;
     throw e; } }),
-  "signin-apple": () => TOUR ? acts["tour-exit"]() : guard(async()=>{ try{ await B.signInApple(); }catch(e){
+  "signin-apple": () => TOUR ? acts["tour-exit"]() : (INAPP && !IS_APP) ? inappHelp() : guard(async()=>{ try{ await B.signInApple(); }catch(e){
     if(/account-exists-with-different-credential/.test(e.code||"")) throw new Error("같은 이메일로 이미 다른 방법으로 가입되어 있어요. 처음 가입한 방법으로 로그인한 뒤 '설정 → 계정'에서 Apple을 연결해 주세요.");
-    if(/popup-closed/.test(e.code||"")) return;   // 애플 로그인 창을 닫았을 때
+    if(/popup-closed|cancelled-popup/.test(e.code||"")) return;   // 애플 로그인 창을 닫았을 때
     throw e; } }),
   "link-login": el => guard(async()=>{
     const kind=el.dataset.v;
