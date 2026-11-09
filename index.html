@@ -70,6 +70,11 @@ body{
   background-size:28px 28px;
   -webkit-font-smoothing:antialiased; word-break:keep-all;
 }
+/* 화면이 옆으로 밀리지 않게: 무엇이 넘쳐도 화면 전체가 좌우로 움직이지 않아요 (clip은 스크롤 칸을 만들지 않아 위쪽 고정 띠도 그대로) */
+html,body{overflow-x:clip}
+/* 띄어쓰기 없이 아주 긴 글(자판 연습 "ㅁ뉴자ㅠ…", 긴 주소, 이모지만 잔뜩)도 칸 안에서 줄을 바꿔요.
+   break-word는 칸 너비를 정할 때 빠져서 카드가 글 길이만큼 넓어지고 화면이 옆으로 밀렸어요 → anywhere (2026-11-09 아이폰 하루 화면) */
+.day-text,.paper-lines,.day-orig div,.day-cmts,.day-fix,.cmt-text,.dcard-title,.dcard-ex,.detail-title,.pen-orig p,.fix-list,.ais-text,.rh-sum,.hc-t,.q-text,.w-title,.w-text,.w-hl{overflow-wrap:anywhere}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 a{color:var(--coral-ink)}
@@ -661,7 +666,7 @@ button.wk-dot:hover{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral-s
 .day-cform input:focus{outline:0;border-bottom-color:var(--pc)}
 .day-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .day-h b{color:var(--pc);font-size:16px}
-.day-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:break-word;background-image:repeating-linear-gradient(transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))}
+.day-text{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:anywhere;background-image:repeating-linear-gradient(transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))}
 .day-ph{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 .day-ph img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}
 .day-hearts{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--coral-ink)}
@@ -1304,8 +1309,8 @@ html.is-app .cm-bub{-webkit-touch-callout:none;-webkit-user-select:none;user-sel
 .fix-e{display:none}
 /* AI 다홍펜 선생님: 일기 칸 위 형광펜 + 다홍펜 칸 (공부방 다홍펜과 같은 모양) */
 .w-ed{position:relative}
-.w-ed .w-text{overflow:hidden;resize:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal}
-.w-hl{position:absolute;inset:0;border:1.5px solid transparent;border-radius:16px;padding:6px 16px;font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all;letter-spacing:normal;color:transparent;pointer-events:none;overflow:hidden}
+.w-ed .w-text{overflow:hidden;resize:none;white-space:pre-wrap;overflow-wrap:anywhere;word-break:keep-all;letter-spacing:normal}
+.w-hl{position:absolute;inset:0;border:1.5px solid transparent;border-radius:16px;padding:6px 16px;font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;overflow-wrap:anywhere;word-break:keep-all;letter-spacing:normal;color:transparent;pointer-events:none;overflow:hidden}
 .w-hl mark{color:transparent;background:rgba(255,214,51,.55);border-radius:4px}
 .w-hl mark.pen-ok{background:rgba(80,200,120,.35)}
 .w-hl mark.pen-ref{background:rgba(90,160,230,.18);border-bottom:2px dotted rgba(60,130,210,.7);border-radius:0}   /* 📘 참고: 안 고쳐도 되는 곳 */
@@ -5878,7 +5883,7 @@ html,body{margin:0;background:#E9EBF0;color:var(--navy);font-family:"Pretendard 
 .stamp{flex:none;transform:rotate(-10deg);color:var(--coral-ink);border:.9mm solid var(--coral);border-radius:48% 52% 45% 55%/55% 45% 55% 45%;padding:3mm 5mm;font-family:"Gowun Batang",serif;font-weight:700;font-size:13pt;margin-top:1mm}
 .stamp.sm{font-size:9.5pt;padding:1.5mm 3mm;border-width:.6mm}
 .d-title{margin:5mm 0 2mm;font-family:var(--diary);font-size:18pt;font-weight:700}
-.d-text{font-family:var(--diary);font-size:13pt;line-height:9.5mm;white-space:pre-wrap;overflow-wrap:break-word;background-image:repeating-linear-gradient(transparent 0,transparent calc(9.5mm - .3mm),var(--line) calc(9.5mm - .3mm),var(--line) 9.5mm);padding-bottom:1mm}
+.d-text{font-family:var(--diary);font-size:13pt;line-height:9.5mm;white-space:pre-wrap;overflow-wrap:anywhere;background-image:repeating-linear-gradient(transparent 0,transparent calc(9.5mm - .3mm),var(--line) calc(9.5mm - .3mm),var(--line) 9.5mm);padding-bottom:1mm}
 .basicp .d-text{min-height:95mm}
 .d-text.sm{font-size:11pt;line-height:7.5mm;background-image:repeating-linear-gradient(transparent 0,transparent calc(7.5mm - .3mm),var(--line) calc(7.5mm - .3mm),var(--line) 7.5mm)}
 .photos{display:grid;gap:3mm;margin-top:5mm}
