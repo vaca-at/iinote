@@ -8,7 +8,7 @@
 <meta name="description" content="매일 일기 습관부터 AI 다홍펜 선생님과 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="아이아이노트">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"아이아이노트","alternateName":"iiNote","url":"https://iinote.co.kr/","applicationCategory":"EducationalApplication","operatingSystem":"Web, Android","installUrl":"https://play.google.com/store/apps/details?id=kr.co.iinote.app","inLanguage":"ko","description":"가족이 함께 쓰는 일기장. 아이 일기는 AI 다홍펜 선생님이 맞춤법과 띄어쓰기를 봐 주고 칭찬과 응원을 해 줘요. 받아쓰기 퀴즈, 칭찬 도장, 성장 기록, 사진 일기, 일기책 PDF.","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"아이아이노트","alternateName":"iiNote","url":"https://iinote.co.kr/","applicationCategory":"EducationalApplication","operatingSystem":"Web, Android, iOS","installUrl":["https://play.google.com/store/apps/details?id=kr.co.iinote.app","https://apps.apple.com/kr/app/id6831842667"],"inLanguage":"ko","description":"가족이 함께 쓰는 일기장. 아이 일기는 AI 다홍펜 선생님이 맞춤법과 띄어쓰기를 봐 주고 칭찬과 응원을 해 줘요. 받아쓰기 퀴즈, 칭찬 도장, 성장 기록, 사진 일기, 일기책 PDF.","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}</script>
 <meta property="og:title" content="아이아이노트 - 온 가족이 함께 쓰는 일기장">
 <meta property="og:description" content="매일 일기 습관부터 AI 다홍펜 선생님과 맞춤법 공부, 성장 기록까지. 온 가족이 함께 쓰고 댓글과 칭찬 도장으로 응원하는 우리집 일기장이에요.">
 <meta property="og:image" content="https://iinote.co.kr/og.png?v=20261104">
@@ -162,6 +162,14 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .lp-play{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:12px 22px;border-radius:14px;background:#fff;color:#1F2A44;font-weight:700;font-size:17px;text-decoration:none}
 .lp-play .play-logo{width:22px;height:22px}
 .lp-b small{margin-top:16px;color:#8E97B0;font-size:13px}
+/* 🍎 (2026-11-10) Google Play · App Store QR 두 개 나란히 */
+.lp-qrs{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.lp-qrs figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:0}
+.lp-qrs .lp-qr{width:150px;height:150px;padding:12px}
+.lp-qrs .lp-play{margin-top:14px;padding:10px 16px;font-size:15px;min-width:150px;justify-content:center}
+.lp-qrs figcaption{margin-top:8px;color:#B9C0D4;font-size:12.5px}
+.apple-logo{width:22px;height:22px;flex:none;color:#111}
+.lp-sc.p.a .apple-logo{width:28px;height:28px;color:#fff}
 .lp-m{display:none}
 @media (max-width:900px){
   .lp{place-items:start center;padding-top:44px}
@@ -3270,7 +3278,7 @@ html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-d
     <li><b>사진 일기 · 일기책 PDF</b> · 사진을 넣어 하루를 남기고, 한 달 일기를 PDF 일기책으로 만들어요.</li>
     <li><b>5~7세 이야기 일기</b> · 아이가 엄마 · 아빠와 나눈 이야기를 녹음하면 아이 말투의 일기로 만들어 줘요.</li>
   </ul>
-  <p class="seo-note">광고 없음 · 아이는 계정 없이 · 휴대폰 · 아이패드 · 컴퓨터 어디서나 iinote.co.kr · 안드로이드 앱은 <a href="https://play.google.com/store/apps/details?id=kr.co.iinote.app">Google Play</a></p>
+  <p class="seo-note">광고 없음 · 아이는 계정 없이 · 휴대폰 · 아이패드 · 컴퓨터 어디서나 iinote.co.kr · 앱은 <a href="https://play.google.com/store/apps/details?id=kr.co.iinote.app">Google Play</a> · <a href="https://apps.apple.com/kr/app/id6831842667">App Store</a></p>
   <p class="seo-load">불러오는 중...</p>
   <noscript><p>아이아이노트는 자바스크립트를 켜야 쓸 수 있어요.</p></noscript>
 </main></div>
@@ -4374,6 +4382,9 @@ const ICONS = {
 const G_LOGO = `<svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
 // 📱 안드로이드 앱 (2026-11-03 Google Play 출시): 스토어 주소 · 플레이 삼각형 로고 (구글 상표 색 그대로)
 const PLAY_URL = "https://play.google.com/store/apps/details?id=kr.co.iinote.app";
+// 🍎 아이폰 · 아이패드 앱 (2026-11-10 App Store 출시)
+const APPSTORE_URL = "https://apps.apple.com/kr/app/id6831842667";
+const AS_LOGO = `<svg class="apple-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.37 12.6c-.02-2.1 1.72-3.12 1.8-3.17-.98-1.43-2.5-1.63-3.04-1.65-1.29-.13-2.52.76-3.18.76-.66 0-1.67-.74-2.74-.72-1.41.02-2.71.82-3.44 2.08-1.47 2.54-.37 6.3 1.05 8.36.7 1 1.53 2.13 2.61 2.09 1.05-.04 1.45-.68 2.72-.68 1.27 0 1.62.68 2.74.66 1.13-.02 1.85-1.02 2.54-2.03.8-1.17 1.13-2.3 1.15-2.36-.03-.01-2.2-.84-2.21-3.34zM14.3 6.43c.58-.7.97-1.68.86-2.65-.83.03-1.84.55-2.44 1.25-.53.62-1 1.62-.88 2.57.93.07 1.88-.47 2.46-1.17z"/></svg>`;
 const PLAY_LOGO = `<svg class="play-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M3.6 2.2C3.2 2.4 3 2.8 3 3.3v17.4c0 .5.2.9.6 1.1L13.4 12z"/><path fill="#34A853" d="M3.6 2.2 13.4 12l3.2-3.1z"/><path fill="#EA4335" d="M3.6 21.8 13.4 12l3.2 3.1z"/><path fill="#FBBC04" d="M16.6 8.9l3.8 2.2c.7.4.7 1.4 0 1.8l-3.8 2.2-3.2-3.1z"/></svg>`;
 const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]||""}</svg>`;
 const logo = s => `<span class="logo-wrap" style="width:${s}px;height:${s}px;border-radius:${Math.round(s*.227)}px"><svg viewBox="0 0 440 440" aria-hidden="true"><rect width="440" height="440" fill="#FBF6EE"/><line x1="0" y1="352" x2="440" y2="352" stroke="#E9DCC8" stroke-width="8"/><line x1="92" y1="0" x2="92" y2="440" stroke="#F2B5A4" stroke-width="8"/><rect x="148" y="178" width="54" height="174" rx="27" fill="#1F2A44"/><rect x="240" y="226" width="54" height="126" rx="27" fill="#1F2A44"/><circle cx="175" cy="122" r="34" fill="#EF6F53"/><circle cx="267" cy="170" r="34" fill="#F4BE45"/></svg></span>`;
@@ -4479,7 +4490,7 @@ function viewLanding2(){
       <ul class="lp-row" aria-label="시작하기">
         ${sc({a:"signin"},"g",G_LOGO,"구글 로그인")}
         ${sc({a:"signin-kakao"},"k",ic("talk"),"카카오 로그인")}
-        ${ios?sc({a:"a2hs"},"p","📲","홈 화면에 추가"):sc({href:PLAY_URL},"p",PLAY_BIG,"앱 받기",'<i class="lp-new">NEW</i>')}
+        ${ios?sc({href:APPSTORE_URL},"p a",AS_LOGO,"앱 받기",'<i class="lp-new">NEW</i>'):sc({href:PLAY_URL},"p",PLAY_BIG,"앱 받기",'<i class="lp-new">NEW</i>')}
         ${sc({a:"kakao-share"},"s",ic("talk"),"카톡 공유")}
         ${sc({a:"copy",v:SHARE_URL},"s",ic("link"),"링크 복사")}
       </ul>
@@ -4500,13 +4511,14 @@ function viewLanding2(){
         </div>
         ${kid}${extra}${foot}
       </section>
-      <aside class="lp-b" aria-label="안드로이드 앱">
-        ${PLAY_BIG}
+      <aside class="lp-b" aria-label="휴대폰 앱 받기">
         <h2>휴대폰은 앱으로</h2>
-        <p>휴대폰 카메라로 찍으면<br>Google Play로 바로 가요</p>
-        <img class="lp-qr" src="img/play-qr.svg" width="150" height="150" alt="Google Play 아이아이노트 QR 코드">
-        <a class="lp-play" href="${PLAY_URL}" target="_blank" rel="noopener">${PLAY_LOGO}Google Play</a>
-        <small>아이폰 · 아이패드 · 컴퓨터는 이 웹으로 써요</small>
+        <p>휴대폰 카메라로 찍으면 앱 받는 곳으로 바로 가요</p>
+        <div class="lp-qrs">
+          <figure><img class="lp-qr" src="img/play-qr.svg" width="150" height="150" alt="Google Play 아이아이노트 QR 코드"><a class="lp-play" href="${PLAY_URL}" target="_blank" rel="noopener">${PLAY_LOGO}Google Play</a><figcaption>안드로이드</figcaption></figure>
+          <figure><img class="lp-qr" src="img/appstore-qr.svg" width="150" height="150" alt="App Store 아이아이노트 QR 코드"><a class="lp-play" href="${APPSTORE_URL}" target="_blank" rel="noopener">${AS_LOGO}App Store</a><figcaption>아이폰 · 아이패드</figcaption></figure>
+        </div>
+        <small>컴퓨터는 이 웹(iinote.co.kr)으로 써요</small>
       </aside>
     </div></div>`;
   return `${tourBar()}<main class="lp">${pc}${mobile}</main>`;
@@ -6966,7 +6978,7 @@ function viewSettings(){
         <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추나 더보기 › 환경 설정에서 골라요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
       </section>
       <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
-        <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. ${IS_APP?"":`안드로이드 휴대폰은 <a href="${PLAY_URL}" target="_blank" rel="noopener">Google Play 앱</a>으로, 아이폰은 브라우저 공유 메뉴의 '홈 화면에 추가'로 아이콘을 만들어 쓸 수 있어요.`}</p>${addrBox()}${kakaoBtn(true)}
+        <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. ${IS_APP?"":`안드로이드 휴대폰은 <a href="${PLAY_URL}" target="_blank" rel="noopener">Google Play</a>, 아이폰 · 아이패드는 <a href="${APPSTORE_URL}" target="_blank" rel="noopener">App Store</a>에서 앱을 받을 수 있어요.`}</p>${addrBox()}${kakaoBtn(true)}
       </section>
     </div>
     <div class="col">
