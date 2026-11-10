@@ -2514,6 +2514,14 @@ html.is-app .set-page .set-sub{padding:0;border:0;background:none}
 .grow-col>.qg-kid{flex:none}
 .my-pf{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:inherit;font:inherit;text-align:left;cursor:pointer}
 .my-pf>.av{flex:none}
+.pf-ch-big{display:flex;align-items:center;gap:12px;width:100%;margin:8px 0 12px;padding:14px 16px;border:2px dashed #E4507F;border-radius:16px;background:linear-gradient(135deg,#FFF0F5,#FFF8E6);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+button.pf-av{border:0;background:none;padding:0;font:inherit;cursor:pointer}
+.pf-ch-big i{font-style:normal;font-size:30px;flex:none}
+.pf-ch-big span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pf-ch-big b{font-size:16px;color:#C2366A}
+.pf-ch-big small{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.pf-ch-grid label.mine{background:color-mix(in srgb,#E4507F 8%,transparent);border-radius:12px}
+:root[data-theme="dark"] .pf-ch-big{background:color-mix(in srgb,#E4507F 14%,var(--surface))}
 .my-pf-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .my-pf b{font-size:17px}.my-pf small{color:var(--ink2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kid-col{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -4528,6 +4536,9 @@ const CHARS = [
   ["phoenix","🐦‍🔥","피닉스","fire"],["moonwolf","🐺","달빛 늑대","moon"],["peacock","🦚","무지개 공작","rainbow"],
   ["goldeagle","🦅","황금 독수리","gold"],["kraken","🦑","심해의 크라켄","deep"],["stardeer","🦌","별빛 사슴","star"],
 ];
+// 내가 넣은 그림들 (2026-11-10): 새 그림을 넣어도 예전 그림은 지우지 않고 char.imgs 에 남겨 두어 나중에 다시 골라요 (최대 8개)
+const CHAR_IMG_MAX = 8;
+const charImgsOf = p => { const c=p?.char||{}, out=[]; [c.img,...(c.imgs||[])].forEach(x=>{ if(x?.url && !out.some(y=>y.url===x.url)) out.push(x); }); return out.slice(0,CHAR_IMG_MAX); };
 const charOf = p => { const c=p?.char; if(!c) return null; if(c.img?.url) return {img:c.img.url, n:"내 캐릭터"};
   const x=CHARS.find(k=>k[0]===c.id); return x?{e:x[1], n:x[2], fx:x[3]||""}:null; };
 // 캐릭터 그림 한 개 (얼굴 동그라미 · 연속 기록 자리). 없으면 dflt(보통 🔥)
@@ -7291,7 +7302,11 @@ addEventListener("beforeunload",e=>{ if(upBusy){ e.preventDefault(); e.returnVal
 // 아이폰은 '사진 보관함'을 고르는 사이에 cancel 을 잘못 보내기도 해서, 아이폰에서는 cancel 로 닫지 않아요
 // 대신 이 띠는 안내일 뿐이라(닫아도 사진은 그대로 와요) 여러 길로 금방 닫혀요 (2026-10-13, 띠가 남아 저장을 못 한다는 제보):
 //   사진이 오면 · 띠나 ✕ 를 누르면 · 사진 창에서 돌아온 뒤 10초 안에 사진이 안 오면 · 늦어도 1분 뒤
-const UP_WAIT_MAX = 60000, UP_BACK_WAIT = 10000;
+// (2026-11-10) 아이폰 · 아이패드 앱의 사진 고르기 · 사진 찍기 창은 앱 안에서 떠서, 닫고 나와도 '돌아왔다' 신호가 안 와 띠가 1분 동안 남았어요
+//   → cancel(안 고르고 닫음)도 받고, 띠가 뜬 뒤 화면을 한 번 누르면 닫고, 길어도 30초에 닫아요. 사진이 늦게 와도 저장은 그대로 돼요(띠는 안내일 뿐)
+const UP_WAIT_MAX = 30000, UP_BACK_WAIT = 10000;
+let upWaitAt=0;
+document.addEventListener("pointerdown",()=>{ if(document.querySelector("#upbar.wait") && Date.now()-upWaitAt>1500) upProg(); },true);
 let upBackT=0;
 function upWaitBack(){ clearTimeout(upBackT); if(!document.querySelector("#upbar.wait")) return;
   upBackT=setTimeout(()=>{ if(document.querySelector("#upbar.wait")) upProg(); },UP_BACK_WAIT); }
@@ -7302,8 +7317,8 @@ document.addEventListener("click",e=>{
   const t=e.target instanceof HTMLInputElement ? e.target : e.target.closest?.("label")?.querySelector('input[type="file"]');
   if(!t || t.type!=="file" || !/^image/.test(t.accept||"") || document.querySelector("#upbar:not([hidden])")) return;
   upProg("📥 사진을 가져오는 중…",0,0,{wait:true,note:"✓ 를 누른 뒤 사진을 받아 오는 데 조금 걸릴 수 있어요 · 안 골랐으면 ✕ 나 띠를 눌러서 닫기"});
-  upWaitT=setTimeout(()=>upProg(),UP_WAIT_MAX);
-  if(!IS_IOS) t.addEventListener("cancel",()=>{ if(document.querySelector("#upbar.wait")) upProg(); },{once:true});
+  upWaitT=setTimeout(()=>upProg(),UP_WAIT_MAX); upWaitAt=Date.now();
+  t.addEventListener("cancel",()=>{ if(document.querySelector("#upbar.wait")) upProg(); },{once:true});
   // 사진 창이 열린 사이 화면이 다시 그려지면 이 칸이 화면에서 빠져, 사진이 와도 아래 change 처리까지 닿지 않아요
   // → 빠진 칸이면 잠깐 화면에 붙여 같은 change 를 다시 보내요 (사진을 잃지 않고, 띠도 닫혀요)
   t.addEventListener("change",()=>{
@@ -8289,7 +8304,8 @@ function viewProfile(){
   const third = p.type==="child" ? ["받은 도장",done.filter(d=>d.stamp).length+"개"] : ["받은 하트",done.reduce((s,d)=>s+heartsOf(d).length,0)+"개"];
   const sub=[p.type==="child"?gradeName(p.grade):"", isMine(p)?"나":""].filter(Boolean).join(" · ");
   const cover = p.cover?.url ? `background-image:url('${esc(p.cover.url)}')` : `background:color-mix(in srgb,${c} 28%,#fff)`;
-  const face = ed && full ? `<label class="pf-av" aria-label="얼굴 사진 바꾸기">${av(p,112)}<span class="pf-cam">${ic("camera")}</span><input type="file" class="pf-file sr" data-kind="photo" accept="image/*"></label>`
+  // (2026-11-10) 프로필 얼굴은 캐릭터로 통일: 편집 중 얼굴을 누르면 '캡처한 그림으로 내 캐릭터 만들기'
+  const face = ed && can ? `<button type="button" class="pf-av" data-act="prof-char-ed" aria-label="캡처한 그림으로 내 캐릭터 만들기">${av(p,112)}<span class="pf-cam">${ic("camera")}</span></button>`
     : can && !ed ? `<button class="pf-av" data-act="prof-edit" aria-label="프로필 편집">${av(p,112)}<span class="pf-cam">${ic("pen")}</span></button>`
     : `<span class="pf-av">${av(p,112)}</span>`;
   const view = `<h2 class="pf-name">${esc(p.name)}</h2>${sub?`<p class="pf-sub">${esc(sub)}</p>`:""}
@@ -8307,17 +8323,16 @@ function viewProfile(){
     ${can?`<button class="btn btn-primary pf-editbtn" data-act="prof-edit">${ic("pen")}프로필 편집</button>`:""}`;
   const form = `<form class="pf-form" data-form="prof" data-id="${esc(p.id)}">
     ${full?`<label class="pf-f"><span>이름</span><input name="name" value="${esc(p.name)}" maxlength="10" required></label>`
-      :`<p class="pf-note">이름 · 생일 · 얼굴 사진은 엄마 · 아빠가 바꿔 줄 수 있어요. 캐릭터 · 배경 사진 · 하고 싶은 말은 내가 직접 꾸며요!</p>`}
+      :`<p class="pf-note">이름 · 생일은 엄마 · 아빠가 바꿔 줄 수 있어요. 캐릭터 · 배경 사진 · 하고 싶은 말은 내가 직접 꾸며요!</p>`}
     <label class="pf-f"><span>가족에게 하고 싶은 말 <small>40자까지</small></span><input name="msg" value="${esc(p.msg||"")}" maxlength="40" placeholder="예: 이번 주도 화이팅!"></label>
     ${!full?"":`<label class="pf-f"><span>생일 <small>(선택 · 월과 날만)</small></span><span class="pf-bd"><select name="bm" aria-label="생일 월"><option value="">월</option>${[...Array(12)].map((_,i)=>`<option value="${i+1}" ${+(p.birthday||"").slice(0,2)===i+1?"selected":""}>${i+1}월</option>`).join("")}</select><select name="bd" aria-label="생일 날"><option value="">일</option>${[...Array(31)].map((_,i)=>`<option value="${i+1}" ${+(p.birthday||"").slice(3,5)===i+1?"selected":""}>${i+1}일</option>`).join("")}</select></span><em>가족 생일 위젯 · 홈 디데이 줄(2주 전부터)에 🎂 로 나와요. 같은 가족에게만 보여요.</em></label>`}
-    <fieldset class="pf-ch"><span>🐾 내 캐릭터 <small>얼굴 동그라미(사진보다 먼저) · 🌟 연속 기록 자리에 나와요</small></span>
+    <fieldset class="pf-ch"><span>🐾 내 캐릭터 <small>프로필 얼굴 · 🌟 연속 기록 자리에 나와요</small></span>
+      <button type="button" class="pf-ch-big" data-act="prof-char-ed"><i>📸</i><span><b>캡처한 그림으로 내 캐릭터 만들기</b><small>좋아하는 캐릭터를 캡처해서 넣으면 바탕을 지우고 얼굴로 맞춰 줘요. 넣은 그림은 아래에 계속 남아서 언제든 다시 골라요.</small></span></button>
       <div class="pf-ch-grid" role="radiogroup" aria-label="내 캐릭터">
-        <label title="이름 글자"><input type="radio" name="char" value="" ${p.char?"":"checked"}><b style="font-size:20px">${esc((p.name||"?").slice(0,1))}</b><small>글자</small></label>
-        ${p.char?.img?.url?`<label title="내가 넣은 그림"><input type="radio" name="char" value="img" checked><img class="ch-img" src="${esc(p.char.img.url)}" alt=""><small>넣은 그림</small></label>`:""}
+        <label title="이름 글자"><input type="radio" name="char" value="" ${charOf(p)?"":"checked"}><b style="font-size:20px">${esc((p.name||"?").slice(0,1))}</b><small>글자</small></label>
+        ${charImgsOf(p).map((x,i)=>`<label class="mine" title="내가 넣은 그림"><input type="radio" name="char" value="img:${i}" ${p.char?.img?.url===x.url?"checked":""}><img class="ch-img" src="${esc(x.url)}" alt=""><small>넣은 그림${i+1}</small></label>`).join("")}
         ${CHARS.map(([k,e,n,fx])=>`<label class="${fx?"leg":""}" title="${esc(n)}"><input type="radio" name="char" value="${k}" ${p.char?.id===k?"checked":""}><span class="ch-e ${fx?"chx-"+fx:""}">${e}</span><small>${esc(n)}</small></label>`).join("")}
       </div>
-      <div class="pf-ch-up"><button type="button" class="btn btn-soft" data-act="prof-char-ed">${ic("camera")}캡처한 그림 넣기</button>
-        <em>좋아하는 캐릭터 그림을 캡처해서 붙여 넣거나 골라 주세요. 바탕을 지우고 캐릭터만 꽉 차게 맞춰 주고, 넣기 전에 눈으로 보며 크기 · 자리를 고칠 수 있어요.</em></div>
     </fieldset>
     ${canEditPhone(p)?`<label class="pf-f"><span>전화번호 <small>(선택)</small></span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" value="${esc(p.phone||"")}" maxlength="20" placeholder="010-0000-0000"><em>같은 가족에게만 보여요. 비워 두면 전화 · 문자 단추가 안 보여요.${p.type==="child"?" 아이 번호는 보호자만 넣을 수 있어요.":""}</em></label>`
       : p.type==="child"?`<p class="pf-note">전화번호는 엄마 · 아빠가 넣어 줄 수 있어요</p>`:""}
@@ -8482,8 +8497,9 @@ async function profCharSave(png){
     try{ r=await B.uploadMedia(`groups/${S.gid}/profiles/${p.id}/char_${rid()}.png`,png); }
     catch(e1){ console.warn("캐릭터 기본 저장소 실패 → 사진첩 저장소",e1); where="album"; r=await B.uploadMedia(`groups/${S.gid}/album/char_${p.id}_${rid()}.png`,png,"album"); }
     step="저장";
-    const old=p.char?.img; await B.update(S.gid,"profiles",p.id,{char:{img:{url:r.url,path:r.path,...(where?{where}:{})}}});
-    if(old?.path) B.deleteMedia(old.path,old.where||undefined).catch(()=>{});
+    const img={url:r.url,path:r.path,...(where?{where}:{})}, all=[img,...charImgsOf(p)], keep=all.slice(0,CHAR_IMG_MAX);
+    await B.update(S.gid,"profiles",p.id,{char:{img,imgs:keep}});
+    all.slice(CHAR_IMG_MAX).forEach(x=>{ if(x.path) B.deleteMedia(x.path,x.where||undefined).catch(()=>{}); });   // 8개 넘은 오래된 그림만 지워요
     await reload("profiles"); upProg(); buzz("ok"); render(); toast("캐릭터를 넣었어요");
   }catch(e){ console.error(e); upProg(); toast(`그림을 넣지 못했어요 (${step}: ${String(e?.code||e?.message||e).slice(0,60)})`); throw e; }
 }
@@ -8546,11 +8562,11 @@ forms.prof = (fd,f) => guard(async()=>{
   const data=full?{name, msg, birthday:fd.bm&&fd.bd?`${pad(+fd.bm)}-${pad(+fd.bd)}`:""}:{msg};   // 아이 스스로: 하고 싶은 말 · 캐릭터만
   if(canEditPhone(p) && "phone" in fd){ const ph=String(fd.phone||"").replace(/[^\d+\- ]/g,"").trim().slice(0,20);
     if(ph && telOf(ph).length<8){ toast("전화번호를 다시 확인해 주세요"); return; } data.phone=ph; }
-  // 🐾 캐릭터: "" = 이름 글자, "img" = 넣은 그림 그대로, 그 밖 = 목록의 캐릭터 (넣은 그림을 안 쓰게 되면 파일도 지워요)
-  let oldImg=null;
-  if("char" in fd && fd.char!=="img"){ const id=String(fd.char||""); data.char=CHARS.some(k=>k[0]===id)?{id}:null; oldImg=p.char?.img||null; }
+  // 🐾 캐릭터: "" = 이름 글자, "img:N" = 내가 넣은 그림 N번째, 그 밖 = 목록의 캐릭터. 넣은 그림들(imgs)은 늘 남겨 둬요
+  if("char" in fd){ const v=String(fd.char||""), imgs=charImgsOf(p), keep=imgs.length?{imgs}:{};
+    if(v.startsWith("img:")){ const x=imgs[+v.slice(4)]; if(x) data.char={img:x,...keep}; }
+    else data.char=CHARS.some(k=>k[0]===v)?{id:v,...keep}:(imgs.length?keep:null); }
   await B.update(S.gid,"profiles",p.id,data); await reload("profiles");
-  if(oldImg?.path) B.deleteMedia(oldImg.path,oldImg.where||undefined).catch(()=>{});
   S.profEdit=false; render(); buzz("ok"); toast("프로필을 바꿨어요");
 });
 // 📅 시간표 단추 · 저장 (acts · forms 가 만들어진 뒤에 붙여요)
