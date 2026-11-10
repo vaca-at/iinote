@@ -2434,6 +2434,7 @@ html.is-app .set-page .set-sub{padding:0;border:0;background:none}
 .hc-ev.more{background:none;padding:0 3px;color:var(--ink3)}
 /* 다가오는 일정: 휴대폰은 화면 1/4 높이 안에서 스크롤, 넓은 화면은 달력 3 : 일정 1 로 나란히 */
 .hp-calwrap .sc-scroll{max-height:25vh;overflow-y:auto}
+.cst-side{display:none}
 @media (min-width:760px){
   .hp-calwrap{display:grid;grid-template-columns:3fr 1fr;gap:12px;align-items:start}
   .hp-calwrap > .block + .block{margin-top:0}
@@ -3237,6 +3238,21 @@ html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-d
   html.is-app .chatting .chat{max-width:860px;margin-inline:auto;width:100%}
   /* 사진첩: 사진을 더 크게 */
   html.is-app .al-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+  /* 달력 쪽: 초록 안내 → 상장 → 달력이 아래 메뉴까지 꽉, 가족 칸은 오른쪽 일정 아래로 */
+  html.is-app .ashell:has(.hp[data-hp="cal"]){display:flex;flex-direction:column;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+  html.is-app .ashell:has(.hp[data-hp="cal"]) .a-main{flex:1;display:flex;flex-direction:column;padding-bottom:8px}
+  html.is-app .hp[data-hp="cal"]{flex:1;display:flex;flex-direction:column}
+  html.is-app .hp[data-hp="cal"]>.hp-green{order:-2}
+  html.is-app .hp[data-hp="cal"]>:not(.hp-green):not(.hp-calwrap){order:-1}
+  html.is-app .hp[data-hp="cal"] .hp-calwrap{flex:1;align-items:stretch}
+  html.is-app .hp[data-hp="cal"] .hp-cal{display:flex;flex-direction:column;margin:0}
+  html.is-app .hp[data-hp="cal"] .hc-grid{flex:1;grid-template-rows:auto;grid-auto-rows:minmax(64px,1fr)}
+  html.is-app .hp[data-hp="cal"] .hc-d{min-height:0}
+  html.is-app .hp[data-hp="cal"] .hp-cal>.cst{display:none}
+  html.is-app .hp[data-hp="cal"] .hc-side{display:flex;flex-direction:column;gap:12px;min-width:0}
+  html.is-app .hp[data-hp="cal"] .hc-side>.block{margin:0}
+  html.is-app .hp[data-hp="cal"] .cst-side{display:block}
+  html.is-app .hp[data-hp="cal"] .cst-side .cst{display:flex;flex-direction:column;gap:8px;margin:0}
   /* 로딩 화면 글씨도 크게 */
   #boot .bt-name{font-size:72px}
   #boot.bt-B .bt-name,#boot.bt-D .bt-name{font-size:64px}
@@ -4838,7 +4854,7 @@ function viewGrow(){
 function viewHomePages(){
   const k=hpage();
   const body = k==="cal" ? hpCal() : k==="album" ? viewAlbum() : k==="report" ? viewReport() : k==="quiz" ? viewQuizHome() : k==="fav" ? viewFavPage() : hpDiary();
-  return `<div class="hp" data-hp="${k}">${k==="diary"||k==="cal"?wipBanner()+consentBanner()+awardBanner()+(k==="diary"?greenBanners():""):""}${body}${k==="cal"?greenBanners():""}</div>`;   // 상장 · 다홍펜 안내 · 디데이는 홈 첫 쪽(달력)과 일기장 쪽에
+  return `<div class="hp" data-hp="${k}">${k==="diary"||k==="cal"?wipBanner()+consentBanner()+awardBanner()+(k==="diary"?greenBanners():""):""}${body}${k==="cal"?greenWrap():""}</div>`;   // 상장 · 다홍펜 안내 · 디데이는 홈 첫 쪽(달력)과 일기장 쪽에
 }
 // 1쪽 일기장: 누구 일기(가족 모두 · 한 사람) + ‹ › 로 오늘 · 어제 · 그저께 …
 function hpDiary(){
@@ -4888,7 +4904,7 @@ function hpCal(){
     <div class="hc-grid">${DAYS.map((w,i)=>`<span class="hc-w ${i===0?"red":i===6?"blue":""}">${w}</span>`).join("")}${lead?`<span style="grid-column:span ${lead}"></span>`:""}${cells}</div>
     ${calStats(ps,dates)}
     ${month!==t.slice(0,7)?`<button class="btn btn-ghost sm" data-act="cal-move" data-v="0">이번 달로</button>`:""}
-  </section>${viewSchedules()}</div>`;
+  </section><div class="hc-side">${viewSchedules()}<div class="cst-side block">${calStats(ps,dates)}</div></div></div>`;   // cst-side: 큰 화면 앱에서만 일정 아래에 가족 칸
 }
 // 4쪽 소식: 가족의 새 일기 · 댓글 · 답글, 내 일기에 온 하트 · 도장 (최근 2주)
 function famNews(){
@@ -5080,6 +5096,8 @@ function tipBanner(){
   return `<div class="pen-ask tip-ask" role="note" title="${esc(text)}"><span class="pen-ask-i" aria-hidden="true">${ic1}</span><p><b>오늘의 기능</b> ${esc(text)}</p>${to?`<button class="btn pill2 sm" data-act="tip-go" data-v="${i}"><i aria-hidden="true">›</i><span>보기</span></button>`:""}<button class="link-btn pen-ask-x" data-act="tip-x" aria-label="오늘은 그만 보기">✕</button></div>`;
 }
 // 초록 띠는 많아야 두 줄: 해야 할 설정(다홍펜 · 꺼 둔 기능)이 먼저, 남는 자리에 오늘의 기능
+// 달력 쪽 초록 안내 한 줄: 큰 화면 앱에서는 탭 바로 아래로 올려요 (hp-green)
+const greenWrap = () => { const g=greenBanners(); return g?`<div class="hp-green">${g}</div>`:""; };
 const greenBanners = () => [penAskBanner(), featAskBanner(), tipBanner()].filter(Boolean).slice(0,1).join("");   // 앱 · 웹 모두 본문 아래 한 줄만 (2026-11-06)
 // 다홍펜 띠: 한 번 "고르기"를 누르면 이 기기에서는 다시 안 떠요 (설정 자리를 알게 됐으니까)
 const penAskKey = () => `iinote-penask-${S.gid}`;
