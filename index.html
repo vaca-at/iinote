@@ -8776,7 +8776,13 @@ function widgetData(){
   // 🌤 오늘 날씨 한 줄 위젯: 앱에서 날씨를 켠 기기만 (wxGet), 없으면 켜는 안내
   const weather=wxGet();
   // 위젯(FwTheme.java)은 디자인 여섯 가지만 알아요 → 황금 들녘은 같은 금빛 계열인 산뜻으로 (새 AAB 에서 위젯 색을 넣기 전까지)
-  return {family:S.group?.name||"우리 가족", design:S.design==="harvest"?"bright":S.design, photos:ph, kids, events:up, eventNote, cal, tt, chat, ddays, bdays, snap, weather};
+  // 🍎 아이폰 위젯 (2026-11-10): 디데이 위젯이 비지 않게 다가오는 공휴일 · 명절, 아이패드 베스트 앨범 위젯에 베스트 일기(글이 긴 일기) 둘 · 짧은 일기 둘
+  const hols=Object.keys(HOLIDAYS).filter(d=>d>=t).sort().slice(0,8).map(d=>({date:d,title:HOLIDAYS[d]}));
+  const sub=S.diaries.filter(d=>d.status==="submitted"&&(d.text||"").trim()), clen=d=>countChars(d.text||"");
+  const dcard=d=>{ const p=prof(d.profileId); return {id:d.id, label:md(d.date), name:p?.name||"", color:pcol(p), text:cut(d.text,140)}; };
+  const best=sub.filter(d=>clen(d)>=60).sort((a,b)=>clen(b)-clen(a)).slice(0,2), bestIds=new Set(best.map(d=>d.id));
+  const notes=sub.filter(d=>!bestIds.has(d.id)&&!(d.photos||[]).length).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,2);
+  return {family:S.group?.name||"우리 가족", design:S.design==="harvest"?"bright":S.design, photos:ph, kids, events:up, eventNote, cal, tt, chat, ddays, bdays, snap, weather, hols, best:best.map(dcard), notes:notes.map(dcard)};
 }
 /* 🌤 위젯 날씨 (2026-10-09, 앱만): 위젯의 '날씨 켜기'를 누르면(iinote://weather) 위치를 한 번 묻고, 대략 위치(소수 둘째 자리 ≈ 1km)를
    Open-Meteo(무료 · 키 없음)에 보내 지금 날씨만 받아요. 위치 · 날씨는 이 기기에만 1시간 보관(ls iinote-wx), 서버에 저장 안 함 */
@@ -8821,7 +8827,7 @@ function appPath(url){
   try{ const u=new URL(url);
     if(u.protocol==="iinote:"){ const k=(u.host||u.pathname.replace(/^\/+/,"")).toLowerCase();
       if(k==="diary" && u.searchParams.get("d")) return "/?d="+encodeURIComponent(u.searchParams.get("d"));   // 하루 한 장 위젯 → 그 일기
-      return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz",mine:"/mine",cal:"/",tt:"/",family:"/family"})[k]||"/"; }   // mine · cal · tt: 하트 · 달력 · 시간표 위젯 (2026-10-08)   // quiz: 받아쓰기 위젯 (2026-10-07)
+      return ({write:"/write",chat:"/chat",album:"/album",home:"/",quiz:"/quiz",mine:"/mine",cal:"/",tt:"/",day:"/",family:"/family"})[k]||"/"; }   // day: 아이폰 바로 가기 위젯의 '하루' (2026-11-10)   // mine · cal · tt: 하트 · 달력 · 시간표 위젯 (2026-10-08)   // quiz: 받아쓰기 위젯 (2026-10-07)
     return u.pathname+u.search; }catch(e){ return /^\//.test(String(url||"")) ? String(url) : "/"; } }
 function openAppUrl(url){
   if(url==="help"){ if(S.phase==="app" && S.me) acts["help-open"](); else S.wantHelp=true; return; }   // 운영자 답장 알림
@@ -8829,7 +8835,7 @@ function openAppUrl(url){
   if(/^iinote:\/\/weather/i.test(String(url||""))){ wxFetch(true); return; }                              // 🌤 날씨 위젯 '날씨 켜기'
   const p=appPath(url);
   // 위젯 '달력 보러 가기' · '시간표 보러 가기' → 홈의 달력 쪽 · 즐겨찾기 쪽의 시간표 칸 (2026-10-08)
-  const wk=/^iinote:\/\/(cal|tt)\b/i.exec(String(url||"")); if(wk){ S.hpage = wk[1].toLowerCase()==="cal" ? "cal" : "fav"; if(S.hpage==="fav") S.favTab="tt"; }
+  const wk=/^iinote:\/\/(cal|tt|day)\b/i.exec(String(url||"")); if(wk){ const w=wk[1].toLowerCase(); S.hpage = w==="cal" ? "cal" : w==="day" ? "diary" : "fav"; if(S.hpage==="fav") S.favTab="tt"; }
   // 🔗 카톡 · 문자로 받은 초대 링크(https://iinote.co.kr/?join=… · ?k=…)가 앱으로 열리면: 그 주소로 앱 화면을 한 번 새로 열어 초대를 받아요 (2026-10-07)
   if(/[?&](join|k)=/.test(p) && !location.search.includes(p.split("?")[1]||"\u0000")){ location.replace(p); return; }
   if(S.phase==="app" && S.me && S.routed){
