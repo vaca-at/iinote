@@ -3348,6 +3348,22 @@ html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-d
   #boot.bt-C .bl{--d:60px;--w:52px;--h:164px;--h2:118px;--g:26px;--dg:14px}
   #boot .bt-bub{font-size:32px;padding:14px 22px}
 }
+/* 📖 사용설명서 (차례 칩 · 번호 제목 · 표 · 도움말 상자) */
+.mn-toc{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.mn-toc button{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px 5px 6px;font:inherit;font-size:13.5px;cursor:pointer}
+.mn-toc i,.mn-sec h2 i{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--coral,#EF6F53);color:#fff;font-style:normal;font-size:11.5px;font-weight:800;flex:none}
+.mn-sec{scroll-margin-top:72px;padding-top:6px}
+.mn-sec h2{display:flex;align-items:center;gap:8px;font-size:18px;margin:22px 0 8px;padding-top:14px;border-top:1.5px dashed var(--line)}
+.mn-sec h2 i{width:24px;height:24px;font-size:13px}
+.mn-sec ol,.mn-sec ul{margin:0 0 10px;padding-left:20px;line-height:1.7}
+.mn-sec li{margin:3px 0}
+.mn-sec p{line-height:1.7}
+.mn-sec table{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 10px;background:var(--surface);border-radius:12px;overflow:hidden}
+.mn-sec th,.mn-sec td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.6}
+.mn-sec th{color:var(--ink3);font-weight:600;font-size:12.5px}
+.mn-sec td:first-child{white-space:nowrap;font-weight:700}
+.mn-tip{border-left:3px solid var(--coral,#EF6F53);background:color-mix(in srgb,var(--coral,#EF6F53) 8%,transparent);border-radius:0 10px 10px 0;padding:8px 12px;font-size:14px}
+.mn-foot{margin-top:20px;font-size:13px;color:var(--ink3)}
 /* ✨ 앱 움직임 (2026-11-11, 시안 B '통통 튀는 반응' + 시안 A '도장 쿵')
    앱에서만 움직여요 (웹은 그대로). 휴대폰에서 '동작 줄이기'를 켜면 하나도 움직이지 않아요
    - 단추를 누르면 쏙 들어갔다가 통 튀어나와요
@@ -4891,7 +4907,84 @@ const pageBox = (t,say,inner) => `<div class="page-h"><h1>${t}</h1></div><div cl
 // (2026-11-10) 환경 설정 = 앱 설정 · 화면 설정(이 기기) + 일기 쓰기 설정(가족 모두). 디자인 · 글씨는 위 막대 🎨 · 가 단추에서
 const viewEnv = () => `<div class="page-h"><h1>환경 설정</h1></div>
   <div class="fam-grid set-page"><div class="col">${IS_APP?appSettings():""}${setScreen()}</div><div class="col">${isParent()?viewFeatToggles():`<p class="set-hint">일기 쓰기 설정은 엄마 · 아빠가 정해요.</p>`}</div></div>`;
-const viewManual = () => pageBox("사용설명서","궁금한 것을 눌러 보세요. 더 궁금하면 '개발자와 상담'으로 물어보세요.",FAQ.map(([q,a])=>`<details class="pk-d"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join(""));
+/* 📖 사용설명서 (2026-11-11, 큰법당 · 캠핑장 설명서 모양): 차례 → 처음 오셨다면 → 화면 한눈에 → 하나씩 → 기록은 어디에 → 자주 묻는 것
+   고칠 때는 아래 MAN 목록의 글만 바꾸면 돼요. [제목, 번호표, 내용] · 내용 안에서 쓸 수 있는 것: <b> <ol> <ul> <table> <p class="mn-tip"> */
+const MAN = () => { const A=IS_APP, more=A?"더보기(☷)":"위 메뉴";
+  return [
+  ["start","처음 오셨다면",`<ol>
+    <li><b>보호자</b>가 구글 · 카카오 · Apple 가운데 하나로 로그인하고 가족 일기장을 만들어요.</li>
+    <li>${more} › <b>우리 가족 설정</b>에서 아이 프로필을 만들고, 엄마 · 아빠 같은 다른 가족은 <b>초대 링크</b>로 불러요.</li>
+    <li>아이는 계정이 없어도 돼요. 보호자가 보낸 <b>휴대폰 연결 링크</b>를 아이 휴대폰에서 한 번 누르면 바로 들어와요.</li>
+    <li>가운데 <b>✎</b> 단추를 눌러 첫 일기를 써 보세요.</li>
+  </ol><p class="mn-tip">로그인 없이 먼저 구경하고 싶으면 첫 화면의 <b>👀 둘러보기</b>를 누르세요. 예시 가족 일기장이 열리고, 거기서 쓴 것은 이 기기에만 남아요.</p>`],
+  ["screen","화면 한눈에",`<table><thead><tr><th>자리</th><th>무엇이 있나요</th></tr></thead><tbody>
+    <tr><td>위 막대</td><td>가족 이름(누르면 홈) · ${A?"<b>🎨</b> 디자인 · <b>가</b> 글씨체 · ":""}<b>🔔</b> 새 소식(내 일기에 온 댓글 · 하트 · 도장)</td></tr>
+    <tr><td>홈 위 칩</td><td><b>달력 · 하루 · 사진첩</b>, 보호자는 <b>AI 리포트</b>, 아이는 <b>받아쓰기</b>, 그리고 <b>즐겨찾기</b>. 옆으로 밀어도 넘어가요</td></tr>
+    ${A?`<tr><td>아래 줄</td><td>홈 · 내 일기 · <b>✎ 일기 쓰기</b> · 채팅 · 더보기</td></tr>
+    <tr><td>더보기</td><td>내 설정 · 환경 설정 · 우리 가족 설정 / 아이들 현황 · 그래프 · PDF · 백업 · 사용설명서. 아래에 카카오톡 공유 · 링크 복사 · 개발자와 상담</td></tr>`
+      :`<tr><td>위 메뉴</td><td>홈 · 내 일기 · 하루 · 사진첩 · 책장 같은 화면과 다른 메뉴, 오른쪽에 💬 가족 채팅</td></tr>`}
+  </tbody></table>`],
+  ["write","일기 쓰기",`<ol>
+    <li><b>✎</b>를 누르면 오늘 일기 칸이 열려요. 날짜를 바꾸면 지난 날 일기도 쓸 수 있어요.</li>
+    <li>날씨와 기분을 고르고, 오늘 있었던 일을 적어요. 사진은 한 일기에 9장까지, 소리는 3분까지 넣을 수 있어요.</li>
+    <li><b>임시 저장</b>은 나만 보고, <b>올리기</b>(아이는 <b>제출하기</b>)를 누르면 가족이 함께 봐요.</li>
+  </ol><ul>
+    <li><b>쓰다가 나가도 괜찮아요.</b> 쓰던 글은 이 기기에 보관돼서 홈에서 이어 쓸 수 있어요.</li>
+    <li><b>손글씨 일기 사진으로 쓰기</b>: 종이 일기장을 찍으면 AI가 글자로 옮겨 줘요. 우리 가족 설정에서 켜요.</li>
+    <li><b>이야기로 일기 쓰기</b>(5~7세): 엄마 · 아빠가 묻고 아이가 대답하는 3분 녹음으로, AI가 아이가 한 말로 일기를 만들어요. 녹음은 일기에 목소리로 남아요.</li>
+    <li>아이 일기는 직접 손으로 써요. 붙여넣기는 안 되고, 보호자가 <b>최소 글자 수</b>를 정할 수 있어요(${A?"환경 설정":"우리 가족 설정"}).</li>
+  </ul>`],
+  ["pen","AI 다홍펜 선생님",`<p>아이가 일기를 다 쓰고 <b>🖍 AI 다홍펜 검사</b>를 누르면, 틀린 낱말을 형광펜으로 칠해 주고 칭찬과 응원 한마디를 해 줘요. 하루에 한 번 받을 수 있어요.</p>
+  <table><thead><tr><th>고치는 방법</th><th>어떻게 되나요</th></tr></thead><tbody>
+    <tr><td>✏️ 스스로</td><td>칠한 곳을 아이가 찾아 고쳐요. 모르겠으면 💡 정답 보기. 다 고쳐야 제출할 수 있어요. <b>초3부터는 늘 스스로</b></td></tr>
+    <tr><td>🤖 바로 고쳐 주기</td><td>7세 이하 · 초1 · 초2만 고를 수 있어요. AI가 고쳐 주고, 바뀐 곳을 소리 내어 읽어 봐요</td></tr>
+  </tbody></table>
+  <ul><li>고치는 방법은 우리 가족 설정 › <b>AI 다홍펜 고치는 방법</b>에서 아이마다 골라요.</li>
+    <li>고친 낱말은 <b>받아쓰기 퀴즈</b>로 저절로 모여요. 아이는 홈 위 <b>받아쓰기</b> 칩에서 풀어요.</li>
+    <li>AI 답이 이상하면 일기 아래 <b>⚑ 이상한 답변 알리기</b>를 눌러 주세요.</li></ul>`],
+  ["read","가족 일기 읽고 응원하기",`<ul>
+    <li><b>하루</b>: 같은 날 가족 일기를 나란히 읽어요. 아이 칸에는 다홍펜이 고친 곳과 칭찬도 보여요.</li>
+    <li><b>하트 ♥</b>는 가족 누구나, <b>칭찬 도장</b>은 보호자가 아이 일기에 하나 찍어요. 같은 도장을 다시 누르면 지워져요.</li>
+    <li><b>댓글 · 답글</b>로 이야기를 이어 가요. 쓰던 댓글은 다시 열면 그대로 있어요.</li>
+    <li>위 <b>🔔</b>에 내 일기에 온 댓글 · 하트 · 도장이 모여요.</li>
+    <li>한 달 내내 쓰면 <b>개근상</b>, 20일 넘게 쓰면 <b>성실상</b>을 받아요.</li>
+  </ul>`],
+  ["cal","달력 · 일정",`<ul>
+    <li>홈 <b>달력</b>에서 날짜마다 누가 일기를 썼는지 보고, 날짜를 누르면 그날 하루로 가요.</li>
+    <li>일정은 <b>가족 모두</b> 또는 <b>나만 보기</b>로 넣어요. 보호자는 생일 같은 가족 기념일도 넣을 수 있어요.</li>
+    <li>학교 시간표 사진을 올리면 AI가 예쁜 칸 시간표로 만들어 줘요.</li>
+  </ul>`],
+  ["album","사진첩 · 채팅",`<ul>
+    <li><b>사진첩</b>: 가족 사진을 모아요. 찍은 날과 누가 나왔는지, 장소를 함께 남길 수 있어요.</li>
+    <li><b>가족 채팅</b>: 답장과 반응 이모지로 대화해요. 사진은 어른만 보낼 수 있고, 90일이 지난 메시지는 저절로 지워져요.</li>
+  </ul>`],
+  ["grow","리포트 · 그래프 · 일기책",`<ul>
+    <li><b>AI 리포트</b>(보호자): 아이 일기의 이번 주 · 이번 달 총평과 다음에 해 볼 것을 받아요.</li>
+    <li><b>아이들 현황 · 그래프</b>: 아이마다 일기를 쓴 날과 글자 수가 그래프로 보이고, 아래에 총평이 붙어요.</li>
+    <li><b>PDF · 백업</b>: 기간과 사람을 골라 <b>PDF 일기책</b>(쪽 모양 10가지)을 만들고, 보호자는 일기 · 댓글을 <b>엑셀 파일</b>로 받아 둘 수 있어요.</li>
+  </ul>`],
+  ["me","프로필 · 꾸미기",`<ul>
+    <li>내 얼굴을 누르면 <b>📷 사진</b>(카카오톡처럼) · <b>🐾 캐릭터</b> · <b>📸 캡처한 그림</b> 가운데 골라요. 마지막에 고른 것이 얼굴이 돼요.</li>
+    <li><b>캡처한 그림으로 캐릭터 만들기</b>: 좋아하는 캐릭터를 캡처해서 넣으면 바탕을 지우고 얼굴로 맞춰 줘요. 넣은 그림은 8개까지 남아서 나중에 다시 골라요.</li>
+    <li>${A?"위 막대 <b>🎨</b>로 디자인, <b>가</b>로 일기 글씨체를":"설정 › <b>화면 꾸미기</b>에서 디자인과 일기 글씨체를"} 바꿔요(원고지 · 포근한 종이 · 밤하늘 등). 내 화면에만 바뀌어요.</li>
+  </ul>`],
+  ["set",A?"설정 세 곳":"설정",(A?`<table><thead><tr><th>어디</th><th>무엇을</th></tr></thead><tbody>
+    <tr><td>내 설정</td><td>프로필 · 계정(로그인 연결 · 로그아웃 · 계정 지우기) · 어디서든 접속하기(컴퓨터 · 태블릿에서 iinote.co.kr)</td></tr>
+    <tr><td>환경 설정</td><td>${A?"알림 · 앱 잠금(지문 · 얼굴) · 누를 때 진동 · ":""}화면 밝기 · 일기 쓰기 설정(최소 글자 수 등)</td></tr>
+    <tr><td>우리 가족 설정</td><td>가족 구성원 · 아이 프로필 · 초대 링크 · 휴대폰 연결 링크 · AI 다홍펜 고치는 방법 · 손글씨 사진 켜기</td></tr>
+  </tbody></table>`:`<ul><li><b>설정</b>: 프로필 · 화면 꾸미기 · 화면 밝기 · 로그인 연결 · 로그아웃 · 계정 지우기</li><li><b>우리 가족</b>: 가족 구성원 · 아이 프로필 · 초대 링크 · 휴대폰 연결 링크 · 일기 쓰기 설정 · AI 다홍펜 고치는 방법</li></ul>`)+(A?`<p class="mn-tip">휴대폰 홈 화면에 <b>달력 · 사진 같은 위젯</b>을 두면 앱을 열지 않아도 가족 소식을 볼 수 있어요.</p>`:"")],
+  ["data","기록은 어디에 남나요",`<table><thead><tr><th>어디에</th><th>무엇이</th></tr></thead><tbody>
+    <tr><td>우리 가족만</td><td>일기 · 사진 · 소리 · 댓글 · 채팅 · 일정 · 받아쓰기 기록. <b>같은 가족 그룹 구성원만</b> 볼 수 있고, 운영자도 내용을 보지 않아요</td></tr>
+    <tr><td>이 기기에만</td><td>화면 밝기 · 글씨 같은 편의 설정, 쓰다 만 일기, 쓰던 댓글, 만든 PDF</td></tr>
+    <tr><td>AI에 잠깐</td><td>다홍펜 검사 · 이야기 일기 · 손글씨 옮기기를 누른 때만, 그 글(또는 사진)을 보내 답을 받아요</td></tr>
+  </tbody></table><p class="mn-tip">일기 하나 · 댓글 하나도 쓴 사람이 언제든 지울 수 있어요. 내 설정 › 계정 › <b>내 계정과 기록 지우기</b>를 누르면 내 기록이 모두 지워져요.</p>`],
+  ["faq","자주 묻는 것",FAQ.map(([q,a])=>`<details class="pk-d"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")],
+]; };
+const viewManual = () => { const m=MAN();
+  return pageBox("사용설명서",`가족이 함께 쓰는 일기장, 처음 한 번만 훑어보면 돼요. 더 궁금하면 ${IS_APP?"더보기 아래 <b>개발자와 상담</b>":"<b>AI 챗봇 상담</b>"}으로 물어보세요.`,
+    `<nav class="mn-toc" aria-label="차례">${m.map(([k,t],i)=>`<button type="button" data-act="man-go" data-v="${k}"><i>${i+1}</i>${t}</button>`).join("")}</nav>
+    ${m.map(([k,t,h],i)=>`<section class="mn-sec" id="mn-${k}"><h2><i>${i+1}</i>${t}</h2>${h}</section>`).join("")}
+    <p class="mn-foot"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a> · <a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></p>`); };
 const viewBackup = () => pageBox("PDF · 백업","일기를 책으로 만들거나, 파일로 받아 둘 수 있어요.",`<button type="button" class="pk-o" data-act="tab" data-v="shelf"><span><b>📄 PDF 일기책</b><small>기간과 사람을 골라 일기책을 만들어요</small></span></button>${isParent()?`<button type="button" class="pk-o" data-act="backup-go"><span><b>💾 백업 (엑셀 파일)</b><small>일기와 댓글을 이 기기에 저장해요</small></span></button>`:""}`);
 function viewInvite(){ const c=S.group?.inviteCode||"", url=`https://${SITE_ADDRESS}/?join=${c}`;
   return pageBox("가족 초대하기","초대 주소를 받은 가족은 바로 우리 일기장에 들어와요.",`<p class="pg-code">초대 코드 <b>${esc(c)}</b></p><button type="button" class="btn btn-primary pg-w" data-act="invite-share">초대 보내기</button><button type="button" class="btn btn-ghost pg-w" data-act="copy" data-v="${esc(url)}">초대 주소 복사</button>`); }
@@ -7506,6 +7599,7 @@ const acts = {
   "join-existing": el => guard(()=>joinWithOtherLogin(el.dataset.v)),
   signout: () => TOUR ? acts["tour-exit"]() : guard(async()=>{ S.chatUnsub?.(); S.chatUnsub=null; ls.del("iinote-login"); S.me=null; S.group=null; S.gid=null; await B.signOut(); }),
   "pen-set": () => { ls.set(penAskKey(),"1"); go(()=>{ S.tab="family"; S.sub=null; S.draft=null; S.penOpen=true; S.famOpen="h-feat"; /* 앱에서는 '가족 구성원' 칸을 펼쳐서 보여 줘요 */ }); setTimeout(()=>document.getElementById("pen-mode")?.scrollIntoView({behavior:"smooth",block:"center"}),80); },
+  "man-go": el => document.getElementById("mn-"+el.dataset.v)?.scrollIntoView({behavior:"smooth",block:"start"}),
   tab: el => go(()=>{ if(S.rec && S.rec.mr.state!=="inactive") S.rec.mr.stop(); if(el.dataset.v==="chat") S.chatJump=true; if(IS_APP && el.dataset.v==="home") S.hpage="cal"; S.tab=el.dataset.v; S.sub=null; S.draft=null; S.talkBusy=null; S.replyTo=null; S.editing=null; }),
   filter: el => go(()=>{ S.filter=el.dataset.v; }),
   pick: el => { const p=prof(el.dataset.id); if(!p||!canUse(p)) return;
