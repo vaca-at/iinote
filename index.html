@@ -3236,7 +3236,22 @@ html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-d
   html.is-app .write{margin-inline:auto}
   html.is-app .chatting .chat{max-width:860px;margin-inline:auto;width:100%}
   /* 사진첩: 사진을 더 크게 */
-  html.is-app .al-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+  html.is-app .al-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+  /* 로딩 화면 글씨도 크게 */
+  #boot .bt-name{font-size:72px}
+  #boot.bt-B .bt-name,#boot.bt-D .bt-name{font-size:64px}
+  #boot.bt-E .bt-name{font-size:24px}
+  #boot .bt-pct{font-size:56px}
+  #boot.bt-B .bt-pct{font-size:34px}
+  #boot.bt-D .bt-pct{font-size:40px}
+  #boot.bt-C .bt-pct{font-size:42px}
+  #boot .bt-big .bt-pct{font-size:84px}
+  #boot .bt-step{font-size:26px}
+  #boot.bt-C .bt-step{font-size:32px}
+  #boot .bt-head{font-size:56px;line-height:88px}
+  #boot .bt-c{left:50%;right:auto;width:min(640px,80vw);transform:translateX(-50%)}
+  #boot.bt-C .bl{--d:60px;--w:52px;--h:164px;--h2:118px;--g:26px;--dg:14px}
+  #boot .bt-bub{font-size:32px;padding:14px 22px}
 }
 </style>
 </head>
