@@ -151,11 +151,14 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .lp-a{padding:48px 44px}
 .lp-a .lp-h{font-size:56px;line-height:1.15;margin:26px 0 14px}
 .lp-a .lp-lead{margin-bottom:28px}
-.lp-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.lp-bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:92px;padding:16px 8px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+/* 웹 첫 화면(PC) 단추: 로그인 3개(구글 · 카카오 · Apple)는 세로로 길게 한 줄에 나란히, 카톡 공유 · 링크 복사는 그 아래 반씩 (6칸 격자) */
+.lp-btns{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.lp-bt{grid-column:span 3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:92px;padding:16px 8px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.lp-bt.lg{grid-column:span 2;min-height:150px;gap:14px}
+.lp-bt.lg svg{width:30px;height:30px}
 .lp-bt:hover{border-color:var(--ink3)}
 .lp-bt.k{background:#FEE500;border-color:#FEE500;color:#191919}
-.lp-bt.ap{grid-column:1/-1;flex-direction:row;min-height:58px;background:#000;border-color:#000;color:#fff}.lp-bt.ap svg{width:22px;height:22px}
+.lp-bt.ap{background:#000;border-color:#000;color:#fff}
 .lp-b{background:#1F2A44;color:#fff;padding:48px 36px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .lp-b h2{font-family:UnzS,var(--diary),sans-serif;font-weight:400;font-size:36px;margin:14px 0 8px;color:#fff}
 .lp-b p{color:#B9C0D4;font-size:16px;margin:0 0 22px}
@@ -4518,9 +4521,9 @@ function viewLanding2(){
         <p class="lp-lead">아이 일기는 AI 선생님이 맞춤법까지 봐 줘요</p>
         ${inapp}
         <div class="lp-btns">
-          <button type="button" class="lp-bt" data-act="signin">${G_LOGO}구글로 시작</button>
-          <button type="button" class="lp-bt k" data-act="signin-kakao">${ic("talk")}카카오로 시작</button>
-          <button type="button" class="lp-bt ap" data-act="signin-apple">${APPLE_LOGO}Apple로 시작</button>
+          <button type="button" class="lp-bt lg" data-act="signin">${G_LOGO}구글로 시작</button>
+          <button type="button" class="lp-bt lg k" data-act="signin-kakao">${ic("talk")}카카오로 시작</button>
+          <button type="button" class="lp-bt lg ap" data-act="signin-apple">${APPLE_LOGO}Apple로 시작</button>
           <button type="button" class="lp-bt" data-act="kakao-share">${ic("talk")}카톡 공유</button>
           <button type="button" class="lp-bt" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button>
         </div>
