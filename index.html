@@ -2512,6 +2512,10 @@ html.is-app .set-page .set-sub{padding:0;border:0;background:none}
 .grow-page{display:grid;gap:14px}
 .grow-col{display:flex;flex-direction:column;gap:12px;min-width:0}
 .grow-col>.qg-kid{flex:none}
+.my-pf{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:inherit;font:inherit;text-align:left;cursor:pointer}
+.my-pf>.av{flex:none}
+.my-pf-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.my-pf b{font-size:17px}.my-pf small{color:var(--ink2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kid-col{display:flex;flex-direction:column;gap:12px;min-width:0}
 .kid-col>.block{margin:0}
 .kid-col>.qg-kid{flex:none;padding:16px;gap:10px;background:var(--surface);box-shadow:0 2px 10px rgba(46,36,51,.06)}
@@ -4829,7 +4833,9 @@ function openPick(kind){
 }
 // 더보기의 페이지들 (2026-11-06, 예전엔 팝업)
 const pageBox = (t,say,inner) => `<div class="page-h"><h1>${t}</h1></div><div class="pk-c pg-c"><p>${say}</p>${inner}</div>`;
-const viewEnv = () => pageBox("환경 설정","화면의 색과 글씨를 골라요. 이 기기에만 적용돼요.",pickDz(true)+pickFt(true));
+// (2026-11-10) 환경 설정 = 앱 설정 · 화면 설정(이 기기) + 일기 쓰기 설정(가족 모두). 디자인 · 글씨는 위 막대 🎨 · 가 단추에서
+const viewEnv = () => `<div class="page-h"><h1>환경 설정</h1></div>
+  <div class="fam-grid set-page"><div class="col">${IS_APP?appSettings():""}${setScreen()}</div><div class="col">${isParent()?viewFeatToggles():`<p class="set-hint">일기 쓰기 설정은 엄마 · 아빠가 정해요.</p>`}</div></div>`;
 const viewManual = () => pageBox("사용설명서","궁금한 것을 눌러 보세요. 더 궁금하면 '개발자와 상담'으로 물어보세요.",FAQ.map(([q,a])=>`<details class="pk-d"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join(""));
 const viewBackup = () => pageBox("PDF · 백업","일기를 책으로 만들거나, 파일로 받아 둘 수 있어요.",`<button type="button" class="pk-o" data-act="tab" data-v="shelf"><span><b>📄 PDF 일기책</b><small>기간과 사람을 골라 일기책을 만들어요</small></span></button>${isParent()?`<button type="button" class="pk-o" data-act="backup-go"><span><b>💾 백업 (엑셀 파일)</b><small>일기와 댓글을 이 기기에 저장해요</small></span></button>`:""}`);
 function viewInvite(){ const c=S.group?.inviteCode||"", url=`https://${SITE_ADDRESS}/?join=${c}`;
@@ -4888,7 +4894,7 @@ function viewMore(){
   const kid=S.me.type==="child";
   // (2026-11-06) 3줄: 내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 우리 아이 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담
   // (2026-11-10) 6개로: 가족 초대는 우리 가족 설정 안으로, 개발자와 상담은 아래 링크 복사 옆으로, 아이들 현황 + 그래프는 한 화면
-  const it=[["settings","내 설정","gear","#E5ECFF","#3F5FB8"],["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["env","환경 설정","lay-quad","#E3F4EC","#2F7A56"],
+  const it=[["settings","내 설정","people","#E5ECFF","#3F5FB8"],["env","환경 설정","gear","#E3F4EC","#2F7A56"],["family","우리 가족 설정","heart","#FFE1EA","#C2366A"],
     isParent()?["kids","아이들 현황 · 그래프","chart","#FFF0C2","#8A6300"]:["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"],["backup","PDF · 백업","book","#F0E6FF","#6B47B8"],["manual","사용설명서","help","#FFF0C2","#8A6300"]];
   const ACT={help:"help-open"};   // 상담은 전체 화면, 나머지는 모두 페이지 (2026-11-06)
   const box=([k,l,i,bg,fg])=>`<button class="more-it" ${ACT[k]?`data-act="${ACT[k]}"`:`data-act="more-go" data-v="${k}"`} style="--mb:${bg};--mf:${fg}"><span>${ic(i)}</span>${l}</button>`;
@@ -7096,8 +7102,9 @@ function viewFamily(){
       </section>
     </div>
     <div class="col">
-      <p class="set-hint">알림 · 앱 잠금 · 화면 밝기 · 로그인 같은 <b>나만의 설정</b>은 <button class="link-btn" data-act="tab" data-v="settings">${ic("gear")}설정</button>에 있어요.</p>
-      ${isParent()?viewFeatToggles():""}
+      ${IS_APP?`<p class="set-hint">알림 · 화면 밝기 · <b>일기 쓰기 설정</b>은 <button class="link-btn" data-act="tab" data-v="env">${ic("gear")}환경 설정</button>, 프로필 · 로그인은 <button class="link-btn" data-act="tab" data-v="settings">${ic("people")}내 설정</button>에 있어요.</p>`
+        :`<p class="set-hint">알림 · 앱 잠금 · 화면 밝기 · 로그인 같은 <b>나만의 설정</b>은 <button class="link-btn" data-act="tab" data-v="settings">${ic("gear")}설정</button>에 있어요.</p>`}
+      ${isParent()&&!IS_APP?viewFeatToggles():""}
       ${viewAnniv()}
       ${isParent()?`<section class="block" aria-labelledby="h-bak"><div class="block-h"><h2 id="h-bak">백업 (엑셀 파일)</h2></div>
         <p style="margin:0 0 12px;color:var(--ink2)">우리 가족의 일기와 댓글을 엑셀에서 열 수 있는 CSV 파일로 이 기기에 저장해요. 사진 · 소리는 파일 안에 주소(링크)로 들어가요. 가끔 받아 두면 안심이에요.</p>
@@ -7109,22 +7116,18 @@ function viewFamily(){
 
 /* ⚙️ 설정 (2026-10-06): 이 기기 · 내 계정에만 적용되는 것 (가족 모두에게 같이 적용되는 건 '우리 가족 설정')
    앱 설정(알림 · 잠금) · 화면 설정 · 어디서든 접속하기 · 계정(프로필 바꾸기 · 로그아웃 · 로그인 연결 · 비밀번호 · 계정 지우기) */
+// (2026-11-10) 앱: 내 설정 = 프로필 설정 → 계정 → 어디서든 접속하기 · 앱 설정과 화면 설정은 환경 설정(viewEnv)으로
+//   웹은 예전처럼 한 화면 (화면 설정 · 어디서든 접속하기 · 계정)
+const setScreen = () => `<section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
+        <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
+        <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추에서 골라요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
+      </section>`;
 function viewSettings(){
   const g=S.group, groups=(S.userDoc?.groupIds||[]);
-  return `<div class="page-h"><h1>${IS_APP?"내 설정":"설정"}</h1></div>
-  <div class="fam-grid set-page">
-    <div class="col">
-      ${IS_APP?appSettings():""}
-      <section class="block" aria-labelledby="h-set"><div class="block-h"><h2 id="h-set">화면 설정</h2></div>
-        <div class="set-row"><span>화면 밝기</span><div class="seg" role="group" aria-label="화면 밝기"><label><input type="radio" name="theme" value="light" ${S.theme==="light"?"checked":""} data-pref="theme"><span>밝게</span></label><label><input type="radio" name="theme" value="dark" ${S.theme==="dark"?"checked":""} data-pref="theme"><span>어둡게</span></label></div></div>
-        <p class="muted" style="font-size:13px;margin:10px 0 0">${IS_APP?"디자인 · 글씨는 화면 위 막대의 🎨 · 가 단추나 더보기 › 환경 설정에서 골라요.":"첫 화면 모양과 일기 글씨는 화면 맨 위 오른쪽에서 바로 고를 수 있어요."}</p>
-      </section>
-      <section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
+  const anyw = `<section class="block" aria-labelledby="h-any2"><div class="block-h"><h2 id="h-any2">어디서든 접속하기</h2></div>
         <p style="margin:0 0 14px;color:var(--ink2)">휴대폰, 아이패드, 컴퓨터, 노트북 모두 아래 주소로 들어와 처음과 같은 계정(구글 또는 카카오)으로 로그인하면 돼요. ${IS_APP?"":`안드로이드 휴대폰은 <a href="${PLAY_URL}" target="_blank" rel="noopener">Google Play</a>, 아이폰 · 아이패드는 <a href="${APPSTORE_URL}" target="_blank" rel="noopener">App Store</a>에서 앱을 받을 수 있어요.`}</p>${addrBox()}${kakaoBtn(true)}
-      </section>
-    </div>
-    <div class="col">
-      <section class="block" aria-labelledby="h-acc"><div class="block-h"><h2 id="h-acc">계정</h2></div>
+      </section>`;
+  const acc = `<section class="block" aria-labelledby="h-acc"><div class="block-h"><h2 id="h-acc">계정</h2></div>
         <div class="row">
           <button class="btn btn-ghost sm" data-act="switch-profile">${ic("people")}프로필 바꾸기</button>
           ${isParent()?`<button class="btn btn-ghost sm" data-act="new-group">${ic("plus")}다른 가족 만들기 · 들어가기</button>`:""}
@@ -7144,7 +7147,26 @@ function viewSettings(){
           <span class="row" style="gap:4px 14px"><a class="link-btn" href="terms.html" target="_blank" rel="noopener">이용약관</a><a class="link-btn" href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span>
         </div>
         ${DEMO?`<p class="muted" style="font-size:14px;margin:16px 0 0">체험 모드예요. <button class="link-btn" data-act="reset-demo">체험 내용을 처음 상태로 되돌리기</button></p>`:""}
+      </section>`;
+  if(IS_APP) return `<div class="page-h"><h1>내 설정</h1></div>
+  <div class="fam-grid set-page">
+    <div class="col">
+      <section class="block" aria-labelledby="h-mypf"><div class="block-h"><h2 id="h-mypf">프로필 설정</h2></div>
+        <button type="button" class="my-pf" data-act="prof-open" data-v="${esc(S.me.id)}">${av(S.me,56)}<span class="my-pf-t"><b>${esc(S.me.name)}</b><small>${esc(S.me.msg||"가족에게 하고 싶은 말을 적어 보세요")}</small></span>${ic("right")}</button>
+        <p class="muted" style="font-size:13px;margin:10px 0 0">캐릭터 · 얼굴 사진 · 배경 사진 · 하고 싶은 말을 바꿀 수 있어요.</p>
       </section>
+      ${acc}
+    </div>
+    <div class="col">${anyw}</div>
+  </div>`;
+  return `<div class="page-h"><h1>설정</h1></div>
+  <div class="fam-grid set-page">
+    <div class="col">
+      ${setScreen()}
+      ${anyw}
+    </div>
+    <div class="col">
+      ${acc}
     </div>
   </div>`;
 }
