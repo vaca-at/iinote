@@ -2396,6 +2396,7 @@ html.is-app .set-page .set-sub{padding:0;border:0;background:none}
 .hc-ph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;max-width:100%}
 .hc-ph.n1 img{aspect-ratio:16/10}
 .hc-f{display:flex;gap:14px;font-size:13px;color:var(--ink3)}
+.hc-ai{display:none}
 .hc-f span{display:flex;align-items:center;gap:4px}
 .hc-f .ic{width:16px;height:16px}
 .hc-stamp{position:absolute;right:14px;top:12px;padding:3px 10px;border:2px solid #E4507F;border-radius:48% 52% 45% 55%/55% 45% 55% 45%;color:#B8306A;font-size:13px;transform:rotate(-8deg);background:var(--surface)}
@@ -3229,6 +3230,12 @@ html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-d
   html.is-app .hp-list>*{break-inside:avoid;margin-bottom:12px}
   html.is-app .hp-list>.hp-write{column-span:all}
   html.is-app .hc-ph.n1 img{aspect-ratio:16/9;max-height:360px}
+  /* 하루 카드: 큰 화면에서는 일기를 끝까지 다 보여 주고, 아이 일기는 AI 다홍펜 한 줄도 */
+  html.is-app .hc-t{display:block;-webkit-line-clamp:unset;overflow:visible}
+  html.is-app .hc-ai{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--sage-soft,#DAF2E5) 80%,transparent);font-size:14px;line-height:1.5;color:var(--ink)}
+  html.is-app .hc-ai-c{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px}
+  html.is-app .hc-ai-c s{color:#C2366A}
+  html.is-app .hc-ai-c b{color:#2F8C6B}
   /* 일기 보기: 왼쪽 일기 · 오른쪽 AI 다홍펜 선생님과 댓글 */
   html.is-app .detail{max-width:1180px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:0 32px;align-items:start}
   html.is-app .detail>.sub-top{grid-column:1/-1}
@@ -4879,6 +4886,9 @@ function hpDiary(){
     </div>
     <div class="hp-list">${cta}${shown.map(x=>hpCard(x.d,x.p)).join("") || (cta?"":`<p class="empty">이날 ${who==="all"?"가족":esc(prof(who)?.name||"")} 일기가 없어요</p>`)}</div>`;
 }
+// 하루 카드 안 AI 다홍펜 한 줄 (큰 화면 앱에서만 보여요, hc-ai): 칭찬 + 고친 낱말
+function hcAI(d){ const r=d.aiResult||{}, cs=(r.corrections||[]).slice(0,3);
+  return `<span class="hc-ai"><span class="hc-ai-p">🖍 ${esc(r.praise||"")}</span>${cs.length?`<span class="hc-ai-c">${cs.map(c=>`<span><s>${esc(c.wrong)}</s> → <b>${esc(c.right)}</b></span>`).join("")}</span>`:""}</span>`; }
 function hpCard(d,p){
   const m=MOODS.find(x=>x[0]===d.mood), w=weatherOf(d.weather), hs=heartsOf(d).length, cs=S.comments.filter(c=>c.diaryId===d.id && !c.deleted).length, ph=(d.photos||[]).slice(0,3);
   const meta=[w?.[1],m?.[1]].filter(Boolean).map(esc).join(" · ")+(d.status!=="submitted"?" · 쓰는 중":"");
@@ -4886,6 +4896,7 @@ function hpCard(d,p){
     <span class="hc-h">${av(p,32)}<b>${esc(p.name)}</b><small>${meta}</small></span>
     <span class="hc-t">${esc(d.text||"")}</span>
     ${ph.length?`<span class="hc-ph n${ph.length}">${ph.map(x=>`<img src="${esc(x.thumb||x.url)}" alt="" loading="lazy">`).join("")}</span>`:""}
+    ${d.aiResult && (d.profileId===S.me?.id || isParent()) ? hcAI(d) : ""}
     <span class="hc-f"><span>♥ ${hs}</span><span>${ic("talk")}${cs}</span></span>
     ${d.stamp?`<span class="hc-stamp">${esc(d.stamp)}</span>`:""}</button>`;
 }
