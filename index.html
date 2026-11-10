@@ -2122,6 +2122,26 @@ html.is-app .al-h{font-size:14px;margin:0 0 6px}
 .pk-o b{display:block;font-size:15px}
 .pk-o small{display:block;font-size:12px;color:var(--ink3)}
 .pk-o.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+/* 🎨 디자인 미리보기 카드 */
+.dz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:0 0 14px}
+.dz-grid .pk-o{flex-direction:column;align-items:stretch;gap:8px;margin:0;padding:8px 8px 10px}
+.dz-grid .pk-o.on{box-shadow:inset 0 0 0 2px var(--ink)}
+.dzp{display:flex;flex-direction:column;gap:6px;aspect-ratio:4/3;padding-bottom:8px;border-radius:10px;overflow:hidden;background:var(--bg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.07)}
+.dzp i{font-style:normal}
+.dzp-top{display:flex;gap:4px;padding:9px 8px 7px;background:var(--top);border-bottom:2px solid var(--topb,transparent)}
+.dzp-top u{flex:1;height:9px;border-radius:5px;background:var(--c2);text-decoration:none}
+.dzp-top u:first-child{background:var(--c1)}.dzp-top u:last-child{background:var(--c3)}
+.dzp-card{flex:1;display:flex;flex-direction:column;gap:5px;margin:0 8px;padding:7px;background:var(--card);border:1.5px solid var(--cardb,transparent);border-radius:var(--r,8px);box-shadow:var(--sh,none)}
+.dzp-card.s{flex:.55}
+.dzp-card s{display:block;height:4px;border-radius:2px;background:var(--ln);text-decoration:none}
+.dzp-card s:nth-child(2){width:78%}.dzp-card s:nth-child(3){width:55%}
+.dz-wongoji{--bg:linear-gradient(#F4CFCA 1px,transparent 1px) 0 0/10px 10px,linear-gradient(90deg,#F4CFCA 1px,transparent 1px) 0 0/10px 10px,#FCFBF7;--top:#FFFFFF;--topb:#D7263D;--c1:#D7263D;--c2:#F7DDE0;--c3:#F7DDE0;--card:#FFFFFF;--cardb:#1E1E24;--ln:#F0B7BE;--r:4px}
+.dz-fresh{--bg:#FFF5F8;--top:linear-gradient(120deg,#FFD9E6,#FFF4D6);--c1:#E4507F;--c2:#F2B320;--c3:#3F73D1;--card:#FFFFFF;--ln:#F2C4D3;--r:10px;--sh:0 2px 6px rgba(228,80,127,.15)}
+.dz-warm{--bg:#FDEEF3;--top:#E4507F;--c1:#FFFFFF;--c2:#F6C945;--c3:#F7A8C2;--card:#FFFDF7;--cardb:#F2CADA;--ln:#F2CADA;--r:12px}
+.dz-clean{--bg:#F4F6FA;--top:#FFFFFF;--topb:#1F4FD8;--c1:#1F4FD8;--c2:#DCE4F5;--c3:#DCE4F5;--card:#FFFFFF;--cardb:#D5DCE8;--ln:#D5DCE8;--r:8px}
+.dz-bright{--bg:#FFFFFF;--top:#FFFFFF;--c1:#0FA3B1;--c2:#E8604C;--c3:#2F7BE5;--card:#F1F3F7;--ln:#C9CFDA;--r:14px}
+.dz-night{--bg:radial-gradient(circle at 20% 70%,#fff 0 1px,transparent 1.5px),radial-gradient(circle at 80% 85%,#FFE7A3 0 1.2px,transparent 1.8px),linear-gradient(#1A2150,#2B3170);--top:#141A40;--c1:#C9B6FF;--c2:#3A4486;--c3:#3A4486;--card:#262E5C;--ln:#8E96C8;--r:10px}
+.dz-harvest{--bg:#FFF6DE;--top:linear-gradient(90deg,#C4567A,#F59A4E);--c1:#FFF6DE;--c2:#F3C46B;--c3:#F3C46B;--card:#FFFBEF;--cardb:#F0D9A0;--ln:#E9C878;--r:10px}
 .pk-c h3{margin:14px 0 8px;font-size:15px}
 .pk-d{margin:0 0 8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px}
 .pk-d summary{font-weight:600;cursor:pointer}
@@ -2481,7 +2501,7 @@ html.is-app .set-page .set-sub{padding:0;border:0;background:none}
 .more-row i{font-style:normal;font-size:20px;color:var(--ink3);transition:transform .15s}
 .more-row.on i{transform:rotate(90deg)}
 .more-foot{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
-.more-share{display:flex;gap:8px}
+.more-share{display:flex;flex-wrap:wrap;gap:8px}
 .more-share button{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 13px;border:0;border-radius:17px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 .more-share .ic{width:16px;height:16px}
 .mf-kakao{background:#FEE500;color:#3A1D1D}
@@ -2490,6 +2510,20 @@ html.is-app .set-page .set-sub{padding:0;border:0;background:none}
 .more-legal a{color:var(--ink3);text-decoration:underline;text-underline-offset:2px}
 /* 📈 우리 아이 그래프 */
 .grow-page{display:grid;gap:14px}
+.grow-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.grow-col>.qg-kid{flex:none}
+.kid-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.kid-col>.block{margin:0}
+.kid-col>.qg-kid{flex:none;padding:16px;gap:10px;background:var(--surface);box-shadow:0 2px 10px rgba(46,36,51,.06)}
+.kid-col .qg-chart{min-height:150px;padding:8px 10px}
+.kid-col .qg-chart svg{min-height:110px}
+.kid-col .qg-words{flex-wrap:wrap;white-space:normal}
+.grow-sum{margin:0;padding:16px}
+.grow-sum h3{margin:0 0 10px;font-size:16px}
+.gs-r+.gs-r{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.gs-l{display:inline-block;margin-bottom:6px;padding:2px 10px;border-radius:999px;background:var(--sage-soft,#DAF2E5);color:#2F8C6B;font-size:12.5px}
+.gs-r p{margin:0;line-height:1.7;font-size:15px}
+.gs-r .gs-tip{margin-top:6px;font-size:14px;color:var(--ink2)}
 @media (min-width:760px){ .grow-page{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .grow-page .qg-kid{padding:16px;gap:10px;background:var(--surface);box-shadow:0 2px 10px rgba(46,36,51,.06)}
 .grow-page .qg-chart{min-height:150px;padding:8px 10px}
@@ -3265,6 +3299,16 @@ html:not(.is-app) :is(.wb-me .wbm-n small,.wk-h,.tag,.dd-tag,.cm-t,.cm-n,.chat-d
   html.is-app .hp[data-hp="cal"] .hc-side>.block{margin:0}
   html.is-app .hp[data-hp="cal"] .cst-side{display:block}
   html.is-app .hp[data-hp="cal"] .cst-side .cst{display:flex;flex-direction:column;gap:8px;margin:0}
+  /* 아이들 현황 · 우리 아이 그래프: 아이 칸을 화면 반반으로 */
+  html.is-app .kid-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))}
+  html.is-app .grow-page{grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:start}
+  /* 개발자와 상담: 작은 창 대신 가운데 큰 창 (가족 채팅처럼) */
+  html.is-app #app .help{inset:20px auto 20px 50%;transform:translateX(-50%);width:min(880px,calc(100vw - 40px));height:auto;border-radius:22px;box-shadow:0 0 0 100vmax rgba(31,42,68,.35),0 12px 40px rgba(46,36,51,.28)}
+  html.is-app .help-top h2{font-size:24px}
+  html.is-app .help-top small{font-size:14px}
+  html.is-app .hm{font-size:17px}
+  html.is-app .hq{height:44px;font-size:16px}
+  html.is-app .help-form textarea{font-size:17px}
   /* 로딩 화면 글씨도 크게 */
   #boot .bt-name{font-size:72px}
   #boot.bt-B .bt-name,#boot.bt-D .bt-name{font-size:64px}
@@ -4774,7 +4818,9 @@ function openSheet(title,say,inner){
 }
 // kind: dz 디자인 · ft 글씨 · all 둘 다 (환경 설정)
 // 디자인 · 글씨 고르는 줄: 고르는 창과 환경 설정 페이지가 같이 써요
-const pickDz = h => `${h?"<h3>디자인</h3>":""}${DESIGNS.map(([k,l])=>`<button type="button" class="pk-o ${S.design===k?"on":""}" data-act="pick-set" data-g="dz" data-k="${k}"><i class="dsw ${k}"></i><span><b>${esc(l)}</b><small>${DESIGN_SAY[k]||""}</small></span></button>`).join("")}`;
+// 환경 설정 쪽(h)은 카드로 나란히, 카드마다 그 디자인의 바탕 · 메뉴 · 일기 칸 미리보기 (2026-11-10)
+const dzPrev = k => `<span class="dzp dz-${k}" aria-hidden="true"><i class="dzp-top"><u></u><u></u><u></u></i><i class="dzp-card"><s></s><s></s><s></s></i><i class="dzp-card s"><s></s><s></s></i></span>`;
+const pickDz = h => h ? `<h3>디자인</h3><div class="dz-grid">${DESIGNS.map(([k,l])=>`<button type="button" class="pk-o ${S.design===k?"on":""}" data-act="pick-set" data-g="dz" data-k="${k}">${dzPrev(k)}<span><b>${esc(l)}</b><small>${DESIGN_SAY[k]||""}</small></span></button>`).join("")}</div>` : `${DESIGNS.map(([k,l])=>`<button type="button" class="pk-o ${S.design===k?"on":""}" data-act="pick-set" data-g="dz" data-k="${k}"><i class="dsw ${k}"></i><span><b>${esc(l)}</b><small>${DESIGN_SAY[k]||""}</small></span></button>`).join("")}`;
 const pickFt = h => `${h?"<h3>글씨</h3>":""}${DFONTS.map(([k,l,f])=>`<button type="button" class="pk-o ${S.dfont===k?"on":""}" data-act="pick-set" data-g="ft" data-k="${k}"><span><b style="font-family:${f}">${esc(l)} · 오늘도 우리 가족 일기장</b><small>${DFONT_SAY[k]||""}</small></span></button>`).join("")}`;
 function openPick(kind){
   const title=kind==="dz"?"디자인 고르기":"글씨 고르기";
@@ -4841,9 +4887,9 @@ function viewMore(){
   // 사진첩 · AI 리포트(아이는 받아쓰기)는 홈 쪽에, 하루는 홈 일기장 쪽과 겹쳐서 뺐어요
   const kid=S.me.type==="child";
   // (2026-11-06) 3줄: 내 설정 · 우리 가족 설정 · 환경 설정 / 아이들 현황 · 우리 아이 그래프 · PDF · 백업 / 가족 초대하기 · 사용설명서 · 개발자와 상담
+  // (2026-11-10) 6개로: 가족 초대는 우리 가족 설정 안으로, 개발자와 상담은 아래 링크 복사 옆으로, 아이들 현황 + 그래프는 한 화면
   const it=[["settings","내 설정","gear","#E5ECFF","#3F5FB8"],["family","우리 가족 설정","people","#FFE1EA","#C2366A"],["env","환경 설정","lay-quad","#E3F4EC","#2F7A56"],
-    ...(isParent()?[["kids","아이들 현황","spark","#FFF0C2","#8A6300"]]:[]),["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"],["backup","PDF · 백업","book","#F0E6FF","#6B47B8"],
-    ...(isParent()?[["invite","가족 초대하기","heart","#FFE1EA","#C2366A"]]:[]),["manual","사용설명서","help","#FFF0C2","#8A6300"],["help","개발자와 상담","talk","#E3F4EC","#2F7A56"]];
+    isParent()?["kids","아이들 현황 · 그래프","chart","#FFF0C2","#8A6300"]:["grow",kid?"내 그래프":"우리 아이 그래프","chart","#FFE6D6","#B5532B"],["backup","PDF · 백업","book","#F0E6FF","#6B47B8"],["manual","사용설명서","help","#FFF0C2","#8A6300"]];
   const ACT={help:"help-open"};   // 상담은 전체 화면, 나머지는 모두 페이지 (2026-11-06)
   const box=([k,l,i,bg,fg])=>`<button class="more-it" ${ACT[k]?`data-act="${ACT[k]}"`:`data-act="more-go" data-v="${k}"`} style="--mb:${bg};--mf:${fg}"><span>${ic(i)}</span>${l}</button>`;
   return `<div class="more-bg" data-act="app-more" aria-hidden="true"></div>
@@ -4851,16 +4897,21 @@ function viewMore(){
     <div class="more-head"><h2 id="more-h">더보기</h2><button class="link-btn" data-act="app-more">닫기</button></div>
     <div class="more-grid">${it.map(box).join("")}</div>
     <div class="more-foot">
-      <div class="more-share"><button class="mf-kakao" data-act="kakao-share">${ic("talk")}카카오톡 공유</button><button class="mf-link" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button></div>
+      <div class="more-share"><button class="mf-kakao" data-act="kakao-share">${ic("talk")}카카오톡 공유</button><button class="mf-link" data-act="copy" data-v="${SHARE_URL}">${ic("link")}링크 복사</button><button class="mf-link" data-act="help-open">${ic("talk")}개발자와 상담</button></div>
       <p class="more-legal"><a href="terms.html" target="_blank" rel="noopener">이용약관</a><span aria-hidden="true">·</span><a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></p>
     </div>
   </section>`;
 }
 // 📈 우리 아이 그래프 (2026-10-07, 탭 grow · 주소 /grow): 아이마다 이번 달 편수 · 평균 글자 · 익힌 낱말 · 연속, 최근 일기 글 길이 그래프, 자주 틀린 낱말 (growBlock)
+// 📈 그래프 아래 AI 총평 (2026-11-10): AI 리포트에서 만든 가장 최근 한 주 · 한 달 총평을 그대로 보여 줘요
+function growSum(p){
+  const rows=[["week","주간 총평"],["month","월간 총평"]].map(([m,l])=>{ const per=repLatest(m), r=p[`report_${per.key}`]; return r?.summary?`<div class="gs-r"><b class="gs-l">${l}</b><p>${esc(r.summary)}</p>${r.tip?`<p class="gs-tip">💡 ${esc(r.tip)}</p>`:""}</div>`:""; }).join("");
+  return `<section class="grow-sum block" aria-label="${esc(p.name)} AI 총평"><h3>💌 ${esc(kidN(p))} AI 총평</h3>${rows||`<p class="muted">아직 만든 총평이 없어요. 홈의 AI 리포트를 열면 저절로 만들어져요.</p>`}</section>`;
+}
 function viewGrow(){
   const kids=S.me.type==="child" ? [S.me] : sortedProfiles().filter(p=>p.type==="child");
   return `<div class="page-h"><h1>${S.me.type==="child"?"내 그래프":"우리 아이 그래프"}</h1></div>
-    ${kids.length?`<div class="grow-page">${kids.map(growBlock).join("")}</div>`:`<p class="empty">아이 프로필이 있으면 아이마다 글솜씨가 자라는 그래프를 보여 줘요.</p>`}`;
+    ${kids.length?`<div class="grow-page">${kids.map(p=>`<div class="grow-col">${growBlock(p)}${isParent()?growSum(p):""}</div>`).join("")}</div>`:`<p class="empty">아이 프로필이 있으면 아이마다 글솜씨가 자라는 그래프를 보여 줘요.</p>`}`;
 }
 // 홈 네 쪽
 function viewHomePages(){
@@ -6199,7 +6250,8 @@ function viewKidsStatus(){
   const t=todayStr(), month=t.slice(0,7), [yy,mm]=month.split("-").map(Number), last=new Date(yy,mm,0).getDate(), lead=toDate(`${month}-01`).getDay();
   const kids=sortedProfiles().filter(p=>p.type==="child");
   if(!kids.length) return `<div class="page-h"><h1>아이들 현황</h1></div><p class="empty">우리 가족 탭에서 아이 프로필을 추가하면 여기에서 아이들의 일기 현황을 볼 수 있어요.</p>`;
-  return `<div class="page-h"><h1>아이들 현황</h1><span class="muted">${mm}월</span></div><div class="kid-grid">${kids.map(p=>{
+  // (2026-11-10) 우리 아이 그래프를 여기로 합쳤어요: 아이마다 현황 카드 아래 그래프 · AI 총평
+  return `<div class="page-h"><h1>아이들 현황 · 그래프</h1><span class="muted">${mm}월</span></div><div class="kid-grid">${kids.map(p=>{
     const td=findDiary(p.id,t), st=td?.status==="submitted"?["done","오늘 썼어요 ✏️"]:td?["draft","쓰는 중"]:["none","아직이에요"];
     const mon=S.diaries.filter(d=>d.profileId===p.id && d.status==="submitted" && d.date.startsWith(month));
     const lens=mon.map(d=>countChars(d.text)), avg=lens.length?Math.round(lens.reduce((a,b)=>a+b,0)/lens.length):0;
@@ -6207,13 +6259,13 @@ function viewKidsStatus(){
     let cal=DAYS.map(w=>`<span class="kc-w">${w}</span>`).join("")+(lead?`<span style="grid-column:span ${lead}"></span>`:"");
     for(let i=1;i<=last;i++){ const ds=`${month}-${pad(i)}`, x=mon.find(d=>d.date===ds);
       cal+=`<button class="kc-d ${x?"w":""} ${ds===t?"today":""}" data-act="day-open" data-v="${ds}" ${ds>t?"disabled":""} title="${fmtShort(ds)}${x?" 일기 있음":""}">${i}${x?.stamp?`<i>⭐</i>`:""}</button>`; }
-    return `<section class="block kid-card" style="--pc:${p.color||"#1F2A44"}">
+    return `<div class="kid-col"><section class="block kid-card" style="--pc:${p.color||"#1F2A44"}">
       <div class="kid-h">${av(p,40)}<div><b>${esc(p.name)}</b><small class="muted">${esc(gradeName(p.grade))}</small></div><span class="pill ${st[0]}">${st[1]}</span></div>
       <div class="kid-stats"><span>📔 <b>${mon.length}</b>편</span><span>${charHTML(p)} <b>${streakOf(p.id)}</b>일 연속</span><span>✏️ 평균 <b>${avg}</b>자</span><span>🖍 고친 곳 <b>${fixes}</b></span></div>
       <div class="kid-cal">${cal}</div>
       <p class="muted" style="font-size:12px;margin:8px 0 0">색칠된 날 = 일기 쓴 날 · ⭐ = 칭찬 도장. 날짜를 누르면 그날 가족 일기를 펼쳐 봐요.</p>
       ${viewStickers(p,true)}${awardList(p)}
-    </section>`; }).join("")}</div>`;
+    </section>${growBlock(p)}${growSum(p)}</div>`; }).join("")}</div>`;
 }
 // 📖 하루: 한 날짜의 가족 일기를 나란히
 function viewDayOpen(){
