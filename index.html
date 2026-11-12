@@ -171,6 +171,12 @@ legend{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:6px;paddin
 .lp-qrs figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:0}
 .lp-qrs .lp-qr{width:150px;height:150px;padding:12px}
 .lp-qrs .lp-play{margin-top:14px;padding:10px 16px;font-size:15px;min-width:150px;justify-content:center}
+/* 🏷 (2026-11-11) 스토어 공식 배지 그림 (색 · 모양 그대로, 높이만 맞춤) */
+.lp-badge{display:inline-block;line-height:0;border-radius:9px}
+.lp-badge img{height:46px;width:auto;display:block}
+.lp-qrs .lp-badge{margin-top:14px}
+.lp-badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px 0 0}
+.lp-badges .lp-badge img{height:44px}
 .lp-qrs figcaption{margin-top:8px;color:#B9C0D4;font-size:12.5px}
 .apple-logo{width:22px;height:22px;flex:none;color:#111}
 .lp-sc.p.a .apple-logo{width:28px;height:28px;color:#fff}
@@ -4696,6 +4702,7 @@ function viewLanding2(){
         ${sc({a:"kakao-share"},"s",ic("talk"),"카톡 공유")}
         ${sc({a:"copy",v:SHARE_URL},"s",ic("link"),"링크 복사")}
       </ul>
+      <div class="lp-badges" aria-label="앱 받기">${ios?"":`<a class="lp-badge" href="${PLAY_URL}" target="_blank" rel="noopener"><img src="img/badge-play.png" alt="Google Play에서 다운로드"></a>`}${IS_ANDROID?"":`<a class="lp-badge" href="${APPSTORE_URL}" target="_blank" rel="noopener"><img src="img/badge-appstore.svg" alt="App Store에서 다운로드"></a>`}</div>
       ${kid}${extra}${foot}
     </div>`;
   // PC: 흰 칸 + 남색 QR 칸
@@ -4718,8 +4725,8 @@ function viewLanding2(){
         <h2>휴대폰은 앱으로</h2>
         <p>휴대폰 카메라로 찍으면 앱 받는 곳으로 바로 가요</p>
         <div class="lp-qrs">
-          <figure><img class="lp-qr" src="img/play-qr.svg" width="150" height="150" alt="Google Play 아이아이노트 QR 코드"><a class="lp-play" href="${PLAY_URL}" target="_blank" rel="noopener">${PLAY_LOGO}Google Play</a><figcaption>안드로이드</figcaption></figure>
-          <figure><img class="lp-qr" src="img/appstore-qr.svg" width="150" height="150" alt="App Store 아이아이노트 QR 코드"><a class="lp-play" href="${APPSTORE_URL}" target="_blank" rel="noopener">${AS_LOGO}App Store</a><figcaption>아이폰 · 아이패드</figcaption></figure>
+          <figure><img class="lp-qr" src="img/play-qr.svg" width="150" height="150" alt="Google Play 아이아이노트 QR 코드"><a class="lp-badge" href="${PLAY_URL}" target="_blank" rel="noopener"><img src="img/badge-play.png" alt="Google Play에서 다운로드"></a><figcaption>안드로이드</figcaption></figure>
+          <figure><img class="lp-qr" src="img/appstore-qr.svg" width="150" height="150" alt="App Store 아이아이노트 QR 코드"><a class="lp-badge" href="${APPSTORE_URL}" target="_blank" rel="noopener"><img src="img/badge-appstore.svg" alt="App Store에서 다운로드"></a><figcaption>아이폰 · 아이패드</figcaption></figure>
         </div>
         <small>컴퓨터는 이 웹(iinote.co.kr)으로 써요</small>
       </aside>
