@@ -2584,11 +2584,13 @@ button.pf-av{border:0;background:none;padding:0;font:inherit;cursor:pointer}
 .help-top small{display:block;font-size:12px;color:var(--ink3)}
 .help-av,.hm-av{display:grid;place-items:center;width:36px;height:36px;flex:none;border-radius:50%;background:var(--ink);color:var(--surface)}
 .help-av .ic,.hm-av .ic{width:20px;height:20px}
-.hm-av.op{background:#E4507F;font-size:13px}
+.hm-av.op{background:#FFE1EC;font-size:19px}.hm-av.bot{background:#ECE5FF;font-size:19px}
 .help-list{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:16px}
 .hm-row{display:flex;gap:8px;align-items:flex-start;max-width:88%}
 .hm{margin:0;padding:10px 14px;font-size:15px;line-height:1.6;white-space:pre-line;border-radius:4px 18px 18px 18px;background:var(--surface);box-shadow:0 1px 6px rgba(46,36,51,.08)}
 .hm b{display:block;font-weight:400;color:#B8306A;font-size:13px}
+.hm.bot{background:color-mix(in srgb,#C9B6FF 18%,var(--surface))}.hm.bot b{color:#6A4FC8}.hm.op{background:color-mix(in srgb,#FF9EC0 16%,var(--surface))}
+.hm-pend{display:block;margin-top:6px;padding-top:6px;border-top:1px dashed color-mix(in srgb,#6A4FC8 30%,transparent);font-size:12.5px;color:#6A4FC8}
 .hm.me{align-self:flex-end;max-width:80%;border-radius:18px 4px 18px 18px;background:var(--ink);color:var(--surface)}
 .hm-wait{align-self:center;margin:0;font-size:13px;color:var(--ink3)}
 .help-q{display:flex;gap:8px;overflow-x:auto;padding:8px 12px;scrollbar-width:none}
@@ -5187,8 +5189,11 @@ const REPORT_CATS = ["불편한 글 · 댓글","이상한 AI 답변","사진 · 
 function viewHelp(){
   const hello={from:"bot",text:`${S.me.name}님, 안녕하세요! AI 챗봇 상담이에요. 무엇을 도와드릴까요?\n아래에서 고르거나 궁금한 것을 적어 보내 주세요. 불편한 글이나 고장은 🚩 신고하기로 알려 주세요.\n📎 캡처한 화면은 ${IS_APP?"글 칸 옆 📎 단추로":"📎 단추나 Ctrl+V(붙여 넣기)로"} 사진을 붙여 보낼 수 있어요.\n👀 여기서 나눈 채팅 내용은 관리자에게 보이고, 관리자가 확인하고 관리해요.`};
   const msgs=[hello,...helpWithBot((S.helpMsgs||[]).map(m=>({from:m.from==="op"?"op":m.from==="bot"?"bot":"me",text:helpMsgText(m.text),img:/^data:image\//.test(m.img||"")?m.img:""})).filter(m=>m.text||m.img)),...(S.helpLocal||[])];   // 예전에 [object Object] 로 남은 답은 빼요
-  const bubble=m=>m.from==="me" ? `<p class="hm me">${m.img?`<img class="hm-img" src="${esc(m.img)}" alt="보낸 사진">`:""}${esc(m.text)}</p>`
-    : `<div class="hm-row"><span class="hm-av ${m.from}" aria-hidden="true">${m.from==="op"?"상":ic("help")}</span><p class="hm ${m.from}">${m.from==="op"?"<b>상담원</b>":""}${esc(m.text)}</p></div>`;
+  // (2026-11-15) AI 답과 관리자 답을 헷갈리지 않게: 🤖 AI 챗봇 자동 답변(보라) · 🧑‍🏫 관리자가 직접 답함(분홍). 관리자 답이 아직 없으면 AI 답 아래에 '관리자 확인 전'
+  const lastOp=msgs.map(m=>m.from).lastIndexOf("op");
+  const bubble=(m,i)=>m.from==="me" ? `<p class="hm me">${m.img?`<img class="hm-img" src="${esc(m.img)}" alt="보낸 사진">`:""}${esc(m.text)}</p>`
+    : m.from==="op" ? `<div class="hm-row"><span class="hm-av op" aria-hidden="true">🧑‍🏫</span><p class="hm op"><b>🧑‍🏫 관리자가 직접 답했어요</b>${esc(m.text)}</p></div>`
+    : `<div class="hm-row"><span class="hm-av bot" aria-hidden="true">🤖</span><p class="hm bot"><b>🤖 AI 챗봇 자동 답변</b>${esc(m.text)}${i>0&&i>lastOp?`<small class="hm-pend">👀 관리자가 아직 확인하기 전이에요</small>`:""}</p></div>`;
   const rep=S.helpRep;
   const chips = rep && !rep.cat
     ? `<div class="help-q" role="group" aria-label="신고 종류">${REPORT_CATS.map(c=>`<button type="button" class="hq rep" data-act="help-rep-cat" data-v="${esc(c)}">${esc(c)}</button>`).join("")}<button type="button" class="hq" data-act="help-rep-x">그만두기</button></div>`
@@ -5197,7 +5202,7 @@ function viewHelp(){
   const ph = rep?.cat ? "어떤 일이 있었는지 적어 주세요" : "궁금한 것을 적어 주세요";
   return `<section class="help" role="dialog" aria-modal="true" aria-labelledby="help-h">
     <header class="help-top"><button class="icon-btn" data-act="help-close" aria-label="닫기">${ic("left")}</button><span class="help-av" aria-hidden="true">${ic("help")}</span><div><h2 id="help-h">AI 챗봇 상담</h2><small>AI 챗봇이 못 푼 건 상담원이 보통 하루 안에 답해요${IS_APP?" · 답장이 오면 알려 드려요":" · 답장은 여기에서 볼 수 있어요"}</small></div><button class="help-x" data-act="help-close" aria-label="닫기">${ic("x")}</button></header>
-    <div class="help-list" id="help-list">${msgs.map(bubble).join("")}${S.helpBusy?`<p class="hm-wait">${S.helpBusy}</p>`:""}</div>
+    <div class="help-list" id="help-list">${msgs.map((m,i)=>bubble(m,i)).join("")}${S.helpBusy?`<p class="hm-wait">${S.helpBusy}</p>`:""}</div>
     ${chips}
     ${S.helpImg?`<div class="help-att"><img src="${esc(S.helpImg)}" alt="붙인 사진"><span>사진 1장을 같이 보내요</span><button type="button" class="link-btn" data-act="help-img-x" aria-label="붙인 사진 빼기">✕ 빼기</button></div>`:""}
     <form class="help-form" data-form="help"><label class="help-clip" title="사진 붙이기" aria-label="사진 붙이기">📎<input type="file" class="sr help-file" accept="image/*"></label><label class="sr" for="help-in">${ph}</label><textarea id="help-in" name="text" rows="1" maxlength="1000" placeholder="${S.helpImg?"사진에 대해 한마디 적어 주세요 (안 적어도 돼요)":ph}" ${S.helpImg?"":"required"}></textarea><button class="help-send" aria-label="보내기">${ic("arrow")}</button></form>
