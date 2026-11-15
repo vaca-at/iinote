@@ -1013,10 +1013,15 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .paper-lines{font-family:var(--diary);font-size:var(--diary-size);line-height:var(--diary-lh);white-space:pre-wrap;word-break:keep-all;padding:0 4px 4px;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--diary-lh) - 1px),var(--rule) calc(var(--diary-lh) - 1px),var(--rule) var(--diary-lh))}
 .comments{margin-top:40px;border-top:1.5px solid var(--line);padding-top:22px}
 .comments h2{font-size:18px;margin:0 0 16px}
-.thread{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.thread{list-style:none;margin:0;padding:0;display:grid;gap:0}
 .thread.nested{margin-top:14px;padding-left:14px;border-left:2px solid var(--line)}
 .thread.nested .thread.nested{padding-left:0;border-left:0}   /* 2026-11-15: 대댓글의 대댓글부터는 더 들여 쓰지 않아요 (안드로이드에서 오른쪽이 잘리던 것) */
-.cmt{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px}.cmt.sub{grid-template-columns:24px minmax(0,1fr);gap:8px}.cmt-to{font-size:12.5px;color:var(--ink3)}.cmt-body{min-width:0}
+.cmt{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;padding-bottom:16px}.cmt-to{font-size:12.5px;color:var(--ink3)}.cmt-body{min-width:0}
+.cmt .rail{position:relative;display:flex;justify-content:center;align-items:flex-start}
+.cmt.line .rail::after{content:"";position:absolute;top:38px;bottom:-14px;width:2px;border-radius:2px;background:var(--line)}
+.cmt.sub .rail .av{margin-top:3px}
+.th-fold-li{margin:-8px 0 14px 42px}.th-fold{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:2px 0;color:var(--ink3);font-size:13px;font-weight:700;cursor:pointer}.th-fold .av{margin-left:-6px;box-shadow:0 0 0 2px var(--bg)}.th-fold .av:first-child{margin-left:0}
+.reply-to{display:flex;justify-content:space-between;align-items:center;background:var(--soft,#F4EFEA);border-radius:10px;padding:5px 10px;font-size:13px;color:var(--ink3)}.reply-to b{color:var(--ink)}
 .cmt-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:14px}
 .cmt-meta .muted{font-size:13px}
 .cmt-text{margin:2px 0 4px;white-space:pre-wrap}
@@ -6681,8 +6686,9 @@ function viewDiaryDetail(){
     ${mine?"":`<p class="ai-report">${repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(d.date)} 일기`)}${p?blkBtn(p.id):""}</p>`}
     </div><div class="dt-side">${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
-      ${cs.length?renderThread(cs,null,0):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
-      <form class="cmt-form" data-form="comment" data-parent=""><label class="sr" for="c-new">댓글</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 한마디 남기기"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-soft">댓글 달기</button></div></form>
+      ${cs.length?renderThread(cs):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
+      ${(()=>{ const rc=S.replyTo?cs.find(x=>x.id===S.replyTo):null, rp=rc?prof(rc.profileId):null;   // 답글도 맨 아래 칸 하나에서 써요
+        return `<form class="cmt-form" data-form="comment" data-parent="${rc?rc.id:""}">${rc?`<div class="reply-to"><span><b>${esc(rp?.name||"가족")}</b>에게 답글 다는 중</span><button type="button" class="link-btn" data-act="cancel-reply" aria-label="답글 그만두기">✕</button></div>`:""}<label class="sr" for="c-new">${rc?"답글":"댓글"}</label><textarea id="c-new" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${rc?`${esc(rp?.name||"")}에게 답글 쓰기`:`${esc(p?.name||"")}에게 한마디 남기기`}"></textarea>${heartBar()}<div class="row" style="justify-content:flex-end"><button class="btn btn-soft">${rc?"답글 달기":"댓글 달기"}</button></div></form>`; })()}
     </section></div></article>`;
 }
 // 🚩 신고 단추: 누르면 AI 챗봇 상담이 '불편한 글 · 댓글' 신고로 열려요 (ref 는 누구의 언제 글인지만, 내용은 안 보내요)
@@ -6690,21 +6696,31 @@ const repBtn = ref => `<button class="link-btn rep-btn" data-act="help-open" dat
 // 댓글 지우기: 쓴 사람, 그리고 아이가 쓴 댓글은 보호자(부모)도 (2026-10-04)
 const canDelCmt = c => !!S.me && (c.profileId===S.me.id || (isParent() && prof(c.profileId)?.type==="child"));
 const delCmtNote = c => c.delBy && c.delBy!==c.profileId ? "(보호자가 지운 댓글이에요)" : "(지운 댓글이에요)";
-// 대댓글은 한 단계만 들여 쓰고(2026-11-15), 셋째 줄부터는 이름 옆에 "↳ 엄마에게"로 누구에게 단 답글인지 보여 줘요. 대댓글 사진은 24px
-function renderThread(cs,parent,depth){
-  const kids=cs.filter(c=>(c.parentId||null)===parent).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
-  if(!kids.length) return "";
-  return `<ul class="thread ${depth?"nested":""}">${kids.map(c=>{ const p=prof(c.profileId), mine=c.profileId===S.me.id, editing=S.editing===c.id;
-    const to = depth>=2 ? prof((cs.find(x=>x.id===parent)||{}).profileId) : null;
-    return `<li class="cmt ${depth?"sub":""}">${av(p,depth?24:32)}<div class="cmt-body">
+/* 💬 스레드 댓글 (2026-11-15, 시안 A): 들여쓰기 없이 첫 댓글 아래로 답글을 시간 순서대로 이어 붙이고, 프로필 사진 아래 세로 선으로 한 대화를 이어요.
+   답글이 3개 넘으면 2개만 보이고 '답글 n개 더 보기'. 바로 위 글이 아닌 사람에게 단 답글은 이름 옆에 '↳ 엄마에게'.
+   답글 쓰는 칸은 맨 아래 하나 ('엄마에게 답글 다는 중 ✕') */
+function cmtItem(c,cs,{reply=false,line=false,prev=null}={}){
+  const p=prof(c.profileId), mine=c.profileId===S.me.id, editing=S.editing===c.id;
+  const par=c.parentId?cs.find(x=>x.id===c.parentId):null, to=reply&&par&&prev&&par.id!==prev.id?prof(par.profileId):null;
+  return `<li class="cmt ${reply?"sub":""} ${line?"line":""}"><div class="rail">${av(p,reply?26:32)}</div><div class="cmt-body">
       <div class="cmt-meta"><strong>${esc(p?.name||"알 수 없음")}</strong>${to?`<span class="cmt-to">↳ ${esc(to.name)}에게</span>`:""}<span class="muted">${relTime(c.createdAt)}${c.edited?" (수정됨)":""}</span><time class="cm-when cmt-at">${cmtFull(c.createdAt)}</time></div>
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
         : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":(S.cmtMore===c.id?repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)+(p?blkBtn(p.id):""):`<button class="link-btn more-btn" data-act="cmt-more" data-id="${c.id}" aria-label="더 보기 (신고 · 차단)">⋯</button>`)}</div>`}
-      ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
-      ${renderThread(cs,c.id,depth+1)}
-    </div></li>`; }).join("")}</ul>`;
+    </div></li>`;
+}
+function renderThread(cs){
+  const t0=(a,b)=>(a.createdAt||0)-(b.createdAt||0), has=id=>cs.some(x=>x.id===id);
+  const tops=cs.filter(c=>!c.parentId||!has(c.parentId)).sort(t0);
+  const under=id=>cs.filter(c=>c.parentId===id).flatMap(k=>[k,...under(k.id)]);
+  return `<ul class="thread">${tops.map(t=>{
+    const reps=under(t.id).sort(t0), open=!!(S.thOpen||{})[t.id], cut=!open&&reps.length>3, shown=cut?reps.slice(0,2):reps, more=reps.length-shown.length;
+    const items=[t,...shown];
+    return items.map((c,i)=>cmtItem(c,cs,{reply:i>0,line:i<items.length-1||more>0,prev:items[i-1]||null})).join("")
+      +(more?`<li class="th-fold-li"><button type="button" class="th-fold" data-act="th-open" data-id="${t.id}">${reps.slice(2,4).map(c=>av(prof(c.profileId),18)).join("")}<span>답글 ${more}개 더 보기</span></button></li>`:"")
+      +(open&&reps.length>3?`<li class="th-fold-li"><button type="button" class="th-fold" data-act="th-close" data-id="${t.id}"><span>답글 접기</span></button></li>`:"");
+  }).join("")}</ul>`;
 }
 
 /* ---------- 일기 쓰기 ---------- */
@@ -7679,7 +7695,9 @@ const acts = {
     ta.focus({preventScroll:true}); ta.setSelectionRange(i,i+er.wrong.length);
     [...document.querySelectorAll("#w-hl mark.pen-x")].find(m=>m.textContent===er.wrong)?.scrollIntoView({behavior:"smooth",block:"center"}); },
   "cmt-more": el => { S.cmtMore=el.dataset.id; render(); },   // ⋯ → 그 댓글에만 신고 · 차단 단추 보이기 (2026-11-15)
-  reply: el => { S.replyTo=el.dataset.id; S.editing=null; render(); document.getElementById("r-"+el.dataset.id)?.focus(); },
+  reply: el => { S.replyTo=el.dataset.id; S.editing=null; render(); const t=document.getElementById("c-new"); if(t){ t.focus(); t.scrollIntoView({block:"center",behavior:"smooth"}); } },
+  "th-open": el => { (S.thOpen=S.thOpen||{})[el.dataset.id]=true; render(); },
+  "th-close": el => { (S.thOpen=S.thOpen||{})[el.dataset.id]=false; render(); },
   "cancel-reply": el => { const f=el.closest("form"); if(f) cmtDrop(f); S.replyTo=null; render(); },   // 취소하면 보관한 답글도 지워요
   "edit-comment": el => { S.editing=el.dataset.id; S.replyTo=null; render(); document.getElementById("e-"+el.dataset.id)?.focus(); },
   "cancel-edit": el => { const f=el.closest("form"); if(f) cmtDrop(f); S.editing=null; render(); },
