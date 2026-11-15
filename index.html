@@ -9039,14 +9039,19 @@ function clearBadge(){ plug("Badge")?.clear().catch(()=>{}); plug("PushNotificat
 // 앱 잠금: 앱을 열 때와 30초 넘게 다른 앱을 쓰다 돌아올 때 지문 · 얼굴 · 휴대폰 잠금으로 확인
 const lockOn = () => IS_APP && ls.get("iinote-lock","")==="1";
 let leftAt=0, outAt=0;   // outAt: 사진 고르기 · 공유 · 바깥 링크로 잠깐 나간 때 (그때는 다시 묻지 않아요)
+// (2026-11-15) 잠금 푸는 창(지문 · 휴대폰 비밀번호)이 떠 있는 동안 안드로이드는 '앱이 잠깐 나갔다'고 알려요.
+// 비밀번호를 천천히 넣으면(30초 넘게) 풀자마자 '오래 나갔다 왔다'로 보고 또 잠그던 것 → 잠금 푸는 중 · 막 푼 뒤 1분은 다시 잠그지 않아요
+let authing=false, unlockedAt=0;
 const LOGO_FULL = `<div class="bl"><span class="bl-i"><i class="bl-dot"></i><i class="bl-bar"></i></span><span class="bl-i bl-r"><i class="bl-dot"></i><i class="bl-bar"></i></span></div>`;
 function showLock(){ if(document.querySelector(".applock")) return;
   const el=document.createElement("div"); el.className="applock"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label","앱 잠금");
   el.innerHTML=`${LOGO_FULL}<p class="applock-t">아이아이노트가 잠겨 있어요</p><button type="button" class="btn btn-primary" data-act="app-unlock">잠금 풀기</button>`;
   document.body.appendChild(el); unlock(); }
 async function unlock(){ const NB=plug("NativeBiometric"); if(!NB){ document.querySelector(".applock")?.remove(); return; }
+  if(authing) return; authing=true;
   try{ await NB.verifyIdentity({reason:"아이아이노트 잠금 풀기", title:"아이아이노트", subtitle:"잠금을 풀어 주세요", negativeButtonText:"취소", useFallback:true});
-    document.querySelector(".applock")?.remove(); buzz("light"); }catch(e){ /* 취소하면 잠금 화면에 남아요 */ } }
+    unlockedAt=Date.now(); document.querySelectorAll(".applock").forEach(x=>x.remove()); buzz("light"); }catch(e){ /* 취소하면 잠금 화면에 남아요 */ }
+  finally{ setTimeout(()=>{ authing=false; },800); } }
 
 // 바깥 링크: 앱 안에 갇히지 않게 휴대폰 브라우저 창(크롬 탭)으로. 우리 사이트의 다른 페이지(약관 등)도 같이
 function openExternal(url){
@@ -9262,9 +9267,9 @@ if(IS_APP){
   });
   // 앱으로 돌아올 때: 아이콘 숫자 지우기 · 잠금 · 새 소식
   AP?.addListener("appStateChange", ({isActive})=>{
-    if(!isActive){ leftAt=Date.now(); return; }
+    if(!isActive){ if(!authing) leftAt=Date.now(); return; }   // 잠금 푸는 창 때문에 잠깐 나간 건 세지 않아요
     clearBadge();
-    if(lockOn() && leftAt && Date.now()-leftAt>30000 && leftAt-outAt>5000) showLock();
+    if(lockOn() && !authing && Date.now()-unlockedAt>60000 && leftAt && Date.now()-leftAt>30000 && leftAt-outAt>5000) showLock();
     if(S.phase==="app" && S.gid && leftAt && Date.now()-leftAt>60000) softRefresh(300);   // 쓰던 중이면 화면은 그대로
   });
   // 바로가기 · 위젯 · 알림으로 열기
