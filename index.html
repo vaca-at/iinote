@@ -9092,9 +9092,10 @@ function widgetData(){
   const md=d=>{ const x=toDate(d); return `${x.getMonth()+1}/${x.getDate()}`; };
   const ago=d=>{ const days=Math.round((toDate(t)-toDate(d))/864e5); return days>=330&&days<=400?"작년 이맘때":days>=28&&days<=33?"한 달 전":days===0?"오늘":days===1?"어제":md(d); };
   // 사진: 가족 일기 사진 + (불러와 둔) 사진첩, 무작위 12장
-  const ph=[...S.diaries.filter(d=>d.status==="submitted").flatMap(d=>(d.photos||[]).filter(p=>p.url&&!p.blob).map(p=>({url:p.url,cap:`${ago(d.date)} · ${prof(d.profileId)?.name||""}`}))),
-    ...(S.album||[]).filter(a=>a.url).map(a=>({url:a.url,cap:[a.date?ago(a.date):"",a.place||"",prof(a.by||a.profileId)?.name||""].filter(Boolean).join(" · ")}))]
-    .filter(p=>/^https:/.test(p.url)).sort(()=>Math.random()-.5).slice(0,12);
+  // (2026-11-15) 무작위로 섞던 것을 최근 순서로: 아이폰 '가족 사진' 위젯을 톡 누르면 다음 장으로 넘어가서, 순서가 매번 바뀌면 안 돼요
+  const ph=[...S.diaries.filter(d=>d.status==="submitted").flatMap(d=>(d.photos||[]).filter(p=>p.url&&!p.blob).map(p=>({url:p.url,cap:`${ago(d.date)} · ${prof(d.profileId)?.name||""}`,k:d.date||""}))),
+    ...(S.album||[]).filter(a=>a.url).map(a=>({url:a.url,cap:[a.date?ago(a.date):"",a.place||"",prof(a.by||a.profileId)?.name||""].filter(Boolean).join(" · "),k:a.date||""}))]
+    .filter(p=>/^https:/.test(p.url)).sort((a,b)=>b.k.localeCompare(a.k)).slice(0,12).map(({url,cap})=>({url,cap}));
   // 🔥 연속 기록 위젯 (2026-10-16): 이 휴대폰에 로그인한 '내' 프로필 하나만 (아이들이 번갈아 나오던 것 뺌). 캐릭터 → 얼굴 사진(round) 순서
   const mine=ps.find(p=>p.type==="parent"&&isMine(p)&&p.id===S.me?.id) || ps.find(p=>p.type==="parent"&&isMine(p)) || S.me;
   const kids=(mine?[mine]:[]).map(p=>{ const ch=charOf(p), ph=!ch&&(p.photo?.thumb||p.photo?.url)||"";
