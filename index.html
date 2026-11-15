@@ -1015,13 +1015,15 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .comments h2{font-size:18px;margin:0 0 16px}
 .thread{list-style:none;margin:0;padding:0;display:grid;gap:16px}
 .thread.nested{margin-top:14px;padding-left:14px;border-left:2px solid var(--line)}
-.cmt{display:grid;grid-template-columns:32px 1fr;gap:10px}
-.cmt-meta{display:flex;align-items:baseline;gap:8px;font-size:14px}
+.thread.nested .thread.nested{padding-left:0;border-left:0}   /* 2026-11-15: 대댓글의 대댓글부터는 더 들여 쓰지 않아요 (안드로이드에서 오른쪽이 잘리던 것) */
+.cmt{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px}.cmt-body{min-width:0}
+.cmt-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:14px}
 .cmt-meta .muted{font-size:13px}
 .cmt-text{margin:2px 0 4px;white-space:pre-wrap}
 .dc-del{margin-left:4px;padding:0 6px;border:0;background:none;color:var(--ink3);font-size:12px;line-height:1.6;border-radius:6px;cursor:pointer}
 .dc-del:hover{background:var(--coral-soft);color:var(--coral-ink)}
-.cmt-acts{display:flex;gap:12px}
+.cmt-acts{display:flex;flex-wrap:wrap;gap:4px 12px}
+.more-btn{letter-spacing:1px;padding:4px 8px!important}
 .cmt-form{display:grid;gap:8px;margin-top:10px}
 .comments>.cmt-form{margin-top:24px}
 
@@ -6697,7 +6699,7 @@ function renderThread(cs,parent,depth){
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
-        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)+(p?blkBtn(p.id):"")}</div>`}
+        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":(S.cmtMore===c.id?repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)+(p?blkBtn(p.id):""):`<button class="link-btn more-btn" data-act="cmt-more" data-id="${c.id}" aria-label="더 보기 (신고 · 차단)">⋯</button>`)}</div>`}
       ${S.replyTo===c.id?`<form class="cmt-form" data-form="comment" data-parent="${c.id}"><label class="sr" for="r-${c.id}">답글</label><textarea id="r-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required placeholder="${esc(p?.name||"")}에게 답글 쓰기"></textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">답글 달기</button><button type="button" class="btn btn-ghost sm" data-act="cancel-reply">취소</button></div></form>`:""}
       ${renderThread(cs,c.id,depth+1)}
     </div></li>`; }).join("")}</ul>`;
@@ -7674,6 +7676,7 @@ const acts = {
     const i=penAt(er,S.draft.text); if(i<0) return;
     ta.focus({preventScroll:true}); ta.setSelectionRange(i,i+er.wrong.length);
     [...document.querySelectorAll("#w-hl mark.pen-x")].find(m=>m.textContent===er.wrong)?.scrollIntoView({behavior:"smooth",block:"center"}); },
+  "cmt-more": el => { S.cmtMore=el.dataset.id; render(); },   // ⋯ → 그 댓글에만 신고 · 차단 단추 보이기 (2026-11-15)
   reply: el => { S.replyTo=el.dataset.id; S.editing=null; render(); document.getElementById("r-"+el.dataset.id)?.focus(); },
   "cancel-reply": el => { const f=el.closest("form"); if(f) cmtDrop(f); S.replyTo=null; render(); },   // 취소하면 보관한 답글도 지워요
   "edit-comment": el => { S.editing=el.dataset.id; S.replyTo=null; render(); document.getElementById("e-"+el.dataset.id)?.focus(); },
