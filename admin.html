@@ -9,13 +9,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 /* 운영자 현황판: 가족 · 구성원 · 일기 수만 세요. 일기 내용은 한 글자도 받아 오지 않아요 (파이어베이스 '개수 세기'만 사용) */
-/* 글씨: 온글잎 윤탱체 (사용자 요청), 없는 기호는 Pretendard 로 */
-@font-face{font-family:'OwnglyphYuntaeng';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608211801@font-160/font-160/온글잎 윤탱체.woff2') format('woff2');font-weight:400;font-display:swap}
+/* 글씨: 온글잎 언즈체 (2026-11-19 사용자 요청: 윤탱체보다 잘 읽혀요), 없는 기호는 Pretendard 로 */
+@font-face{font-family:'OngleipUnz';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2406-1@1.0/Ownglyph_UNZ-Rg.woff2') format('woff2');font-weight:400;font-display:swap}
 :root{--bg:#FBF6EE;--paper:#FFFDF9;--soft:#F6EFE3;--ink:#1F2A44;--sub:#767E91;--line:#E7DDCD;--grid:rgba(31,42,68,.045);--accent:#EF6F53;--accent-ink:#B8452D;--accent-soft:#FCE6DF;--ok:#3F7F70;--ok-soft:#DFEEE9;--butter:#F4BE45;--butter-soft:#FCF0CF;--sky:#6F9BD8;--sky-soft:#E3ECF8;--warn:#B8452D;--sun:#C9503A;--sat:#4A74B5;--g0:#EFE7DA;--g1:#C6E3B5;--g2:#8CCB7E;--g3:#4FA25A;--g4:#2E6F3C}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--grid:rgba(242,237,227,.035);--accent:#F07C62;--accent-ink:#F59C86;--accent-soft:#3A2A2A;--ok:#8CC2B4;--ok-soft:#1E3430;--butter:#E8B84A;--butter-soft:#352F20;--sky:#8FB3E6;--sky-soft:#1F2C44;--warn:#F59C86;--sun:#F59C86;--sat:#8FB3E6;--g0:#263049;--g1:#2C4A33;--g2:#3F7A48;--g3:#5FAE68;--g4:#9BDD8F}}
 :root[data-theme="dark"]{--bg:#141A28;--paper:#1B2336;--soft:#222B40;--ink:#F2EDE3;--sub:#9CA2B0;--line:#2B3550;--grid:rgba(242,237,227,.035);--accent:#F07C62;--accent-ink:#F59C86;--accent-soft:#3A2A2A;--ok:#8CC2B4;--ok-soft:#1E3430;--butter:#E8B84A;--butter-soft:#352F20;--sky:#8FB3E6;--sky-soft:#1F2C44;--warn:#F59C86;--sun:#F59C86;--sat:#8FB3E6;--g0:#263049;--g1:#2C4A33;--g2:#3F7A48;--g3:#5FAE68;--g4:#9BDD8F}
 *{box-sizing:border-box}
-body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font-family:'OwnglyphYuntaeng',"Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;line-height:1.55;font-size:18px;word-break:keep-all}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font-family:'OngleipUnz',"Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;line-height:1.55;font-size:18px;word-break:keep-all}
 .wrap{max-width:1040px;margin:0 auto;padding:22px 16px 56px}
 header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-bottom:18px}
 h1{font-size:30px;margin:0;flex:1;min-width:10em;font-weight:400;letter-spacing:-.01em}
@@ -72,6 +72,7 @@ table{width:100%;border-collapse:collapse;font-size:19px}
 th,td{border-bottom:1.5px dashed var(--line);padding:7px 10px;text-align:center;white-space:nowrap}
 th{color:var(--sub);font-size:17px;border-bottom:1.5px solid var(--line)}
 td.l,th.l{text-align:left}
+tr.sorth th{cursor:pointer;user-select:none}tr.sorth th:hover{color:var(--ink)}tr.sorth th .sa{color:var(--accent-ink);font-size:13px}
 tr.fam{cursor:pointer}
 tr.fam:hover td{background:var(--soft)}
 tr.mem td{background:var(--soft);font-size:16px}
@@ -143,6 +144,8 @@ td.src-w,td.src-a{color:var(--sub)}
 .kpi span{font-size:16px;color:var(--sub)}
 .kpi small{display:block;font-size:14px;color:var(--sub);margin-top:2px}
 .kpi .up{color:var(--ok)}
+.kpi.q4{grid-template-columns:repeat(4,minmax(0,1fr))}   /* 더 깊이 보기 숫자 칸 4개는 가로 1/4 씩 */
+@media (max-width:700px){.kpi.q4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .links{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .links a{text-decoration:none;color:inherit}
 .grid2{display:grid;grid-template-columns:1fr;gap:0 16px}
@@ -395,7 +398,7 @@ function deepSection(fams,users,usage,ms,kinds){
   // 한 가족 · 한 편당 숫자
   const m0=usage?.months?.[0], cost=m0?usd(m0)+(m0.transcribe||0)*STT_USD:null;
   const d30=fams.reduce((s,f)=>s+f.m,0), kSub=kids.reduce((s,p)=>s+(p.sub||0),0), aSub=ms.reduce((s,p)=>s+(p.sub||0),0), pen=kids.reduce((s,p)=>s+(p.pen||0),0);
-  const unit=`<div class="kpi">
+  const unit=`<div class="kpi q4">
     <div><b>${cost!=null&&active?won(cost/active):"-"}</b><span>활동 가족 한 곳당 이번 달 AI 비용</span><small>이번 주 쓴 ${active}가족 기준</small></div>
     <div><b>${cost!=null&&d30?won(cost/d30):"-"}</b><span>일기 한 편당 AI 비용</span><small>이번 달 금액 ÷ 최근 30일 일기 ${d30}편 (어림)</small></div>
     <div><b>${pct(pen,kSub)}%</b><span>다홍펜 받은 아이 일기</span><small>아이가 낸 ${kSub}편 중 ${pen}편</small></div>
@@ -518,7 +521,7 @@ function render(fams,users,idx,usage,stats,kinds){
   // 이름은 보여 주지 않아요: 가족은 만든 차례대로 번호, 사람은 보호자 · 아이(학년)로만
   fams.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach((f,i)=>{ f.no=i+1; });
   const rows=fams.sort((a,b)=>b.w-a.w||b.total-a.total).map((f,i)=>`
-    <tr class="fam" data-act="toggle" data-v="${i}"><td class="l"><b>가족 ${f.no}</b> <span class="sub">▾</span></td><td>${fmtDate(f.createdAt)}</td>
+    <tr class="fam" data-act="toggle" data-v="${i}" data-no="${f.no}" data-made="${f.createdAt||0}" data-ppl="${f.members.length*100+f.members.filter(p=>p.type!=="child").length}" data-today="${f.today||0}" data-w="${f.w}" data-m="${f.m}" data-total="${f.total}"><td class="l"><b>가족 ${f.no}</b> <span class="sub">▾</span></td><td>${fmtDate(f.createdAt)}</td>
       <td>${f.members.filter(p=>p.type!=="child").length} · ${f.members.filter(p=>p.type==="child").length}</td>
       <td>${f.today||'<span class="z">0</span>'}</td><td class="l"><span class="bar" style="width:${Math.round(f.w/maxW*60)}px"></span>${f.w}</td><td>${f.m}</td><td>${f.total}</td></tr>
     ${f.members.map(p=>`<tr class="mem" data-g="${i}" hidden><td class="l">${p.type==="child"?`아이 <span class="sub">${gradeName(p.grade)}${p.linked?" · 자기 기기":""}</span>`:"보호자"}</td>
@@ -553,7 +556,7 @@ function render(fams,users,idx,usage,stats,kinds){
     ${visitCard(stats)}
     ${aiCard(usage)}
     <div class="card"><h2>🏡 가족별</h2><div class="scroll"><table>
-      <tr><th class="l">가족 (누르면 사람별)</th><th>만든 날</th><th>보호자 · 아이</th><th>오늘</th><th class="l">최근 7일</th><th>30일</th><th>전체</th></tr>${rows||'<tr><td colspan="7" class="z">아직 가족이 없어요</td></tr>'}
+      <tr class="sorth">${[["no","가족 (누르면 사람별)","l"],["made","만든 날"],["ppl","보호자 · 아이"],["today","오늘"],["w","최근 7일","l"],["m","30일"],["total","전체"]].map(([k,l,c])=>`<th class="${c||""}" data-act="sort" data-k="${k}" title="누르면 정렬 (한 번 더 누르면 반대로)">${l} <span class="sa"></span></th>`).join("")}</tr>${rows||'<tr><td colspan="7" class="z">아직 가족이 없어요</td></tr>'}
     </table></div>
     <p class="note">일기 수는 쓰는 중(임시 저장)을 포함해요. 사람별 ‘전체’는 제출한 일기 수예요. 이 화면은 이름과 일기 내용을 보여 주지 않고 숫자만 세요.</p>
     ${idx.length?`<p class="alert">사람별 최근 7일(?)을 세려면 파이어베이스 색인이 한 번 필요해요. <a href="${esc(idx[0])}" target="_blank" rel="noopener">여기를 눌러 색인 만들기</a> → 몇 분 뒤 새로고침.</p>`:""}</div>`;
@@ -623,8 +626,18 @@ document.addEventListener("click", async e => {
   if(act==="visit-more"){ const t=document.getElementById("visit-more"); t.hidden=!t.hidden; b.textContent=t.hidden?"▾ 이전 23일 펼쳐 보기":"▴ 접기 (최근 7일만)"; }
   if(act==="inbox") loadInbox(null);
   if(act==="inbox-open") loadInbox(b.dataset.v);
+  if(act==="sort") sortFam(b);
   if(act==="toggle") document.querySelectorAll(`tr.mem[data-g="${b.dataset.v}"]`).forEach(r=>r.hidden=!r.hidden);
 });
+// 🏡 가족별 표 정렬 (2026-11-19): 제목 칸을 누르면 그 값으로 정렬 · 한 번 더 누르면 반대로. 사람별 줄은 가족 줄을 따라가요
+function sortFam(th){
+  const table=th.closest("table"), k=th.dataset.k, dir=th.dataset.dir==="down"?"up":"down";
+  table.querySelectorAll("th[data-k]").forEach(x=>{ delete x.dataset.dir; x.querySelector(".sa").textContent=""; });
+  th.dataset.dir=dir; th.querySelector(".sa").textContent=dir==="down"?"▼":"▲";
+  const fams=[...table.querySelectorAll("tr.fam")], parent=fams[0]?.parentNode; if(!parent) return;
+  fams.sort((a,b)=>(dir==="down"?-1:1)*((+a.dataset[k])-(+b.dataset[k]))||(+a.dataset.no)-(+b.dataset.no));
+  fams.forEach(f=>{ parent.appendChild(f); table.querySelectorAll(`tr.mem[data-g="${f.dataset.v}"]`).forEach(m=>parent.appendChild(m)); });
+}
 // 차트 말풍선: data-tip 이 있는 막대에 마우스를 올리거나 누르면 그 숫자를 보여 줘요
 const tipEl=document.createElement("div"); tipEl.id="tip"; tipEl.setAttribute("role","tooltip"); document.body.appendChild(tipEl);
 document.addEventListener("pointerover", e=>{ const t=e.target.closest?.("[data-tip]"); if(!t){ tipEl.style.display="none"; return; } tipEl.textContent=t.dataset.tip; tipEl.style.display="block"; });
