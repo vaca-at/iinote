@@ -1001,6 +1001,17 @@ form:has(input[name="role"][value="parent"]:checked) .child-only{display:none}
 .dcard-date{color:var(--ink3);margin-left:auto}
 .dcard-title{font-family:var(--diary);font-size:21px;margin:4px 0 0;line-height:1.35}
 .dcard-ex{margin:0;font-family:var(--diary);font-size:calc(var(--diary-size) * .82);line-height:1.5;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* 🕊 가족 다툼 (2026-11-21): 쉬는 중 띠 · 댓글 아래 숨기기 / 오늘 하루 안 보기 · 부모님 소식의 다툼 칸 */
+.peace-strip{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px;padding:12px 14px;border:1.5px dashed var(--line);border-radius:16px;background:var(--surface)}
+.peace-strip p{margin:0;flex:1 1 220px;font-size:14px;line-height:1.55}
+.cmt-acts .hide-btn{color:#C4482E;font-weight:700}
+.cmt-acts .mute-btn,.ai-report .mute-btn{font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.nw-fight{list-style:none}
+.fight{border:1.5px solid #EF6F53;border-radius:16px;padding:12px;background:#FFF6F2;color:#2E2433;display:grid;gap:10px;margin:4px 0 8px;text-align:left}
+.fight-h{display:flex;align-items:center;gap:8px}.fight-h small{margin-left:auto;color:#6B5F69;font-size:12px}
+.fight-tag{font-size:12px;font-weight:700;color:#fff;background:#C4482E;border-radius:999px;padding:2px 9px}
+.fight-tl{margin:0;padding:0 0 0 10px;list-style:none;border-left:2px solid #F2C6B9;display:grid;gap:6px;font-size:13.5px;line-height:1.5}
+.fight-acts{display:flex;gap:8px;flex-wrap:wrap}
 /* 휴대폰(카드 한 줄에 하나, 2026-11-21): 카드 하나가 화면 한 장쯤 — 사진은 화면 높이의 40%까지(넘치면 가운데를 잘라 보여요), 일기는 6줄까지 */
 @media (max-width:699px){
   .dcard-ex{-webkit-line-clamp:6;line-height:1.55}
@@ -4273,6 +4284,48 @@ const prof = id => S.profiles.find(p=>p.id===id);
 const blockKey = pid => `${S.gid}:${pid}`;
 const isBlocked = pid => !!pid && pid!==S.me?.id && (S.userDoc?.blocked||[]).includes(blockKey(pid));
 const unBlocked = list => (S.userDoc?.blocked||[]).length ? list.filter(x=>!isBlocked(x.profileId||x.by)) : list;
+/* 🕊 가족 다툼 (2026-11-21, 시안: 아이 화면 A '글 아래 작은 줄' · 부모님 화면 B '소식 창 안 다툼 항목')
+   groups/{gid}/peace = {kind, by, target, cid, ref, text, until, at} (+ 풀면 liftedAt · liftedBy). 가족 모두 읽고 써요 (규칙: peace 블록)
+   mute = 오늘 하루 안 보기 (이 프로필만, 내일 아침 7시에 저절로 풀림 · 부모님이 일찍 풀 수 있음) · hide = 내 일기에 달린 댓글 숨기기 · report = 가족을 신고(부모님 소식에 '다툼') */
+const PEACE_H = 7;
+const peaceUntil = () => { const d=new Date(); d.setDate(d.getDate()+1); d.setHours(PEACE_H,0,0,0); return d.getTime(); };
+const peaceOn = e => !e.liftedAt && (e.kind!=="mute" || (e.until||0)>Date.now());
+const isMuted = pid => !!pid && !!S.me && pid!==S.me.id && (S.peace||[]).some(e=>e.kind==="mute" && e.by===S.me.id && e.target===pid && peaceOn(e));
+const isHiddenCmt = c => !!S.me && (S.peace||[]).some(e=>e.kind==="hide" && e.by===S.me.id && e.cid===c.id && peaceOn(e));
+const unPeace = list => !(S.peace||[]).length ? list : list.filter(x=>!isMuted(x.profileId) && !(x.diaryId && isHiddenCmt(x)));
+// 목록은 받을 때 걸러 두는데, 그때 '나'가 아직 없었으면 지금 목록에서 한 번 더 걸러요. 다시 보이게 할 때(풀기 · 프로필 바꾸기)는 새로 받아요(peaceRestore)
+function peaceApply(){ ["diaries","comments"].forEach(c=>{ if(Array.isArray(S[c])) S[c]=unPeace(S[c]); }); }
+const peaceCutBy = pid => (S.peace||[]).some(e=>e.by===pid && ["mute","hide"].includes(e.kind) && peaceOn(e));
+async function peaceRestore(){ try{ await Promise.all([reload("diaries"),reload("comments")]); }catch(e){ console.warn("다시 받기",e); } }
+async function loadPeace(){ if(!S.gid) return; try{ S.peace=await B.list(S.gid,"peace"); S.peaceOK=true; }catch(e){ console.warn("다툼 기록",e); S.peace=S.peace||[]; S.peaceOK=false; } }
+async function peaceAdd(data){
+  try{ const id=await B.add(S.gid,"peace",{...data,by:S.me.id,at:Date.now()}); S.peace=[...(S.peace||[]),{id,...data,by:S.me.id,at:Date.now()}]; peaceApply(); return true; }
+  catch(e){ console.warn("다툼 기록 쓰기",e); toast("아직 준비 중이에요. 잠시 뒤에 다시 해 주세요"); return false; }
+}
+async function peaceLift(list){
+  const now=Date.now();
+  try{ await Promise.all(list.map(e=>B.update(S.gid,"peace",e.id,{liftedAt:now,liftedBy:S.me.id}))); list.forEach(e=>{ e.liftedAt=now; e.liftedBy=S.me.id; }); peaceApply(); return true; }
+  catch(e){ console.warn("다툼 풀기",e); toast("풀지 못했어요. 잠시 뒤에 다시 해 주세요"); return false; }
+}
+const muteBtn = pid => pid && pid!==S.me?.id && prof(pid) ? `<button class="link-btn mute-btn" data-act="peace-mute" data-v="${esc(pid)}">오늘 하루 안 보기</button>` : "";
+// 쉬는 중 띠: 내가 오늘 하루 안 보기로 한 가족 (홈 맨 위)
+function peaceStrip(){
+  const L=(S.peace||[]).filter(e=>e.kind==="mute" && e.by===S.me?.id && peaceOn(e)), pids=[...new Set(L.map(e=>e.target))].filter(prof);
+  return pids.map(pid=>{ const p=prof(pid); return `<div class="peace-strip block"><p><b>${esc(kidN(p))}</b>의 글은 <b>내일 아침 ${PEACE_H}시까지 쉬는 중</b>이에요. 마음이 풀리면 언제든 다시 볼 수 있어요.</p><button class="btn btn-soft sm" data-act="peace-unmute" data-v="${esc(pid)}">지금 다시 보기</button></div>`; }).join("");
+}
+// 부모님 소식: 최근 이틀의 신고 · 안 보기를 아이 둘씩 묶어 '다툼' 한 건으로 (시간 순서 줄)
+function peaceFights(){
+  if(!isParent()) return [];
+  const since=Date.now()-2*864e5, ev=(S.peace||[]).filter(e=>["report","mute"].includes(e.kind) && (e.at||0)>=since && prof(e.by)?.type==="child" && prof(e.target)), by={};   // 아이가 시작한 것만
+  ev.forEach(e=>{ const k=[e.by,e.target].sort().join("|"); (by[k]||=[]).push(e); });
+  return Object.entries(by).map(([k,L])=>{ L.sort((a,b)=>a.at-b.at); return {k, L, at:L[L.length-1].at, pids:k.split("|"), live:L.filter(e=>e.kind==="mute" && peaceOn(e))}; });
+}
+const hm = t => { const d=new Date(t); return `${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`; };
+function fightCard(f){
+  const [a,b]=f.pids.map(prof), line=e=>`<li><b>${hm(e.at)}</b> ${esc(prof(e.by)?.name||"가족")}${e.kind==="report"?`이(가) 신고: ${esc(String(e.text||e.ref||"").replace(/\s+/g," ").slice(0,60))}`:`이(가) ${esc(prof(e.target)?.name||"가족")} 글을 ${e.liftedAt?"안 보다가 다시 봐요":"오늘 하루 안 보기로 했어요"}`}</li>`;
+  return `<div class="fight"><div class="fight-h"><span class="fight-tag">다툼</span><b>${esc(a?.name||"")} · ${esc(b?.name||"")}</b><small>${relTime(f.at)}</small></div><ol class="fight-tl">${f.L.map(line).join("")}</ol>
+    <div class="fight-acts"><button class="btn btn-primary sm" data-act="peace-note" data-v="${esc(f.k)}">화해 쪽지 쓰기</button>${f.live.length?`<button class="btn btn-ghost sm" data-act="peace-lift" data-v="${esc(f.k)}">안 보기 풀기</button>`:""}</div></div>`;
+}
 const blkBtn = pid => `<button class="link-btn rep-btn" data-act="block-toggle" data-v="${esc(pid)}">${ic("x")}차단</button>`;
 // 🌌 밤하늘 색 (2026-10-08, 사용자가 고른 B '별빛 파스텔'): 얼굴 동그라미 빛무리 = 밝은 색, 달력 작은 점 = 한 단계 진한 색.
 //    가족 순서대로 여덟 색을 나눠 줘서 서로 겹치지 않아요 (예전 프로필 색 p.color 는 그대로 두고 화면에서만 바꿔요)
@@ -4322,6 +4375,7 @@ const myWords = () => S.quizWords.filter(w=>w.profileId===S.me.id);
 
 async function reloadAll(){
   const names=["profiles","diaries","comments","schedules","links","quizWords"];
+  await loadPeace();   // 🕊 다툼 기록 먼저 (일기 · 댓글을 거를 때 써요, 규칙이 없으면 빈 목록)
   const res = await Promise.all(names.map(c=>B.list(S.gid,c)));
   names.forEach((c,i)=>S[c]=safeList(c,res[i]));
 }
@@ -4329,7 +4383,7 @@ async function reload(c){ S[c] = safeList(c, await B.list(S.gid,c)); if(c==="pro
 // 프로필 색은 style 속성에 그대로 들어가니, 색 모양(#abc · #aabbcc · var(--이름))이 아니면 기본색으로
 function safeList(c,list){
   if(c==="profiles") list.forEach(p=>{ if(!/^(#[0-9a-f]{3,8}|var\(--[a-z0-9-]+\))$/i.test(String(p.color||""))) p.color=COLORS[0]; });
-  if(c==="diaries"||c==="comments") return unBlocked(list);
+  if(c==="diaries"||c==="comments") return unPeace(unBlocked(list));
   return list;
 }
 
@@ -4428,6 +4482,7 @@ function newsItems(){
     } else if(isParent() && prof(d.profileId)?.type==="child" && d.status==="submitted" && (d.createdAt||0)>=since)
       out.push({at:d.createdAt, ic:"📒", text:`${nm(d.profileId)}이(가) ${fmtShort(d.date)} 일기를 썼어요`, id:d.id});
   }
+  peaceFights().forEach(f=>out.push({at:f.at, fight:f}));   // 🕊 부모님: 아이들 다툼
   return out.sort((a,b)=>b.at-a.at).slice(0,30);
 }
 function famNewsUnread(){ const k=newsSeenKey(); if(ls.get(k,null)===null){ ls.set(k,String(Date.now())); return 0; } const seen=Number(ls.get(k,"0")); return famNews().filter(x=>x.at>seen).length; }
@@ -4439,7 +4494,7 @@ function viewNews(){
   if(IS_APP) return `<div class="news-bg" data-act="news-open" aria-hidden="true"></div><div class="news-panel fam" role="dialog" aria-label="새 소식"><div class="news-h"><b>새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>${newsDd()}${hpNews().replace(/data-act="open-diary"/g,'data-act="news-go"')}</div>`;
   const seen=Number(ls.get(newsSeenKey(),"0")), items=newsItems();
   return `<div class="news-bg" data-act="news-open" aria-hidden="true"></div><div class="news-panel" role="dialog" aria-label="새 소식"><div class="news-h"><b>🔔 새 소식</b><button class="link-btn" data-act="news-open">닫기</button></div>${newsDd()}
-    ${items.length?`<ul>${items.map(x=>`<li class="${x.at>S.newsSeenBefore?"new":""}"><button data-act="news-go" data-id="${esc(x.id)}"><span class="ni">${x.ic}</span><span class="nt">${esc(x.text)}</span><small>${relTime(x.at)}</small></button></li>`).join("")}</ul>`
+    ${items.length?`<ul>${items.map(x=>x.fight?`<li class="nw-fight">${fightCard(x.fight)}</li>`:`<li class="${x.at>S.newsSeenBefore?"new":""}"><button data-act="news-go" data-id="${esc(x.id)}"><span class="ni">${x.ic}</span><span class="nt">${esc(x.text)}</span><small>${relTime(x.at)}</small></button></li>`).join("")}</ul>`
       :`<p class="muted" style="margin:6px 0 0;font-size:14px">최근 2주 동안 새 소식이 없어요.</p>`}</div>`;
 }
 // 채팅 이모지 반응: 한 사람당 하나 (같은 걸 다시 누르면 빠져요). chats.reactions = {프로필id: 이모지}
@@ -4553,7 +4608,7 @@ async function enterGroup(gid){
   let p = prof(saved);
   // 기억해 둔 프로필이 합치기로 없어졌으면, 내 로그인이 쓰는 프로필로
   if(saved && !p){ const m=S.profiles.filter(x=>x.type==="parent" && isMine(x)); if(m.length===1){ p=m[0]; ls.set("iinote-pid-"+gid,p.id); } }
-  if(p && canUse(p) && !(p.type==="child" && p.pin)){ S.me=p; S.phase="app"; }
+  if(p && canUse(p) && !(p.type==="child" && p.pin)){ S.me=p; S.phase="app"; peaceApply(); }
   else { S.phase="picker"; if(askPin) S.pinFor=askPin; }
   render();
 }
@@ -5115,7 +5170,7 @@ function hpDiary(){
   const wp=who!=="all"?prof(who):null;
   const pbar = wp ? `<div class="hp-pf block"><button class="hp-pf-main" data-act="prof-open" data-v="${esc(wp.id)}">${av(wp,44)}<span class="hp-pf-t"><b>${esc(wp.name)}</b><small>${esc(wp.msg||"프로필 보기")}</small></span>${ic("right")}</button>
       ${IS_APP && wp.phone && !isMine(wp)?`<a class="hp-pf-act" href="tel:${esc(telOf(wp.phone))}" aria-label="${esc(wp.name)}에게 전화">${ic("phone")}</a><a class="hp-pf-act" href="sms:${esc(telOf(wp.phone))}" aria-label="${esc(wp.name)}에게 문자">${ic("mail")}</a>`:""}</div>` : "";
-  return `<div class="hp-who" role="group" aria-label="누구 일기">${chips}</div>${pbar}
+  return `${peaceStrip()}<div class="hp-who" role="group" aria-label="누구 일기">${chips}</div>${pbar}
     <div class="hp-day block">
       <button class="hp-arw" data-act="home-day" data-v="-1" aria-label="전날">${ic("left")}</button>
       <div class="hp-dt"><p><b>${fmtLong(hd)}</b>${tag?`<span class="hp-tag">${tag}</span>`:""}</p>
@@ -5168,13 +5223,14 @@ function famNews(){
   }
   for(const c of S.comments){ if(c.deleted || c.profileId===me || (c.createdAt||0)<since) continue; const d=dmap.get(c.diaryId); if(!d) continue;
     out.push({at:c.createdAt,k:"cmt",p:c.profileId,text:`${esc(nm(c.profileId))}이(가) ${d.profileId===me?"내":d.profileId===c.profileId?"자기":esc(nm(d.profileId))+"의"} 일기에 ${c.parentId?"답글":"댓글"}을 남겼어요`,q:c.text,id:d.id}); }
+  peaceFights().forEach(f=>out.push({at:f.at,k:"fight",f}));   // 🕊 부모님: 아이들 다툼 (시안 B)
   return out.sort((a,b)=>b.at-a.at).slice(0,40);
 }
 function hpNews(){
   const items=famNews(), seen=S.newsSeenBefore||0, t=todayStr(), y=addDays(t,-1);
   const KIND={diary:["pen","#FFF0C2","#A87400"],cmt:["talk","#FFE1EA","#C2366A"],heart:["heart","#FFE1EA","#C2366A"],stamp:["check","#DAF2E5","#2F8C6B"]};
   const groups=[["오늘",x=>ymd(new Date(x.at))===t],["어제",x=>ymd(new Date(x.at))===y],["지난 소식",x=>ymd(new Date(x.at))<y]];
-  const row=x=>{ const [i,bg,fg]=KIND[x.k]; return `<li><button class="nw ${x.at>seen?"new":""}" data-act="open-diary" data-id="${esc(x.id)}"><span class="nw-k" style="background:${bg};color:${fg}">${ic(i)}</span><span class="nw-t"><span>${x.text}</span>${x.q?`<q>${esc(String(x.q).replace(/\s+/g," ").slice(0,40))}</q>`:""}</span><small>${relTime(x.at)}</small></button></li>`; };
+  const row=x=>{ if(x.k==="fight") return `<li class="nw-fight">${fightCard(x.f)}</li>`; const [i,bg,fg]=KIND[x.k]; return `<li><button class="nw ${x.at>seen?"new":""}" data-act="open-diary" data-id="${esc(x.id)}"><span class="nw-k" style="background:${bg};color:${fg}">${ic(i)}</span><span class="nw-t"><span>${x.text}</span>${x.q?`<q>${esc(String(x.q).replace(/\s+/g," ").slice(0,40))}</q>`:""}</span><small>${relTime(x.at)}</small></button></li>`; };
   const body=groups.map(([h,f])=>{ const L=items.filter(f); return L.length?`<h3 class="nw-h">${h}</h3><ul class="nw-list block">${L.map(row).join("")}</ul>`:""; }).join("");
   return body || `<p class="empty">최근 2주 동안 새 소식이 없어요. 가족 일기에 먼저 댓글을 남겨 보세요.</p>`;
 }
@@ -5359,11 +5415,11 @@ function penAskBanner(){
   return `<div class="pen-ask" role="note" title="지금은 다홍펜이 틀린 곳을 바로 고쳐 줘요. 아이가 스스로 고치게 할 수도 있어요."><span class="pen-ask-i" aria-hidden="true">✍️</span><p><b>${ks.map(p=>esc(p.name)).join(" · ")}</b> 다홍펜 고치는 방법</p><button class="btn pill2 sm" data-act="pen-set"><i aria-hidden="true">✎</i><span>고르기</span></button><button class="link-btn pen-ask-x" data-act="pen-x" aria-label="다시 보지 않기">✕</button></div>`;
 }
 function viewHome(){
-  const st=homeStyle();
-  if(st==="calendar") return viewHomeCalendar();
-  if(st==="quad") return viewHomeQuad();
-  if(st==="album") return viewHomeAlbum();
-  return viewHomeDiary();
+  const st=homeStyle(), ps=peaceStrip();   // 🕊 오늘 하루 안 보기 중인 가족이 있으면 맨 위에 '쉬는 중' 띠
+  if(st==="calendar") return ps+viewHomeCalendar();
+  if(st==="quad") return ps+viewHomeQuad();
+  if(st==="album") return ps+viewHomeAlbum();
+  return ps+viewHomeDiary();
 }
 function viewHomeDiary(){
   // 위 날짜(‹ ›)로 고른 날 기준: 그날 누가 썼는지 · 그날 앞뒤 사흘 (예전엔 날짜를 넘겨도 늘 오늘 기준이라 지난 날이 '아직이에요'로 보였어요)
@@ -6693,7 +6749,7 @@ function viewDiaryDetail(){
     ${d.talk?.dialog?.length?`<details class="talk-log"><summary>🎙 엄마 · 아빠와 나눈 이야기로 쓴 일기예요 · 이야기 보기</summary>${talkLines(d.talk.dialog)}</details>`:""}
     ${(d.hand||[]).length?`<section class="hand-att" aria-label="첨부파일"><h3>📝 종이 일기장에 손으로 쓴 일기예요 · 첨부파일 ${d.hand.length}개</h3>${handFiles(d.hand,false)}</section>`:""}
     ${viewReact(d,mine)}
-    ${mine?"":`<p class="ai-report">${repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(d.date)} 일기`)}${p?blkBtn(p.id):""}</p>`}
+    ${mine?"":`<p class="ai-report">${repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(d.date)} 일기`,p?.id)}${muteBtn(p?.id)}${p?blkBtn(p.id):""}</p>`}
     </div><div class="dt-side">${showAI?viewAIResult(d.aiResult,d.text,false):""}
     <section class="comments" aria-labelledby="h-cm"><h2 id="h-cm">댓글 ${cs.length}</h2>
       ${cs.length?renderThread(cs):`<p class="muted">첫 댓글로 ${esc(kidN(p))}의 하루에 답해 주세요.</p>`}
@@ -6702,7 +6758,7 @@ function viewDiaryDetail(){
     </section></div></article>`;
 }
 // 🚩 신고 단추: 누르면 AI 챗봇 상담이 '불편한 글 · 댓글' 신고로 열려요 (ref 는 누구의 언제 글인지만, 내용은 안 보내요)
-const repBtn = ref => `<button class="link-btn rep-btn" data-act="help-open" data-rep="불편한 글 · 댓글" data-ref="${esc(ref)}">${ic("flag")}신고</button>`;
+const repBtn = (ref,pid) => `<button class="link-btn rep-btn" data-act="help-open" data-rep="불편한 글 · 댓글" data-ref="${esc(ref)}"${pid?` data-pid="${esc(pid)}"`:""}>${ic("flag")}신고</button>`;   // pid = 신고당한 가족 (부모님 소식 '다툼'에 써요)
 // 댓글 지우기: 쓴 사람, 그리고 아이가 쓴 댓글은 보호자(부모)도 (2026-10-04)
 const canDelCmt = c => !!S.me && (c.profileId===S.me.id || (isParent() && prof(c.profileId)?.type==="child"));
 const delCmtNote = c => c.delBy && c.delBy!==c.profileId ? "(보호자가 지운 댓글이에요)" : "(지운 댓글이에요)";
@@ -6717,7 +6773,7 @@ function cmtItem(c,cs,{reply=false,line=false,prev=null}={}){
       ${editing
         ? `<form class="cmt-form" data-form="edit-comment" data-id="${c.id}"><label class="sr" for="e-${c.id}">댓글 수정</label><textarea id="e-${c.id}" name="text" rows="2" spellcheck="false" maxlength="500" required>${esc(c.text)}</textarea>${heartBar()}<div class="row"><button class="btn btn-soft sm">수정 완료</button><button type="button" class="btn btn-ghost sm" data-act="cancel-edit">취소</button></div></form>`
         : c.deleted ? `<p class="cmt-text muted">${delCmtNote(c)}</p>`
-        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":(S.cmtMore===c.id?repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`)+(p?blkBtn(p.id):""):`<button class="link-btn more-btn" data-act="cmt-more" data-id="${c.id}" aria-label="더 보기 (신고 · 차단)">⋯</button>`)}</div>`}
+        : `<p class="cmt-text">${esc(c.text)}</p><div class="cmt-acts"><button class="link-btn" data-act="reply" data-id="${c.id}">${ic("reply")}답글</button>${mine?`<button class="link-btn" data-act="edit-comment" data-id="${c.id}">${ic("pen")}${labelEdit()}</button>`:""}${canDelCmt(c)?`<button class="link-btn" data-act="del-comment" data-id="${c.id}" ${mine?"":`title="보호자로서 아이 댓글 지우기"`}>${ic("trash")}${labelDel()}</button>`:""}${mine?"":`${S.diaries.find(d=>d.id===c.diaryId)?.profileId===S.me.id?`<button class="link-btn hide-btn" data-act="peace-hide" data-id="${c.id}">숨기기</button>`:""}${repBtn(`${p?kidN(p):"가족"}의 ${fmtShort(ymd(new Date(c.createdAt||Date.now())))} 댓글`,p?.id)}${muteBtn(p?.id)}${S.cmtMore===c.id?(p?blkBtn(p.id):""):`<button class="link-btn more-btn" data-act="cmt-more" data-id="${c.id}" aria-label="더 보기 (차단)">⋯</button>`}`}</div>`}
     </div></li>`;
 }
 function renderThread(cs){
@@ -7968,7 +8024,9 @@ async function uploadPending(d){
 }
 function openKidWrite(){ S.tab="home"; loadDraft(todayStr()); S.sub={type:"write"}; render(); window.scrollTo(0,0); toast(`${kidN(S.me)}의 일기를 써요`); }
 function enterAs(p){
-  S.me=p; S.pinFor=null; S.phase="app"; S.sub=null; S.filter="all";
+  const wasCut=S.me && S.me.id!==p.id && peaceCutBy(S.me.id);   // 앞 프로필이 숨겨 둔 글은 새 프로필에서 다시 보여야 해요
+  S.me=p; S.pinFor=null; S.phase="app"; S.sub=null; S.filter="all"; peaceApply();
+  if(wasCut) peaceRestore().then(()=>render());
   if((S.tab==="quiz" && p.type!=="child") || (["kids","report"].includes(S.tab) && p.type==="child")) S.tab="home";
   ls.set("iinote-pid-"+S.gid,p.id); render(); window.scrollTo(0,0);
 }
@@ -8849,7 +8907,7 @@ const helpScroll = () => requestAnimationFrame(()=>{ const l=document.getElement
 Object.assign(acts,{
   "help-open": el => { S.helpOpen=true; S.moreOpen=false; S.newsOpen=false; S.helpNew=false; S.prof=null;
     // 일기 · 댓글의 '신고'에서 열면 신고 종류를 미리 골라 둬요
-    if(el?.dataset?.rep){ S.helpRep={cat:el.dataset.rep, ref:el.dataset.ref||""}; helpSay({from:"bot",text:`🚩 ${el.dataset.ref?el.dataset.ref+"에 대해 ":""}신고할게요. 어떤 일이 있었는지 아래에 적어 주세요.`}); }
+    if(el?.dataset?.rep){ S.helpRep={cat:el.dataset.rep, ref:el.dataset.ref||"", pid:el.dataset.pid||""}; helpSay({from:"bot",text:`🚩 ${el.dataset.ref?el.dataset.ref+"에 대해 ":""}신고할게요. 어떤 일이 있었는지 아래에 적어 주세요.`}); }
     render(); helpScroll();
     if(!DEMO) B.callFn?.("supportList").then(r=>{ S.helpMsgs=r.msgs||[]; if(S.helpOpen){ render(); helpScroll(); } }).catch(e=>console.warn("상담",e)); },
   "help-close": () => { S.helpOpen=false; S.helpRep=null; render(); },
@@ -8915,6 +8973,19 @@ document.addEventListener("paste", e=>{ if(!S.helpOpen || CE.el) return;
 document.addEventListener("drop", e=>{ if(!S.helpOpen || !e.target.closest?.(".help")) return; const f=e.dataTransfer?.files?.[0]; if(f && /^image\//.test(f.type)){ e.preventDefault(); helpImgSet(f); } });
 document.addEventListener("dragover", e=>{ if(S.helpOpen && e.target.closest?.(".help")) e.preventDefault(); });
 Object.assign(acts,{ "help-img-x": () => { S.helpImg=null; render(); } });
+// 🕊 가족 다툼 단추 (2026-11-21): 오늘 하루 안 보기 · 다시 보기 · 내 일기 댓글 숨기기 · (부모님) 안 보기 풀기 · 화해 쪽지
+Object.assign(acts,{
+  "peace-mute": el => { const pid=el.dataset.v, p=prof(pid); if(!p || pid===S.me?.id) return;
+    peaceAdd({kind:"mute",target:pid,until:peaceUntil()}).then(ok=>{ if(!ok) return; buzz("ok"); S.sub=null; render(); toast(`내일 아침 ${PEACE_H}시까지 ${p.name}의 글을 안 보여요`); }); },
+  "peace-unmute": el => { const pid=el.dataset.v, L=(S.peace||[]).filter(e=>e.kind==="mute" && e.by===S.me.id && e.target===pid && peaceOn(e));
+    peaceLift(L).then(async ok=>{ if(!ok) return; await peaceRestore(); render(); toast(`${prof(pid)?.name||"가족"}의 글을 다시 보여요`); }); },
+  "peace-hide": el => { const c=S.comments.find(x=>x.id===el.dataset.id); if(!c) return;
+    peaceAdd({kind:"hide",target:c.profileId,cid:c.id}).then(ok=>{ if(!ok) return; render(); toast("이 댓글을 숨겼어요. 나에게만 안 보여요"); }); },
+  "peace-lift": el => { const f=peaceFights().find(x=>x.k===el.dataset.v); if(!f?.live.length) return;
+    peaceLift(f.live).then(ok=>{ if(ok){ render(); toast("안 보기를 풀었어요. 아이들 화면에 다시 보여요"); } }); },
+  "peace-note": el => { const f=peaceFights().find(x=>x.k===el.dataset.v); if(!f) return; const [a,b]=f.pids.map(id=>prof(id)?.name||"");
+    S.chatDraft=`${a} · ${b}, 오늘 서로 속상했지? 이따 같이 이야기해 보자. 둘 다 많이 사랑해.`; S.newsOpen=false; acts.tab({dataset:{v:"chat"}}); }
+});
 forms.help = (fd,f) => { let text=String(fd.text||"").trim(); const img=S.helpImg||""; if(!text && !img) return; if(!text) text="(캡처 화면을 보냈어요)";
   if(DEMO){ toast("둘러보기에서는 보낼 수 없어요. 로그인한 뒤에 보내 주세요"); return; }
   const rep=S.helpRep?.cat?S.helpRep:null, ta=document.getElementById("help-in"); if(ta) ta.value="";
@@ -8934,7 +9005,15 @@ forms.help = (fd,f) => { let text=String(fd.text||"").trim(); const img=S.helpIm
       const r=await B.callFn("supportSend",{text,name:S.me.name,family:S.group?.name||"",...(rep?{report:rep.cat,ref:rep.ref}:{}),...(ai?.reply&&!local?{bot:ai.reply,kind:ai.kind}:{}),...(img?{img}:{})});
       S.helpMsgs=r.msgs||[]; S.helpRep=null; S.helpLocal=[];   // 서버에 남은 대화(내 글 · AI 챗봇 답)로 바꿔 그려요
       const sent=`상담원에게 전달했어요. ${IS_APP?"답장이 오면 알림으로 알려 드릴게요.":"답장은 여기 AI 챗봇 상담에서 볼 수 있어요."}`;
-      if(rep) helpSay({from:"bot",text:"신고를 받았어요. 알려 줘서 고마워요. 상담원이 살펴보고 답해 드릴게요."});
+      if(rep){
+        // 🕊 가족을 신고하면 부모님 소식에 '다툼'으로 남기고(규칙이 없으면 조용히 건너뜀), 아이에게는 누가 잘못했는지 말하지 않고 마음부터 받아 줘요 (2026-11-21)
+        const fam=rep.pid && prof(rep.pid) && rep.pid!==S.me.id;
+        if(fam) B.add(S.gid,"peace",{kind:"report",by:S.me.id,target:rep.pid,ref:rep.ref||"",text:text.slice(0,200),at:Date.now()}).then(id=>{ S.peace=[...(S.peace||[]),{id,kind:"report",by:S.me.id,target:rep.pid,ref:rep.ref||"",text:text.slice(0,200),at:Date.now()}]; }).catch(e=>console.warn("다툼 기록",e));
+        const kid=S.me.type==="child";
+        helpSay({from:"bot",text: fam && kid
+          ? `${["많이 속상했겠다.","그런 일이 있어서 마음이 많이 상했겠어.","속상한 마음을 꾹 참지 않고 말해 줘서 정말 잘했어."][Math.floor(Math.random()*3)]} 이야기해 줘서 고마워. 부모님께도 살짝 전해 둘게.\n\n오늘은 ${prof(rep.pid).name}의 글을 보고 싶지 않으면, 글 아래 '오늘 하루 안 보기'를 눌러도 돼. 내일 아침이면 저절로 풀려.`
+          : fam ? "알려 주셔서 고마워요. 가족 다툼으로 기록해 두었어요. 상담원도 살펴보고 답해 드릴게요." : "신고를 받았어요. 알려 줘서 고마워요. 상담원이 살펴보고 답해 드릴게요."});
+      }
       else helpBotKeep(text, ai?.reply ? ai.reply+(local?"\n\n"+sent:"") : sent);   // 서버가 AI 챗봇 답을 안 돌려줘도 사라지지 않게 이 기기에 남겨요
       buzz("ok");
     }catch(e){ console.warn("상담 보내기",e); if(!ai?.reply){ toast("보내지 못했어요. 인터넷 연결을 확인하고 다시 보내 주세요"); const t2=document.getElementById("help-in"); if(t2) t2.value=text; if(img) S.helpImg=img; S.helpLocal=(S.helpLocal||[]).filter(m=>m.text!==text); } }
